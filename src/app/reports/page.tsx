@@ -97,6 +97,7 @@ export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
 
+  console.log(appliedFilters)
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page
   };
@@ -126,7 +127,7 @@ export default function Staff() {
       <div className="flex justify-center">
         <div className='shadow-md container rounded-md m-2 p-2'>
 
-        <div className="grid grid-cols-2 mb-1">
+          <div className="grid grid-cols-2 mb-1">
             <div className="flex justify-start items-center space-x-2">
               <span className="font-semibold">Report ({reportData.length})</span>
               <div className=" w-80 ">
@@ -177,7 +178,7 @@ export default function Staff() {
                       className={`px-2 py-1 rounded-lg text-sm ${item.status === 'Paid'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
-                      }`}
+                        }`}
                     >
                       {item.status}
                     </span>

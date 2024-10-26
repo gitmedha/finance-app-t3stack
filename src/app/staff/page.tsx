@@ -97,6 +97,7 @@ export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
 
+  console.log(appliedFilters)
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page
   };
@@ -177,7 +178,7 @@ export default function Staff() {
                       className={`px-2 py-1 rounded-lg text-sm ${item.status === 'Active'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
-                      }`}
+                        }`}
                     >
                       {item.status}
                     </span>

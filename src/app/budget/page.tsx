@@ -106,6 +106,7 @@ export default function Staff() {  // Removed async here
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
 
+  console.log(appliedFilters)
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page
   };

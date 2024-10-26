@@ -99,14 +99,15 @@ export default function Expenses() {
     temp: '',
     year: '',
     month: ''
-});
+  });
 
-const handleSelect = (name: string, value: string) => {
+  console.log(appliedFilters)
+  const handleSelect = (name: string, value: string) => {
     setFilters((prev) => ({
-        ...prev,
-        [name]: value,
+      ...prev,
+      [name]: value,
     }));
-};
+  };
 
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page

@@ -92,7 +92,6 @@ const totalItems = 100; // Total number of items (for example)
 const itemsPerPage = 10; // Items per page
 
 export default function Expenses() {
-  const [appliedFilters, setAppliedFilters] = useState({});
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
   const [filters, setFilters] = useState({
@@ -101,7 +100,6 @@ export default function Expenses() {
     month: ''
 });
 
-console.log(appliedFilters)
 
 const handleSelect = (name: string, value: string) => {
     setFilters((prev) => ({

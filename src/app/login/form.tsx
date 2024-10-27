@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"; // Corrected import
 import { Button, Spinner } from "@radix-ui/themes";
 import { useAuth } from "~/context";
 import { useEffect } from "react";
+import Link from "next/link";
 
 interface FormData {
   email: string;
@@ -23,9 +24,9 @@ const LoginForm = () => {
     reset(); // Reset the form if needed
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     setIsAuthenticated(false)
-  },[])
+  }, [])
 
   return (
     <form
@@ -64,8 +65,11 @@ const LoginForm = () => {
       </div>
 
       <Button type='submit' className="py-2 mt-2 px-8 !bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md !cursor-pointer select-none">
-        Submit
+        Login
       </Button>
+      <Link className="mt-2 text-primary font-medium" href='/forgot-password'>
+        Forgot password
+      </Link>
 
       {/* <button
         type="submit"

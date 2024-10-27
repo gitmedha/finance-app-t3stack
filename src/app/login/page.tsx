@@ -3,6 +3,7 @@ import LoginForm from "./form";
 
 export default function LoginPage() {
 
+
   return (
     <div className="h-[100vh] w-full overflow-hidden flex justify-start items-center">
       <div className=" p-3 w-4/12 h-full bg-gray-50">

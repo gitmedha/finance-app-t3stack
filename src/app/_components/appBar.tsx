@@ -19,6 +19,7 @@ const AppBar = () => {
     { menu: 'Staff', path: '/staff', icon: <FaUser /> },
     { menu: 'Reports', path: '/reports', icon: <BiSolidReport /> }]
 
+ 
   return (
     <nav className="shadow-lg bg-primary">
       <div className="container mx-auto flex justify-between items-center py-1 ">
@@ -44,9 +45,12 @@ const AppBar = () => {
         </ul>
         <div className="flex justify-start items-center text-white space-x-2">
           <span className="font-medium">Hi, Praveen K</span>
-          <button className='cursor-pointer rounded-full flex justify-center items-center focus:ring-0  text-primary bg-white h-8 w-8' >
+          {/* <button onClick={handleLogout} className='cursor-pointer rounded-full flex justify-center items-center focus:ring-0  text-primary bg-white h-8 w-8' >
             <LuLogOut />
-          </button>
+          </button> */}
+          <Link href='/login' className='cursor-pointer rounded-full flex justify-center items-center focus:ring-0  text-primary bg-white h-8 w-8' >
+            <LuLogOut />
+          </Link>
         </div>
       </div>
     </nav>

@@ -3,6 +3,8 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation"; // Corrected import
 import { Button, Spinner } from "@radix-ui/themes";
+import { useAuth } from "~/context";
+import { useEffect } from "react";
 
 interface FormData {
   email: string;
@@ -10,13 +12,20 @@ interface FormData {
 }
 
 const LoginForm = () => {
+  const { setIsAuthenticated } = useAuth();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
   const router = useRouter(); // Initialize useRouter
+
   const onSubmit: SubmitHandler<FormData> = (data) => {
     // Here you would typically call your authentication API
-    router.push("/"); // Redirect to home page
+    setIsAuthenticated(true)
+    router.push("/reports"); // Redirect to home page
     reset(); // Reset the form if needed
   };
+
+  useEffect(()=>{
+    setIsAuthenticated(false)
+  },[])
 
   return (
     <form

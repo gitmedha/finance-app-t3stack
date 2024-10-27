@@ -1,13 +1,12 @@
 'use client';
 
 import { useState } from "react";
-// import AppBar from "./_components/appBar";
+import SearchInput from "~/app/_components/searchInput";
+import PaginationLimitSelect from "~/app/_components/pagination/limit";
+import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import ReportFilterForm from "./reports/filter";
-import SearchInput from "./_components/searchInput";
-import PaginationLimitSelect from "./_components/pagination/limit";
-import ReactPaginationStyle from "./_components/pagination/pagination";
 
-const financeReportData = [
+const reportData = [
   {
     id: 1,
     date: "2024/10/01",
@@ -50,58 +49,50 @@ const financeReportData = [
   },
   {
     id: 6,
-    date: "2024/10/02",
-    description: "Client Payment",
-    category: "Income",
-    amount: "1,200.00",
+    date: "2024/10/09",
+    description: "Rent Payment",
+    category: "Expenses",
+    amount: "1,000.00",
     status: "Paid",
   },
   {
     id: 7,
-    date: "2024/10/03",
-    description: "Electricity Bill",
+    date: "2024/10/12",
+    description: "Software Subscription",
     category: "Expenses",
     amount: "200.00",
     status: "Pending",
   },
   {
     id: 8,
-    date: "2024/10/05",
-    description: "Internet Subscription",
+    date: "2024/10/15",
+    description: "Client Refund",
     category: "Expenses",
-    amount: "100.00",
+    amount: "300.00",
     status: "Paid",
   },
   {
     id: 9,
-    date: "2024/10/07",
-    description: "Consultation Fees",
+    date: "2024/10/18",
+    description: "Client Payment",
     category: "Income",
-    amount: "750.00",
+    amount: "1,500.00",
     status: "Paid",
   },
   {
     id: 10,
-    date: "2024/10/05",
-    description: "Internet Subscription",
-    category: "Expenses",
-    amount: "100.00",
-    status: "Paid",
-  },
-  {
-    id: 11,
-    date: "2024/10/07",
-    description: "Consultation Fees",
+    date: "2024/10/18",
+    description: "Client Payment",
     category: "Income",
-    amount: "750.00",
+    amount: "1,500.00",
     status: "Paid",
   }
 ];
+
 const totalItems = 100; // Total number of items (for example)
 const itemsPerPage = 10; // Items per page
 
-
-export default function Staff() {  // Removed async here
+export default function Staff() {
   const [appliedFilters, setAppliedFilters] = useState({});
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
@@ -116,7 +107,7 @@ export default function Staff() {  // Removed async here
     console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
 
-  const handleApplyFilters = (filters: any) => {
+  const handleApplyFilters = (filters: object) => {
     setAppliedFilters(filters);
     console.log("Applied Filters:", filters);
   };
@@ -136,11 +127,11 @@ export default function Staff() {  // Removed async here
       <div className="flex justify-center">
         <div className='shadow-md container rounded-md m-2 p-2'>
 
-          <div className="grid grid-cols-2 mb-1">
+        <div className="grid grid-cols-2 mb-1">
             <div className="flex justify-start items-center space-x-2">
-              <span className="font-semibold">Staff ({financeReportData.length})</span>
+              <span className="font-semibold">Report ({reportData.length})</span>
               <div className=" w-80 ">
-                <SearchInput placeholder="Search Staff"
+                <SearchInput placeholder="Search Report"
                   className="p-2"
                 />
               </div>
@@ -173,7 +164,7 @@ export default function Staff() {  // Removed async here
               </tr>
             </thead>
             <tbody>
-              {financeReportData.map((item) => (
+              {reportData.map((item) => (
                 <tr
                   key={item.id}
                   className="border-b hover:bg-gray-100 transition-colors"
@@ -187,7 +178,7 @@ export default function Staff() {  // Removed async here
                       className={`px-2 py-1 rounded-lg text-sm ${item.status === 'Paid'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
-                        }`}
+                      }`}
                     >
                       {item.status}
                     </span>
@@ -198,7 +189,6 @@ export default function Staff() {  // Removed async here
           </table>
         </div>
       </div>
-
     </div>
   );
 }

@@ -12,9 +12,9 @@ interface FormData {
 const LoginForm = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
   const router = useRouter(); // Initialize useRouter
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
+  const onSubmit: SubmitHandler<FormData> = (data) => {
     // Here you would typically call your authentication API
-    await router.push("/"); // Redirect to home page
+    router.push("/"); // Redirect to home page
     reset(); // Reset the form if needed
   };
 

@@ -5,7 +5,8 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 
 const categories = ["Finance", "Health", "Education", "Technology", "Miscellaneous"];
 
-const DonorFilterForm = ({ onApply, onClear }: { onApply: (filters: any) => void; onClear: () => void }) => {
+const DonorFilterForm = ({ onApply, onClear }: { onApply: (filters: object) => void; onClear: () => void }) => {
+  
   const [filters, setFilters] = useState({
     category: '',
     status: '',

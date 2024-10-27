@@ -97,7 +97,6 @@ export default function DonorReport() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
 
-  console.log(appliedFilters)
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page
   };
@@ -107,7 +106,7 @@ export default function DonorReport() {
     console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
 
-  const handleApplyFilters = (filters: any) => {
+  const handleApplyFilters = (filters: object) => {
     setAppliedFilters(filters);
     console.log("Applied Filters:", filters);
   };

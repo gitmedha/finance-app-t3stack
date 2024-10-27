@@ -11,7 +11,7 @@ import { IoHome } from "react-icons/io5";
 import Image from "next/image";
 
 const AppBar = () => {
-  let menus = [
+  const menus = [
     { menu: 'Home', path: '/', icon: <IoHome /> },
     { menu: 'Budget', path: '/budget', icon: <HiBanknotes /> },
     { menu: 'Donors', path: '/donors', icon: <FaHandHoldingHeart /> },

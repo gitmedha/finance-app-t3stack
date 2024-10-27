@@ -116,7 +116,7 @@ export default function Staff() {  // Removed async here
     console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
 
-  const handleApplyFilters = (filters: any) => {
+  const handleApplyFilters = (filters: object) => {
     setAppliedFilters(filters);
     console.log("Applied Filters:", filters);
   };

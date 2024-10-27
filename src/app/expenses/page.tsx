@@ -99,15 +99,16 @@ export default function Expenses() {
     temp: '',
     year: '',
     month: ''
-  });
+});
 
-  console.log(appliedFilters)
-  const handleSelect = (name: string, value: string) => {
+console.log(appliedFilters)
+
+const handleSelect = (name: string, value: string) => {
     setFilters((prev) => ({
-      ...prev,
-      [name]: value,
+        ...prev,
+        [name]: value,
     }));
-  };
+};
 
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page
@@ -116,16 +117,6 @@ export default function Expenses() {
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
     console.log('Selected limit:', newLimit); // Handle limit change as needed
-  };
-
-  const handleApplyFilters = (filters: any) => {
-    setAppliedFilters(filters);
-    console.log("Applied Filters:", filters);
-  };
-
-  const handleClearFilters = () => {
-    setAppliedFilters({});
-    console.log("Filters cleared");
   };
 
   return (

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { TextField, Text, IconButton } from '@radix-ui/themes';
 import Modal from '../_components/Modal';
-import { MdOutlineEdit } from "react-icons/md";
+import { MdEdit } from "react-icons/md";
 
 interface FilterOptions {
     Date: string,
@@ -31,7 +31,7 @@ const EditExpense: React.FC<ItemDetailProps> = ({ item }) => {
     return (
         <>
             <IconButton className='!bg-primary !h-7 !w-7 !cursor-pointer' onClick={() => setIsModalOpen(true)}>
-                <MdOutlineEdit size={20} />
+                <MdEdit size={20} />
             </IconButton>
 
             <Modal

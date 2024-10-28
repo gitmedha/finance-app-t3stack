@@ -131,7 +131,7 @@ export default function Staff() {  // Removed async here
   return (
     <div className="h-full">
       <div className="mb-6 p-2 shadow-lg bg-white flex justify-center">
-        <div className="container py-1">
+        <div className="container">
           <BudgetFilterForm filters={filters} handleSelect={handleSelect} />
         </div>
       </div>
@@ -162,7 +162,7 @@ export default function Staff() {  // Removed async here
             </div>
           </div>
 
-          <table className="min-w-full table-auto border-collapse">
+          <table className="min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 <th className="p-2">Date</th>
@@ -179,11 +179,11 @@ export default function Staff() {  // Removed async here
                   key={item.id}
                   className="border-b hover:bg-gray-100 text-sm transition-colors"
                 >
-                  <td className="p-1.5">{item.date}</td>
-                  <td className="p-1.5">{item.description}</td>
-                  <td className="p-1.5">{item.category}</td>
-                  <td className="p-1.5">Rs. {item.amount}</td>
-                  <td className="p-1.5">
+                  <td className="p-2">{item.date}</td>
+                  <td className="p-2">{item.description}</td>
+                  <td className="p-2">{item.category}</td>
+                  <td className="p-2">Rs. {item.amount}</td>
+                  <td className="p-2">
                     <span
                       className={`px-2 py-1 rounded-lg text-sm ${item.status === 'Paid'
                         ? 'bg-green-100 text-green-700'
@@ -193,7 +193,7 @@ export default function Staff() {  // Removed async here
                       {item.status}
                     </span>
                   </td>
-                  <td className="p-1.5 space-x-2">
+                  <td className="p-1 space-x-2">
                     <EditBudget item={item} />
                     <DeleteBudget item={item} />
                   </td>

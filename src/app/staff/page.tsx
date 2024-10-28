@@ -150,7 +150,7 @@ export default function Staff() {
             <span className="font-semibold">Staff ({staffData.length})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Staff"
-                className="p-1"
+                className="p-2"
               />
             </div>
             <div className="flex justify-end items-center space-x-2">
@@ -169,13 +169,13 @@ export default function Staff() {
             </div>
           </div>
 
-          <table className="min-w-full table-auto border-collapse">
+          <table className="min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {
                   cols?.map(col => {
                     return (
-                      <th key={col} className="p-1">{col}</th>
+                      <th key={col} className="p-2">{col}</th>
                     )
                   })
                 }
@@ -187,12 +187,12 @@ export default function Staff() {
                   key={item.EmpID}
                   className="border-b text-sm hover:bg-gray-100 transition-colors"
                 >
-                  <td className="p-1">{item.Name}</td>
-                  <td className="p-1">{item.EmpID}</td>
-                  <td className="p-1">{item.Designation}</td>
-                  <td className="p-1">{item.Department}</td>
-                  <td className="p-1">{item.JoiningDate}</td>
-                  <td className="p-1">
+                  <td className="p-2">{item.Name}</td>
+                  <td className="p-2">{item.EmpID}</td>
+                  <td className="p-2">{item.Designation}</td>
+                  <td className="p-2">{item.Department}</td>
+                  <td className="p-2">{item.JoiningDate}</td>
+                  <td className="p-2">
                     <span
                       className={`px-2 py-1 rounded-lg text-sm ${item.Status === 'Active'
                         ? 'bg-green-100 text-green-700'
@@ -202,7 +202,7 @@ export default function Staff() {
                       {item.Status}
                     </span>
                   </td>
-                  <td className="p-1">{item.CreatedAt}</td>
+                  <td className="p-2">{item.CreatedAt}</td>
                   <td className="p-1 space-x-2">
                     <EditStaff item={item} />
                     <DeleteStaff item={item} />

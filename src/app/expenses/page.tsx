@@ -158,7 +158,7 @@ export default function Expenses() {
   return (
     <div className="h-full">
       <div className="mb-6 p-1 shadow-lg bg-white flex justify-center">
-        <div className="container py-2">
+        <div className="container py-1">
           <ExpenseFilterForm handleFileupload={handleFileupload} handleSelect={handleSelect} filters={filters} />
         </div>
       </div>
@@ -169,7 +169,7 @@ export default function Expenses() {
             <span className="font-semibold">Expenses ({records.length})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Expenses"
-                className="p-1"
+                className="p-2"
               />
             </div>
 
@@ -189,11 +189,11 @@ export default function Expenses() {
             </div>
           </div>
 
-          <table className="min-w-full table-auto border-collapse">
+          <table className="min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {cols?.map(col => {
-                  return <th key={col} className="p-1">{col}</th>
+                  return <th key={col} className="p-2">{col}</th>
                 })}
               </tr>
             </thead>
@@ -203,21 +203,21 @@ export default function Expenses() {
                   key={index}
                   className="border-b hover:bg-gray-100 text-sm transition-colors"
                 >
-                  <td className="p-1.5">{item.Date}</td>
-                  <td className="p-1.5">{item.Amount}</td>
-                  <td className="p-1.5">{item.Currency}</td>
-                  <td className="p-1.5">{item.Category}</td>
-                  <td className="p-1.5">{item.CostCenter}</td>
-                  <td className="p-1.5">{item.Description}</td>
-                  <td className="p-1.5">
+                  <td className="p-2">{item.Date}</td>
+                  <td className="p-2">{item.Amount}</td>
+                  <td className="p-2">{item.Currency}</td>
+                  <td className="p-2">{item.Category}</td>
+                  <td className="p-2">{item.CostCenter}</td>
+                  <td className="p-2">{item.Description}</td>
+                  <td className="p-2">
                     <span
                       className={`p-1 rounded-lg text-xs ${item.Status === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
                     >
                       {item.Status}
                     </span>
                   </td>
-                  <td className="p-1.5">{item.Type}</td>
-                  <td className="p-1.5">{item.CreatedAt}</td>
+                  <td className="p-2">{item.Type}</td>
+                  <td className="p-2">{item.CreatedAt}</td>
                   <td className="p-1.5 space-x-2">
                     <EditExpense item={item} />
                     <DeleteExpense item={item} />

@@ -127,7 +127,7 @@ export default function DepartmentReport() {
             <span className="font-semibold">Departments ({departmentRecords.length})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Department"
-                className="p-1"
+                className="p-2"
               />
             </div>
 
@@ -153,7 +153,7 @@ export default function DepartmentReport() {
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {
                   cols?.map(col => {
-                    return <th key={col} className="p-1">{col}</th>
+                    return <th key={col} className="p-2">{col}</th>
                   })
                 }
 
@@ -165,11 +165,11 @@ export default function DepartmentReport() {
                   key={item.CreatedAt}
                   className="border-b hover:bg-gray-100 text-sm transition-colors"
                 >
-                  <td className="p-1.5">{item.Name}</td>
-                  <td className="p-1.5">{item.Code}</td>
-                  <td className="p-1.5">{item.Type}</td>
-                  <td className="p-1.5">{item.ParentDept}</td>
-                  <td className="p-1.5">{item.CreatedAt}</td>
+                  <td className="p-2">{item.Name}</td>
+                  <td className="p-2">{item.Code}</td>
+                  <td className="p-2">{item.Type}</td>
+                  <td className="p-2">{item.ParentDept}</td>
+                  <td className="p-2">{item.CreatedAt}</td>
                   <td className="space-x-2">
                     <EditDepartments item={item} />
                     <DeleteDepartment item={item} />

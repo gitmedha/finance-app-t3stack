@@ -138,8 +138,6 @@ const CostCentersFilterForm: React.FC<CostCentersFilterFormProps> = ({ filters, 
       <div className='flex justify-end items-center'>
           <AddCostCenters />
       </div>
-
-     
     </div>
   );
 };

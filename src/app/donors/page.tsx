@@ -158,7 +158,7 @@ export default function DonorReport() {
             <span className="font-semibold">Donors ({donorData.length})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Donor"
-                className="p-1"
+                className="p-2"
               />
             </div>
 
@@ -179,12 +179,12 @@ export default function DonorReport() {
           </div>
 
 
-          <table className="min-w-full table-auto border-collapse">
+          <table className="min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {
                   cols?.map(col => {
-                    return <th key={col} className="p-1">{col}</th>
+                    return <th key={col} className="p-2">{col}</th>
                   })
                 }
 
@@ -196,14 +196,14 @@ export default function DonorReport() {
                   key={item?.CreatedAt}
                   className="border-b hover:bg-gray-100 text-sm transition-colors"
                 >
-                  <td className="p-1.5">{item.Name}</td>
-                  <td className="p-1.5">{item.CostCenter}</td>
-                  <td className="p-1.5">{item.Year}</td>
-                  <td className="p-1.5">{item.TotalBudget}</td>
-                  <td className="p-1.5">{item.ReceivedBudget}</td>
-                  <td className="p-1.5">{item.Currency}</td>
-                  <td className="p-1.5">{item.Type}</td>
-                  <td className="p-1.5">{item.CreatedAt}</td>
+                  <td className="p-2">{item.Name}</td>
+                  <td className="p-2">{item.CostCenter}</td>
+                  <td className="p-2">{item.Year}</td>
+                  <td className="p-2">{item.TotalBudget}</td>
+                  <td className="p-2">{item.ReceivedBudget}</td>
+                  <td className="p-2">{item.Currency}</td>
+                  <td className="p-2">{item.Type}</td>
+                  <td className="p-2">{item.CreatedAt}</td>
                   <td className="p-1.5 space-x-2">
                     <EditDonor item={item} />
                     <DeleteDonor item={item} />

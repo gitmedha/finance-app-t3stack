@@ -17,7 +17,7 @@ const PaginationLimitSelect: React.FC<PaginationLimitSelectProps> = ({
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button className="cursor-pointer py-0.5 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+        <button className="cursor-pointer py-0.5 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
           <span>
             {selectedLimit ? `${selectedLimit} Rows` : 'Select Rows'}
           </span>

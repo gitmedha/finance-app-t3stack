@@ -1,6 +1,7 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
 import FileUploadInput from '../_components/Inputs/fileUploadInput';
+import AddExpense from './add';
 
 const financialYear = ['22-23', '23-24', '24-25', '25-26', '26-27', '27-28', '28-29', '29-30'];
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -24,7 +25,7 @@ const ExpenseFilterForm = ({ handleSelect, filters, handleFileupload }: ExpenseF
         <div className="grid grid-cols-5 gap-4 w-full">
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                    <button color="gray" className="cursor-pointer py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                    <button color="gray" className="cursor-pointer py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
                         <span>{filters.year || 'Filter by Select Year'}</span>
                         <RiArrowDropDownLine size={30} />
                     </button>
@@ -44,7 +45,7 @@ const ExpenseFilterForm = ({ handleSelect, filters, handleFileupload }: ExpenseF
 
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                    <button color="gray" className="cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                    <button color="gray" className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
                         <span>{filters.month || 'Filter by Select Month'}</span>
                         <RiArrowDropDownLine size={30} />
                     </button>
@@ -64,7 +65,7 @@ const ExpenseFilterForm = ({ handleSelect, filters, handleFileupload }: ExpenseF
 
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                    <button color="gray" className="cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                    <button color="gray" className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
                         <span>{filters.temp || 'Filter by Select Template'}</span>
                         <RiArrowDropDownLine size={30} />
                     </button>
@@ -84,6 +85,9 @@ const ExpenseFilterForm = ({ handleSelect, filters, handleFileupload }: ExpenseF
 
             <div>
                <FileUploadInput handleChange={handleFileupload} />
+            </div>
+            <div className='flex justify-end items-center'>
+                <AddExpense />
             </div>
         </div>
     );

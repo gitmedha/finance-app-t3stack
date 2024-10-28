@@ -5,9 +5,11 @@ import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import StaffFilterForm from "./filter";
+import EditStaff from "./edit";
+import DeleteStaff from "./delete";
 
-const cols = ['Name', 'Emp ID', 'Designation', 'Department', 'Joining Date', 'Status', 'Created At', 'Action']
-// add, edit and delete  action with full modal 
+const cols = ['Name', 'Emp ID', 'Designation', 'Department', 'Joining Date', 'Status', 'Created At', 'actions']
+// add, edit and delete  actions with full modal 
 
 const staffData = [
   {
@@ -136,19 +138,19 @@ export default function Staff() {
 
   return (
     <div className="h-full">
-      <div className="mb-6 p-2 shadow-md bg-white flex justify-center">
+      <div className="mb-6 p-1 shadow-lg bg-white flex justify-center">
         <div className="container py-1">
           <StaffFilterForm handleSelect={handleSelect} filters={filters} />
         </div>
       </div>
       <div className="flex justify-center">
-        <div className='shadow-md container rounded-md m-2 p-2'>
+        <div className='shadow-lg container rounded-lg m-2 p-1'>
 
           <div className="flex justify-between items-center mb-1">
             <span className="font-semibold">Staff ({staffData.length})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Staff"
-                className="p-2"
+                className="p-1"
               />
             </div>
             <div className="flex justify-end items-center space-x-2">
@@ -173,7 +175,7 @@ export default function Staff() {
                 {
                   cols?.map(col => {
                     return (
-                      <th key={col} className="px-4 py-2">{col}</th>
+                      <th key={col} className="p-1">{col}</th>
                     )
                   })
                 }
@@ -183,14 +185,14 @@ export default function Staff() {
               {staffData.map((item) => (
                 <tr
                   key={item.EmpID}
-                  className="border-b hover:bg-gray-100 transition-colors"
+                  className="border-b text-sm hover:bg-gray-100 transition-colors"
                 >
-                  <td className="px-4 py-2">{item.Name}</td>
-                  <td className="px-4 py-2">{item.EmpID}</td>
-                  <td className="px-4 py-2">{item.Designation}</td>
-                  <td className="px-4 py-2">{item.Department}</td>
-                  <td className="px-4 py-2">{item.JoiningDate}</td>
-                  <td className="px-4 py-2">
+                  <td className="p-1">{item.Name}</td>
+                  <td className="p-1">{item.EmpID}</td>
+                  <td className="p-1">{item.Designation}</td>
+                  <td className="p-1">{item.Department}</td>
+                  <td className="p-1">{item.JoiningDate}</td>
+                  <td className="p-1">
                     <span
                       className={`px-2 py-1 rounded-lg text-sm ${item.Status === 'Active'
                         ? 'bg-green-100 text-green-700'
@@ -200,7 +202,11 @@ export default function Staff() {
                       {item.Status}
                     </span>
                   </td>
-                  <td className="px-4 py-2">{item.CreatedAt}</td>
+                  <td className="p-1">{item.CreatedAt}</td>
+                  <td className="p-1 space-x-2">
+                    <EditStaff item={item} />
+                    <DeleteStaff item={item} />
+                  </td>
                 </tr>
               ))}
             </tbody>

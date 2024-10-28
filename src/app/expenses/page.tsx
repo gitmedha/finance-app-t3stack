@@ -5,8 +5,10 @@ import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import ExpenseFilterForm from "./filter";
+import EditExpense from "./edit";
+import DeleteExpense from "./delete";
 
-const cols = ['Date', 'Amount', 'Currency', 'Category', 'Cost Center', 'Description', 'Status', 'Type', 'Created At']
+const cols = ['Date', 'Amount', 'Currency', 'Category', 'Cost Center', 'Description', 'Status', 'Type', 'Created At','actions']
 
 const records = [
   {
@@ -155,19 +157,19 @@ export default function Expenses() {
 
   return (
     <div className="h-full">
-      <div className="mb-6 p-2 shadow-md bg-white flex justify-center">
-        <div className="container py-1">
+      <div className="mb-6 p-1 shadow-lg bg-white flex justify-center">
+        <div className="container py-2">
           <ExpenseFilterForm handleFileupload={handleFileupload} handleSelect={handleSelect} filters={filters} />
         </div>
       </div>
       <div className="flex justify-center">
-        <div className='shadow-md container rounded-md m-2 p-2'>
+        <div className='shadow-lg container rounded-lg m-2 p-1'>
 
           <div className="flex justify-between items-center mb-1">
             <span className="font-semibold">Expenses ({records.length})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Expenses"
-                className="p-2"
+                className="p-1"
               />
             </div>
 
@@ -191,7 +193,7 @@ export default function Expenses() {
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {cols?.map(col => {
-                  return <th key={col} className="px-4 py-2">{col}</th>
+                  return <th key={col} className="p-1">{col}</th>
                 })}
               </tr>
             </thead>
@@ -201,21 +203,25 @@ export default function Expenses() {
                   key={index}
                   className="border-b hover:bg-gray-100 text-sm transition-colors"
                 >
-                  <td className="px-2 py-1">{item.Date}</td>
-                  <td className="px-2 py-1">Rs. {item.Amount}</td>
-                  <td className="px-2 py-1">{item.Currency}</td>
-                  <td className="px-2 py-1">{item.Category}</td>
-                  <td className="px-2 py-1">{item.CostCenter}</td>
-                  <td className="px-2 py-1">{item.Description}</td>
-                  <td className="px-2 py-1">
+                  <td className="p-1.5">{item.Date}</td>
+                  <td className="p-1.5">{item.Amount}</td>
+                  <td className="p-1.5">{item.Currency}</td>
+                  <td className="p-1.5">{item.Category}</td>
+                  <td className="p-1.5">{item.CostCenter}</td>
+                  <td className="p-1.5">{item.Description}</td>
+                  <td className="p-1.5">
                     <span
-                      className={`px-2 py-1 rounded-lg text-xs ${item.Status === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                      className={`p-1 rounded-lg text-xs ${item.Status === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
                     >
                       {item.Status}
                     </span>
                   </td>
-                  <td className="px-2 py-1">{item.Type}</td>
-                  <td className="px-2 py-1">{item.CreatedAt}</td>
+                  <td className="p-1.5">{item.Type}</td>
+                  <td className="p-1.5">{item.CreatedAt}</td>
+                  <td className="p-1.5 space-x-2">
+                    <EditExpense item={item} />
+                    <DeleteExpense item={item} />
+                  </td>
                 </tr>
               ))}
 

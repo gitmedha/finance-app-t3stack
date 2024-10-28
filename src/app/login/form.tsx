@@ -4,8 +4,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation"; // Corrected import
 import { Button, Spinner } from "@radix-ui/themes";
 import { useAuth } from "~/context";
-import { useEffect } from "react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 interface FormData {
   email: string;
@@ -17,16 +17,16 @@ const LoginForm = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
   const router = useRouter(); // Initialize useRouter
 
+  useEffect(() => {
+    setIsAuthenticated(false)
+  }, [])
+
   const onSubmit: SubmitHandler<FormData> = (data) => {
     // Here you would typically call your authentication API
     setIsAuthenticated(true)
-    router.push("/reports"); // Redirect to home page
+    router.push("/home"); // Redirect to home page
     reset(); // Reset the form if needed
   };
-
-  // useEffect(() => {
-  //   setIsAuthenticated(false)
-  // }, [])
 
   return (
     <form
@@ -51,7 +51,7 @@ const LoginForm = () => {
         <input
           {...register("email", { required: "Email is required" })}
           placeholder="email@demo.com"
-          className="border rounded-md px-3 py-2 text-sm w-full outline-none"
+          className="border rounded-lg px-3 py-2 text-sm w-full outline-none"
         />
         {errors.email && (
           <span className="text-red-500 text-xs">{errors.email.message}</span>
@@ -61,7 +61,7 @@ const LoginForm = () => {
         <label className="font-[400] text-xs text-gray-600">Enter Your Password</label>
         <input
           {...register("password", { required: "Password is required" })}
-          className="border rounded-md px-3 py-2 text-sm w-full outline-none"
+          className="border rounded-lg px-3 py-2 text-sm w-full outline-none"
           type="password"
           placeholder="******"
         />
@@ -70,7 +70,7 @@ const LoginForm = () => {
         )}
       </div>
 
-      <Button size='3' type='submit' className="py-4 !my-3 px-8 !bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md !cursor-pointer select-none">
+      <Button size='3' type='submit' className="py-4 !my-3 px-8 !bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg !cursor-pointer select-none">
         Login
       </Button>
       <Link className="mt-2 text-primary font-medium" href='/forgot-password'>
@@ -79,7 +79,7 @@ const LoginForm = () => {
 
       {/* <button
         type="submit"
-        className="py-2 mt-2 px-8 bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md cursor-pointer select-none"
+        className="py-2 mt-2 px-8 bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg cursor-pointer select-none"
       >
         <Spinner loading />
         Submit

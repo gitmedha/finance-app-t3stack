@@ -1,6 +1,7 @@
 // components/DropdownFilterForm.tsx
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
+import AddStaff from './add';
 
 const categories = ["Finance", "Health", "Education", "Technology", "Miscellaneous"];
 interface FilterOptions {
@@ -17,13 +18,12 @@ interface StaffFilterFormProps {
 }
 
 const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect }) => {
-  console.log(filters)
 
   return (
     <div className="grid grid-cols-6 gap-4">
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button color="gray" className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.category || 'Filter by Select Category'}
             </span>
@@ -46,7 +46,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger className="w-full" asChild>
-          <button color='gray' className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.status || 'Filter by Select Status'}
             </span>
@@ -69,7 +69,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button color='gray' className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.byTime || 'Filter by Select By time'}
             </span>
@@ -92,7 +92,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button color='gray' className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.year || 'Filter by Select Year'}
             </span>
@@ -116,7 +116,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button color='gray' className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.month || 'Filter by Select Month'}
             </span>
@@ -137,7 +137,9 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
         </DropdownMenu.Content>
       </DropdownMenu.Root>
 
-     
+      <div className='flex justify-end items-center'>
+        <AddStaff />
+      </div>
     </div>
   );
 };

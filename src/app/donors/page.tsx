@@ -5,8 +5,10 @@ import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import DonorFilterForm from "./filter";
+import EditDonor from "./edit";
+import DeleteDonor from "./delete";
 
-const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Currency', 'Type', 'Created At']
+const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Currency', 'Type', 'Created At','actions']
 const donorData = [
   {
     Name: 'Marketing Campaign',
@@ -15,7 +17,7 @@ const donorData = [
     TotalBudget: 50000,
     ReceivedBudget: 30000,
     Currency: 'USD',
-    Type: 'Expense',
+    Type:'FC',
     CreatedAt: '2023-04-10 10:00:00',
   },
   {
@@ -25,7 +27,7 @@ const donorData = [
     TotalBudget: 15000,
     ReceivedBudget: 15000,
     Currency: 'USD',
-    Type: 'Training',
+    Type:'FC',
     CreatedAt: '2023-04-12 09:15:00',
   },
   {
@@ -35,7 +37,7 @@ const donorData = [
     TotalBudget: 120000,
     ReceivedBudget: 60000,
     Currency: 'USD',
-    Type: 'Development',
+    Type:'FC',
     CreatedAt: '2023-05-01 14:30:00',
   },
   {
@@ -45,7 +47,7 @@ const donorData = [
     TotalBudget: 8000,
     ReceivedBudget: 5000,
     Currency: 'EUR',
-    Type: 'Expense',
+    Type:'FC',
     CreatedAt: '2023-05-05 12:00:00',
   },
   {
@@ -55,7 +57,7 @@ const donorData = [
     TotalBudget: 25000,
     ReceivedBudget: 25000,
     Currency: 'USD',
-    Type: 'Maintenance',
+    Type:'NFC',
     CreatedAt: '2023-06-15 16:00:00',
   },
   {
@@ -65,7 +67,7 @@ const donorData = [
     TotalBudget: 30000,
     ReceivedBudget: 20000,
     Currency: 'USD',
-    Type: 'Event',
+    Type:'FC',
     CreatedAt: '2023-07-01 18:30:00',
   },
   {
@@ -75,7 +77,7 @@ const donorData = [
     TotalBudget: 20000,
     ReceivedBudget: 10000,
     Currency: 'USD',
-    Type: 'Research',
+    Type:'NFC',
     CreatedAt: '2023-08-01 15:45:00',
   },
   {
@@ -85,7 +87,7 @@ const donorData = [
     TotalBudget: 10000,
     ReceivedBudget: 7000,
     Currency: 'USD',
-    Type: 'Service',
+    Type:'FC',
     CreatedAt: '2023-08-10 11:15:00',
   },
   {
@@ -95,7 +97,7 @@ const donorData = [
     TotalBudget: 50000,
     ReceivedBudget: 25000,
     Currency: 'EUR',
-    Type: 'Project',
+    Type:'NFC',
     CreatedAt: '2023-09-20 08:45:00',
   },
   {
@@ -105,7 +107,7 @@ const donorData = [
     TotalBudget: 150000,
     ReceivedBudget: 100000,
     Currency: 'USD',
-    Type: 'Setup',
+    Type:'FC',
     CreatedAt: '2023-10-05 10:20:00',
   }
 ];
@@ -144,19 +146,19 @@ export default function DonorReport() {
 
   return (
     <div className="h-full">
-      <div className="mb-6 p-2 shadow-md bg-white flex justify-center">
+      <div className="mb-6 p-1 shadow-lg bg-white flex justify-center">
         <div className="container py-1">
           <DonorFilterForm filters={filters} handleSelect={handleSelect} />
         </div>
       </div>
       <div className="flex justify-center">
-        <div className='shadow-md container rounded-md m-2 p-2'>
+        <div className='shadow-lg container rounded-lg m-2 p-1'>
 
           <div className="flex justify-between items-center mb-1">
             <span className="font-semibold">Donors ({donorData.length})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Donor"
-                className="p-2"
+                className="p-1"
               />
             </div>
 
@@ -182,7 +184,7 @@ export default function DonorReport() {
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {
                   cols?.map(col => {
-                    return <th key={col} className="px-4 py-2">{col}</th>
+                    return <th key={col} className="p-1">{col}</th>
                   })
                 }
 
@@ -192,16 +194,20 @@ export default function DonorReport() {
               {donorData.map((item) => (
                 <tr
                   key={item?.CreatedAt}
-                  className="border-b hover:bg-gray-100 transition-colors"
+                  className="border-b hover:bg-gray-100 text-sm transition-colors"
                 >
-                  <td className="px-4 py-2">{item.Name}</td>
-                  <td className="px-4 py-2">{item.CostCenter}</td>
-                  <td className="px-4 py-2">{item.Year}</td>
-                  <td className="px-4 py-2">Rs. {item.TotalBudget}</td>
-                  <td className="px-4 py-2">Rs. {item.ReceivedBudget}</td>
-                  <td className="px-4 py-2">{item.Currency}</td>
-                  <td className="px-4 py-2">{item.Type}</td>
-                  <td className="px-4 py-2">{item.CreatedAt}</td>
+                  <td className="p-1.5">{item.Name}</td>
+                  <td className="p-1.5">{item.CostCenter}</td>
+                  <td className="p-1.5">{item.Year}</td>
+                  <td className="p-1.5">{item.TotalBudget}</td>
+                  <td className="p-1.5">{item.ReceivedBudget}</td>
+                  <td className="p-1.5">{item.Currency}</td>
+                  <td className="p-1.5">{item.Type}</td>
+                  <td className="p-1.5">{item.CreatedAt}</td>
+                  <td className="p-1.5 space-x-2">
+                    <EditDonor item={item} />
+                    <DeleteDonor item={item} />
+                  </td>
                 </tr>
               ))}
             </tbody>

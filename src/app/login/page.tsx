@@ -1,12 +1,20 @@
+'use client';
+
 import Image from "next/image";
 import LoginForm from "./form";
+import { useAuth } from "~/context";
+import { useEffect } from "react";
 
 export default function LoginPage() {
+  const { setIsAuthenticated } = useAuth()
 
+  useEffect(() => {
+    setIsAuthenticated(false)
+  }, [])
 
   return (
     <div className="h-[100vh] w-full overflow-hidden flex justify-start items-center">
-      
+
       <div
         className="w-8/12 h-full bg-cover bg-center"
         style={{ backgroundImage: "url('/bg-login-ui.png')" }}

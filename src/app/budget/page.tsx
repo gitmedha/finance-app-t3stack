@@ -5,6 +5,8 @@ import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import BudgetFilterForm from "./filter";
+import EditBudget from "./edit";
+import DeleteBudget from "./delete";
 
 const financeReportData = [
   {
@@ -128,13 +130,13 @@ export default function Staff() {  // Removed async here
 
   return (
     <div className="h-full">
-      <div className="mb-6 p-2 shadow-md bg-white flex justify-center">
+      <div className="mb-6 p-2 shadow-lg bg-white flex justify-center">
         <div className="container py-1">
           <BudgetFilterForm filters={filters} handleSelect={handleSelect} />
         </div>
       </div>
       <div className="flex justify-center">
-        <div className='shadow-md container rounded-md m-2 p-2'>
+        <div className='shadow-lg container rounded-lg m-2 p-2'>
 
           <div className="flex justify-between items-center mb-1">
             <span className="font-semibold">Budget ({financeReportData.length})</span>
@@ -163,24 +165,25 @@ export default function Staff() {  // Removed async here
           <table className="min-w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
-                <th className="px-4 py-2">Date</th>
-                <th className="px-4 py-2">Description</th>
-                <th className="px-4 py-2">Category</th>
-                <th className="px-4 py-2">Amount</th>
-                <th className="px-4 py-2">Status</th>
+                <th className="p-2">Date</th>
+                <th className="p-2">Description</th>
+                <th className="p-2">Category</th>
+                <th className="p-2">Amount</th>
+                <th className="p-2">Status</th>
+                <th className="p-2">actions</th>
               </tr>
             </thead>
             <tbody>
               {financeReportData.map((item) => (
                 <tr
                   key={item.id}
-                  className="border-b hover:bg-gray-100 transition-colors"
+                  className="border-b hover:bg-gray-100 text-sm transition-colors"
                 >
-                  <td className="px-4 py-2">{item.date}</td>
-                  <td className="px-4 py-2">{item.description}</td>
-                  <td className="px-4 py-2">{item.category}</td>
-                  <td className="px-4 py-2">Rs. {item.amount}</td>
-                  <td className="px-4 py-2">
+                  <td className="p-1.5">{item.date}</td>
+                  <td className="p-1.5">{item.description}</td>
+                  <td className="p-1.5">{item.category}</td>
+                  <td className="p-1.5">Rs. {item.amount}</td>
+                  <td className="p-1.5">
                     <span
                       className={`px-2 py-1 rounded-lg text-sm ${item.status === 'Paid'
                         ? 'bg-green-100 text-green-700'
@@ -189,6 +192,10 @@ export default function Staff() {  // Removed async here
                     >
                       {item.status}
                     </span>
+                  </td>
+                  <td className="p-1.5 space-x-2">
+                    <EditBudget item={item} />
+                    <DeleteBudget item={item} />
                   </td>
                 </tr>
               ))}

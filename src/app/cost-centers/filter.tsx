@@ -1,9 +1,8 @@
-// components/DropdownFilterForm.tsx
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
+import AddCostCenters from './add';
 
 const categories = ["Finance", "Health", "Education", "Technology", "Miscellaneous"];
-
 interface FilterOptions {
   category: string,
   status: string,
@@ -11,18 +10,18 @@ interface FilterOptions {
   year: string,
   month: string
 }
-interface ReportFilterFormProps {
+interface CostCentersFilterFormProps {
   filters: FilterOptions;
   handleSelect: (name: string, value: string) => void;
 }
 
-const ReportFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSelect }) => {
+const CostCentersFilterForm: React.FC<CostCentersFilterFormProps> = ({ filters, handleSelect }) => {
 
   return (
     <div className="grid grid-cols-6 gap-4">
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button color="gray" className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.category || 'Filter by Select Category'}
             </span>
@@ -45,7 +44,7 @@ const ReportFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSele
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger className="w-full" asChild>
-          <button color='gray' className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.status || 'Filter by Select Status'}
             </span>
@@ -68,7 +67,7 @@ const ReportFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSele
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button color='gray' className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.byTime || 'Filter by Select By time'}
             </span>
@@ -91,7 +90,7 @@ const ReportFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSele
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button color='gray' className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.year || 'Filter by Select Year'}
             </span>
@@ -115,7 +114,7 @@ const ReportFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSele
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button color='gray' className='cursor-pointer w-full py-1 border rounded-md text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+          <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
               {filters.month || 'Filter by Select Month'}
             </span>
@@ -135,8 +134,14 @@ const ReportFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSele
           ))}
         </DropdownMenu.Content>
       </DropdownMenu.Root>
+
+      <div className='flex justify-end items-center'>
+          <AddCostCenters />
+      </div>
+
+     
     </div>
   );
 };
 
-export default ReportFilterForm;
+export default CostCentersFilterForm;

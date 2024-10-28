@@ -5,8 +5,10 @@ import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import DepartmentFilterForm from "./filter";
+import EditDepartments from "./edit";
+import DeleteDepartment from "./delete";
 
-const cols = ['Name', 'Code', 'Type', 'Parent Dept', 'CreatedAt']
+const cols = ['Name', 'Code', 'Type', 'Parent Dept', 'Created At', 'Actions']
 
 const departmentRecords = [
   {
@@ -113,19 +115,19 @@ export default function DepartmentReport() {
 
   return (
     <div className="h-full">
-      <div className="mb-6 p-2 shadow-md bg-white flex justify-center">
+      <div className="mb-6 p-1 shadow-lg bg-white flex justify-center">
         <div className="container py-1">
           <DepartmentFilterForm filters={filters} handleSelect={handleSelect} />
         </div>
       </div>
       <div className="flex justify-center">
-        <div className='shadow-md container rounded-md m-2 p-2'>
+        <div className='shadow-lg container rounded-lg m-2 p-1'>
 
           <div className="flex justify-between items-center mb-1">
             <span className="font-semibold">Departments ({departmentRecords.length})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Department"
-                className="p-2"
+                className="p-1"
               />
             </div>
 
@@ -151,7 +153,7 @@ export default function DepartmentReport() {
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {
                   cols?.map(col => {
-                    return <th key={col} className="px-4 py-2">{col}</th>
+                    return <th key={col} className="p-1">{col}</th>
                   })
                 }
 
@@ -161,13 +163,17 @@ export default function DepartmentReport() {
               {departmentRecords.map((item) => (
                 <tr
                   key={item.CreatedAt}
-                  className="border-b hover:bg-gray-100 transition-colors"
+                  className="border-b hover:bg-gray-100 text-sm transition-colors"
                 >
-                  <td className="px-4 py-2">{item.Name}</td>
-                  <td className="px-4 py-2">{item.Code}</td>
-                  <td className="px-4 py-2">{item.Type}</td>
-                  <td className="px-4 py-2">{item.ParentDept}</td>
-                  <td className="px-4 py-2">{item.CreatedAt}</td>
+                  <td className="p-1.5">{item.Name}</td>
+                  <td className="p-1.5">{item.Code}</td>
+                  <td className="p-1.5">{item.Type}</td>
+                  <td className="p-1.5">{item.ParentDept}</td>
+                  <td className="p-1.5">{item.CreatedAt}</td>
+                  <td className="space-x-2">
+                    <EditDepartments item={item} />
+                    <DeleteDepartment item={item} />
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -20,24 +20,24 @@ const ReactPaginationStyle: React.FC<ReactPaginationStyleProps> = ({
   return (
     <ReactPaginate
       previousLabel={
-        <span className="border border-primary text-primary rounded-md w-6 h-6 flex justify-center items-center">
+        <span className="border border-primary text-primary rounded-lg w-6 h-6 flex justify-center items-center">
           <FaArrowLeft />
         </span>
       }
       nextLabel={
-        <span className="border border-primary text-primary rounded-md w-6 h-6 flex justify-center items-center">
+        <span className="border border-primary text-primary rounded-lg w-6 h-6 flex justify-center items-center">
           <FaArrowRight />
         </span>
       }
       pageCount={count || 1}
       breakLabel=".."
       pageRangeDisplayed={0} // This could be adjusted as needed
-      activeLinkClassName="bg-primary text-white w-6 h-6 rounded-md flex justify-center items-center"
-      pageClassName="flex justify-center text-primary items-center rounded-md border border-primary h-6 w-6"
+      activeLinkClassName="bg-primary text-white w-6 h-6 rounded-lg flex justify-center items-center"
+      pageClassName="flex justify-center text-primary items-center rounded-lg border border-primary h-6 w-6"
       marginPagesDisplayed={1}
       forcePage={currentPage > 0 ? currentPage - 1 : 0}
       onPageChange={handlePagination}
-      containerClassName="pagination react-paginate rounded-md text-sm gap-2 flex justify-end my-2"
+      containerClassName="pagination react-paginate rounded-lg text-sm gap-2 flex justify-end my-2"
     />
   );
 };

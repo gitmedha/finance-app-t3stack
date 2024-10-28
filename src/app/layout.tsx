@@ -8,6 +8,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { Theme } from "@radix-ui/themes";
 import AppBar from "./_components/appBar";
 import { ContextProvider, useAuth } from "~/context"; // Correct path to AuthContext
+import { useEffect } from "react";
 
 export default function RootLayout({
   children,
@@ -15,8 +16,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body className="bg-[#f5f5f5]">
-        <main 
-        className="h-[100vh]">
+        <main
+          className="h-[100vh]">
           <TRPCReactProvider>
             <Theme>
               <ContextProvider>
@@ -31,10 +32,15 @@ export default function RootLayout({
 }
 
 const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const {isAuthenticated} = useAuth()
+  const { isAuthenticated, setIsAuthenticated } = useAuth()
+
+  useEffect(() => {
+    setIsAuthenticated(true)
+  }, [])
+
   return (
     <>
-     { isAuthenticated&&<AppBar />}
+      {isAuthenticated && <AppBar />}
       {children}
     </>
   );

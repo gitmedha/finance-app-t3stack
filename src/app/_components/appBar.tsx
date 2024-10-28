@@ -2,6 +2,7 @@
 
 // import { IconButton } from "@radix-ui/themes";
 import Link from "next/link";
+import { useRouter } from "next/navigation"; // Use `next/navigation` for app router
 import { LuLogOut } from "react-icons/lu";
 import { FaHandHoldingHeart, FaUser } from "react-icons/fa";
 import { GiExpense } from "react-icons/gi";
@@ -11,6 +12,7 @@ import { GiOfficeChair, GiMoneyStack } from "react-icons/gi";
 import Image from "next/image";
 
 const AppBar = () => {
+
   const menus = [
     { menu: 'Home', path: '/home', icon: <IoHome /> },
     { menu: 'Budget', path: '/budget', icon: <HiBanknotes /> },
@@ -19,8 +21,8 @@ const AppBar = () => {
     { menu: 'Cost Centers', path: '/cost-centers', icon: <GiMoneyStack /> },
     { menu: 'Expenses', path: '/expenses', icon: <GiExpense /> },
     { menu: 'Staff', path: '/staff', icon: <FaUser /> },
-    ]
- 
+  ]
+
   return (
     <nav className="shadow-lg bg-primary">
       <div className="container mx-auto flex justify-between items-center py-1 ">
@@ -46,7 +48,7 @@ const AppBar = () => {
         </ul>
         <div className="flex justify-start items-center text-white space-x-2">
           <span className="font-medium">Hi, Praveen K</span>
-      
+
           <Link href='/login' className='cursor-pointer rounded-full flex justify-center items-center focus:ring-0  text-primary bg-white h-8 w-8' >
             <LuLogOut />
           </Link>

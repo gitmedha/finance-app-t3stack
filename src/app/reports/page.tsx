@@ -93,11 +93,23 @@ const totalItems = 100; // Total number of items (for example)
 const itemsPerPage = 10; // Items per page
 
 export default function Staff() {
-  const [appliedFilters, setAppliedFilters] = useState({});
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
+  const [filters, setFilters] = useState({
+    category: '',
+    status: '',
+    byTime: '',
+    year: '',
+    month: ''
+  });
 
-  console.log(appliedFilters)
+  const handleSelect = (name: string, value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page
   };
@@ -107,34 +119,23 @@ export default function Staff() {
     console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
 
-  const handleApplyFilters = (filters: object) => {
-    setAppliedFilters(filters);
-    console.log("Applied Filters:", filters);
-  };
-
-  const handleClearFilters = () => {
-    setAppliedFilters({});
-    console.log("Filters cleared");
-  };
-
   return (
     <div className="h-full">
       <div className="mb-6 p-2 shadow-md bg-white flex justify-center">
         <div className="container py-1">
-          <ReportFilterForm onApply={handleApplyFilters} onClear={handleClearFilters} />
+          <ReportFilterForm filters={filters} handleSelect={handleSelect} />
         </div>
       </div>
       <div className="flex justify-center">
         <div className='shadow-md container rounded-md m-2 p-2'>
 
-        <div className="grid grid-cols-2 mb-1">
-            <div className="flex justify-start items-center space-x-2">
-              <span className="font-semibold">Report ({reportData.length})</span>
-              <div className=" w-80 ">
-                <SearchInput placeholder="Search Report"
-                  className="p-2"
-                />
-              </div>
+          <div className="flex justify-between items-center mb-1">
+            <span className="font-semibold">Reports ({reportData.length})</span>
+
+            <div className=" w-80 ">
+              <SearchInput placeholder="Search Report"
+                className="p-2"
+              />
             </div>
 
             <div className="flex justify-end items-center space-x-2">
@@ -178,7 +179,7 @@ export default function Staff() {
                       className={`px-2 py-1 rounded-lg text-sm ${item.status === 'Paid'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
-                      }`}
+                        }`}
                     >
                       {item.status}
                     </span>

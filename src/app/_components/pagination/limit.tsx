@@ -24,7 +24,7 @@ const PaginationLimitSelect: React.FC<PaginationLimitSelectProps> = ({
           <RiArrowDropDownLine size={30} />
         </button>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 w-full">
+      <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
         {limits.map((limit) => (
           <DropdownMenu.Item
             key={limit}

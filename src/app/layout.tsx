@@ -7,7 +7,7 @@ import { GeistSans } from "geist/font/sans";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Theme } from "@radix-ui/themes";
 import AppBar from "./_components/appBar";
-import { AuthProvider, useAuth } from "~/context"; // Correct path to AuthContext
+import { ContextProvider } from "~/context"; // Correct path to AuthContext
 
 export default function RootLayout({
   children,
@@ -18,9 +18,9 @@ export default function RootLayout({
         <main className="h-[100vh] bg-gray-50">
           <TRPCReactProvider>
             <Theme>
-              <AuthProvider>
+              <ContextProvider>
                 <AppContent>{children}</AppContent>
-              </AuthProvider>
+              </ContextProvider>
             </Theme>
           </TRPCReactProvider>
         </main>
@@ -30,11 +30,10 @@ export default function RootLayout({
 }
 
 const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
 
   return (
     <>
-      {isAuthenticated && <AppBar />}
+      <AppBar />
       {children}
     </>
   );

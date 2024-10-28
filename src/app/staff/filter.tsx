@@ -1,41 +1,23 @@
 // components/DropdownFilterForm.tsx
-import { useState } from "react";
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
 
 const categories = ["Finance", "Health", "Education", "Technology", "Miscellaneous"];
+interface FilterOptions {
+  category: string,
+  status: string,
+  byTime: string,
+  year: string,
+  month: string
+}
 
-const StaffFilterForm = ({ onApply, onClear }: { onApply: (filters: object) => void; onClear: () => void }) => {
-  
-  const [filters, setFilters] = useState({
-    category: '',
-    status: '',
-    byTime: '',
-    year: '',
-    month: ''
-  });
+interface StaffFilterFormProps {
+  filters: FilterOptions;
+  handleSelect: (name: string, value: string) => void;
+}
 
-  const handleSelect = (name: string, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleApply = () => {
-    onApply(filters);
-  };
-
-  const handleClear = () => {
-    setFilters({
-      category: '',
-      status: '',
-      byTime: '',
-      year: '',
-      month: ''
-    });
-    onClear();
-  };
+const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect }) => {
+  console.log(filters)
 
   return (
     <div className="grid grid-cols-6 gap-4">
@@ -49,7 +31,7 @@ const StaffFilterForm = ({ onApply, onClear }: { onApply: (filters: object) => v
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 w-full">
+        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
           {categories.map((category) => (
             <DropdownMenu.Item
               key={category}
@@ -72,7 +54,7 @@ const StaffFilterForm = ({ onApply, onClear }: { onApply: (filters: object) => v
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 w-full">
+        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
           {categories.map((status) => (
             <DropdownMenu.Item
               key={status}
@@ -95,7 +77,7 @@ const StaffFilterForm = ({ onApply, onClear }: { onApply: (filters: object) => v
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 w-full">
+        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
           {categories.map((byTime) => (
             <DropdownMenu.Item
               key={byTime}
@@ -118,7 +100,7 @@ const StaffFilterForm = ({ onApply, onClear }: { onApply: (filters: object) => v
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 w-full">
+        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
           {categories.map((year) => (
             <DropdownMenu.Item
               key={year}
@@ -142,7 +124,7 @@ const StaffFilterForm = ({ onApply, onClear }: { onApply: (filters: object) => v
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 w-full">
+        <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
           {categories.map((month) => (
             <DropdownMenu.Item
               key={month}
@@ -155,14 +137,7 @@ const StaffFilterForm = ({ onApply, onClear }: { onApply: (filters: object) => v
         </DropdownMenu.Content>
       </DropdownMenu.Root>
 
-      <div className="grid grid-cols-2 gap-2 ">
-        <button color="gray" className='cursor-pointer w-full py-1 rounded-md border border-primary text-primary' onClick={handleClear}>
-          Clear
-        </button>
-        <button color='green' className='bg-primary cursor-pointer w-full py-1 rounded-md text-white' onClick={handleApply}>
-          Apply
-        </button>
-      </div>
+     
     </div>
   );
 };

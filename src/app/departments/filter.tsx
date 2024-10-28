@@ -9,12 +9,12 @@ interface FilterOptions {
   year: string,
   month: string
 }
-interface BudgetFilterFormProps {
+interface DepartmentFilterFormProps {
   filters: FilterOptions;
   handleSelect: (name: string, value: string) => void;
 }
 
-const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect }) => {
+const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({ filters, handleSelect }) => {
 
   return (
     <div className="grid grid-cols-6 gap-4">
@@ -139,4 +139,4 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   );
 };
 
-export default BudgetFilterForm;
+export default DepartmentFilterForm;

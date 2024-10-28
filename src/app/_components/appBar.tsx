@@ -8,13 +8,16 @@ import { GiExpense } from "react-icons/gi";
 import { BiSolidReport } from "react-icons/bi";
 import { HiBanknotes } from "react-icons/hi2";
 import { IoHome } from "react-icons/io5";
+import { GiOfficeChair, GiMoneyStack } from "react-icons/gi";
 import Image from "next/image";
 
 const AppBar = () => {
   const menus = [
-    { menu: 'Home', path: '/', icon: <IoHome /> },
+    { menu: 'Home', path: '/home', icon: <IoHome /> },
     { menu: 'Budget', path: '/budget', icon: <HiBanknotes /> },
     { menu: 'Donors', path: '/donors', icon: <FaHandHoldingHeart /> },
+    { menu: 'Department', path: '/departments', icon: <GiOfficeChair /> },
+    { menu: 'Cost Rate', path: '/cost-rate', icon: <GiMoneyStack /> },
     { menu: 'Expenses', path: '/expenses', icon: <GiExpense /> },
     { menu: 'Staff', path: '/staff', icon: <FaUser /> },
     { menu: 'Reports', path: '/reports', icon: <BiSolidReport /> }]

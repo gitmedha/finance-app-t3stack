@@ -24,21 +24,27 @@ const LoginForm = () => {
     reset(); // Reset the form if needed
   };
 
-  useEffect(() => {
-    setIsAuthenticated(false)
-  }, [])
+  // useEffect(() => {
+  //   setIsAuthenticated(false)
+  // }, [])
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="px-10 flex flex-col justify-center items-center h-3/4"
+      className="px-10 flex flex-col justify-center items-center mt-10 h-2/4"
     >
-      <div className="flex flex-col items-center justify-center gap-2 mb-8">
-        <p className="m-0 text-2xl font-semibold text-primary">
-          Medha Finance Management
+      <div className="flex flex-col items-center justify-start gap-2 mb-8">
+        <p className="m-0 text-4xl font-semibold text-primary">
+          <span className="-ml-10">
+            MEDHA
+          </span> 
+          <br/>
+          <span className="ml-8">
+            FINANCE
+          </span>
         </p>
       </div>
-      <div className="w-full flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2 mb-4">
         <label className="font-[400] text-xs text-gray-600">
           Enter Your Email
         </label>
@@ -51,7 +57,7 @@ const LoginForm = () => {
           <span className="text-red-500 text-xs">{errors.email.message}</span>
         )}
       </div>
-      <div className="my-2 w-full flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2 mb-4">
         <label className="font-[400] text-xs text-gray-600">Enter Your Password</label>
         <input
           {...register("password", { required: "Password is required" })}
@@ -64,7 +70,7 @@ const LoginForm = () => {
         )}
       </div>
 
-      <Button type='submit' className="py-2 mt-2 px-8 !bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md !cursor-pointer select-none">
+      <Button size='3' type='submit' className="py-4 !my-3 px-8 !bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md !cursor-pointer select-none">
         Login
       </Button>
       <Link className="mt-2 text-primary font-medium" href='/forgot-password'>

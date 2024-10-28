@@ -4,118 +4,87 @@ import { useState } from "react";
 import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
-import DonorFilterForm from "./filter";
+import DepartmentFilterForm from "./filter";
 
-const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Currency', 'Type', 'Created At']
-const donorData = [
+const cols = ['Name', 'Code', 'Type', 'Parent Dept', 'CreatedAt']
+
+const departmentRecords = [
   {
-    Name: 'Marketing Campaign',
-    CostCenter: 'Marketing',
-    Year: '23-24',
-    TotalBudget: 50000,
-    ReceivedBudget: 30000,
-    Currency: 'USD',
-    Type: 'Expense',
-    CreatedAt: '2023-04-10 10:00:00',
+    Name: 'Human Resources',
+    Code: 'HR001',
+    Type: 'Administration',
+    ParentDept: 'Corporate',
+    CreatedAt: '2020-03-15 09:00:00',
   },
   {
-    Name: 'Employee Training',
-    CostCenter: 'HR',
-    Year: '23-24',
-    TotalBudget: 15000,
-    ReceivedBudget: 15000,
-    Currency: 'USD',
-    Type: 'Training',
-    CreatedAt: '2023-04-12 09:15:00',
+    Name: 'Finance',
+    Code: 'FIN002',
+    Type: 'Support',
+    ParentDept: 'Corporate',
+    CreatedAt: '2019-07-21 14:20:00',
   },
   {
-    Name: 'Product Development',
-    CostCenter: 'R&D',
-    Year: '24-25',
-    TotalBudget: 120000,
-    ReceivedBudget: 60000,
-    Currency: 'USD',
-    Type: 'Development',
-    CreatedAt: '2023-05-01 14:30:00',
+    Name: 'Marketing',
+    Code: 'MKT003',
+    Type: 'Operations',
+    ParentDept: 'Sales and Marketing',
+    CreatedAt: '2021-02-18 11:45:00',
   },
   {
-    Name: 'Office Supplies',
-    CostCenter: 'Administration',
-    Year: '24-25',
-    TotalBudget: 8000,
-    ReceivedBudget: 5000,
-    Currency: 'EUR',
-    Type: 'Expense',
-    CreatedAt: '2023-05-05 12:00:00',
+    Name: 'Sales',
+    Code: 'SAL004',
+    Type: 'Operations',
+    ParentDept: 'Sales and Marketing',
+    CreatedAt: '2018-05-25 16:30:00',
   },
   {
-    Name: 'System Upgrade',
-    CostCenter: 'IT',
-    Year: '23-24',
-    TotalBudget: 25000,
-    ReceivedBudget: 25000,
-    Currency: 'USD',
-    Type: 'Maintenance',
-    CreatedAt: '2023-06-15 16:00:00',
+    Name: 'Research and Development',
+    Code: 'RND005',
+    Type: 'Core',
+    ParentDept: 'Corporate',
+    CreatedAt: '2020-12-05 10:10:00',
   },
   {
-    Name: 'Client Events',
-    CostCenter: 'Sales',
-    Year: '23-24',
-    TotalBudget: 30000,
-    ReceivedBudget: 20000,
-    Currency: 'USD',
-    Type: 'Event',
-    CreatedAt: '2023-07-01 18:30:00',
+    Name: 'Customer Support',
+    Code: 'CST006',
+    Type: 'Support',
+    ParentDept: 'Operations',
+    CreatedAt: '2019-11-15 08:50:00',
   },
   {
-    Name: 'Market Research',
-    CostCenter: 'R&D',
-    Year: '24-25',
-    TotalBudget: 20000,
-    ReceivedBudget: 10000,
-    Currency: 'USD',
-    Type: 'Research',
-    CreatedAt: '2023-08-01 15:45:00',
+    Name: 'Information Technology',
+    Code: 'IT007',
+    Type: 'Support',
+    ParentDept: 'Corporate',
+    CreatedAt: '2022-04-01 13:15:00',
   },
   {
-    Name: 'Legal Consulting',
-    CostCenter: 'HR',
-    Year: '23-24',
-    TotalBudget: 10000,
-    ReceivedBudget: 7000,
-    Currency: 'USD',
-    Type: 'Service',
-    CreatedAt: '2023-08-10 11:15:00',
+    Name: 'Legal',
+    Code: 'LEG008',
+    Type: 'Administration',
+    ParentDept: 'Corporate',
+    CreatedAt: '2017-09-10 17:05:00',
   },
   {
-    Name: 'Branding Project',
-    CostCenter: 'Marketing',
-    Year: '24-25',
-    TotalBudget: 50000,
-    ReceivedBudget: 25000,
-    Currency: 'EUR',
-    Type: 'Project',
-    CreatedAt: '2023-09-20 08:45:00',
+    Name: 'Product Management',
+    Code: 'PM009',
+    Type: 'Core',
+    ParentDept: 'Corporate',
+    CreatedAt: '2021-08-12 12:30:00',
   },
   {
-    Name: 'Infrastructure Setup',
-    CostCenter: 'Operations',
-    Year: '24-25',
-    TotalBudget: 150000,
-    ReceivedBudget: 100000,
-    Currency: 'USD',
-    Type: 'Setup',
-    CreatedAt: '2023-10-05 10:20:00',
+    Name: 'Logistics',
+    Code: 'LOG010',
+    Type: 'Operations',
+    ParentDept: 'Operations',
+    CreatedAt: '2019-03-08 09:20:00',
   }
 ];
-
-// ( FC or NFC )
 
 const totalItems = 100; // Total number of items (for example)
 const itemsPerPage = 10; // Items per page
 
-export default function DonorReport() {
+export default function DepartmentReport() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
   const [filters, setFilters] = useState({
@@ -146,16 +115,16 @@ export default function DonorReport() {
     <div className="h-full">
       <div className="mb-6 p-2 shadow-md bg-white flex justify-center">
         <div className="container py-1">
-          <DonorFilterForm filters={filters} handleSelect={handleSelect} />
+          <DepartmentFilterForm filters={filters} handleSelect={handleSelect} />
         </div>
       </div>
       <div className="flex justify-center">
         <div className='shadow-md container rounded-md m-2 p-2'>
 
           <div className="flex justify-between items-center mb-1">
-            <span className="font-semibold">Donors ({donorData.length})</span>
+            <span className="font-semibold">Departments ({departmentRecords.length})</span>
             <div className=" w-80 ">
-              <SearchInput placeholder="Search Donor"
+              <SearchInput placeholder="Search Department"
                 className="p-2"
               />
             </div>
@@ -189,18 +158,15 @@ export default function DonorReport() {
               </tr>
             </thead>
             <tbody>
-              {donorData.map((item) => (
+              {departmentRecords.map((item) => (
                 <tr
-                  key={item?.CreatedAt}
+                  key={item.CreatedAt}
                   className="border-b hover:bg-gray-100 transition-colors"
                 >
                   <td className="px-4 py-2">{item.Name}</td>
-                  <td className="px-4 py-2">{item.CostCenter}</td>
-                  <td className="px-4 py-2">{item.Year}</td>
-                  <td className="px-4 py-2">Rs. {item.TotalBudget}</td>
-                  <td className="px-4 py-2">Rs. {item.ReceivedBudget}</td>
-                  <td className="px-4 py-2">{item.Currency}</td>
+                  <td className="px-4 py-2">{item.Code}</td>
                   <td className="px-4 py-2">{item.Type}</td>
+                  <td className="px-4 py-2">{item.ParentDept}</td>
                   <td className="px-4 py-2">{item.CreatedAt}</td>
                 </tr>
               ))}

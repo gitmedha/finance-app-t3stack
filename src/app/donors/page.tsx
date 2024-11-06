@@ -7,6 +7,25 @@ import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import DonorFilterForm from "./filter";
 import EditDonor from "./edit";
 import DeleteDonor from "./delete";
+import { db } from "~/server/db";
+// import {
+//   categoryMasterInFinanceProject,
+//   categoryHierarchyInFinanceProject,
+//   costCenterInFinanceProject,
+//   departmentHierarchyInFinanceProject,
+//   donorMasterInFinanceProject,
+//   departmentMasterInFinanceProject,
+//   staffMasterInFinanceProject,
+//   knexMigrationsInFinanceProject,
+//   knexMigrationsLockInFinanceProject,
+//   roleMasterInFinanceProject,
+//   budgetMasterInFinanceProject,
+//   tallyDepartmentInFinanceProject,
+//   tallyDonorInFinanceProject,
+//   budgetDetailsInFinanceProject,
+//   userMasterInFinanceProject,
+//   tallyStaffInFinanceProject,
+// } from "~/server/db/schema";
 
 const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Currency', 'Type', 'Created At','actions']
 const donorData = [
@@ -117,7 +136,7 @@ const donorData = [
 const totalItems = 100; // Total number of items (for example)
 const itemsPerPage = 10; // Items per page
 
-export default function DonorReport() {
+export default async function DonorReport() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(0);
   const [filters, setFilters] = useState({
@@ -143,6 +162,7 @@ export default function DonorReport() {
     setLimit(newLimit);
     console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
+
 
   return (
     <div className="h-full">

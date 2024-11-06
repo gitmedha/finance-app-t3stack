@@ -7,109 +7,17 @@ import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import StaffFilterForm from "./filter";
 import EditStaff from "./edit";
 import DeleteStaff from "./delete";
+import { api } from "~/trpc/react";
+import type { GetStaffsResponse, Staff } from "./staff";
 
 const cols = ['Name', 'Emp ID', 'Designation', 'Department', 'Joining Date', 'Status', 'Created At', 'actions']
-// add, edit and delete  actions with full modal 
-
-const staffData = [
-  {
-    Name: 'Alice Johnson',
-    EmpID: 'EMP001',
-    Designation: 'Software Engineer',
-    Department: 'IT',
-    JoiningDate: '2020-01-15',
-    Status: 'Active',
-    CreatedAt: '2020-01-15 10:00:00',
-  },
-  {
-    Name: 'Bob Smith',
-    EmpID: 'EMP002',
-    Designation: 'Project Manager',
-    Department: 'Operations',
-    JoiningDate: '2019-04-25',
-    Status: 'Active',
-    CreatedAt: '2019-04-25 09:30:00',
-  },
-  {
-    Name: 'Charlie Lee',
-    EmpID: 'EMP003',
-    Designation: 'UI/UX Designer',
-    Department: 'Design',
-    JoiningDate: '2021-06-20',
-    Status: 'Active',
-    CreatedAt: '2021-06-20 14:45:00',
-  },
-  {
-    Name: 'Diana Cruz',
-    EmpID: 'EMP004',
-    Designation: 'HR Specialist',
-    Department: 'Human Resources',
-    JoiningDate: '2018-11-05',
-    Status: 'Inactive',
-    CreatedAt: '2018-11-05 08:00:00',
-  },
-  {
-    Name: 'Ethan Brown',
-    EmpID: 'EMP005',
-    Designation: 'Marketing Executive',
-    Department: 'Marketing',
-    JoiningDate: '2022-03-15',
-    Status: 'Active',
-    CreatedAt: '2022-03-15 10:10:00',
-  },
-  {
-    Name: 'Fiona Green',
-    EmpID: 'EMP006',
-    Designation: 'Accountant',
-    Department: 'Finance',
-    JoiningDate: '2020-09-12',
-    Status: 'Inactive',
-    CreatedAt: '2020-09-12 13:30:00',
-  },
-  {
-    Name: 'George King',
-    EmpID: 'EMP007',
-    Designation: 'Business Analyst',
-    Department: 'Operations',
-    JoiningDate: '2021-01-30',
-    Status: 'Active',
-    CreatedAt: '2021-01-30 11:15:00',
-  },
-  {
-    Name: 'Hannah Scott',
-    EmpID: 'EMP008',
-    Designation: 'Data Scientist',
-    Department: 'Data',
-    JoiningDate: '2022-07-18',
-    Status: 'Active',
-    CreatedAt: '2022-07-18 16:20:00',
-  },
-  {
-    Name: 'Ian Walker',
-    EmpID: 'EMP009',
-    Designation: 'Sales Manager',
-    Department: 'Sales',
-    JoiningDate: '2019-08-01',
-    Status: 'Inactive',
-    CreatedAt: '2019-08-01 09:45:00',
-  },
-  {
-    Name: 'Jessica Evans',
-    EmpID: 'EMP010',
-    Designation: 'Content Writer',
-    Department: 'Marketing',
-    JoiningDate: '2023-05-10',
-    Status: 'Active',
-    CreatedAt: '2023-05-10 12:00:00',
-  }
-];
-
-const totalItems = 100; // Total number of items (for example)
-const itemsPerPage = 10; // Items per page
 
 export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isLoading, isError, refetch } = api.get.getStaffs.useQuery({ page: currentPage, limit })
+
+  const result: GetStaffsResponse | undefined = data;
 
   const [filters, setFilters] = useState({
     category: '',
@@ -126,15 +34,14 @@ export default function Staff() {
     }));
   };
 
-
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page
   };
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
-    console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
+
 
   return (
     <div className="h-full">
@@ -147,19 +54,19 @@ export default function Staff() {
         <div className='shadow-lg container rounded-lg m-2 p-1'>
 
           <div className="flex justify-between items-center mb-1">
-            <span className="font-semibold">Staff ({staffData.length})</span>
+            <span className="font-semibold">Staff ({result?.staffs ? result.totalCount : ''})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Staff"
                 className="p-2"
               />
             </div>
             <div className="flex justify-end items-center space-x-2">
-              <ReactPaginationStyle
-                total={totalItems}
+              {result?.staffs && <ReactPaginationStyle
+                total={result?.totalCount}
                 currentPage={currentPage}
                 handlePagination={handlePagination}
-                limit={itemsPerPage}
-              />
+                limit={limit}
+              />}
 
               <PaginationLimitSelect
                 limits={[10, 20, 50, 100]} // Define the limits you want to provide
@@ -182,27 +89,27 @@ export default function Staff() {
               </tr>
             </thead>
             <tbody>
-              {staffData.map((item) => (
+              {result?.staffs && result?.staffs.map((item: Staff) => (
                 <tr
-                  key={item.EmpID}
+                  key={item?.id}
                   className="border-b text-sm hover:bg-gray-100 transition-colors"
                 >
-                  <td className="p-2">{item.Name}</td>
-                  <td className="p-2">{item.EmpID}</td>
-                  <td className="p-2">{item.Designation}</td>
-                  <td className="p-2">{item.Department}</td>
-                  <td className="p-2">{item.JoiningDate}</td>
+                  <td className="p-2">{item.name}</td>
+                  <td className="p-2">{item.empNo}</td>
+                  <td className="p-2">{item.description}</td>
+                  <td className="p-2">{item.department}</td>
+                  <td className="p-2">{item.createdAt}</td>
                   <td className="p-2">
                     <span
-                      className={`px-2 py-1 rounded-lg text-sm ${item.Status === 'Active'
+                      className={`px-2 py-1 rounded-lg text-sm ${item.isactive
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
                         }`}
                     >
-                      {item.Status}
+                      {item.isactive ? 'Active' : 'InActive'}
                     </span>
                   </td>
-                  <td className="p-2">{item.CreatedAt}</td>
+                  <td className="p-2">{item.createdAt}</td>
                   <td className="p-1 space-x-2">
                     <EditStaff item={item} />
                     <DeleteStaff item={item} />

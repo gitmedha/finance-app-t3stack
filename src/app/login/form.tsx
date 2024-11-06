@@ -1,31 +1,44 @@
+
+
 'use client';
 
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation"; // Corrected import
-import { Button, Spinner } from "@radix-ui/themes";
-import { useAuth } from "~/context";
+import { Button } from "@radix-ui/themes";
 import Link from "next/link";
-import { useEffect } from "react";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+import { api } from "~/trpc/react";
 
 interface FormData {
-  email: string;
+  username: string;
   password: string;
 }
 
 const LoginForm = () => {
-  const { setIsAuthenticated } = useAuth();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const loginMutation = api.post.login.useMutation();
 
-  useEffect(() => {
-    setIsAuthenticated(false)
-  }, [])
-
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    // Here you would typically call your authentication API
-    setIsAuthenticated(true)
-    router.push("/home"); // Redirect to home page
-    reset(); // Reset the form if needed
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.username,
+        password: data.password,
+      });
+  
+      setLoading(false);
+      if (result?.error) {
+        alert("Invalid username or password. Please try again.");
+      } else {
+        router.push("/home"); // Customize this path
+      }
+      reset();
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
@@ -46,15 +59,15 @@ const LoginForm = () => {
       </div>
       <div className="w-full flex flex-col gap-2 mb-4">
         <label className="font-[400] text-xs text-gray-600">
-          Enter Your Email
+          Enter Your Username
         </label>
         <input
-          {...register("email", { required: "Email is required" })}
+          {...register("username", { required: "Username is required" })}
           placeholder="email@demo.com"
           className="border rounded-lg px-3 py-2 text-sm w-full outline-none"
         />
-        {errors.email && (
-          <span className="text-red-500 text-xs">{errors.email.message}</span>
+        {errors.username && (
+          <span className="text-red-500 text-xs">{errors.username.message}</span>
         )}
       </div>
       <div className="w-full flex flex-col gap-2 mb-4">
@@ -70,20 +83,18 @@ const LoginForm = () => {
         )}
       </div>
 
-      <Button size='3' type='submit' className="py-4 !my-3 px-8 !bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg !cursor-pointer select-none">
-        Login
+      <Button
+        size='3'
+        type='submit'
+        className="py-4 !my-3 px-8 !bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg !cursor-pointer select-none"
+        disabled={loading}
+      >
+        {loading ? "Logging in..." : "Login"}
       </Button>
+      
       <Link className="mt-2 text-primary font-medium" href='/forgot-password'>
         Forgot password
       </Link>
-
-      {/* <button
-        type="submit"
-        className="py-2 mt-2 px-8 bg-primary hover:bg-primary/90 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg cursor-pointer select-none"
-      >
-        <Spinner loading />
-        Submit
-      </button> */}
     </form>
   );
 };

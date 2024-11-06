@@ -1,7 +1,8 @@
-import { pgTable, pgSchema, foreignKey, unique, serial, varchar, boolean, timestamp, integer, text, numeric, date, bigint } from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, foreignKey, unique, serial, varchar, boolean, date, integer, text, numeric, timestamp, bigint } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 export const financeProject = pgSchema("finance_project");
+
 
 
 export const categoryMasterInFinanceProject = financeProject.table("category_master", {
@@ -11,8 +12,8 @@ export const categoryMasterInFinanceProject = financeProject.table("category_mas
 	isactive: boolean("isactive").notNull(),
 	description: varchar("description", { length: 255 }),
 	notes: varchar("Notes", { length: 255 }),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
 },
@@ -39,8 +40,8 @@ export const categoryHierarchyInFinanceProject = financeProject.table("category_
 	isactive: boolean("isactive").notNull(),
 	notes: text("notes"),
 	description: text("description"),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
 },
@@ -72,8 +73,8 @@ export const costCenterInFinanceProject = financeProject.table("cost_center", {
 	description: text("description"),
 	notes: text("notes"),
 	isactive: boolean("isactive").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
 },
@@ -100,8 +101,8 @@ export const departmentHierarchyInFinanceProject = financeProject.table("departm
 	isactive: boolean("isactive").notNull(),
 	notes: text("notes"),
 	description: text("description"),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
 },
@@ -123,15 +124,18 @@ export const departmentHierarchyInFinanceProject = financeProject.table("departm
 export const donorMasterInFinanceProject = financeProject.table("donor_master", {
 	id: serial("id").primaryKey().notNull(),
 	name: varchar("name", { length: 255 }).notNull(),
+	costCenter: integer("cost_center"),
+	finYear: integer("fin_year").notNull(),
+	totalBudget: numeric("total_budget", { precision: 8, scale:  2 }).notNull(),
+	budgetReceived: numeric("budget_received", { precision: 8, scale:  2 }).notNull(),
 	currency: text("currency").notNull(),
 	notes: varchar("notes", { length: 255 }),
 	description: varchar("description", { length: 255 }),
 	isactive: boolean("isactive").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
-	donorType: text("donor_type"),
 },
 (table) => {
 	return {
@@ -145,6 +149,7 @@ export const donorMasterInFinanceProject = financeProject.table("donor_master", 
 			foreignColumns: [userMasterInFinanceProject.id],
 			name: "donor_master_updated_by_fkey"
 		}),
+		donorMasterDonorCodeKey: unique("donor_master_donor_code_key").on(table.costCenter),
 	}
 });
 
@@ -156,8 +161,8 @@ export const departmentMasterInFinanceProject = financeProject.table("department
 	isactive: boolean("isactive").notNull(),
 	notes: varchar("notes", { length: 255 }),
 	description: varchar("description", { length: 255 }),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
 },
@@ -178,38 +183,37 @@ export const departmentMasterInFinanceProject = financeProject.table("department
 	}
 });
 
-export const donorBudgetInFinanceProject = financeProject.table("donor_budget", {
-	id: integer("id").primaryKey().generatedAlwaysAsIdentity({ name: "finance_project.donor_budget_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
-	donorId: integer("donor_id").notNull(),
-	finYear: text("fin_year").notNull(),
-	plannedBudget: numeric("planned_budget", { precision: 8, scale:  2 }).notNull(),
-	receivedBudget: numeric("received_budget", { precision: 8, scale:  2 }).notNull(),
-	balanceDonation: numeric("balance_donation", { precision: 8, scale:  2 }).notNull(),
+export const staffMasterInFinanceProject = financeProject.table("staff_master", {
+	id: serial("id").primaryKey().notNull(),
+	name: varchar("name", { length: 25 }).notNull(),
+	empNo: text("emp_no").notNull(),
+	isactive: boolean("isactive").notNull(),
 	notes: varchar("notes", { length: 255 }),
 	description: varchar("description", { length: 255 }),
-	isactive: boolean("isactive").notNull(),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
 	updatedBy: integer("updated_by"),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	department: integer("department"),
 },
 (table) => {
 	return {
-		fkCreatedby: foreignKey({
+		departmentMasterByFkey: foreignKey({
+			columns: [table.department],
+			foreignColumns: [departmentMasterInFinanceProject.id],
+			name: "department_master_by_fkey"
+		}),
+		staffMasterCreatedByFkey: foreignKey({
 			columns: [table.createdBy],
 			foreignColumns: [userMasterInFinanceProject.id],
-			name: "fk_createdby"
+			name: "staff_master_created_by_fkey"
 		}),
-		fkDonorId: foreignKey({
-			columns: [table.donorId],
-			foreignColumns: [donorMasterInFinanceProject.id],
-			name: "fk_donor_id"
-		}),
-		fkUpdatedby: foreignKey({
+		staffMasterUpdatedByFkey: foreignKey({
 			columns: [table.updatedBy],
 			foreignColumns: [userMasterInFinanceProject.id],
-			name: "fk_updatedby"
+			name: "staff_master_updated_by_fkey"
 		}),
+		staffMasterEmpNoKey: unique("staff_master_emp_no_key").on(table.empNo),
 	}
 });
 
@@ -258,48 +262,6 @@ export const budgetMasterInFinanceProject = financeProject.table("budget_master"
 	}
 });
 
-export const tallyStaffInFinanceProject = financeProject.table("tally_staff", {
-	id: serial("id").primaryKey().notNull(),
-	voucherName: varchar("voucher_name", { length: 25 }).notNull(),
-	voucherNum: integer("voucher_num").notNull(),
-	ledgerName: varchar("ledger_name", { length: 255 }).notNull(),
-	transactionId: text("transaction_id"),
-	date: date("date").notNull(),
-	accountType: varchar("account_type", { length: 255 }).notNull(),
-	amount: numeric("amount", { precision: 8, scale:  2 }).notNull(),
-	empNo: integer("emp_no").notNull(),
-	isExpense: text("is_expense").notNull(),
-	currency: text("currency").notNull(),
-	narration: varchar("narration", { length: 255 }).notNull(),
-	notes: varchar("notes", { length: 255 }),
-	isactive: boolean("isactive").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
-	createdBy: integer("created_by"),
-	updatedBy: integer("updated_by"),
-	finMonth: text("fin_month").notNull(),
-	finYear: text("fin_year").notNull(),
-},
-(table) => {
-	return {
-		tallyStaffCc: foreignKey({
-			columns: [table.empNo],
-			foreignColumns: [costCenterInFinanceProject.id],
-			name: "tally_staff_cc"
-		}),
-		tallyStaffCreatedByFkey: foreignKey({
-			columns: [table.createdBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "tally_staff_created_by_fkey"
-		}),
-		tallyStaffUpdatedByFkey: foreignKey({
-			columns: [table.updatedBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "tally_staff_updated_by_fkey"
-		}),
-	}
-});
-
 export const tallyDepartmentInFinanceProject = financeProject.table("tally_department", {
 	id: serial("id").primaryKey().notNull(),
 	voucherName: varchar("voucher_name", { length: 25 }).notNull(),
@@ -315,8 +277,8 @@ export const tallyDepartmentInFinanceProject = financeProject.table("tally_depar
 	narration: varchar("narration", { length: 255 }).notNull(),
 	notes: varchar("notes", { length: 255 }),
 	isactive: boolean("isactive").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
 	finMonth: text("fin_month").notNull(),
@@ -338,6 +300,48 @@ export const tallyDepartmentInFinanceProject = financeProject.table("tally_depar
 			columns: [table.updatedBy],
 			foreignColumns: [userMasterInFinanceProject.id],
 			name: "tally_department_updated_by_fkey"
+		}),
+	}
+});
+
+export const tallyDonorInFinanceProject = financeProject.table("tally_donor", {
+	id: serial("id").primaryKey().notNull(),
+	voucherName: varchar("voucher_name", { length: 25 }).notNull(),
+	voucherNum: integer("voucher_num").notNull(),
+	ledgerName: varchar("ledger_name", { length: 255 }).notNull(),
+	transactionId: text("transaction_id"),
+	date: timestamp("date", { withTimezone: true, mode: 'string' }).notNull(),
+	accountType: varchar("account_type", { length: 255 }).notNull(),
+	amount: numeric("amount", { precision: 12, scale:  2 }).notNull(),
+	costCenter: integer("cost_center").notNull(),
+	isExpense: text("is_expense").notNull(),
+	currency: text("currency").notNull(),
+	narration: varchar("narration", { length: 255 }).notNull(),
+	notes: varchar("notes", { length: 255 }),
+	isactive: boolean("isactive").notNull(),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
+	createdBy: integer("created_by").notNull(),
+	updatedBy: integer("updated_by"),
+	finMonth: text("fin_month").notNull(),
+	finYear: text("fin_year").notNull(),
+},
+(table) => {
+	return {
+		tallyDonorCreatedByFkey: foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [userMasterInFinanceProject.id],
+			name: "tally_donor_created_by_fkey"
+		}),
+		tallyDonorDonorCodeFkey: foreignKey({
+			columns: [table.costCenter],
+			foreignColumns: [costCenterInFinanceProject.id],
+			name: "tally_donor_donor_code_fkey"
+		}),
+		tallyDonorUpdatedByFkey: foreignKey({
+			columns: [table.updatedBy],
+			foreignColumns: [userMasterInFinanceProject.id],
+			name: "tally_donor_updated_by_fkey"
 		}),
 	}
 });
@@ -397,8 +401,8 @@ export const userMasterInFinanceProject = financeProject.table("user_master", {
 	isactive: boolean("isactive").notNull(),
 	notes: varchar("notes", { length: 255 }),
 	description: varchar("description", { length: 255 }),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
 	createdBy: integer("created_by"),
 	updatedBy: integer("updated_by"),
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -420,78 +424,44 @@ export const userMasterInFinanceProject = financeProject.table("user_master", {
 	}
 });
 
-export const staffMasterInFinanceProject = financeProject.table("staff_master", {
-	id: serial("id").primaryKey().notNull(),
-	name: varchar("name", { length: 25 }).notNull(),
-	empNo: text("emp_no").notNull(),
-	isactive: boolean("isactive").notNull(),
-	notes: varchar("notes", { length: 255 }),
-	description: varchar("description", { length: 255 }),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
-	createdBy: integer("created_by").notNull(),
-	updatedBy: integer("updated_by"),
-	department: integer("department"),
-},
-(table) => {
-	return {
-		departmentMasterByFkey: foreignKey({
-			columns: [table.department],
-			foreignColumns: [departmentMasterInFinanceProject.id],
-			name: "department_master_by_fkey"
-		}),
-		staffMasterCreatedByFkey: foreignKey({
-			columns: [table.createdBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "staff_master_created_by_fkey"
-		}),
-		staffMasterUpdatedByFkey: foreignKey({
-			columns: [table.updatedBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "staff_master_updated_by_fkey"
-		}),
-		staffMasterEmpNoKey: unique("staff_master_emp_no_key").on(table.empNo),
-	}
-});
-
-export const tallyDonorInFinanceProject = financeProject.table("tally_donor", {
+export const tallyStaffInFinanceProject = financeProject.table("tally_staff", {
 	id: serial("id").primaryKey().notNull(),
 	voucherName: varchar("voucher_name", { length: 25 }).notNull(),
 	voucherNum: integer("voucher_num").notNull(),
 	ledgerName: varchar("ledger_name", { length: 255 }).notNull(),
 	transactionId: text("transaction_id"),
-	date: timestamp("date", { withTimezone: true, mode: 'string' }).notNull(),
+	date: date("date").notNull(),
 	accountType: varchar("account_type", { length: 255 }).notNull(),
-	amount: numeric("amount", { precision: 12, scale:  2 }).notNull(),
-	costCenter: integer("cost_center").notNull(),
+	amount: numeric("amount", { precision: 8, scale:  2 }).notNull(),
+	empNo: integer("emp_no").notNull(),
 	isExpense: text("is_expense").notNull(),
 	currency: text("currency").notNull(),
 	narration: varchar("narration", { length: 255 }).notNull(),
 	notes: varchar("notes", { length: 255 }),
 	isactive: boolean("isactive").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }),
-	createdBy: integer("created_by").notNull(),
+	createdAt: date("created_at"),
+	updatedAt: date("updated_at"),
+	createdBy: integer("created_by"),
 	updatedBy: integer("updated_by"),
 	finMonth: text("fin_month").notNull(),
 	finYear: text("fin_year").notNull(),
 },
 (table) => {
 	return {
-		tallyDonorCreatedByFkey: foreignKey({
+		tallyStaffCc: foreignKey({
+			columns: [table.empNo],
+			foreignColumns: [costCenterInFinanceProject.id],
+			name: "tally_staff_cc"
+		}),
+		tallyStaffCreatedByFkey: foreignKey({
 			columns: [table.createdBy],
 			foreignColumns: [userMasterInFinanceProject.id],
-			name: "tally_donor_created_by_fkey"
+			name: "tally_staff_created_by_fkey"
 		}),
-		tallyDonorDonorCodeFkey: foreignKey({
-			columns: [table.costCenter],
-			foreignColumns: [costCenterInFinanceProject.id],
-			name: "tally_donor_donor_code_fkey"
-		}),
-		tallyDonorUpdatedByFkey: foreignKey({
+		tallyStaffUpdatedByFkey: foreignKey({
 			columns: [table.updatedBy],
 			foreignColumns: [userMasterInFinanceProject.id],
-			name: "tally_donor_updated_by_fkey"
+			name: "tally_staff_updated_by_fkey"
 		}),
 	}
 });

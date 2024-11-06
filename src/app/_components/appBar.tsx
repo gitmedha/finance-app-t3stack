@@ -2,7 +2,6 @@
 
 // import { IconButton } from "@radix-ui/themes";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // Use `next/navigation` for app router
 import { LuLogOut } from "react-icons/lu";
 import { FaHandHoldingHeart, FaUser } from "react-icons/fa";
 import { GiExpense } from "react-icons/gi";
@@ -10,6 +9,8 @@ import { HiBanknotes } from "react-icons/hi2";
 import { IoHome } from "react-icons/io5";
 import { GiOfficeChair, GiMoneyStack } from "react-icons/gi";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
+import { IconButton } from "@radix-ui/themes";
 
 const AppBar = () => {
 
@@ -49,9 +50,9 @@ const AppBar = () => {
         <div className="flex justify-start items-center text-white space-x-2">
           <span className="font-medium">Hi, Praveen K</span>
 
-          <Link href='/login' className='cursor-pointer rounded-full flex justify-center items-center focus:ring-0  text-primary bg-white h-8 w-8' >
+          <IconButton onClick={()=>signOut()} className=' !bg-primary/20 !cursor-pointer rounded-full flex justify-center items-center focus:ring-0  text-primary h-8 w-8' >
             <LuLogOut />
-          </Link>
+          </IconButton>
         </div>
       </div>
     </nav>

@@ -7,12 +7,12 @@ import { GeistSans } from "geist/font/sans";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Theme } from "@radix-ui/themes";
 import AppBar from "./_components/appBar";
-import { ContextProvider, useAuth } from "~/context"; // Correct path to AuthContext
-import { useEffect } from "react";
+import { ContextProvider } from "~/context"; // Correct path to AuthContext
+import { useSession } from "next-auth/react";
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{ children: React.ReactNode}>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body className="bg-[#f5f5f5]">
@@ -32,15 +32,11 @@ export default function RootLayout({
 }
 
 const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, setIsAuthenticated } = useAuth()
-
-  useEffect(() => {
-    setIsAuthenticated(true)
-  }, [])
+  const { data: session } = useSession();
 
   return (
     <>
-      {isAuthenticated && <AppBar />}
+      {session && <AppBar />}
       {children}
     </>
   );

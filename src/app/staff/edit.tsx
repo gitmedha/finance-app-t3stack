@@ -6,13 +6,17 @@ import Modal from '../_components/Modal';
 import { MdEdit } from "react-icons/md";
 
 interface FilterOptions {
-    Name: string,
-    EmpID: string,
-    Designation: string,
-    Department: string,
-    JoiningDate: string,
-    Status: string,
-    CreatedAt: string,
+    id: number;
+  name: string;
+  isactive: boolean;
+  description: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+  createdBy: number;
+  updatedBy: number | null;
+  empNo: string;
+  department: number | null;
 }
 
 interface ItemDetailProps {

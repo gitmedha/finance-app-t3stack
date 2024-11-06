@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
+import { SessionProvider } from "next-auth/react"
 interface AuthContextType {
   isAuthenticated: boolean;
   setIsAuthenticated: (value: boolean) => void;
@@ -7,12 +7,14 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const ContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ContextProvider: React.FC<{ children: ReactNode, }> = ({ children}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
-      {children}
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated}}>
+      <SessionProvider>
+        {children}
+      </SessionProvider>
     </AuthContext.Provider>
   );
 };

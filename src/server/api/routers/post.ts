@@ -80,11 +80,10 @@ export const postRouter = createTRPCRouter({
         where: (fields, operators) =>
           operators.eq(fields.email, input.email),
       });
-      
+      // console.log(user)
       if (!user) {
         return { message: "Invalid username ", user, success: false };
       }
-
       // Compare the hashed password with the input password
       const isPasswordValid = await bcrypt.compare(input.password, user.password);
       if (!isPasswordValid) {

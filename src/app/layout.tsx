@@ -33,6 +33,7 @@ export default function RootLayout({
 
 const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { data: session } = useSession();
+
   return (
     <>
       {session && <AppBar />}

@@ -24,28 +24,30 @@ const LoginForm = () => {
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      setError('')
+      setError('');
+      setLoading(true)
       const result = await loginMutation.mutateAsync(data);
       if (result?.success) {
         const res = await signIn("credentials", {
           redirect: false,
-          email: data.email,
-          password: data.password,
+          ...result.user
         });
+  
         if (res?.error) {
-          alert("Invalid email or password. Please try again.");
+          setLoading(false)
+          setError("Invalid email or password. Please try again.");
         } else {
-          router.push("/home"); // Customize this path
+          router.push("/home"); // Redirect after successful login
         }
-        reset();
-        setLoading(false);
       } else {
-        setError(result?.message)
+        setError(result?.message);
+        setLoading(false)
       }
     } catch (error) {
       console.error("Login failed:", error);
     }
   };
+  
 
   return (
     <form

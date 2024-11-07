@@ -9,10 +9,11 @@ import { HiBanknotes } from "react-icons/hi2";
 import { IoHome } from "react-icons/io5";
 import { GiOfficeChair, GiMoneyStack } from "react-icons/gi";
 import Image from "next/image";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { IconButton } from "@radix-ui/themes";
 
 const AppBar = () => {
+  const { data: session } = useSession();
 
   const menus = [
     { menu: 'Home', path: '/home', icon: <IoHome /> },
@@ -23,6 +24,8 @@ const AppBar = () => {
     { menu: 'Expenses', path: '/expenses', icon: <GiExpense /> },
     { menu: 'Staff', path: '/staff', icon: <FaUser /> },
   ]
+
+  console.log(session)
 
   return (
     <nav className="shadow-lg bg-primary">
@@ -48,7 +51,7 @@ const AppBar = () => {
           })}
         </ul>
         <div className="flex justify-start items-center text-white space-x-2">
-          <span className="font-medium">Hi, Praveen K</span>
+          <span className="font-medium capitalize">Hi, {session?.user.fullName}</span>
 
           <IconButton onClick={()=>signOut()} className=' !bg-primary/20 !cursor-pointer rounded-full flex justify-center items-center focus:ring-0  text-primary h-8 w-8' >
             <LuLogOut />

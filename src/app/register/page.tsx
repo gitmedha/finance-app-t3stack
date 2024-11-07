@@ -11,7 +11,7 @@ export default async function RegisterPage() {
         <div className="flex justify-center items-center">
           <Image src="/medha-primary.png" alt="Logo" width={150} height={150} />
         </div>
-        <RegisterForm />
+        {/* <RegisterForm /> */}
       </div>
     </div>
   );

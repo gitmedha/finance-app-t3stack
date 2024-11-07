@@ -3,20 +3,26 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 export { default } from "next-auth/middleware"
 
-// checking route with token
+// Middleware to protect routes based on token presence
 export async function middleware(request: NextRequest) {
-    const token = await getToken({req: request})
+    const token = await getToken({ req: request })
     const url = request.nextUrl
 
-    if(token && (url.pathname.startsWith('/login') || url.pathname === '/') ){
+    // Redirect logged-in users away from the login page
+    if (token && url.pathname === '/login') {
         return NextResponse.redirect(new URL('/home', request.url))
-    }else if(!token){
+    }
+
+    // Redirect unauthenticated users to login page for protected routes
+    if (!token && !url.pathname.startsWith('/login')) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
-    return NextResponse.next();
+
+    // Allow request to proceed
+    return NextResponse.next()
 }
 
-// auth logic applies on these routes  and protected routes
+// Protect these routes with middleware
 export const config = {
     matcher: [
         '/',
@@ -24,9 +30,9 @@ export const config = {
         '/budget',
         '/donors',
         '/departments',
-        '/cost-centers', 
+        '/cost-centers',
         '/expenses',
         '/staff',
-        '/login',
+        '/login' // Include login route to apply middleware
     ],
 }

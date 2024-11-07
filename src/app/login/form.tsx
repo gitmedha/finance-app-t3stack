@@ -20,11 +20,13 @@ const LoginForm = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const loginMutation = api.post.login.useMutation();
+  const [error, setError] = useState('')
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
+      setError('')
       const result = await loginMutation.mutateAsync(data);
-      if(result?.success){
+      if (result?.success) {
         const res = await signIn("credentials", {
           redirect: false,
           email: data.email,
@@ -37,8 +39,9 @@ const LoginForm = () => {
         }
         reset();
         setLoading(false);
+      } else {
+        setError(result?.message)
       }
-      console.log(result)
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -53,8 +56,8 @@ const LoginForm = () => {
         <p className="m-0 text-4xl font-semibold text-primary">
           <span className="-ml-10">
             MEDHA
-          </span> 
-          <br/>
+          </span>
+          <br />
           <span className="ml-8">
             FINANCE
           </span>
@@ -86,6 +89,11 @@ const LoginForm = () => {
         )}
       </div>
 
+      {error && (
+          <span className="text-red-500 text-xs bg-red-50 border border-red-500 p-2 w-full rounded-md">{error}</span>
+        )}
+
+     
       <Button
         size='3'
         type='submit'
@@ -94,7 +102,7 @@ const LoginForm = () => {
       >
         {loading ? "Logging in..." : "Login"}
       </Button>
-     
+
     </form>
   );
 };

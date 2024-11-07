@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
     const token = await getToken({req: request})
     const url = request.nextUrl
 
-    if(token && ( url.pathname.startsWith('/login')) ){
+    if(token && (url.pathname.startsWith('/login') || url.pathname === '/') ){
         return NextResponse.redirect(new URL('/home', request.url))
     }else if(!token){
         return NextResponse.redirect(new URL('/login', request.url))
@@ -27,5 +27,6 @@ export const config = {
         '/cost-centers', 
         '/expenses',
         '/staff',
+        '/login',
     ],
 }

@@ -27,7 +27,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ placeholder = "Search...", cl
             type="search"
             placeholder={placeholder}
             onChange={onChange}
-            className={` outlined pl-1 rounded-lg disabled:bg-white placeholder:text-gray-600  text-textSecondary text-sm outline-none focus:ring-0 block w-full ${className}`}
+            className={`outlined pl-1 rounded-lg disabled:bg-white placeholder:text-gray-600  text-textSecondary text-sm outline-none focus:ring-0 block w-full ${className}`}
         />
     </div>
 }

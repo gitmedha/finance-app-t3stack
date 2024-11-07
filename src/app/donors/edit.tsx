@@ -4,21 +4,7 @@ import React, { useState } from 'react';
 import { TextField, Text, IconButton } from '@radix-ui/themes';
 import Modal from '../_components/Modal';
 import { MdEdit } from "react-icons/md";
-
-interface FilterOptions {
-    Name: string,
-    CostCenter: string,
-    Year: string,
-    TotalBudget:number,
-    ReceivedBudget: number,
-    Currency: string,
-    Type: string,
-    CreatedAt: string,
-}
-
-interface ItemDetailProps {
-    item: FilterOptions;
-}
+import type { ItemDetailProps} from "./donor";
 
 const EditDonor: React.FC<ItemDetailProps> = ({ item }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,13 +30,13 @@ const EditDonor: React.FC<ItemDetailProps> = ({ item }) => {
                     <Text as="div" size="2" mb="1" weight="bold">
                         Name
                     </Text>
-                    <TextField.Root defaultValue={item?.Name} placeholder="Enter your Amount" />
+                    <TextField.Root defaultValue={item?.name} placeholder="Enter your Amount" />
                 </label>
                 <label>
                     <Text as="div" size="2" mb="1" weight="bold">
                         Description
                     </Text>
-                    <TextField.Root defaultValue={item?.TotalBudget.toString()} placeholder="Enter your Description" />
+                    <TextField.Root defaultValue={item?.totalBudget.toString()} placeholder="Enter your Description" />
                 </label>
             </Modal>
         </>

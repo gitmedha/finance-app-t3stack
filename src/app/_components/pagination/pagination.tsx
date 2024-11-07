@@ -31,7 +31,7 @@ const ReactPaginationStyle: React.FC<ReactPaginationStyleProps> = ({
       }
       pageCount={count || 1}
       breakLabel=".."
-      pageRangeDisplayed={0} // This could be adjusted as needed
+      pageRangeDisplayed={2} // This could be adjusted as needed
       activeLinkClassName="bg-primary text-white w-6 h-6 rounded-lg flex justify-center items-center"
       pageClassName="flex justify-center text-primary items-center rounded-lg border border-primary h-6 w-6"
       marginPagesDisplayed={1}

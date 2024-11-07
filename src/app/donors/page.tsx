@@ -1,144 +1,20 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
-import DonorFilterForm from "./filter";
+import { api } from "~/trpc/react";
+import type { GetDonorsResponse, Donors } from "./donor";
 import EditDonor from "./edit";
 import DeleteDonor from "./delete";
-import { db } from "~/server/db";
-// import {
-//   categoryMasterInFinanceProject,
-//   categoryHierarchyInFinanceProject,
-//   costCenterInFinanceProject,
-//   departmentHierarchyInFinanceProject,
-//   donorMasterInFinanceProject,
-//   departmentMasterInFinanceProject,
-//   staffMasterInFinanceProject,
-//   knexMigrationsInFinanceProject,
-//   knexMigrationsLockInFinanceProject,
-//   roleMasterInFinanceProject,
-//   budgetMasterInFinanceProject,
-//   tallyDepartmentInFinanceProject,
-//   tallyDonorInFinanceProject,
-//   budgetDetailsInFinanceProject,
-//   userMasterInFinanceProject,
-//   tallyStaffInFinanceProject,
-// } from "~/server/db/schema";
+import DonorFilterForm from "./filter";
 
-const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Currency', 'Type', 'Created At','actions']
-const donorData = [
-  {
-    Name: 'Marketing Campaign',
-    CostCenter: 'Marketing',
-    Year: '23-24',
-    TotalBudget: 50000,
-    ReceivedBudget: 30000,
-    Currency: 'USD',
-    Type:'FC',
-    CreatedAt: '2023-04-10 10:00:00',
-  },
-  {
-    Name: 'Employee Training',
-    CostCenter: 'HR',
-    Year: '23-24',
-    TotalBudget: 15000,
-    ReceivedBudget: 15000,
-    Currency: 'USD',
-    Type:'FC',
-    CreatedAt: '2023-04-12 09:15:00',
-  },
-  {
-    Name: 'Product Development',
-    CostCenter: 'R&D',
-    Year: '24-25',
-    TotalBudget: 120000,
-    ReceivedBudget: 60000,
-    Currency: 'USD',
-    Type:'FC',
-    CreatedAt: '2023-05-01 14:30:00',
-  },
-  {
-    Name: 'Office Supplies',
-    CostCenter: 'Administration',
-    Year: '24-25',
-    TotalBudget: 8000,
-    ReceivedBudget: 5000,
-    Currency: 'EUR',
-    Type:'FC',
-    CreatedAt: '2023-05-05 12:00:00',
-  },
-  {
-    Name: 'System Upgrade',
-    CostCenter: 'IT',
-    Year: '23-24',
-    TotalBudget: 25000,
-    ReceivedBudget: 25000,
-    Currency: 'USD',
-    Type:'NFC',
-    CreatedAt: '2023-06-15 16:00:00',
-  },
-  {
-    Name: 'Client Events',
-    CostCenter: 'Sales',
-    Year: '23-24',
-    TotalBudget: 30000,
-    ReceivedBudget: 20000,
-    Currency: 'USD',
-    Type:'FC',
-    CreatedAt: '2023-07-01 18:30:00',
-  },
-  {
-    Name: 'Market Research',
-    CostCenter: 'R&D',
-    Year: '24-25',
-    TotalBudget: 20000,
-    ReceivedBudget: 10000,
-    Currency: 'USD',
-    Type:'NFC',
-    CreatedAt: '2023-08-01 15:45:00',
-  },
-  {
-    Name: 'Legal Consulting',
-    CostCenter: 'HR',
-    Year: '23-24',
-    TotalBudget: 10000,
-    ReceivedBudget: 7000,
-    Currency: 'USD',
-    Type:'FC',
-    CreatedAt: '2023-08-10 11:15:00',
-  },
-  {
-    Name: 'Branding Project',
-    CostCenter: 'Marketing',
-    Year: '24-25',
-    TotalBudget: 50000,
-    ReceivedBudget: 25000,
-    Currency: 'EUR',
-    Type:'NFC',
-    CreatedAt: '2023-09-20 08:45:00',
-  },
-  {
-    Name: 'Infrastructure Setup',
-    CostCenter: 'Operations',
-    Year: '24-25',
-    TotalBudget: 150000,
-    ReceivedBudget: 100000,
-    Currency: 'USD',
-    Type:'FC',
-    CreatedAt: '2023-10-05 10:20:00',
-  }
-];
+const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Status', 'Currency', 'Type', 'Created At', 'actions']
 
-// ( FC or NFC )
-
-const totalItems = 100; // Total number of items (for example)
-const itemsPerPage = 10; // Items per page
-
-export default async function DonorReport() {
+export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
     category: '',
     status: '',
@@ -146,6 +22,35 @@ export default async function DonorReport() {
     year: '',
     month: ''
   });
+
+  const [searchTerm, setSearch] = useState('')
+
+  // Fetch data with pagination
+  const { data, isLoading, refetch } = api.get.getDonors.useQuery(
+    { page: currentPage, limit, searchTerm },
+    { enabled: false } // Disable automatic query execution
+  );
+
+  // Trigger refetch on page or limit change
+  useEffect(() => {
+    refetch();
+  }, [currentPage, limit, searchTerm, refetch]);
+
+  const result: GetDonorsResponse | undefined = data;
+
+  const handleSearch = (e: any) => {
+    const debounceTimer = setTimeout(() => {
+      if (e.target.value.trim().length > 2) {
+        setSearch(e.target.value.trim())
+      }else if(e.target.value.trim().length === 0){
+        setSearch('')
+      }
+    }, 1500)
+    return () => {
+      clearTimeout(debounceTimer)
+    }
+
+  }
 
   const handleSelect = (name: string, value: string) => {
     setFilters((prev) => ({
@@ -155,14 +60,12 @@ export default async function DonorReport() {
   };
 
   const handlePagination = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected); // Update current page
+    setCurrentPage(selectedPage.selected + 1);
   };
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
-    console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
-
 
   return (
     <div className="h-full">
@@ -173,22 +76,21 @@ export default async function DonorReport() {
       </div>
       <div className="flex justify-center">
         <div className='shadow-lg container rounded-lg m-2 p-1'>
-
-          <div className="flex justify-between items-center mb-1">
-            <span className="font-semibold">Donors ({donorData.length})</span>
+          <div className="flex justify-between items-center mb-1 px-2">
+            <span className="font-semibold">Donors ({result?.donors ? result.totalCount : ''})</span>
             <div className=" w-80 ">
-              <SearchInput placeholder="Search Donor"
+              <SearchInput placeholder="Search Staff"
                 className="p-2"
+                onChange={handleSearch}
               />
             </div>
-
             <div className="flex justify-end items-center space-x-2">
-              <ReactPaginationStyle
-                total={totalItems}
+              {result?.donors && <ReactPaginationStyle
+                total={result?.totalCount}
                 currentPage={currentPage}
                 handlePagination={handlePagination}
-                limit={itemsPerPage}
-              />
+                limit={limit}
+              />}
 
               <PaginationLimitSelect
                 limits={[10, 20, 50, 100]} // Define the limits you want to provide
@@ -198,32 +100,48 @@ export default async function DonorReport() {
             </div>
           </div>
 
-
-          <table className="min-w-full table-auto border-collapse p-2">
+          {isLoading ? <div className='w-full flex justify-center items-center h-[46vh]'>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                Loading...
+              </span>
+            </div>
+          </div> : (result?.donors && <table className="min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {
                   cols?.map(col => {
-                    return <th key={col} className="p-2">{col}</th>
+                    return (
+                      <th key={col} className="p-2">{col}</th>
+                    )
                   })
                 }
-
               </tr>
             </thead>
             <tbody>
-              {donorData.map((item) => (
+              {result?.donors.map((item: Donors) => (
                 <tr
-                  key={item?.CreatedAt}
-                  className="border-b hover:bg-gray-100 text-sm transition-colors"
+                  key={item?.id}
+                  className="border-b text-sm hover:bg-gray-100 transition-colors"
                 >
-                  <td className="p-2">{item.Name}</td>
-                  <td className="p-2">{item.CostCenter}</td>
-                  <td className="p-2">{item.Year}</td>
-                  <td className="p-2">{item.TotalBudget}</td>
-                  <td className="p-2">{item.ReceivedBudget}</td>
-                  <td className="p-2">{item.Currency}</td>
-                  <td className="p-2">{item.Type}</td>
-                  <td className="p-2">{item.CreatedAt}</td>
+                  <td className="p-2">{item.name}</td>
+                  <td className="p-2">{item.costCenter}</td>
+                  <td className="p-2">{item.finYear}</td>
+                  <td className="p-2">{item.totalBudget}</td>
+                  <td className="p-2">{item.budgetReceived}</td>
+                  <td className="p-2">
+                    <span
+                      className={`px-2 py-1 rounded-lg text-sm ${item.isactive
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                        }`}
+                    >
+                      {item.isactive ? 'Active' : 'InActive'}
+                    </span>
+                  </td>
+                  <td className="p-2">{item.currency}</td>
+                  <td className="p-2">{item.type}</td>
+                  <td className="p-2">{item.createdAt}</td>
                   <td className="p-1.5 space-x-2">
                     <EditDonor item={item} />
                     <DeleteDonor item={item} />
@@ -231,7 +149,7 @@ export default async function DonorReport() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table>)}
         </div>
       </div>
     </div>

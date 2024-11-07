@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
@@ -15,10 +15,6 @@ const cols = ['Name', 'Emp ID', 'Designation', 'Department', 'Joining Date', 'St
 export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
-  const { data, isLoading, isError, refetch } = api.get.getStaffs.useQuery({ page: currentPage, limit })
-
-  const result: GetStaffsResponse | undefined = data;
-
   const [filters, setFilters] = useState({
     category: '',
     status: '',
@@ -26,6 +22,35 @@ export default function Staff() {
     year: '',
     month: ''
   });
+
+  const [searchTerm, setSearch] = useState('')
+
+  // Fetch data with pagination
+  const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
+    { page: currentPage, limit, searchTerm },
+    { enabled: false } // Disable automatic query execution
+  );
+
+  // Trigger refetch on page or limit change
+  useEffect(() => {
+    refetch();
+  }, [currentPage, limit,searchTerm, refetch]);
+
+  const result: GetStaffsResponse | undefined = data;
+
+  const handleSearch = (e: any) => {
+    const debounceTimer = setTimeout(() => {
+      if(e.target.value.trim().length > 2){
+        setSearch(e.target.value.trim())
+      }else if(e.target.value.trim().length === 0){
+        setSearch('')
+      }
+    }, 1500)
+    return () => {
+      clearTimeout(debounceTimer)
+    }
+
+  }
 
   const handleSelect = (name: string, value: string) => {
     setFilters((prev) => ({
@@ -35,7 +60,7 @@ export default function Staff() {
   };
 
   const handlePagination = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected); // Update current page
+    setCurrentPage(selectedPage.selected + 1);
   };
 
   const handleLimitChange = (newLimit: number) => {
@@ -52,12 +77,12 @@ export default function Staff() {
       </div>
       <div className="flex justify-center">
         <div className='shadow-lg container rounded-lg m-2 p-1'>
-
-          <div className="flex justify-between items-center mb-1">
+          <div className="flex justify-between items-center mb-1 px-2">
             <span className="font-semibold">Staff ({result?.staffs ? result.totalCount : ''})</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Staff"
                 className="p-2"
+                onChange={handleSearch}
               />
             </div>
             <div className="flex justify-end items-center space-x-2">
@@ -76,7 +101,13 @@ export default function Staff() {
             </div>
           </div>
 
-          <table className="min-w-full table-auto border-collapse p-2">
+          {isLoading ? <div className='w-full flex justify-center items-center h-[46vh]'>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                Loading...
+              </span>
+            </div>
+          </div> : (result?.staffs && <table className="min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {
@@ -89,7 +120,7 @@ export default function Staff() {
               </tr>
             </thead>
             <tbody>
-              {result?.staffs && result?.staffs.map((item: Staff) => (
+              {result?.staffs.map((item: Staff) => (
                 <tr
                   key={item?.id}
                   className="border-b text-sm hover:bg-gray-100 transition-colors"
@@ -117,7 +148,7 @@ export default function Staff() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table>)}
         </div>
       </div>
     </div>

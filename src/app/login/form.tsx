@@ -11,7 +11,7 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 
 interface FormData {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -23,19 +23,22 @@ const LoginForm = () => {
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email: data.username,
-        password: data.password,
-      });
-  
-      setLoading(false);
-      if (result?.error) {
-        alert("Invalid username or password. Please try again.");
-      } else {
-        router.push("/home"); // Customize this path
+      const result = await loginMutation.mutateAsync(data);
+      if(result?.success){
+        const res = await signIn("credentials", {
+          redirect: false,
+          email: data.email,
+          password: data.password,
+        });
+        if (res?.error) {
+          alert("Invalid email or password. Please try again.");
+        } else {
+          router.push("/home"); // Customize this path
+        }
+        reset();
+        setLoading(false);
       }
-      reset();
+      console.log(result)
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -59,15 +62,15 @@ const LoginForm = () => {
       </div>
       <div className="w-full flex flex-col gap-2 mb-4">
         <label className="font-[400] text-xs text-gray-600">
-          Enter Your Username
+          Enter Your email
         </label>
         <input
-          {...register("username", { required: "Username is required" })}
+          {...register("email", { required: "email is required" })}
           placeholder="email@demo.com"
           className="border rounded-lg px-3 py-2 text-sm w-full outline-none"
         />
-        {errors.username && (
-          <span className="text-red-500 text-xs">{errors.username.message}</span>
+        {errors.email && (
+          <span className="text-red-500 text-xs">{errors.email.message}</span>
         )}
       </div>
       <div className="w-full flex flex-col gap-2 mb-4">

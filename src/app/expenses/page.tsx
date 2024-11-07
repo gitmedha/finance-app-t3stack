@@ -189,7 +189,7 @@ export default function Expenses() {
             </div>
           </div>
 
-          <table className="min-w-full table-auto border-collapse p-2">
+         <table className="min-h-72 min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {cols?.map(col => {

@@ -12,15 +12,18 @@ import DonorFilterForm from "./filter";
 
 const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Status', 'Currency', 'Type', 'Created At', 'actions']
 
-export default function Staff() {
+export default function Donor() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
-    category: '',
-    status: '',
-    byTime: '',
-    year: '',
-    month: ''
+    name: '',
+    costCenter: '',
+    finYear: '',
+    totalBudget:'',
+    budgetReceived:'',
+    currency: '',
+    notes: '',
+    createdAt: '',
   });
 
   const [searchTerm, setSearch] = useState('')
@@ -79,7 +82,7 @@ export default function Staff() {
           <div className="flex justify-between items-center mb-1 px-2">
             <span className="font-semibold">Donors ({result?.donors ? result.totalCount : ''})</span>
             <div className=" w-80 ">
-              <SearchInput placeholder="Search Staff"
+              <SearchInput placeholder="Search Donor"
                 className="p-2"
                 onChange={handleSearch}
               />
@@ -106,7 +109,7 @@ export default function Staff() {
                 Loading...
               </span>
             </div>
-          </div> : (result?.donors && <table className="min-w-full table-auto border-collapse p-2">
+          </div> : (result?.donors &&<table className="min-h-72 min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {

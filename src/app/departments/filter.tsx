@@ -1,19 +1,9 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
 import AddDepartment from '../donors/add';
+import type { DepartmentFilterFormProps } from "./department";
 
 const categories = ["Finance", "Health", "Education", "Technology", "Miscellaneous"];
-interface FilterOptions {
-  category: string,
-  status: string,
-  byTime: string,
-  year: string,
-  month: string
-}
-interface DepartmentFilterFormProps {
-  filters: FilterOptions;
-  handleSelect: (name: string, value: string) => void;
-}
 
 const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({ filters, handleSelect }) => {
 
@@ -23,9 +13,8 @@ const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({ filters, ha
         <DropdownMenu.Trigger asChild>
           <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.category || 'Filter by Select Category'}
+              {filters.deptCode || 'Filter by Select Code'}
             </span>
-
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
@@ -46,7 +35,7 @@ const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({ filters, ha
         <DropdownMenu.Trigger className="w-full" asChild>
           <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.status || 'Filter by Select Status'}
+              {filters.type || 'Filter by Select Type'}
             </span>
 
             <RiArrowDropDownLine size={30} />
@@ -66,74 +55,73 @@ const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({ filters, ha
       </DropdownMenu.Root>
 
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger asChild>
+        <DropdownMenu.Trigger className="w-full" asChild>
           <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.byTime || 'Filter by Select By time'}
+              {filters.type || 'Filter by Select Type'}
             </span>
 
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-          {categories.map((byTime) => (
+          {categories.map((status) => (
             <DropdownMenu.Item
-              key={byTime}
+              key={status}
               className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-              onSelect={() => handleSelect('byTime', byTime)}
+              onSelect={() => handleSelect('status', status)}
             >
-              {byTime}
+              {status}
             </DropdownMenu.Item>
           ))}
         </DropdownMenu.Content>
       </DropdownMenu.Root>
 
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger asChild>
+        <DropdownMenu.Trigger className="w-full" asChild>
           <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.year || 'Filter by Select Year'}
+              {filters.type || 'Filter by Select Type'}
             </span>
 
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-          {categories.map((year) => (
+          {categories.map((status) => (
             <DropdownMenu.Item
-              key={year}
+              key={status}
               className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-              onSelect={() => handleSelect('year', year)}
+              onSelect={() => handleSelect('status', status)}
             >
-              {year}
+              {status}
             </DropdownMenu.Item>
           ))}
         </DropdownMenu.Content>
       </DropdownMenu.Root>
-
-
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger asChild>
+        <DropdownMenu.Trigger className="w-full" asChild>
           <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.month || 'Filter by Select Month'}
+              {filters.type || 'Filter by Select Type'}
             </span>
 
             <RiArrowDropDownLine size={30} />
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-          {categories.map((month) => (
+          {categories.map((status) => (
             <DropdownMenu.Item
-              key={month}
+              key={status}
               className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-              onSelect={() => handleSelect('month', month)}
+              onSelect={() => handleSelect('status', status)}
             >
-              {month}
+              {status}
             </DropdownMenu.Item>
           ))}
         </DropdownMenu.Content>
       </DropdownMenu.Root>
+     
       <div className='flex justify-end items-center'>
         <AddDepartment />
       </div>

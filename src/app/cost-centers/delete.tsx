@@ -3,18 +3,7 @@ import React, { useState } from 'react';
 import { TextField, Text, IconButton } from '@radix-ui/themes';
 import Modal from '../_components/Modal';
 import { MdDelete } from "react-icons/md";
-
-
-interface FilterOptions {
-    Name:string,
-    Code:string,
-    Type:string,
-    CreatedAt:string,
-}
-
-interface ItemDetailProps {
-    item: FilterOptions;
-}
+import type { ItemDetailProps } from "./cost-center";
 
 const DeleteCostCenters: React.FC<ItemDetailProps> = ({ item }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,13 +29,13 @@ const DeleteCostCenters: React.FC<ItemDetailProps> = ({ item }) => {
                     <Text as="div" size="2" mb="1" weight="bold">
                         Name
                     </Text>
-                    <TextField.Root defaultValue={item?.Name} placeholder="Enter your Name" />
+                    <TextField.Root defaultValue={item?.name || ''} placeholder="Enter your Name" />
                 </label>
                 <label>
                     <Text as="div" size="2" mb="1" weight="bold">
                         Description
                     </Text>
-                    <TextField.Root defaultValue={item?.Code} placeholder="Enter your Description" />
+                    <TextField.Root defaultValue={item?.description || ''} placeholder="Enter your Description" />
                 </label>
             </Modal>
         </>

@@ -1,101 +1,58 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import DepartmentFilterForm from "./filter";
 import EditDepartments from "./edit";
 import DeleteDepartment from "./delete";
+import { api } from "~/trpc/react";
+import type { GetDepartmentResponse, Department } from "./department";
 
-const cols = ['Name', 'Code', 'Type', 'Parent Dept', 'Created At', 'Actions']
-
-const departmentRecords = [
-  {
-    Name: 'Human Resources',
-    Code: 'HR001',
-    Type: 'Administration',
-    ParentDept: 'Corporate',
-    CreatedAt: '2020-03-15 09:00:00',
-  },
-  {
-    Name: 'Finance',
-    Code: 'FIN002',
-    Type: 'Support',
-    ParentDept: 'Corporate',
-    CreatedAt: '2019-07-21 14:20:00',
-  },
-  {
-    Name: 'Marketing',
-    Code: 'MKT003',
-    Type: 'Operations',
-    ParentDept: 'Sales and Marketing',
-    CreatedAt: '2021-02-18 11:45:00',
-  },
-  {
-    Name: 'Sales',
-    Code: 'SAL004',
-    Type: 'Operations',
-    ParentDept: 'Sales and Marketing',
-    CreatedAt: '2018-05-25 16:30:00',
-  },
-  {
-    Name: 'Research and Development',
-    Code: 'RND005',
-    Type: 'Core',
-    ParentDept: 'Corporate',
-    CreatedAt: '2020-12-05 10:10:00',
-  },
-  {
-    Name: 'Customer Support',
-    Code: 'CST006',
-    Type: 'Support',
-    ParentDept: 'Operations',
-    CreatedAt: '2019-11-15 08:50:00',
-  },
-  {
-    Name: 'Information Technology',
-    Code: 'IT007',
-    Type: 'Support',
-    ParentDept: 'Corporate',
-    CreatedAt: '2022-04-01 13:15:00',
-  },
-  {
-    Name: 'Legal',
-    Code: 'LEG008',
-    Type: 'Administration',
-    ParentDept: 'Corporate',
-    CreatedAt: '2017-09-10 17:05:00',
-  },
-  {
-    Name: 'Product Management',
-    Code: 'PM009',
-    Type: 'Core',
-    ParentDept: 'Corporate',
-    CreatedAt: '2021-08-12 12:30:00',
-  },
-  {
-    Name: 'Logistics',
-    Code: 'LOG010',
-    Type: 'Operations',
-    ParentDept: 'Operations',
-    CreatedAt: '2019-03-08 09:20:00',
-  }
-];
-
-const totalItems = 100; // Total number of items (for example)
-const itemsPerPage = 10; // Items per page
+const cols = ['Name', 'Code', 'Type', 'Status', 'Created At', 'Actions']
 
 export default function DepartmentReport() {
   const [limit, setLimit] = useState<number>(10); // Default limit
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearch] = useState('')
+
   const [filters, setFilters] = useState({
-    category: '',
-    status: '',
-    byTime: '',
-    year: '',
-    month: ''
+    departmentname: '',
+    type: '',
+    deptCode: '',
+    isactive: '',
+    notes: '',
+    description: '',
+    createdAt: '',
   });
+
+
+  // Fetch data with pagination
+  const { data, isLoading, refetch } = api.get.getDepartments.useQuery(
+    { page: currentPage, limit, searchTerm },
+    { enabled: false } // Disable automatic query execution
+  );
+
+  // Trigger refetch on page or limit change
+  useEffect(() => {
+    refetch();
+  }, [currentPage, limit, searchTerm, refetch]);
+
+  const result: GetDepartmentResponse | undefined = data;
+
+  const handleSearch = (e: any) => {
+    const debounceTimer = setTimeout(() => {
+      if (e.target.value.trim().length > 2) {
+        setSearch(e.target.value.trim())
+      } else if (e.target.value.trim().length === 0) {
+        setSearch('')
+      }
+    }, 1500)
+    return () => {
+      clearTimeout(debounceTimer)
+    }
+  }
 
   const handleSelect = (name: string, value: string) => {
     setFilters((prev) => ({
@@ -105,12 +62,12 @@ export default function DepartmentReport() {
   };
 
   const handlePagination = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected); // Update current page
+    setCurrentPage(selectedPage.selected + 1);
   };
+
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
-    console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
 
   return (
@@ -122,22 +79,21 @@ export default function DepartmentReport() {
       </div>
       <div className="flex justify-center">
         <div className='shadow-lg container rounded-lg m-2 p-1'>
-
-          <div className="flex justify-between items-center mb-1">
-            <span className="font-semibold">Departments ({departmentRecords.length})</span>
+          <div className="flex justify-between items-center mb-1 px-2">
+            <span className="font-semibold">Departments ({result?.departments ? result.totalCount : ''})</span>
             <div className=" w-80 ">
-              <SearchInput placeholder="Search Department"
+              <SearchInput placeholder="Search Cost Center"
                 className="p-2"
+                onChange={handleSearch}
               />
             </div>
-
             <div className="flex justify-end items-center space-x-2">
-              <ReactPaginationStyle
-                total={totalItems}
+              {result?.departments && <ReactPaginationStyle
+                total={result?.totalCount}
                 currentPage={currentPage}
                 handlePagination={handlePagination}
-                limit={itemsPerPage}
-              />
+                limit={limit}
+              />}
 
               <PaginationLimitSelect
                 limits={[10, 20, 50, 100]} // Define the limits you want to provide
@@ -147,37 +103,52 @@ export default function DepartmentReport() {
             </div>
           </div>
 
-
-          <table className="min-w-full table-auto border-collapse p-2">
+          {isLoading ? <div className='w-full flex justify-center items-center h-[46vh]'>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                Loading...
+              </span>
+            </div>
+          </div> : (result?.departments && <table className="min-h-72 min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {
                   cols?.map(col => {
-                    return <th key={col} className="p-2">{col}</th>
+                    return (
+                      <th key={col} className="p-2">{col}</th>
+                    )
                   })
                 }
-
               </tr>
             </thead>
             <tbody>
-              {departmentRecords.map((item) => (
+              {result?.departments.map((item: Department) => (
                 <tr
-                  key={item.CreatedAt}
-                  className="border-b hover:bg-gray-100 text-sm transition-colors"
+                  key={item?.id}
+                  className="border-b text-sm hover:bg-gray-100 transition-colors"
                 >
-                  <td className="p-2">{item.Name}</td>
-                  <td className="p-2">{item.Code}</td>
-                  <td className="p-2">{item.Type}</td>
-                  <td className="p-2">{item.ParentDept}</td>
-                  <td className="p-2">{item.CreatedAt}</td>
-                  <td className="space-x-2">
+                  <td className="p-2">{item.departmentname}</td>
+                  <td className="p-2">{item.deptCode}</td>
+                  <td className="p-2">{item.type}</td>
+                  <td className="p-2">
+                    <span
+                      className={`px-2 py-1 rounded-lg text-sm ${item.isactive
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                        }`}
+                    >
+                      {item.isactive ? 'Active' : 'InActive'}
+                    </span>
+                  </td>
+                  <td className="p-2">{item.createdAt}</td>
+                  <td className="p-1.5 space-x-2">
                     <EditDepartments item={item} />
                     <DeleteDepartment item={item} />
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table>)}
         </div>
       </div>
     </div>

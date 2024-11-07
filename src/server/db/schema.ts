@@ -77,6 +77,7 @@ export const costCenterInFinanceProject = financeProject.table("cost_center", {
 	updatedAt: date("updated_at"),
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
+	code: text("code").notNull(),
 },
 (table) => {
 	return {
@@ -118,39 +119,6 @@ export const departmentHierarchyInFinanceProject = financeProject.table("departm
 			foreignColumns: [userMasterInFinanceProject.id],
 			name: "department_hierarchy_updated_by_fkey"
 		}),
-	}
-});
-
-export const donorMasterInFinanceProject = financeProject.table("donor_master", {
-	id: serial("id").primaryKey().notNull(),
-	name: varchar("name", { length: 255 }).notNull(),
-	costCenter: integer("cost_center"),
-	finYear: integer("fin_year").notNull(),
-	totalBudget: numeric("total_budget", { precision: 8, scale:  2 }).notNull(),
-	budgetReceived: numeric("budget_received", { precision: 8, scale:  2 }).notNull(),
-	currency: text("currency").notNull(),
-	notes: varchar("notes", { length: 255 }),
-	type: varchar("type", { length: 50 }),
-	description: varchar("description", { length: 255 }),
-	isactive: boolean("isactive").notNull(),
-	createdAt: date("created_at").notNull(),
-	updatedAt: date("updated_at"),
-	createdBy: integer("created_by").notNull(),
-	updatedBy: integer("updated_by"),
-},
-(table) => {
-	return {
-		donorMasterCreatedByFkey: foreignKey({
-			columns: [table.createdBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "donor_master_created_by_fkey"
-		}),
-		donorMasterUpdatedByFkey: foreignKey({
-			columns: [table.updatedBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "donor_master_updated_by_fkey"
-		}),
-		donorMasterDonorCodeKey: unique("donor_master_donor_code_key").on(table.costCenter),
 	}
 });
 
@@ -215,6 +183,39 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
 			name: "staff_master_updated_by_fkey"
 		}),
 		staffMasterEmpNoKey: unique("staff_master_emp_no_key").on(table.empNo),
+	}
+});
+
+export const donorMasterInFinanceProject = financeProject.table("donor_master", {
+	id: serial("id").primaryKey().notNull(),
+	name: varchar("name", { length: 255 }).notNull(),
+	costCenter: integer("cost_center"),
+	finYear: integer("fin_year").notNull(),
+	totalBudget: numeric("total_budget", { precision: 8, scale:  2 }).notNull(),
+	budgetReceived: numeric("budget_received", { precision: 8, scale:  2 }).notNull(),
+	currency: text("currency").notNull(),
+	notes: varchar("notes", { length: 255 }),
+	description: varchar("description", { length: 255 }),
+	isactive: boolean("isactive").notNull(),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
+	createdBy: integer("created_by").notNull(),
+	updatedBy: integer("updated_by"),
+	type: varchar("type", { length: 50 }),
+},
+(table) => {
+	return {
+		donorMasterCreatedByFkey: foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [userMasterInFinanceProject.id],
+			name: "donor_master_created_by_fkey"
+		}),
+		donorMasterUpdatedByFkey: foreignKey({
+			columns: [table.updatedBy],
+			foreignColumns: [userMasterInFinanceProject.id],
+			name: "donor_master_updated_by_fkey"
+		}),
+		donorMasterDonorCodeKey: unique("donor_master_donor_code_key").on(table.costCenter),
 	}
 });
 
@@ -301,48 +302,6 @@ export const tallyDepartmentInFinanceProject = financeProject.table("tally_depar
 			columns: [table.updatedBy],
 			foreignColumns: [userMasterInFinanceProject.id],
 			name: "tally_department_updated_by_fkey"
-		}),
-	}
-});
-
-export const tallyDonorInFinanceProject = financeProject.table("tally_donor", {
-	id: serial("id").primaryKey().notNull(),
-	voucherName: varchar("voucher_name", { length: 25 }).notNull(),
-	voucherNum: integer("voucher_num").notNull(),
-	ledgerName: varchar("ledger_name", { length: 255 }).notNull(),
-	transactionId: text("transaction_id"),
-	date: timestamp("date", { withTimezone: true, mode: 'string' }).notNull(),
-	accountType: varchar("account_type", { length: 255 }).notNull(),
-	amount: numeric("amount", { precision: 12, scale:  2 }).notNull(),
-	costCenter: integer("cost_center").notNull(),
-	isExpense: text("is_expense").notNull(),
-	currency: text("currency").notNull(),
-	narration: varchar("narration", { length: 255 }).notNull(),
-	notes: varchar("notes", { length: 255 }),
-	isactive: boolean("isactive").notNull(),
-	createdAt: date("created_at").notNull(),
-	updatedAt: date("updated_at"),
-	createdBy: integer("created_by").notNull(),
-	updatedBy: integer("updated_by"),
-	finMonth: text("fin_month").notNull(),
-	finYear: text("fin_year").notNull(),
-},
-(table) => {
-	return {
-		tallyDonorCreatedByFkey: foreignKey({
-			columns: [table.createdBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "tally_donor_created_by_fkey"
-		}),
-		tallyDonorDonorCodeFkey: foreignKey({
-			columns: [table.costCenter],
-			foreignColumns: [costCenterInFinanceProject.id],
-			name: "tally_donor_donor_code_fkey"
-		}),
-		tallyDonorUpdatedByFkey: foreignKey({
-			columns: [table.updatedBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "tally_donor_updated_by_fkey"
 		}),
 	}
 });
@@ -463,6 +422,48 @@ export const tallyStaffInFinanceProject = financeProject.table("tally_staff", {
 			columns: [table.updatedBy],
 			foreignColumns: [userMasterInFinanceProject.id],
 			name: "tally_staff_updated_by_fkey"
+		}),
+	}
+});
+
+export const tallyDonorInFinanceProject = financeProject.table("tally_donor", {
+	id: serial("id").primaryKey().notNull(),
+	voucherName: varchar("voucher_name", { length: 25 }).notNull(),
+	voucherNum: integer("voucher_num").notNull(),
+	ledgerName: varchar("ledger_name", { length: 255 }).notNull(),
+	transactionId: text("transaction_id"),
+	date: timestamp("date", { withTimezone: true, mode: 'string' }).notNull(),
+	accountType: varchar("account_type", { length: 255 }).notNull(),
+	amount: numeric("amount", { precision: 12, scale:  2 }).notNull(),
+	costCenter: integer("cost_center").notNull(),
+	isExpense: text("is_expense").notNull(),
+	currency: text("currency").notNull(),
+	narration: varchar("narration", { length: 255 }).notNull(),
+	notes: varchar("notes", { length: 255 }),
+	isactive: boolean("isactive").notNull(),
+	createdAt: date("created_at").notNull(),
+	updatedAt: date("updated_at"),
+	createdBy: integer("created_by").notNull(),
+	updatedBy: integer("updated_by"),
+	finMonth: text("fin_month").notNull(),
+	finYear: text("fin_year").notNull(),
+},
+(table) => {
+	return {
+		tallyDonorCreatedByFkey: foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [userMasterInFinanceProject.id],
+			name: "tally_donor_created_by_fkey"
+		}),
+		tallyDonorDonorCodeFkey: foreignKey({
+			columns: [table.costCenter],
+			foreignColumns: [costCenterInFinanceProject.id],
+			name: "tally_donor_donor_code_fkey"
+		}),
+		tallyDonorUpdatedByFkey: foreignKey({
+			columns: [table.updatedBy],
+			foreignColumns: [userMasterInFinanceProject.id],
+			name: "tally_donor_updated_by_fkey"
 		}),
 	}
 });

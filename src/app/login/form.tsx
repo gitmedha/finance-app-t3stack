@@ -94,10 +94,7 @@ const LoginForm = () => {
       >
         {loading ? "Logging in..." : "Login"}
       </Button>
-      
-      <Link className="mt-2 text-primary font-medium" href='/forgot-password'>
-        Forgot password
-      </Link>
+     
     </form>
   );
 };

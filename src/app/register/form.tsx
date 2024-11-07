@@ -3,7 +3,6 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Button } from "@radix-ui/themes";
-import Link from "next/link";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 
@@ -143,9 +142,6 @@ const RegisterForm = () => {
         {loading ? "Registering..." : "Register"}
       </Button>
 
-      <Link className="mt-2 text-primary font-medium" href="/forgot-password">
-        Forgot password?
-      </Link>
     </form>
   );
 };

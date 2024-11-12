@@ -5,6 +5,7 @@ import type { ReportFilterFormProps } from "./donor";
 
 const categories = ["Finance", "Health", "Education", "Technology", "Miscellaneous"];
 
+// Type and status 
 const DonorFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSelect }) => {
 
   return (

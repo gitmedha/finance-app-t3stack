@@ -17,6 +17,7 @@ interface StaffFilterFormProps {
   handleSelect: (name: string, value: string) => void;
 }
 
+// Department, designation ,  status ( Active or Inactive ),  
 const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect }) => {
 
   return (

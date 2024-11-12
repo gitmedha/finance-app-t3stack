@@ -19,19 +19,19 @@ const PaginationLimitSelect: React.FC<PaginationLimitSelectProps> = ({
       <DropdownMenu.Trigger asChild>
         <button className="cursor-pointer py-0.5 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
           <span>
-            {selectedLimit ? `${selectedLimit} Rows` : 'Select Rows'}
+            {selectedLimit ? `${selectedLimit}` : 'Rows'}
           </span>
           <RiArrowDropDownLine size={30} />
         </button>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+      <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[90px]">
         {limits.map((limit) => (
           <DropdownMenu.Item
             key={limit}
-            className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+            className="p-2 text-sm focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
             onSelect={() => onLimitChange(limit)} // Call the function when a limit is selected
           >
-            {limit} Rows
+            {limit}
           </DropdownMenu.Item>
         ))}
       </DropdownMenu.Content>

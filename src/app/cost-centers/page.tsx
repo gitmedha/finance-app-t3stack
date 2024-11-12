@@ -9,6 +9,7 @@ import type { costCenters, GetcostCentersResponse } from "./cost-center";
 import EditCostCenters from "./edit";
 import DeleteCostCenters from "./delete";
 import CostCenterFilterForm from "./filter";
+import AddCostCenters from "./add";
 
 const cols = ['Name', 'Code', 'Type', 'Created At', 'actions']
 
@@ -42,7 +43,7 @@ export default function CostCenter() {
     const debounceTimer = setTimeout(() => {
       if (e.target.value.trim().length > 2) {
         setSearch(e.target.value.trim())
-      }else if(e.target.value.trim().length === 0){
+      } else if (e.target.value.trim().length === 0) {
         setSearch('')
       }
     }, 1500)
@@ -58,7 +59,7 @@ export default function CostCenter() {
       [name]: value,
     }));
   };
-  
+
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected + 1);
   };
@@ -69,21 +70,23 @@ export default function CostCenter() {
 
   return (
     <div className="h-full">
-      <div className="mb-6 p-1 shadow-lg bg-white flex justify-center">
-        <div className="container py-1">
-          <CostCenterFilterForm filters={filters} handleSelect={handleSelect} />
-        </div>
-      </div>
-      <div className="flex justify-center">
+      <div className="mt-5 flex justify-center">
         <div className='shadow-lg container rounded-lg m-2 p-1'>
-          <div className="flex justify-between items-center mb-1 px-2">
-            <span className="font-semibold">Cost center ({result?.costCenters ? result.totalCount : ''})</span>
-            <div className=" w-80 ">
-              <SearchInput placeholder="Search Cost Center"
-                className="p-2"
-                onChange={handleSearch}
-              />
+          <div className="w-full flex justify-between items-center mb-1 px-2">
+
+            <div className="w-full flex justify-start items-center space-x-2">
+              <span className="font-semibold">Count: {result?.costCenters ? result.totalCount : ''}</span>
+              <div className=" w-[200px] ">
+                <SearchInput placeholder="Search Cost Center"
+                  className="p-2"
+                  onChange={handleSearch}
+                />
+              </div>
+
+              <CostCenterFilterForm filters={filters} handleSelect={handleSelect} />
+
             </div>
+
             <div className="flex justify-end items-center space-x-2">
               {result?.costCenters && <ReactPaginationStyle
                 total={result?.totalCount}
@@ -97,6 +100,8 @@ export default function CostCenter() {
                 selectedLimit={limit}
                 onLimitChange={handleLimitChange}
               />
+
+              <AddCostCenters />
             </div>
           </div>
 
@@ -106,7 +111,7 @@ export default function CostCenter() {
                 Loading...
               </span>
             </div>
-          </div> : (result?.costCenters && <table className="min-h-72 min-w-full table-auto border-collapse p-2">
+          </div> : (result?.costCenters && <table className="min-h-[80vh] min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {

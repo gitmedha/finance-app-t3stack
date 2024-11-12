@@ -5,6 +5,7 @@ import type { DepartmentFilterFormProps } from "./department";
 
 const categories = ["Finance", "Health", "Education", "Technology", "Miscellaneous"];
 
+// Type and status 
 const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({ filters, handleSelect }) => {
 
   return (

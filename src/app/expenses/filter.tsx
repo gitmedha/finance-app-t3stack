@@ -15,18 +15,18 @@ interface Filters {
 
 interface ExpenseFilterFormProps {
     handleSelect: (name: string, value: string) => void;
-    handleFileupload: (data:object) => void;
+    handleFileupload: (data: object) => void;
     filters: Filters;
 }
 
 const ExpenseFilterForm = ({ handleSelect, filters, handleFileupload }: ExpenseFilterFormProps) => {
 
     return (
-        <div className="grid grid-cols-5 gap-4 w-full">
+        <div className='grid grid-cols-1 gap-3 lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-1'>
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                     <button color="gray" className="cursor-pointer py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                        <span>{filters.year || 'Filter by Select Year'}</span>
+                        <span>{filters.year || 'Select Year'}</span>
                         <RiArrowDropDownLine size={30} />
                     </button>
                 </DropdownMenu.Trigger>
@@ -46,7 +46,7 @@ const ExpenseFilterForm = ({ handleSelect, filters, handleFileupload }: ExpenseF
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                     <button color="gray" className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                        <span>{filters.month || 'Filter by Select Month'}</span>
+                        <span>{filters.month || 'Select Month'}</span>
                         <RiArrowDropDownLine size={30} />
                     </button>
                 </DropdownMenu.Trigger>
@@ -66,7 +66,7 @@ const ExpenseFilterForm = ({ handleSelect, filters, handleFileupload }: ExpenseF
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                     <button color="gray" className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                        <span>{filters.temp || 'Filter by Select Template'}</span>
+                        <span>{filters.temp || 'Select Template'}</span>
                         <RiArrowDropDownLine size={30} />
                     </button>
                 </DropdownMenu.Trigger>
@@ -83,9 +83,10 @@ const ExpenseFilterForm = ({ handleSelect, filters, handleFileupload }: ExpenseF
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
 
-            <div>
-               <FileUploadInput handleChange={handleFileupload} />
-            </div>
+            <FileUploadInput handleChange={handleFileupload} />
+
+            <div />
+
             <div className='flex justify-end items-center'>
                 <AddExpense />
             </div>

@@ -23,7 +23,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         <DropdownMenu.Trigger asChild>
           <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.category || 'Filter by Select Category'}
+              {filters.category || 'Select Category'}
             </span>
 
             <RiArrowDropDownLine size={30} />
@@ -46,7 +46,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         <DropdownMenu.Trigger className="w-full" asChild>
           <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.status || 'Filter by Select Status'}
+              {filters.status || 'Select Status'}
             </span>
 
             <RiArrowDropDownLine size={30} />
@@ -69,7 +69,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         <DropdownMenu.Trigger asChild>
           <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.byTime || 'Filter by Select By time'}
+              {filters.byTime || 'Select By time'}
             </span>
 
             <RiArrowDropDownLine size={30} />
@@ -92,7 +92,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         <DropdownMenu.Trigger asChild>
           <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.year || 'Filter by Select Year'}
+              {filters.year || 'Select Year'}
             </span>
 
             <RiArrowDropDownLine size={30} />
@@ -116,7 +116,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         <DropdownMenu.Trigger asChild>
           <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
             <span>
-              {filters.month || 'Filter by Select Month'}
+              {filters.month || 'Select Month'}
             </span>
 
             <RiArrowDropDownLine size={30} />

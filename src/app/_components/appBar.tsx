@@ -25,8 +25,6 @@ const AppBar = () => {
     { menu: 'Staff', path: '/staff', icon: <FaUser /> },
   ]
 
-  console.log(session)
-
   return (
     <nav className="shadow-lg bg-primary">
       <div className="container mx-auto flex justify-between items-center py-1 ">

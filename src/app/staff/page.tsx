@@ -19,7 +19,8 @@ export default function Staff() {
   const [searchTerm, setSearch] = useState('')
 
   const [filters, setFilters] = useState({
-    department: '',
+    department: 0,
+    departmentname: '',
     status: 'Active',
     designation: '',
   });
@@ -52,11 +53,24 @@ export default function Staff() {
 
   }
 
-  const handleSelect = (name: string, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleSelect = (name: string, value: object) => {
+    if (name === 'department') {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: (value as any).id,
+        departmentname:(value as any).departmentname,
+      }));
+    } else if (name === 'status') {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: (value as any).value,
+      }));
+    } else if (name === 'designation') {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: (value as any).id,
+      }));
+    }
   };
 
   const handlePagination = (selectedPage: { selected: number }) => {
@@ -69,7 +83,6 @@ export default function Staff() {
 
 
   return (
-
     <div className="mt-5 flex justify-center">
       <div className='min-h-[400px] container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
 

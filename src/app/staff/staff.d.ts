@@ -12,7 +12,7 @@ interface Staff {
   createdBy: number;
   updatedBy: number | null;
   empNo: string;
-  department: number | null;
+  department: number | null | string;
   departmentname: string | null;
 }
 
@@ -23,12 +23,13 @@ interface GetStaffsResponse {
 }
 
 interface FilterOptions {
-  department: number | null | string,
-  status: string,
-  designation: string,
+  department: number | null | string;
+  departmentname: string,
+  status: string;
+  designation: string;
 }
 
 interface StaffFilterFormProps {
   filters: FilterOptions;
-  handleSelect: (name: string, value: string) => void;
+  handleSelect: (name: string, value: object) => void;
 }

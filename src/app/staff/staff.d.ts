@@ -1,5 +1,5 @@
 // Use a type-only export to avoid conflicts with isolatedModules
-export type { Staff, GetStaffsResponse };
+export type { Staff, GetStaffsResponse, FilterOptions, StaffFilterFormProps };
 
 interface Staff {
   id: number;
@@ -19,4 +19,16 @@ interface GetStaffsResponse {
   staffs: Staff[];
   totalCount: number;
   totalPages: number;
+}
+
+interface FilterOptions {
+  department: string,
+  status: string,
+  designation: string,
+}
+
+
+interface StaffFilterFormProps {
+  filters: FilterOptions;
+  handleSelect: (name: string, value: string) => void;
 }

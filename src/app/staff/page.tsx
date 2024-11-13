@@ -16,26 +16,25 @@ const cols = ['Name', 'Emp ID', 'Designation', 'Department', 'Joining Date', 'St
 export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearch] = useState('')
+
   const [filters, setFilters] = useState({
-    category: '',
+    department: '',
     status: '',
-    byTime: '',
-    year: '',
-    month: ''
+    designation: '',
   });
 
-  const [searchTerm, setSearch] = useState('')
 
   // Fetch data with pagination
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
-    { page: currentPage, limit, searchTerm },
+    { page: currentPage, limit, searchTerm , ...filters},
     { enabled: false } // Disable automatic query execution
   );
 
   // Trigger refetch on page or limit change
   useEffect(() => {
     refetch();
-  }, [currentPage, limit, searchTerm, refetch]);
+  }, [currentPage, filters, limit, searchTerm, refetch]);
 
   const result: GetStaffsResponse | undefined = data;
 

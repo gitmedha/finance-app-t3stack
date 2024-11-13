@@ -70,7 +70,7 @@ export default function CostCenter() {
 
   return (
     <div className="mt-5 flex justify-center">
-      <div className='container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
+      <div className='min-h-[400px] container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
         <div className="w-full flex justify-between items-center mb-1 px-2">
           <div className="w-full flex justify-start items-center space-x-2">
             <span className="font-semibold">Count: {result?.costCenters ? result.totalCount : ''}</span>

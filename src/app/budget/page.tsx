@@ -139,7 +139,7 @@ export default function Staff() {  // Removed async here
         <div className='shadow-lg container rounded-lg m-2 p-2'>
 
           <div className="flex justify-between items-center mb-1">
-            <span className="font-semibold">Budget ({financeReportData.length})</span>
+            <span className="font-semibold">Count: {financeReportData.length}</span>
             <div className=" w-80 ">
               <SearchInput placeholder="Search Budget"
                 className="p-2"
@@ -162,7 +162,7 @@ export default function Staff() {  // Removed async here
             </div>
           </div>
 
-         <table className="min-h-72 min-w-full table-auto border-collapse p-2">
+         <table className="  min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 <th className="p-2">Date</th>

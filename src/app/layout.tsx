@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body className="bg-[#f3f4f65e]">
@@ -36,7 +36,18 @@ const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <>
+      {session === undefined && <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="mt-4 text-center">
+          <p className="text-xl animate-pulse font-extrabold text-primary">
+            Loading...
+          </p>
+          <p className=" text-sm font-semibold text-primary/80">
+            We're preparing your content.
+          </p>
+        </div>
+      </div>}
       {session && <AppBar />}
+      
       {children}
     </>
   );

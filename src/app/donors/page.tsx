@@ -74,10 +74,10 @@ export default function Donor() {
   return (
     <div className="h-full">
       <div className="flex justify-center mt-8">
-        <div className='container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
+        <div className='min-h-[400px] container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
           <div className="flex justify-between items-center mb-1 px-2">
             <div className="flex justify-start items-center space-x-2">
-              <span className="font-semibold">Donors ({result?.donors ? result.totalCount : ''})</span>
+              <span className="font-semibold">Count: {result?.donors ? result.totalCount : ''}</span>
               <div className=" w-[200px] ">
                 <SearchInput placeholder="Search Donor"
                   className="p-2"
@@ -110,7 +110,7 @@ export default function Donor() {
                 Loading...
               </span>
             </div>
-          </div> : (result?.donors && <table className="min-h-72 min-w-full table-auto border-collapse p-2">
+          </div> : (result?.donors && <table className="  min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {

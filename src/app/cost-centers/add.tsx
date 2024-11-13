@@ -15,7 +15,7 @@ const AddCostCenters: React.FC = () => {
 
     return (
         <>
-            <IconButton className='!bg-primary !h-10 !w-10 !cursor-pointer' onClick={() => setIsModalOpen(true)}>
+            <IconButton className='!bg-primary !h-8 !w-8 !cursor-pointer' onClick={() => setIsModalOpen(true)}>
                 <BiPlus size={20} />
             </IconButton>
 

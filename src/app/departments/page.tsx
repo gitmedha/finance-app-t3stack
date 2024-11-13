@@ -74,12 +74,12 @@ export default function DepartmentReport() {
   return (
     <div className="h-full">
       <div className="flex justify-center mt-8">
-      <div className='container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
+      <div className='min-h-[400px] container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
           <div className="flex justify-between items-center mb-1 px-2">
             <div className="flex justify-start items-center space-x-2">
-              <span className="font-semibold">Departments ({result?.departments ? result.totalCount : ''})</span>
+              <span className="font-semibold">Count: {result?.departments ? result.totalCount : ''}</span>
               <div className=" w-[200px] ">
-                <SearchInput placeholder="Search Cost Center"
+                <SearchInput placeholder="Search departments"
                   className="p-2"
                   onChange={handleSearch}
                 />
@@ -110,7 +110,7 @@ export default function DepartmentReport() {
                 Loading...
               </span>
             </div>
-          </div> : (result?.departments && <table className="min-h-72 min-w-full table-auto border-collapse p-2">
+          </div> : (result?.departments && <table className="  min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {

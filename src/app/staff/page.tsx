@@ -72,7 +72,7 @@ export default function Staff() {
   return (
 
     <div className="mt-5 flex justify-center">
-      <div className='container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
+      <div className='min-h-[400px] container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
 
         <div className="flex justify-between items-center mb-1 px-2">
           <div className="flex justify-start items-center space-x-2">
@@ -109,7 +109,7 @@ export default function Staff() {
               Loading...
             </span>
           </div>
-        </div> : (result?.staffs && <table className="min-h-72 min-w-full table-auto border-collapse p-2">
+        </div> : (result?.staffs && <table className="  min-w-full table-auto border-collapse p-2">
           <thead>
             <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
               {

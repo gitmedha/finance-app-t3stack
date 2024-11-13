@@ -13,6 +13,7 @@ interface Staff {
   updatedBy: number | null;
   empNo: string;
   department: number | null;
+  departmentname: string | null;
 }
 
 interface GetStaffsResponse {
@@ -22,11 +23,10 @@ interface GetStaffsResponse {
 }
 
 interface FilterOptions {
-  department: string,
+  department: number | null | string,
   status: string,
   designation: string,
 }
-
 
 interface StaffFilterFormProps {
   filters: FilterOptions;

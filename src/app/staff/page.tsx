@@ -20,7 +20,7 @@ export default function Staff() {
 
   const [filters, setFilters] = useState({
     department: '',
-    status: '',
+    status: 'Active',
     designation: '',
   });
 
@@ -129,7 +129,7 @@ export default function Staff() {
                 <td className="p-2">{item.name}</td>
                 <td className="p-2">{item.empNo}</td>
                 <td className="p-2">{item.description}</td>
-                <td className="p-2">{item.department}</td>
+                <td className="p-2">{item.departmentname}</td>
                 <td className="p-2">{item.createdAt}</td>
                 <td className="p-2">
                   <span
@@ -138,7 +138,7 @@ export default function Staff() {
                       : 'bg-red-100 text-red-700'
                       }`}
                   >
-                    {item.isactive ? 'Active' : 'InActive'}
+                    {item.isactive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td className="p-2">{item.createdAt}</td>

@@ -51,8 +51,12 @@ export const getStaffs = protectedProcedure.input(z.object({
     statusCondition
   )).offset(offset).limit(limit)
 
-  // // Get the total count of records with the same condition
-  const totalCountResult = await db.select({ count: count() }).from(staffMaster).where(searchCondition); // Count with filter if searchCondition is defined
+  // Get the total count of records with the same condition
+  const totalCountResult = await db.select({ count: count() }).from(staffMaster).where(and(
+    searchCondition,
+    departmentCondition,
+    statusCondition
+  ))
 
   const totalCount = totalCountResult[0]?.count || 0;
 

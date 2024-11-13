@@ -5,7 +5,7 @@ import { TextField, Text, IconButton } from '@radix-ui/themes';
 import Modal from '../_components/Modal';
 import { BiPlus } from 'react-icons/bi';
 
-const AddDepartment: React.FC = () => {
+const AddDonors: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSave = () => {
@@ -43,4 +43,4 @@ const AddDepartment: React.FC = () => {
     );
 };
 
-export default AddDepartment;
+export default AddDonors;

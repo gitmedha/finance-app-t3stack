@@ -15,11 +15,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode}>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="bg-[#f5f5f5]">
+      <body className="bg-[#f3f4f65e]">
         <main
           className="h-[100vh]">
           <TRPCReactProvider>
-            <Theme>
+            <Theme className="!bg-[#f3f4f65e]">
               <ContextProvider>
                 <AppContent>{children}</AppContent>
               </ContextProvider>

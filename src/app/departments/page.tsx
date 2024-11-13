@@ -9,6 +9,7 @@ import EditDepartments from "./edit";
 import DeleteDepartment from "./delete";
 import { api } from "~/trpc/react";
 import type { GetDepartmentResponse, Department } from "./department";
+import AddDepartment from "./add";
 
 const cols = ['Name', 'Code', 'Type', 'Status', 'Created At', 'Actions']
 
@@ -72,21 +73,20 @@ export default function DepartmentReport() {
 
   return (
     <div className="h-full">
-      <div className="mb-6 p-1 shadow-lg bg-white flex justify-center">
-        <div className="container py-1">
-          <DepartmentFilterForm filters={filters} handleSelect={handleSelect} />
-        </div>
-      </div>
-      <div className="flex justify-center">
-        <div className='shadow-lg container rounded-lg m-2 p-1'>
+      <div className="flex justify-center mt-8">
+      <div className='container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
           <div className="flex justify-between items-center mb-1 px-2">
-            <span className="font-semibold">Departments ({result?.departments ? result.totalCount : ''})</span>
-            <div className=" w-80 ">
-              <SearchInput placeholder="Search Cost Center"
-                className="p-2"
-                onChange={handleSearch}
-              />
+            <div className="flex justify-start items-center space-x-2">
+              <span className="font-semibold">Departments ({result?.departments ? result.totalCount : ''})</span>
+              <div className=" w-[200px] ">
+                <SearchInput placeholder="Search Cost Center"
+                  className="p-2"
+                  onChange={handleSearch}
+                />
+              </div>
+              <DepartmentFilterForm filters={filters} handleSelect={handleSelect} />
             </div>
+
             <div className="flex justify-end items-center space-x-2">
               {result?.departments && <ReactPaginationStyle
                 total={result?.totalCount}
@@ -100,6 +100,7 @@ export default function DepartmentReport() {
                 selectedLimit={limit}
                 onLimitChange={handleLimitChange}
               />
+              <AddDepartment />
             </div>
           </div>
 

@@ -69,89 +69,84 @@ export default function CostCenter() {
   };
 
   return (
-    <div className="h-full">
-      <div className="mt-5 flex justify-center">
-        <div className='shadow-lg container rounded-lg m-2 p-1'>
-          <div className="w-full flex justify-between items-center mb-1 px-2">
-
-            <div className="w-full flex justify-start items-center space-x-2">
-              <span className="font-semibold">Count: {result?.costCenters ? result.totalCount : ''}</span>
-              <div className=" w-[200px] ">
-                <SearchInput placeholder="Search Cost Center"
-                  className="p-2"
-                  onChange={handleSearch}
-                />
-              </div>
-
-              <CostCenterFilterForm filters={filters} handleSelect={handleSelect} />
-
-            </div>
-
-            <div className="flex justify-end items-center space-x-2">
-              {result?.costCenters && <ReactPaginationStyle
-                total={result?.totalCount}
-                currentPage={currentPage}
-                handlePagination={handlePagination}
-                limit={limit}
-              />}
-
-              <PaginationLimitSelect
-                limits={[10, 20, 50, 100]} // Define the limits you want to provide
-                selectedLimit={limit}
-                onLimitChange={handleLimitChange}
+    <div className="mt-5 flex justify-center">
+      <div className='container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
+        <div className="w-full flex justify-between items-center mb-1 px-2">
+          <div className="w-full flex justify-start items-center space-x-2">
+            <span className="font-semibold">Count: {result?.costCenters ? result.totalCount : ''}</span>
+            <div className=" w-[200px] ">
+              <SearchInput placeholder="Search Cost Center"
+                className="p-2"
+                onChange={handleSearch}
               />
-
-              <AddCostCenters />
             </div>
+            <CostCenterFilterForm filters={filters} handleSelect={handleSelect} />
           </div>
 
-          {isLoading ? <div className='w-full flex justify-center items-center h-[46vh]'>
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
-              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                Loading...
-              </span>
-            </div>
-          </div> : (result?.costCenters && <table className="min-h-[80vh] min-w-full table-auto border-collapse p-2">
-            <thead>
-              <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
-                {
-                  cols?.map(col => {
-                    return (
-                      <th key={col} className="p-2">{col}</th>
-                    )
-                  })
-                }
-              </tr>
-            </thead>
-            <tbody>
-              {result?.costCenters.map((item: costCenters) => (
-                <tr
-                  key={item?.id}
-                  className="border-b text-sm hover:bg-gray-100 transition-colors"
-                >
-                  <td className="p-2">{item.name}</td>
-                  <td className="p-2">{item.description}</td>
-                  <td className="p-2">{item.type}</td>
-                  <td className="p-2">
-                    <span
-                      className={`px-2 py-1 rounded-lg text-sm ${item.isactive
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
-                        }`}
-                    >
-                      {item.isactive ? 'Active' : 'InActive'}
-                    </span>
-                  </td>
-                  <td className="p-2">{item.createdAt}</td>
-                  <td className="p-1.5 space-x-2">
-                    <EditCostCenters item={item} />
-                    <DeleteCostCenters item={item} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>)}
+          <div className="flex justify-end items-center space-x-2">
+            {result?.costCenters && <ReactPaginationStyle
+              total={result?.totalCount}
+              currentPage={currentPage}
+              handlePagination={handlePagination}
+              limit={limit}
+            />}
+
+            <PaginationLimitSelect
+              limits={[10, 20, 50, 100]} // Define the limits you want to provide
+              selectedLimit={limit}
+              onLimitChange={handleLimitChange}
+            />
+
+            <AddCostCenters />
+          </div>
         </div>
+
+        {isLoading ? <div className='w-full flex justify-center items-center h-[46vh]'>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+            <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+              Loading...
+            </span>
+          </div>
+        </div> : (result?.costCenters && <table className="min-h-[calc(50vh)] min-w-full table-auto border-collapse p-2">
+          <thead>
+            <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
+              {
+                cols?.map(col => {
+                  return (
+                    <th key={col} className="p-2">{col}</th>
+                  )
+                })
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {result?.costCenters.map((item: costCenters) => (
+              <tr
+                key={item?.id}
+                className="border-b text-sm hover:bg-gray-100 transition-colors"
+              >
+                <td className="p-2">{item.name}</td>
+                <td className="p-2">{item.description}</td>
+                <td className="p-2">{item.type}</td>
+                <td className="p-2">
+                  <span
+                    className={`px-2 py-1 rounded-lg text-sm ${item.isactive
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
+                      }`}
+                  >
+                    {item.isactive ? 'Active' : 'InActive'}
+                  </span>
+                </td>
+                <td className="p-2">{item.createdAt}</td>
+                <td className="p-1.5 space-x-2">
+                  <EditCostCenters item={item} />
+                  <DeleteCostCenters item={item} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>)}
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import type { GetDonorsResponse, Donors } from "./donor";
 import EditDonor from "./edit";
 import DeleteDonor from "./delete";
 import DonorFilterForm from "./filter";
+import AddDonors from "./add";
 
 const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Status', 'Currency', 'Type', 'Created At', 'actions']
 
@@ -19,8 +20,8 @@ export default function Donor() {
     name: '',
     costCenter: '',
     finYear: '',
-    totalBudget:'',
-    budgetReceived:'',
+    totalBudget: '',
+    budgetReceived: '',
     currency: '',
     notes: '',
     createdAt: '',
@@ -45,7 +46,7 @@ export default function Donor() {
     const debounceTimer = setTimeout(() => {
       if (e.target.value.trim().length > 2) {
         setSearch(e.target.value.trim())
-      }else if(e.target.value.trim().length === 0){
+      } else if (e.target.value.trim().length === 0) {
         setSearch('')
       }
     }, 1500)
@@ -72,21 +73,20 @@ export default function Donor() {
 
   return (
     <div className="h-full">
-      <div className="mb-6 p-1 shadow-lg bg-white flex justify-center">
-        <div className="container py-1">
-          <DonorFilterForm filters={filters} handleSelect={handleSelect} />
-        </div>
-      </div>
-      <div className="flex justify-center">
-        <div className='shadow-lg container rounded-lg m-2 p-1'>
+      <div className="flex justify-center mt-8">
+        <div className='container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
           <div className="flex justify-between items-center mb-1 px-2">
-            <span className="font-semibold">Donors ({result?.donors ? result.totalCount : ''})</span>
-            <div className=" w-80 ">
-              <SearchInput placeholder="Search Donor"
-                className="p-2"
-                onChange={handleSearch}
-              />
+            <div className="flex justify-start items-center space-x-2">
+              <span className="font-semibold">Donors ({result?.donors ? result.totalCount : ''})</span>
+              <div className=" w-[200px] ">
+                <SearchInput placeholder="Search Donor"
+                  className="p-2"
+                  onChange={handleSearch}
+                />
+              </div>
+              <DonorFilterForm filters={filters} handleSelect={handleSelect} />
             </div>
+
             <div className="flex justify-end items-center space-x-2">
               {result?.donors && <ReactPaginationStyle
                 total={result?.totalCount}
@@ -100,6 +100,7 @@ export default function Donor() {
                 selectedLimit={limit}
                 onLimitChange={handleLimitChange}
               />
+              <AddDonors />
             </div>
           </div>
 
@@ -109,7 +110,7 @@ export default function Donor() {
                 Loading...
               </span>
             </div>
-          </div> : (result?.donors &&<table className="min-h-72 min-w-full table-auto border-collapse p-2">
+          </div> : (result?.donors && <table className="min-h-72 min-w-full table-auto border-collapse p-2">
             <thead>
               <tr className="bg-gray-200 text-gray-600 text-left text-sm uppercase">
                 {

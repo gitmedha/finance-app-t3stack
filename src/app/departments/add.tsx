@@ -5,7 +5,7 @@ import { TextField, Text, IconButton } from '@radix-ui/themes';
 import Modal from '../_components/Modal';
 import { BiPlus } from 'react-icons/bi';
 
-const AddBudget: React.FC = () => {
+const AddDepartment: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSave = () => {
@@ -43,4 +43,4 @@ const AddBudget: React.FC = () => {
     );
 };
 
-export default AddBudget;
+export default AddDepartment;

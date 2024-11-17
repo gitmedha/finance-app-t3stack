@@ -14,6 +14,7 @@ interface Staff {
   empNo: string;
   department: number | null | string;
   departmentname: string | null;
+  designation : string | null
 }
 
 interface GetStaffsResponse {

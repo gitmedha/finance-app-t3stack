@@ -21,7 +21,6 @@ interface GetDepartmentResponse {
     totalPages: number;
 }
 
-
 interface FilterOptions {
     status: string;
     type: string;

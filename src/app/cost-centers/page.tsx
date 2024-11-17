@@ -17,25 +17,23 @@ export default function CostCenter() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
-    category: '',
-    status: '',
-    byTime: '',
-    year: '',
-    month: ''
+    status: 'Active',
+    type: '',
   });
+
 
   const [searchTerm, setSearch] = useState('')
 
   // Fetch data with pagination
   const { data, isLoading, refetch } = api.get.getCostCenters.useQuery(
-    { page: currentPage, limit, searchTerm },
+    { page: currentPage, limit, searchTerm, ...filters },
     { enabled: false } // Disable automatic query execution
   );
 
   // Trigger refetch on page or limit change
   useEffect(() => {
     refetch();
-  }, [currentPage, limit, searchTerm, refetch]);
+  }, [currentPage, limit, searchTerm, refetch, filters]);
 
   const result: GetcostCentersResponse | undefined = data;
 
@@ -53,10 +51,10 @@ export default function CostCenter() {
 
   }
 
-  const handleSelect = (name: string, value: string) => {
+  const handleSelect = (name: string, value: object) => {
     setFilters((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: (value as any).value,
     }));
   };
 

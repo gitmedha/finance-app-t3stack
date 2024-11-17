@@ -1,5 +1,4 @@
 
-// components/DropdownFilterForm.tsx
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
 import type { StaffFilterFormProps } from "./staff";
@@ -10,15 +9,17 @@ import { useEffect } from 'react';
 const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect }) => {
   
   // Fetch data with pagination
+  const { data:designations, refetch:designationsFetch } = api.get.getDesignation.useQuery();
   const { data, refetch } = api.get.getDepartments.useQuery(
     { page: 1, limit:100 },
     { enabled: false } // Disable automatic query execution
   );
-  // console.log(data)
+
   // Trigger refetch on page or limit change
   useEffect(() => {
+    designationsFetch()
     refetch();
-  }, [refetch]);
+  }, [refetch, designationsFetch]);
 
   return (
     <>
@@ -41,6 +42,31 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
                 onSelect={() => handleSelect('department', dep)}
               >
                 {dep.departmentname}
+              </DropdownMenu.Item>
+            ))}
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      </div>
+
+      <div className='w-52'>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+              <span>
+                {filters.designation || 'Select Designation'}
+              </span>
+
+              <RiArrowDropDownLine size={30} />
+            </button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+            {designations?.designations.map((d,i) => (
+              <DropdownMenu.Item
+                key={i || d?.designation}
+                className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                onSelect={() => handleSelect('designation', d)}
+              >
+                {d.designation}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>

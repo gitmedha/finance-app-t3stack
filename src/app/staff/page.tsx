@@ -81,7 +81,7 @@ export default function Staff() {
     setLimit(newLimit);
   };
 
-
+// console.log(data)
   return (
     <div className="mt-5 flex justify-center">
       <div className='min-h-[400px] container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
@@ -141,7 +141,7 @@ export default function Staff() {
               >
                 <td className="p-2">{item.name}</td>
                 <td className="p-2">{item.empNo}</td>
-                <td className="p-2">{item.description}</td>
+                <td className="p-2">{item.designation}</td>
                 <td className="p-2">{item.departmentname}</td>
                 <td className="p-2">{item.createdAt}</td>
                 <td className="p-2">

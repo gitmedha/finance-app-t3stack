@@ -23,7 +23,6 @@ export default function DepartmentReport() {
     type: '',
   });
 
-
   // Fetch data with pagination
   const { data, isLoading, refetch } = api.get.getDepartments.useQuery(
     { page: currentPage, limit, searchTerm , ...filters},
@@ -59,7 +58,6 @@ export default function DepartmentReport() {
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected + 1);
   };
-
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);

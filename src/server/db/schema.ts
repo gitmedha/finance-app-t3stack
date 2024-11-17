@@ -164,7 +164,7 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
 	createdBy: integer("created_by").notNull(),
 	updatedBy: integer("updated_by"),
 	department: integer("department"),
-	designation: integer("designation"),
+	designation: varchar("designation", { length: 155 }),
 },
 (table) => {
 	return {

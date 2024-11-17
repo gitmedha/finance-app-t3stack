@@ -12,7 +12,7 @@ const DonorFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSelec
           <DropdownMenu.Trigger asChild>
             <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
               <span>
-                {filters.status || 'Select Type'}
+                {filters.status || 'Select Status'}
               </span>
               <RiArrowDropDownLine size={30} />
             </button>
@@ -41,13 +41,13 @@ const DonorFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSelec
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-            {[{value:'FC'}, {value:'NFC'}].map((type) => (
+            {[{value:'FC'}, {value:'NFC'},{value:''}].map((type) => (
               <DropdownMenu.Item
                 key={type.value}
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
                 onSelect={() => handleSelect('type', type)}
               >
-                {type.value}
+                {type.value || 'All'}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>

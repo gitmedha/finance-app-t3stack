@@ -16,7 +16,7 @@ export const getStaffs = protectedProcedure.input(z.object({
   status: z.string().optional().default('Active'), // Optional search term
   designation: z.string().optional().default(""), // Optional search term
 })).query(async ({ ctx, input }) => {
-  const { page, limit, searchTerm, status, department } = input;
+  const { page, limit, searchTerm, status, department, designation } = input;
 
   // console.log(input)
   const offset = (page - 1) * limit;
@@ -26,6 +26,7 @@ export const getStaffs = protectedProcedure.input(z.object({
     : undefined;
   const departmentCondition = department ? eq(staffMaster.department, department) : undefined
   const statusCondition = eq(staffMaster.isactive, (status === 'Active') )
+  const designationCondition = designation ? eq(staffMaster.designation, designation) : undefined
  
   const staffs = await ctx.db.select({
     id: staffMaster.id,
@@ -40,6 +41,7 @@ export const getStaffs = protectedProcedure.input(z.object({
     updatedBy: staffMaster.updatedBy,
     department: staffMaster.department,
     departmentname: departmentMaster.departmentname,
+    designation:staffMaster.designation
     // count: count()
   }).from(staffMaster).leftJoin(departmentMaster,
     and(
@@ -48,14 +50,16 @@ export const getStaffs = protectedProcedure.input(z.object({
   )).where(and(
     searchCondition,
     departmentCondition,
-    statusCondition
+    statusCondition,
+    designationCondition
   )).offset(offset).limit(limit)
 
   // Get the total count of records with the same condition
   const totalCountResult = await db.select({ count: count() }).from(staffMaster).where(and(
     searchCondition,
     departmentCondition,
-    statusCondition
+    statusCondition,
+    designationCondition
   ))
 
   const totalCount = totalCountResult[0]?.count || 0;
@@ -64,5 +68,16 @@ export const getStaffs = protectedProcedure.input(z.object({
     staffs,
     totalCount,
     totalPages: Math.ceil(totalCount / limit),
+  };
+})
+
+export const getDesignation = protectedProcedure.query(async ({ ctx, input }) => {
+  const designations = await ctx.db.select({
+    designation: staffMaster.designation,
+  })
+  .from(staffMaster).groupBy(staffMaster.designation); // Group by type to get unique values
+
+  return {
+    designations,
   };
 })

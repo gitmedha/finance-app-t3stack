@@ -22,7 +22,7 @@ export const getDonors = protectedProcedure.input(z.object({
     ? ilike(donorMaster.name, `%${searchTerm}%`)
     : undefined;
   const typeCondition = type ? eq(donorMaster.type, type) : undefined
-  const statusCondition = status !== '' ?  eq(donorMaster.isactive, (status === 'Active')) : undefined
+  const statusCondition = status ?  eq(donorMaster.isactive, (status === 'Active')) : undefined
 
   const donors = await ctx.db.select({
     id:donorMaster.id,

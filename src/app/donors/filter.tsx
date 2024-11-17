@@ -1,9 +1,9 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
-import type { ReportFilterFormProps } from "./donor";
+import type { DonorFilterFormProps } from "./donor";
 
 // Type and status 
-const DonorFilterForm: React.FC<ReportFilterFormProps> = ({ filters, handleSelect }) => {
+const DonorFilterForm: React.FC<DonorFilterFormProps> = ({ filters, handleSelect }) => {
 
   return (
     <>

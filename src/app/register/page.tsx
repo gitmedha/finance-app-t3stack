@@ -1,6 +1,6 @@
 
 import Image from "next/image";
-import RegisterForm from "./form";
+// import RegisterForm from "./form";
 
 export default async function RegisterPage() {
 

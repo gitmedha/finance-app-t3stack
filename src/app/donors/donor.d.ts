@@ -1,5 +1,5 @@
 // Use a type-only export to avoid conflicts with isolatedModules
-export type { Donors, GetDonorsResponse, FilterOptions, ItemDetailProps, ReportFilterFormProps };
+export type { Donors, GetDonorsResponse, FilterOptions, ItemDetailProps, DonorFilterFormProps, SelectValue };
 
 interface Donors {
   id: number;
@@ -7,7 +7,7 @@ interface Donors {
   costCenter: number | null;
   finYear: number;
   totalBudget: number | string;
-  budgetReceived:number | string;
+  budgetReceived: number | string;
   currency: string;
   notes: string | null;
   description: string | null;
@@ -27,16 +27,19 @@ interface GetDonorsResponse {
 
 
 interface FilterOptions {
-    status: string;
-    type: string;
+  status: string;
+  type: string;
 }
 
 interface ItemDetailProps {
-    item: Donors;
+  item: Donors;
 }
 
-interface ReportFilterFormProps {
-    filters: FilterOptions;
-    handleSelect: (name: string, value: object) => void;
-  }
-  
+// 4. Typing handleSelect
+interface SelectValue {
+  value: string; // adjust according to the actual structure of value
+}
+interface DonorFilterFormProps {
+  filters: FilterOptions;
+  handleSelect: (name: string, value: SelectValue) => void;
+}

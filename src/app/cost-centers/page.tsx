@@ -5,7 +5,7 @@ import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import { api } from "~/trpc/react";
-import type { costCenters, GetcostCentersResponse } from "./cost-center";
+import type { costCenters, GetcostCentersResponse, SelectValue } from "./cost-center";
 import EditCostCenters from "./edit";
 import DeleteCostCenters from "./delete";
 import CostCenterFilterForm from "./filter";
@@ -32,12 +32,12 @@ export default function CostCenter() {
 
   // Trigger refetch on page or limit change
   useEffect(() => {
-    refetch();
+    void refetch();
   }, [currentPage, limit, searchTerm, refetch, filters]);
 
   const result: GetcostCentersResponse | undefined = data;
 
-  const handleSearch = (e: any) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const debounceTimer = setTimeout(() => {
       if (e.target.value.trim().length > 2) {
         setSearch(e.target.value.trim())
@@ -51,10 +51,10 @@ export default function CostCenter() {
 
   }
 
-  const handleSelect = (name: string, value: object) => {
+  const handleSelect = (name: string, value: SelectValue) => {
     setFilters((prev) => ({
       ...prev,
-      [name]: (value as any).value,
+      [name]: value.value, // No need for `any` type
     }));
   };
 

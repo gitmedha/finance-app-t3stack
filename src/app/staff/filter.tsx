@@ -7,11 +7,11 @@ import { useEffect } from 'react';
 
 // Department, designation ,  status ( Active or Inactive ),  
 const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect }) => {
-  
+
   // Fetch data with pagination
-  const { data:designations, refetch:designationsFetch } = api.get.getDesignation.useQuery();
+  const { data: designations, refetch: designationsFetch } = api.get.getDesignation.useQuery();
   const { data, refetch } = api.get.getDepartments.useQuery(
-    { page: 1, limit:100 },
+    { page: 1, limit: 100 },
     { enabled: false } // Disable automatic query execution
   );
 
@@ -20,7 +20,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
     void designationsFetch();
     void refetch();
   }, [refetch, designationsFetch]);
-  
+
   return (
     <>
       <div className='w-52'>
@@ -35,6 +35,12 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+            <DropdownMenu.Item
+              className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+              onSelect={() => handleSelect('department', { departmentname: '' })}
+            >
+              All
+            </DropdownMenu.Item>
             {data?.departments.map((dep) => (
               <DropdownMenu.Item
                 key={dep?.id}
@@ -60,7 +66,13 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-            {designations?.designations.map((d,i) => (
+            <DropdownMenu.Item
+              className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+              onSelect={() => handleSelect('department', { designation: '' })}
+            >
+              All
+            </DropdownMenu.Item>
+            {designations?.designations.map((d, i) => (
               <DropdownMenu.Item
                 key={i || d?.designation}
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
@@ -85,13 +97,13 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-            {[{value:'Active'}, {value:'Inactive'}].map((status) => (
+            {[{ value: '' },{ value: 'Active' }, { value: 'Inactive' }].map((status) => (
               <DropdownMenu.Item
                 key={status.value}
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
                 onSelect={() => handleSelect('status', status)}
               >
-                {status.value}
+                {status.value || 'All'}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>

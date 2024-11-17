@@ -2,8 +2,8 @@
 
 import React, { FC, ReactNode } from 'react';
 import { Dialog } from '@radix-ui/themes';
-import { Button, Spinner } from '@radix-ui/themes';
-import { TextField, Text, Flex } from '@radix-ui/themes';
+import { Button } from '@radix-ui/themes';
+import { Flex } from '@radix-ui/themes';
 import clsx from 'clsx';
 
 interface ModalProps {
@@ -21,9 +21,9 @@ const Modal: FC<ModalProps> = ({
   description,
   isOpen,
   onClose,
-  onSave,
+  // onSave,
   children,
-  isLoading = false
+  // isLoading = false
 }) => {
   return (
 

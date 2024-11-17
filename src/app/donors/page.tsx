@@ -5,7 +5,7 @@ import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import { api } from "~/trpc/react";
-import type { GetDonorsResponse, Donors } from "./donor";
+import type { GetDonorsResponse, Donors, SelectValue } from "./donor";
 import EditDonor from "./edit";
 import DeleteDonor from "./delete";
 import DonorFilterForm from "./filter";
@@ -23,37 +23,39 @@ export default function Donor() {
 
   const [searchTerm, setSearch] = useState('')
 
-  // Fetch data with pagination
+  // 3. Safe API Query with Promise Handling
   const { data, isLoading, refetch } = api.get.getDonors.useQuery(
-    { page: currentPage, limit, searchTerm, ...filters},
-    { enabled: false } // Disable automatic query execution
+    { page: currentPage, limit, searchTerm, ...filters },
+    { enabled: false }
   );
 
   // Trigger refetch on page or limit change
   useEffect(() => {
-    refetch();
+    void refetch(); // Ignore promise if you don't need to handle it
   }, [currentPage, limit, searchTerm, filters, refetch]);
 
   const result: GetDonorsResponse | undefined = data;
 
-  const handleSearch = (e: any) => {
+  // 2. Refactor debounce with proper event typing
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const debounceTimer = setTimeout(() => {
-      if (e.target.value.trim().length > 2) {
-        setSearch(e.target.value.trim())
-      } else if (e.target.value.trim().length === 0) {
-        setSearch('')
+      const searchValue = e.target.value.trim();
+      if (searchValue.length > 2) {
+        setSearch(searchValue);
+      } else if (searchValue.length === 0) {
+        setSearch('');
       }
-    }, 1500)
+    }, 1500);
+
     return () => {
-      clearTimeout(debounceTimer)
-    }
+      clearTimeout(debounceTimer);
+    };
+  };
 
-  }
-
-  const handleSelect = (name: string, value: object) => {
+  const handleSelect = (name: string, value: SelectValue) => {
     setFilters((prev) => ({
       ...prev,
-      [name]: (value as any).value,
+      [name]: value.value, // No need for `any` type
     }));
   };
 

@@ -1,5 +1,5 @@
 // Use a type-only export to avoid conflicts with isolatedModules
-export type { Department, GetDepartmentResponse, FilterOptions, ItemDetailProps, DepartmentFilterFormProps };
+export type { Department, GetDepartmentResponse, FilterOptions, ItemDetailProps, DepartmentFilterFormProps, SelectValue };
 
 interface Department {
     id: number;
@@ -30,7 +30,10 @@ interface ItemDetailProps {
     item: Department;
 }
 
+interface SelectValue {
+    value: string; // adjust according to the actual structure of value
+  }
 interface DepartmentFilterFormProps {
     filters: FilterOptions;
-    handleSelect: (name: string, value: object) => void;
+    handleSelect: (name: string, value: SelectValue) => void;
 }

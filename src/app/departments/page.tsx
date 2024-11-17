@@ -8,7 +8,7 @@ import DepartmentFilterForm from "./filter";
 import EditDepartments from "./edit";
 import DeleteDepartment from "./delete";
 import { api } from "~/trpc/react";
-import type { GetDepartmentResponse, Department } from "./department";
+import type { GetDepartmentResponse, Department, SelectValue } from "./department";
 import AddDepartment from "./add";
 
 const cols = ['Name', 'Code', 'Type', 'Status', 'Created At', 'Actions']
@@ -31,12 +31,12 @@ export default function DepartmentReport() {
 
   // Trigger refetch on page or limit change
   useEffect(() => {
-    refetch();
+    void refetch(); // Ignore promise if you don't need to handle it
   }, [currentPage, limit, searchTerm, refetch, filters]);
 
   const result: GetDepartmentResponse | undefined = data;
 
-  const handleSearch = (e: any) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const debounceTimer = setTimeout(() => {
       if (e.target.value.trim().length > 2) {
         setSearch(e.target.value.trim())
@@ -48,10 +48,11 @@ export default function DepartmentReport() {
       clearTimeout(debounceTimer)
     }
   }
-  const handleSelect = (name: string, value: object) => {
+
+  const handleSelect = (name: string, value: SelectValue) => {
     setFilters((prev) => ({
       ...prev,
-      [name]: (value as any).value,
+      [name]: value.value, // No need for `any` type
     }));
   };
 

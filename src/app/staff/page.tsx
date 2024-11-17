@@ -55,25 +55,30 @@ export default function Staff() {
     };
   };
 
-  const handleSelect = (name: string, value: object) => {
-    if (name === 'department') {
-      setFilters((prev) => ({
-        ...prev,
-        [name]: (value as any).id,
-        departmentname: (value as any).departmentname,
-      }));
-    } else if (name === 'status') {
-      setFilters((prev) => ({
-        ...prev,
-        [name]: (value as any).value,
-      }));
-    } else if (name === 'designation') {
-      setFilters((prev) => ({
-        ...prev,
-        [name]: (value as any).designation,
-      }));
-    }
-  };
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+
+const handleSelect = (name: string, value: object) => {
+  if (name === 'department') {
+    setFilters((prev) => ({
+      ...prev,
+      [name]: (value as any)?.id ?? 0,            // Using 'any' with optional chaining
+      departmentname: (value as any)?.departmentname, // Using 'any' with optional chaining
+    }));
+  } else if (name === 'status') {
+    setFilters((prev) => ({
+      ...prev,
+      [name]: (value as any)?.value, // Using 'any' with optional chaining
+    }));
+  } else if (name === 'designation') {
+    setFilters((prev) => ({
+      ...prev,
+      [name]: (value as any)?.designation, // Using 'any' with optional chaining
+    }));
+  }
+};
+
+/* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+
 
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected + 1);

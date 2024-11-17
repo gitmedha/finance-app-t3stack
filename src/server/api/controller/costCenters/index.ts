@@ -52,7 +52,7 @@ export const getCostCenters = protectedProcedure.input(z.object({
     typeCondition
   )); // Count with filter if searchCondition is defined
 
-  const totalCount = totalCountResult[0]?.count || 0;
+  const totalCount = totalCountResult[0]?.count ?? 0;
 
   return {
     costCenters,

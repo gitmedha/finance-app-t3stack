@@ -40,7 +40,7 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
                     <Text as="div" size="2" mb="1" weight="bold">
                         Department
                     </Text>
-                    <TextField.Root defaultValue={item?.departmentname || ''} placeholder="Enter your Department" />
+                    <TextField.Root defaultValue={item?.departmentname ?? ''} placeholder="Enter your Department" />
                 </label>
             </Modal>
         </>

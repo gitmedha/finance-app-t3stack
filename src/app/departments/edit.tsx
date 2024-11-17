@@ -31,13 +31,13 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item }) => {
                     <Text as="div" size="2" mb="1" weight="bold">
                         Name
                     </Text>
-                    <TextField.Root defaultValue={item?.departmentname || ''} placeholder="Enter your Amount" />
+                    <TextField.Root defaultValue={item?.departmentname ?? ''} placeholder="Enter your Amount" />
                 </label>
                 <label>
                     <Text as="div" size="2" mb="1" weight="bold">
                         Description
                     </Text>
-                    <TextField.Root defaultValue={item?.description || ''} placeholder="Enter your Description" />
+                    <TextField.Root defaultValue={item?.description ?? ''} placeholder="Enter your Description" />
                 </label>
             </Modal>
         </>

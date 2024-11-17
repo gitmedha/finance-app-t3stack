@@ -15,7 +15,7 @@ interface FormData {
 }
 
 const LoginForm = () => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const loginMutation = api.post.login.useMutation();

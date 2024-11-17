@@ -18,7 +18,6 @@ export const getStaffs = protectedProcedure.input(z.object({
 })).query(async ({ ctx, input }) => {
   const { page, limit, searchTerm, status, department, designation } = input;
 
-  // console.log(input)
   const offset = (page - 1) * limit;
   // Apply the search condition only if searchTerm is not an empty string
   const searchCondition = searchTerm
@@ -62,7 +61,7 @@ export const getStaffs = protectedProcedure.input(z.object({
     designationCondition
   ))
 
-  const totalCount = totalCountResult[0]?.count || 0;
+  const totalCount = totalCountResult[0]?.count ?? 0;
 
   return {
     staffs,
@@ -71,7 +70,7 @@ export const getStaffs = protectedProcedure.input(z.object({
   };
 })
 
-export const getDesignation = protectedProcedure.query(async ({ ctx, input }) => {
+export const getDesignation = protectedProcedure.query(async ({ ctx }) => {
   const designations = await ctx.db.select({
     designation: staffMaster.designation,
   })

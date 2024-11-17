@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, foreignKey, unique, serial, varchar, boolean, date, integer, text, numeric, timestamp, bigint } from "drizzle-orm/pg-core"
+import { pgSchema, foreignKey, unique, serial, varchar, boolean, date, integer, text, numeric, timestamp, bigint } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 export const financeProject = pgSchema("finance_project");

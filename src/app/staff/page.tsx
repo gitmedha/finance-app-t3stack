@@ -28,37 +28,39 @@ export default function Staff() {
 
   // Fetch data with pagination
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
-    { page: currentPage, limit, searchTerm , ...filters},
+    { page: currentPage, limit, searchTerm, ...filters },
     { enabled: false } // Disable automatic query execution
   );
 
   // Trigger refetch on page or limit change
   useEffect(() => {
-    refetch();
-  }, [currentPage, filters, limit, searchTerm, refetch]);
+    const fetchData = async () => {
+      await refetch();
+    };
+    void fetchData();
+  }, [refetch, currentPage, filters, limit, searchTerm]);
 
   const result: GetStaffsResponse | undefined = data;
 
-  const handleSearch = (e: any) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const debounceTimer = setTimeout(() => {
       if (e.target.value.trim().length > 2) {
-        setSearch(e.target.value.trim())
+        setSearch(e.target.value.trim());
       } else if (e.target.value.trim().length === 0) {
-        setSearch('')
+        setSearch('');
       }
-    }, 1500)
+    }, 1500);
     return () => {
-      clearTimeout(debounceTimer)
-    }
-
-  }
+      clearTimeout(debounceTimer);
+    };
+  };
 
   const handleSelect = (name: string, value: object) => {
     if (name === 'department') {
       setFilters((prev) => ({
         ...prev,
         [name]: (value as any).id,
-        departmentname:(value as any).departmentname,
+        departmentname: (value as any).departmentname,
       }));
     } else if (name === 'status') {
       setFilters((prev) => ({
@@ -68,7 +70,7 @@ export default function Staff() {
     } else if (name === 'designation') {
       setFilters((prev) => ({
         ...prev,
-        [name]: (value as any).id,
+        [name]: (value as any).designation,
       }));
     }
   };
@@ -81,7 +83,6 @@ export default function Staff() {
     setLimit(newLimit);
   };
 
-// console.log(data)
   return (
     <div className="mt-5 flex justify-center">
       <div className='min-h-[400px] container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>

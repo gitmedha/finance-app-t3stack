@@ -153,7 +153,7 @@ export default function Expenses() {
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
-    console.log('Selected limit:', newLimit); // Handle limit change as needed
+    // console.log('Selected limit:', newLimit); // Handle limit change as needed
   };
 
   return (

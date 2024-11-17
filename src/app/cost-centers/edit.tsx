@@ -30,13 +30,13 @@ const EditCostCenters: React.FC<ItemDetailProps> = ({ item }) => {
                     <Text as="div" size="2" mb="1" weight="bold">
                         Name
                     </Text>
-                    <TextField.Root defaultValue={item?.name || ''} placeholder="Enter your Name" />
+                    <TextField.Root defaultValue={item?.name ?? ''} placeholder="Enter your Name" />
                 </label>
                 <label>
                     <Text as="div" size="2" mb="1" weight="bold">
                         Description
                     </Text>
-                    <TextField.Root defaultValue={item?.description || ''} placeholder="Enter description" />
+                    <TextField.Root defaultValue={item?.description ?? ''} placeholder="Enter description" />
                 </label>
             </Modal>
         </>

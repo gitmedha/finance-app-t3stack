@@ -17,10 +17,10 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
 
   // Trigger refetch on page or limit change
   useEffect(() => {
-    designationsFetch()
-    refetch();
+    void designationsFetch();
+    void refetch();
   }, [refetch, designationsFetch]);
-
+  
   return (
     <>
       <div className='w-52'>

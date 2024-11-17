@@ -68,7 +68,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
             <DropdownMenu.Item
               className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-              onSelect={() => handleSelect('department', { designation: '' })}
+              onSelect={() => handleSelect('designation', { designation: '' })}
             >
               All
             </DropdownMenu.Item>

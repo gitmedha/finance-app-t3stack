@@ -12,7 +12,7 @@ export const getCostCenters = protectedProcedure.input(z.object({
   page: z.number().min(1).default(1),
   limit: z.number().min(1).max(100).default(10),
   searchTerm: z.string().optional().default(""), // Optional search term
-  type: z.string().optional().default("Active"), // Optional search term
+  type: z.string().optional().default(""), // Optional search term
   status: z.string().optional().default(""), // Optional search term
 
 })).query(async ({ ctx, input }) => {

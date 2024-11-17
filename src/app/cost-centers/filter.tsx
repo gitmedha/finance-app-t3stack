@@ -24,13 +24,13 @@ const CostCentersFilterForm: React.FC<CostCenterFilterFormProps> = ({ filters, h
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-            {[{ value: 'Active' }, { value: 'Inactive' }].map((status) => (
+            {[{ value: '' },{ value: 'Active' }, { value: 'Inactive' }].map((status) => (
               <DropdownMenu.Item
                 key={status.value}
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
                 onSelect={() => handleSelect('status', status)}
               >
-                {status.value}
+                {status.value || 'All'}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>

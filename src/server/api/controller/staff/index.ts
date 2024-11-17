@@ -17,7 +17,6 @@ export const getStaffs = protectedProcedure.input(z.object({
   designation: z.string().optional().default(""), // Optional search term
 })).query(async ({ ctx, input }) => {
   const { page, limit, searchTerm, status, department, designation } = input;
-
   const offset = (page - 1) * limit;
   // Apply the search condition only if searchTerm is not an empty string
   const searchCondition = searchTerm

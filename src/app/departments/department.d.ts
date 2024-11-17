@@ -21,15 +21,9 @@ interface GetDepartmentResponse {
     totalPages: number;
 }
 
-
 interface FilterOptions {
-    departmentname: string;
+    status: string;
     type: string;
-    deptCode?: number | string;
-    isactive: boolean | string;
-    notes?: string | null;
-    description?: string | null;
-    createdAt: string; // ISO date string format
 }
 
 interface ItemDetailProps {
@@ -38,5 +32,5 @@ interface ItemDetailProps {
 
 interface DepartmentFilterFormProps {
     filters: FilterOptions;
-    handleSelect: (name: string, value: string) => void;
+    handleSelect: (name: string, value: object) => void;
 }

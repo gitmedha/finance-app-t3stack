@@ -19,8 +19,9 @@ export default function Staff() {
   const [searchTerm, setSearch] = useState('')
 
   const [filters, setFilters] = useState({
-    department: '',
-    status: '',
+    department: 0,
+    departmentname: '',
+    status: 'Active',
     designation: '',
   });
 
@@ -52,11 +53,24 @@ export default function Staff() {
 
   }
 
-  const handleSelect = (name: string, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleSelect = (name: string, value: object) => {
+    if (name === 'department') {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: (value as any).id,
+        departmentname:(value as any).departmentname,
+      }));
+    } else if (name === 'status') {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: (value as any).value,
+      }));
+    } else if (name === 'designation') {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: (value as any).id,
+      }));
+    }
   };
 
   const handlePagination = (selectedPage: { selected: number }) => {
@@ -67,9 +81,8 @@ export default function Staff() {
     setLimit(newLimit);
   };
 
-
+// console.log(data)
   return (
-
     <div className="mt-5 flex justify-center">
       <div className='min-h-[400px] container p-4 mt-6 lg:mt-0 rounded shadow bg-white'>
 
@@ -128,8 +141,8 @@ export default function Staff() {
               >
                 <td className="p-2">{item.name}</td>
                 <td className="p-2">{item.empNo}</td>
-                <td className="p-2">{item.description}</td>
-                <td className="p-2">{item.department}</td>
+                <td className="p-2">{item.designation}</td>
+                <td className="p-2">{item.departmentname}</td>
                 <td className="p-2">{item.createdAt}</td>
                 <td className="p-2">
                   <span
@@ -138,7 +151,7 @@ export default function Staff() {
                       : 'bg-red-100 text-red-700'
                       }`}
                   >
-                    {item.isactive ? 'Active' : 'InActive'}
+                    {item.isactive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td className="p-2">{item.createdAt}</td>

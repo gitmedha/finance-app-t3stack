@@ -19,26 +19,20 @@ export default function DepartmentReport() {
   const [searchTerm, setSearch] = useState('')
 
   const [filters, setFilters] = useState({
-    departmentname: '',
+    status: 'Active',
     type: '',
-    deptCode: '',
-    isactive: '',
-    notes: '',
-    description: '',
-    createdAt: '',
   });
-
 
   // Fetch data with pagination
   const { data, isLoading, refetch } = api.get.getDepartments.useQuery(
-    { page: currentPage, limit, searchTerm },
+    { page: currentPage, limit, searchTerm , ...filters},
     { enabled: false } // Disable automatic query execution
   );
 
   // Trigger refetch on page or limit change
   useEffect(() => {
     refetch();
-  }, [currentPage, limit, searchTerm, refetch]);
+  }, [currentPage, limit, searchTerm, refetch, filters]);
 
   const result: GetDepartmentResponse | undefined = data;
 
@@ -54,18 +48,16 @@ export default function DepartmentReport() {
       clearTimeout(debounceTimer)
     }
   }
-
-  const handleSelect = (name: string, value: string) => {
+  const handleSelect = (name: string, value: object) => {
     setFilters((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: (value as any).value,
     }));
   };
 
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected + 1);
   };
-
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);

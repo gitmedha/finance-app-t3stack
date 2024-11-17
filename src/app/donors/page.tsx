@@ -17,28 +17,22 @@ export default function Donor() {
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
-    name: '',
-    costCenter: '',
-    finYear: '',
-    totalBudget: '',
-    budgetReceived: '',
-    currency: '',
-    notes: '',
-    createdAt: '',
+    type: '',
+    status: '',
   });
 
   const [searchTerm, setSearch] = useState('')
 
   // Fetch data with pagination
   const { data, isLoading, refetch } = api.get.getDonors.useQuery(
-    { page: currentPage, limit, searchTerm },
+    { page: currentPage, limit, searchTerm, ...filters},
     { enabled: false } // Disable automatic query execution
   );
 
   // Trigger refetch on page or limit change
   useEffect(() => {
     refetch();
-  }, [currentPage, limit, searchTerm, refetch]);
+  }, [currentPage, limit, searchTerm, filters, refetch]);
 
   const result: GetDonorsResponse | undefined = data;
 
@@ -56,10 +50,10 @@ export default function Donor() {
 
   }
 
-  const handleSelect = (name: string, value: string) => {
+  const handleSelect = (name: string, value: object) => {
     setFilters((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: (value as any).value,
     }));
   };
 

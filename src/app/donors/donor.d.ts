@@ -27,14 +27,8 @@ interface GetDonorsResponse {
 
 
 interface FilterOptions {
-    name: string;
-    costCenter: string;
-    finYear: string;
-    totalBudget:number | string;
-    budgetReceived:number | string;
-    currency: string;
-    notes: string;
-    createdAt: string;
+    status: string;
+    type: string;
 }
 
 interface ItemDetailProps {
@@ -43,6 +37,6 @@ interface ItemDetailProps {
 
 interface ReportFilterFormProps {
     filters: FilterOptions;
-    handleSelect: (name: string, value: string) => void;
+    handleSelect: (name: string, value: object) => void;
   }
   

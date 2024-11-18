@@ -11,7 +11,7 @@ import DeleteCostCenters from "./delete";
 import CostCenterFilterForm from "./filter";
 import AddCostCenters from "./add";
 
-const cols = ['Name', 'Code', 'Type', 'Created At', 'actions']
+const cols = ['Name', 'Code', 'Type','Status' ,'Created At', 'actions']
 
 export default function CostCenter() {
   const [limit, setLimit] = useState<number>(10); // Default limit

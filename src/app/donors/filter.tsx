@@ -18,13 +18,13 @@ const DonorFilterForm: React.FC<DonorFilterFormProps> = ({ filters, handleSelect
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-            {[{value:'Active'}, {value:'Inactive'}].map((status) => (
+          {[{ value: '' }, { value: 'Active' }, { value: 'Inactive' }].map((status) => (
               <DropdownMenu.Item
                 key={status.value}
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
                 onSelect={() => handleSelect('status', status)}
               >
-                {status.value}
+                {status.value || 'All'}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>
@@ -41,7 +41,7 @@ const DonorFilterForm: React.FC<DonorFilterFormProps> = ({ filters, handleSelect
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-            {[{value:'FC'}, {value:'NFC'},{value:''}].map((type) => (
+            {[{value:''}, {value:'FC'}, {value:'NFC'}].map((type) => (
               <DropdownMenu.Item
                 key={type.value}
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"

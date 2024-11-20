@@ -57,6 +57,7 @@ export default function Staff() {
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 
+console.log(filters)
 const handleSelect = (name: string, value: object) => {
   if (name === 'department') {
     setFilters((prev) => ({

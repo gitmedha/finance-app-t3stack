@@ -1,4 +1,4 @@
-import { pgSchema, foreignKey, unique, serial, varchar, boolean, date, integer, text, numeric, timestamp, bigint } from "drizzle-orm/pg-core"
+import { pgTable, pgSchema, foreignKey, unique, serial, varchar, boolean, date, integer, text, numeric, timestamp, bigint } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 export const financeProject = pgSchema("finance_project");
@@ -152,45 +152,6 @@ export const departmentMasterInFinanceProject = financeProject.table("department
 	}
 });
 
-export const staffMasterInFinanceProject = financeProject.table("staff_master", {
-	id: serial("id").primaryKey().notNull(),
-	name: varchar("name", { length: 25 }).notNull(),
-	empNo: text("emp_no").notNull(),
-	isactive: boolean("isactive").notNull(),
-	notes: varchar("notes", { length: 255 }),
-	description: varchar("description", { length: 255 }),
-	createdAt: date("created_at").notNull(),
-	updatedAt: date("updated_at"),
-	createdBy: integer("created_by").notNull(),
-	updatedBy: integer("updated_by"),
-	department: integer("department"),
-	designation: varchar("designation", { length: 155 }),
-	nature_of_employment: varchar("nature_of_employment", { length: 80 }),
-	state: varchar("state", { length: 80 }),
-	program: varchar("program", { length: 80 }),
-	location: varchar("location", { length: 80 }),
-},
-(table) => {
-	return {
-		departmentMasterByFkey: foreignKey({
-			columns: [table.department],
-			foreignColumns: [departmentMasterInFinanceProject.id],
-			name: "department_master_by_fkey"
-		}),
-		staffMasterCreatedByFkey: foreignKey({
-			columns: [table.createdBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "staff_master_created_by_fkey"
-		}),
-		staffMasterUpdatedByFkey: foreignKey({
-			columns: [table.updatedBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "staff_master_updated_by_fkey"
-		}),
-		staffMasterEmpNoKey: unique("staff_master_emp_no_key").on(table.empNo),
-	}
-});
-
 export const donorMasterInFinanceProject = financeProject.table("donor_master", {
 	id: serial("id").primaryKey().notNull(),
 	name: varchar("name", { length: 255 }).notNull(),
@@ -224,18 +185,6 @@ export const donorMasterInFinanceProject = financeProject.table("donor_master", 
 	}
 });
 
-export const knexMigrationsInFinanceProject = financeProject.table("knex_migrations", {
-	id: serial("id").primaryKey().notNull(),
-	name: varchar("name", { length: 255 }),
-	batch: integer("batch"),
-	migrationTime: timestamp("migration_time", { withTimezone: true, mode: 'string' }),
-});
-
-export const knexMigrationsLockInFinanceProject = financeProject.table("knex_migrations_lock", {
-	index: serial("index").primaryKey().notNull(),
-	isLocked: integer("is_locked"),
-});
-
 export const roleMasterInFinanceProject = financeProject.table("role_master", {
 	id: serial("id").primaryKey().notNull(),
 	role: varchar("role", { length: 255 }).notNull(),
@@ -266,6 +215,46 @@ export const budgetMasterInFinanceProject = financeProject.table("budget_master"
 			name: "budget_master_updated_by_fkey"
 		}),
 		budgetMasterVersionFinancialYearUnique: unique("budget_master_version_financial_year_unique").on(table.name, table.financialYear),
+	}
+});
+
+export const staffMasterInFinanceProject = financeProject.table("staff_master", {
+	id: serial("id").primaryKey().notNull(),
+	name: varchar("name", { length: 25 }).notNull(),
+	empNo: text("emp_no").notNull(),
+	isactive: boolean("isactive").notNull(),
+	notes: varchar("notes", { length: 255 }),
+	description: varchar("description", { length: 255 }),
+	createdAt: timestamp("created_at", { mode: 'string' }),
+	updatedAt: timestamp("updated_at", { mode: 'string' }),
+	createdBy: integer("created_by").notNull(),
+	updatedBy: integer("updated_by"),
+	department: integer("department").notNull(),
+	designation: varchar("designation", { length: 155 }),
+	nature_of_employment: varchar("nature_of_employment", { length: 70 }),
+	state: varchar("state", { length: 70 }),
+	location: varchar("location", { length: 70 }),
+	program: varchar("program", { length: 70 }),
+
+},
+(table) => {
+	return {
+		departmentMasterByFkey: foreignKey({
+			columns: [table.department],
+			foreignColumns: [departmentMasterInFinanceProject.id],
+			name: "department_master_by_fkey"
+		}),
+		staffMasterCreatedByFkey: foreignKey({
+			columns: [table.createdBy],
+			foreignColumns: [userMasterInFinanceProject.id],
+			name: "staff_master_created_by_fkey"
+		}),
+		staffMasterUpdatedByFkey: foreignKey({
+			columns: [table.updatedBy],
+			foreignColumns: [userMasterInFinanceProject.id],
+			name: "staff_master_updated_by_fkey"
+		}),
+		staffMasterEmpNoKey: unique("staff_master_emp_no_key").on(table.empNo),
 	}
 });
 

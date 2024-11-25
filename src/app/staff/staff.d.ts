@@ -1,7 +1,7 @@
 // Use a type-only export to avoid conflicts with isolatedModules
-export type { Staff, GetStaffsResponse, FilterOptions, StaffFilterFormProps };
+export type { StaffItem, GetStaffsResponse, FilterOptions, StaffFilterFormProps };
 
-interface Staff {
+interface StaffItem {
   id: number;
   name: string;
   isactive: boolean;
@@ -14,11 +14,15 @@ interface Staff {
   empNo: string;
   department: number | null | string;
   departmentname: string | null;
-  designation : string | null
+  designation: string | null;
+  nature_of_employment?: string | null;
+  state?: string | null;
+  location?: string | null;
+  program?: string | null;
 }
 
 interface GetStaffsResponse {
-  staffs: Staff[];
+  staffs: StaffItem[];
   totalCount: number;
   totalPages: number;
 }

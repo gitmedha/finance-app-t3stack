@@ -9,9 +9,9 @@ import EditStaff from "./edit";
 import DeleteStaff from "./delete";
 import AddStaff from './add';
 import { api } from "~/trpc/react";
-import type { GetStaffsResponse, Staff } from "./staff";
+import type { GetStaffsResponse, StaffItem } from "./staff";
 
-const cols = ['Name', 'Emp ID', 'Designation', 'Department', 'Joining Date', 'Status', 'Created At', 'actions']
+const cols = ['Name', 'Emp ID', "Nature of Employment", 'Designation', 'Department', 'State', 'Program', 'Location', 'Joining Date', 'Status', 'Created At', 'actions']
 
 export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit
@@ -40,7 +40,7 @@ export default function Staff() {
     void fetchData();
   }, [refetch, currentPage, filters, limit, searchTerm]);
 
-  const result: GetStaffsResponse | undefined = data;
+  const result = data as GetStaffsResponse | undefined;
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const debounceTimer = setTimeout(() => {
@@ -57,7 +57,6 @@ export default function Staff() {
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 
-console.log(filters)
 const handleSelect = (name: string, value: object) => {
   if (name === 'department') {
     setFilters((prev) => ({
@@ -141,15 +140,19 @@ const handleSelect = (name: string, value: object) => {
             </tr>
           </thead>
           <tbody>
-            {result?.staffs.map((item: Staff) => (
+            {result?.staffs.map((item: StaffItem) => (
               <tr
                 key={item?.id}
                 className="border-b text-sm hover:bg-gray-100 transition-colors"
               >
                 <td className="p-2">{item.name}</td>
                 <td className="p-2">{item.empNo}</td>
+                <td className="p-2">{item.nature_of_employment}</td>
                 <td className="p-2">{item.designation}</td>
                 <td className="p-2">{item.departmentname}</td>
+                <td className="p-2">{item.state}</td>
+                <td className="p-2">{item.program}</td>
+                <td className="p-2">{item.location}</td>
                 <td className="p-2">{item.createdAt}</td>
                 <td className="p-2">
                   <span

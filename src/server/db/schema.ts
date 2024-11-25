@@ -165,6 +165,10 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
 	updatedBy: integer("updated_by"),
 	department: integer("department"),
 	designation: varchar("designation", { length: 155 }),
+	nature_of_employment: varchar("nature_of_employment", { length: 80 }),
+	state: varchar("state", { length: 80 }),
+	program: varchar("program", { length: 80 }),
+	location: varchar("location", { length: 80 }),
 },
 (table) => {
 	return {

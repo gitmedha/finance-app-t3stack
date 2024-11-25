@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import moment from 'moment';
 import SearchInput from "~/app/_components/searchInput";
 import PaginationLimitSelect from "~/app/_components/pagination/limit";
 import ReactPaginationStyle from "~/app/_components/pagination/pagination";
@@ -11,7 +12,7 @@ import AddStaff from './add';
 import { api } from "~/trpc/react";
 import type { GetStaffsResponse, StaffItem } from "./staff";
 
-const cols = ['Name', 'Emp ID', "Nature of Employment", 'Designation', 'Department', 'State', 'Program', 'Location', 'Joining Date', 'Status', 'Created At', 'actions']
+const cols = ['Name', 'Emp ID', "Nature of Employment", 'Designation', 'Department', 'State', 'Program', 'Location', 'Joining Date', 'Status', 'Actions']
 
 export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit
@@ -153,7 +154,7 @@ const handleSelect = (name: string, value: object) => {
                 <td className="p-2">{item.state}</td>
                 <td className="p-2">{item.program}</td>
                 <td className="p-2">{item.location}</td>
-                <td className="p-2">{item.createdAt}</td>
+                <td className="p-2">{moment(item.createdAt).format('DD/MM/YYYY')}</td>
                 <td className="p-2">
                   <span
                     className={`px-2 py-1 rounded-lg text-sm ${item.isactive
@@ -164,7 +165,6 @@ const handleSelect = (name: string, value: object) => {
                     {item.isactive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
-                <td className="p-2">{item.createdAt}</td>
                 <td className="p-1 space-x-2">
                   <EditStaff item={item} />
                   <DeleteStaff item={item} />

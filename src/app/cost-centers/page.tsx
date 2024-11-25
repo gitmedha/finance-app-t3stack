@@ -10,6 +10,7 @@ import EditCostCenters from "./edit";
 import DeleteCostCenters from "./delete";
 import CostCenterFilterForm from "./filter";
 import AddCostCenters from "./add";
+import moment from "moment";
 
 const cols = ['Name', 'Code', 'Type','Status' ,'Created At', 'actions']
 
@@ -136,7 +137,7 @@ export default function CostCenter() {
                     {item.isactive ? 'Active' : 'InActive'}
                   </span>
                 </td>
-                <td className="p-2">{item.createdAt}</td>
+                <td className="p-2">{moment(item.createdAt).format('DD-MM-YYYY')}</td>
                 <td className="p-1.5 space-x-2">
                   <EditCostCenters item={item} />
                   <DeleteCostCenters item={item} />

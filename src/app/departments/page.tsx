@@ -10,6 +10,7 @@ import DeleteDepartment from "./delete";
 import { api } from "~/trpc/react";
 import type { GetDepartmentResponse, Department, SelectValue } from "./department";
 import AddDepartment from "./add";
+import moment from "moment";
 
 const cols = ['Name', 'Code', 'Type', 'Status', 'Created At', 'Actions']
 
@@ -134,7 +135,7 @@ export default function DepartmentReport() {
                       {item.isactive ? 'Active' : 'InActive'}
                     </span>
                   </td>
-                  <td className="p-2">{item.createdAt}</td>
+                  <td className="p-2">{moment(item.createdAt).format('DD-MM-YYYY')}</td>
                   <td className="p-1.5 space-x-2">
                     <EditDepartments item={item} />
                     <DeleteDepartment item={item} />

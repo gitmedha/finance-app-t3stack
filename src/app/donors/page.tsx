@@ -10,6 +10,7 @@ import EditDonor from "./edit";
 import DeleteDonor from "./delete";
 import DonorFilterForm from "./filter";
 import AddDonors from "./add";
+import moment from "moment";
 
 const cols = ['Name', 'Cost Center', 'Year', 'Total Budget', 'Received Budget', 'Status', 'Currency', 'Type', 'Created At', 'actions']
 
@@ -141,7 +142,7 @@ export default function Donor() {
                   </td>
                   <td className="p-2">{item.currency}</td>
                   <td className="p-2">{item.type}</td>
-                  <td className="p-2">{item.createdAt}</td>
+                  <td className="p-2">{moment(new Date(item.createdAt)).format('DD-MM-YYYY')}</td>
                   <td className="p-1.5 space-x-2">
                     <EditDonor item={item} />
                     <DeleteDonor item={item} />

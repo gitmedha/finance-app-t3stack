@@ -8,6 +8,7 @@ import ExpenseFilterForm from "./filter";
 import EditExpense from "./edit";
 import DeleteExpense from "./delete";
 import AddExpense from "./add";
+import moment from "moment";
 
 const cols = ['Date', 'Amount', 'Currency', 'Category', 'Cost Center', 'Description', 'Status', 'Type', 'Created At', 'actions']
 
@@ -216,7 +217,7 @@ export default function Expenses() {
                   </span>
                 </td>
                 <td className="p-2">{item.Type}</td>
-                <td className="p-2">{item.CreatedAt}</td>
+                <td className="p-2">{moment(item.CreatedAt).format('DD-MM-YYYY')}</td>
                 <td className="p-1.5 space-x-2">
                   <EditExpense item={item} />
                   <DeleteExpense item={item} />

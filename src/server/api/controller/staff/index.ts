@@ -25,8 +25,6 @@ export const getStaffs = protectedProcedure.input(z.object({
   const departmentCondition = department === 0 ? undefined : eq(staffMaster.department, department)
   const statusCondition = eq(staffMaster.isactive, (status === 'Active'))
   const designationCondition = designation ? eq(staffMaster.designation, designation) : undefined
-  console.log(designation)
-  console.log(department,"department --------------")
 
   const staffs = await ctx.db.select({
     id: staffMaster.id,

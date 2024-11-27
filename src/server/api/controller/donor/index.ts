@@ -61,3 +61,46 @@ export const getDonors = protectedProcedure.input(z.object({
     totalPages: Math.ceil(totalCount / limit),
   };
 })
+
+
+export const addDonor = protectedProcedure
+  .input(
+    z.object({
+      name: z.string().min(1, "Name is required"),
+      costCenter: z.number().optional(),
+      finYear: z.number().min(2000, "Invalid min financial year").max(3100, "Invalid max financial year"),
+      totalBudget: z.number().positive("Total budget must be greater than 0"),
+      budgetReceived: z.number().positive("Budget received must be greater than 0"),
+      currency: z.string().min(1, "Currency is required"),
+      notes: z.string().optional().nullable(),
+      description: z.string().optional().nullable(),
+      isactive: z.boolean(),
+      createdBy: z.number().min(1, "Invalid creator ID"),
+      type: z.string().optional(),
+      createdAt: z.string(),
+    })
+  )
+  .mutation(async ({ ctx, input }) => {
+    try {
+      // Convert numeric fields to strings for the database
+      const formattedInput = {
+        ...input,
+        totalBudget: input.totalBudget.toString(),
+        budgetReceived: input.budgetReceived.toString(),
+        id:undefined
+      };
+      console.log(formattedInput)
+
+      // Insert new donor into the database
+      const result = await ctx.db.insert(donorMaster).values(formattedInput);
+      return {
+        success: true,
+        message: "Donor added successfully",
+        donor: result[0], // Return the created donor
+      };
+    } catch (error) {
+      console.log(error);
+      console.error("Error adding donor:", error);
+      throw new Error("Failed to add donor. Please try again.");
+    }
+  });

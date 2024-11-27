@@ -153,36 +153,17 @@ export const departmentMasterInFinanceProject = financeProject.table("department
 });
 
 export const donorMasterInFinanceProject = financeProject.table("donor_master", {
-	id: serial("id").primaryKey().notNull(),
-	name: varchar("name", { length: 255 }).notNull(),
-	costCenter: integer("cost_center"),
-	finYear: integer("fin_year").notNull(),
-	totalBudget: numeric("total_budget", { precision: 8, scale:  2 }).notNull(),
-	budgetReceived: numeric("budget_received", { precision: 8, scale:  2 }).notNull(),
-	currency: text("currency").notNull(),
-	notes: varchar("notes", { length: 255 }),
-	description: varchar("description", { length: 255 }),
-	isactive: boolean("isactive").notNull(),
-	createdAt: date("created_at").notNull(),
-	updatedAt: date("updated_at"),
-	createdBy: integer("created_by").notNull(),
-	updatedBy: integer("updated_by"),
-	type: varchar("type", { length: 50 }),
-},
-(table) => {
-	return {
-		donorMasterCreatedByFkey: foreignKey({
-			columns: [table.createdBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "donor_master_created_by_fkey"
-		}),
-		donorMasterUpdatedByFkey: foreignKey({
-			columns: [table.updatedBy],
-			foreignColumns: [userMasterInFinanceProject.id],
-			name: "donor_master_updated_by_fkey"
-		}),
-		donorMasterDonorCodeKey: unique("donor_master_donor_code_key").on(table.costCenter),
-	}
+	id: serial("id").primaryKey().notNull(), // Auto-generated primary key
+	name: varchar("name", { length: 255 }).notNull(), // Donor name
+	costCenter: integer("cost_center").notNull(), // Optional cost center
+	finYear: integer("fin_year").notNull(), // Financial year
+	totalBudget: numeric("total_budget", { precision: 12, scale: 2 }).notNull(), // Total budget
+	budgetReceived: numeric("budget_received", { precision: 12, scale: 2 }).notNull(), // Budget received
+	currency: varchar("currency", { length: 10 }).notNull(), // Currency code (e.g., USD)
+	isactive: boolean("isactive").notNull(), // Active status
+	createdAt: date("created_at").defaultNow().notNull(), // Auto-filled created date
+	updatedAt: date("updated_at").defaultNow().notNull(), // Auto-updated on modification
+	type: varchar("type", { length: 50 }).notNull(), // Optional donor type
 });
 
 export const roleMasterInFinanceProject = financeProject.table("role_master", {
@@ -235,7 +216,6 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
 	state: varchar("state", { length: 70 }),
 	location: varchar("location", { length: 70 }),
 	program: varchar("program", { length: 70 }),
-
 },
 (table) => {
 	return {

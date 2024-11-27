@@ -234,6 +234,8 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
 	natureOfEmployment: varchar("nature_of_employment", { length: 70 }),
 	state: varchar("state", { length: 70 }),
 	location: varchar("location", { length: 70 }),
+	state_id: integer("state_id").notNull().references(() => statesMasterInFinanceProject.id), // Foreign key to state_master
+	location_id: integer("location_id").notNull().references(() => locationMasterInFinanceProject.id), // Foreign key to location_master
 	program: varchar("program", { length: 70 }),
 },
 (table) => {

@@ -8,7 +8,7 @@ import {
 import { db } from "~/server/db";
 import { departmentMasterInFinanceProject as departmentMaster, staffMasterInFinanceProject as staffMaster } from "~/server/db/schema";
 
-export const getStaffs = protectedProcedure.input(z.object({
+export const getStates = protectedProcedure.input(z.object({
   page: z.number().min(1).default(1),
   limit: z.number().min(1).max(100).default(10),
   searchTerm: z.string().optional().default(""), // Optional search term

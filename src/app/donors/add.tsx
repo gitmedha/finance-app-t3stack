@@ -50,7 +50,6 @@ const AddDonors: React.FC = () => {
                 createdAt: data.createdAt || new Date().toISOString(), // Ensure `createdAt` is always a string
             };
             let res = await donorMutation.mutateAsync(submissionData);
-            console.log("Donor added:", res);
             reset();
             setIsModalOpen(false);
         } catch (error) {

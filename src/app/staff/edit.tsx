@@ -4,13 +4,15 @@ import React, { useState } from 'react';
 import { TextField, Text, IconButton } from '@radix-ui/themes';
 import Modal from '../_components/Modal';
 import { MdEdit } from "react-icons/md";
-import type { Staff } from "./staff";
+import type { StaffItem } from "./staff";
+import { api } from '~/trpc/react';
 
 interface ItemDetailProps {
-    item: Staff;
+    item: StaffItem;
 }
 
 const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
+    const getAllStates = api.get.getAllStates.useQuery()
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSave = () => {

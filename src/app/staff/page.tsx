@@ -26,8 +26,6 @@ export default function Staff() {
     designation: '',
   });
 
-
-  // Fetch data with pagination
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
     { page: currentPage, limit, searchTerm, ...filters },
     { enabled: false } // Disable automatic query execution

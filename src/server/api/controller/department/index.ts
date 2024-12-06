@@ -60,6 +60,22 @@ export const getDepartments = protectedProcedure.input(z.object({
   };
 })
 
+
+export const getAllDepartments = protectedProcedure.query(async ({ ctx }) => {
+  const departments = await ctx.db
+    .select({
+      id: departmentMaster.id,
+      name: departmentMaster.departmentname,
+    })
+    .from(departmentMaster);
+
+  return departments.map((department) => {
+    return {
+      value: department.id,
+      label: department.name,
+    };
+  });
+});
 // export const getDepartmentsTypes = protectedProcedure.query(async ({ ctx, input }) => {
 //   const departmentsType = await ctx.db.select({
 //     type: departmentMaster.type,

@@ -1,48 +1,59 @@
-
-import React, { useState } from 'react';
-import { TextField, Text, IconButton } from '@radix-ui/themes';
-import Modal from '../_components/Modal';
+import React, { useState } from "react";
+import { TextField, Text, IconButton, Flex, Button } from "@radix-ui/themes";
+import Modal from "../_components/Modal";
 import { MdDelete } from "react-icons/md";
-import type { Staff } from "./staff";
+import type { StaffItem } from "./staff";
+import { api } from "~/trpc/react";
 interface ItemDetailProps {
-    item: Staff;
+  item: StaffItem;
 }
 
 const DeleteStaff: React.FC<ItemDetailProps> = ({ item }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleSave = () => {
-        setIsModalOpen(false);
-    };
+  const deleteStaffMutation = api.delete.deleteStaff.useMutation()
 
-    return (
-        <>
-            <IconButton className='!bg-primary !h-7 !w-7 !cursor-pointer' onClick={() => setIsModalOpen(true)}>
-                <MdDelete size={20} />
-            </IconButton>
+  const handleDelete = async () => {
+    try {
+      await deleteStaffMutation.mutateAsync({ id: item.id })
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding staff:", error);
+    }
+  };
 
-            <Modal
-                title="Delete Staff"
-                description="Are You sure you want to delete ?"
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleSave}
+  return (
+    <>
+      <IconButton
+        className="!h-7 !w-7 !cursor-pointer !bg-primary"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <MdDelete size={20} />
+      </IconButton>
+
+      <Modal
+        title="Delete Staff"
+        description="Are you sure you want to delete this staff?"
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      >
+        <Flex gap="3" mt="4" justify="end">
+            <Button
+              onClick={() => setIsModalOpen(false)}
+              type="button"
+              className="!cursor-pointer"
+              variant="soft"
+              color="gray"
             >
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Name
-                    </Text>
-                    <TextField.Root defaultValue={item?.name} placeholder="Enter your full name" />
-                </label>
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Department
-                    </Text>
-                    <TextField.Root defaultValue={item?.departmentname ?? ''} placeholder="Enter your Department" />
-                </label>
-            </Modal>
-        </>
-    );
+              Cancel
+            </Button>
+            <Button onClick={handleDelete} color="red" className="!cursor-pointer">
+              Delete
+            </Button>
+          </Flex>
+      </Modal>
+    </>
+  );
 };
 
 export default DeleteStaff;

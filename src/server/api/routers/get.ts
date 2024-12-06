@@ -5,7 +5,7 @@ import {
 import { getDesignation, getStaffs } from "../controller/staff";
 import { getDonors } from "../controller/donor";
 import { getCostCenters } from "../controller/costCenters";
-import { getDepartments } from "../controller/department";
+import { getDepartments, getAllDepartments } from "../controller/department";
 import { getAllLocations, getAllStates } from "../controller/geography";
 
 export const getRouter = createTRPCRouter({
@@ -14,6 +14,7 @@ export const getRouter = createTRPCRouter({
   getCostCenters,
   getDesignation,
   getDepartments,
+  getAllDepartments,
   getAllStates,
   getAllLocations,
   getSecretMessage: protectedProcedure.query(() => {

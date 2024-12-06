@@ -1,52 +1,250 @@
 // pages/ProfileEditPage.tsx
 
-import React, { useState } from 'react';
-import { TextField, Text, IconButton } from '@radix-ui/themes';
-import Modal from '../_components/Modal';
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useForm, type SubmitHandler, Controller } from "react-hook-form";
+import { IconButton, Button, Flex } from "@radix-ui/themes";
+import Modal from "../_components/Modal";
 import { MdEdit } from "react-icons/md";
-import type { StaffItem } from "./staff";
-import { api } from '~/trpc/react';
+import { api } from "~/trpc/react";
+import Select from "react-select";
+import { type StaffItem } from "./staff";
 
 interface ItemDetailProps {
-    item: StaffItem;
+  item: StaffItem;
 }
 
 const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
-    const getAllStates = api.get.getAllStates.useQuery()
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const userData = useSession();
+  const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm<StaffItem>({
+    defaultValues: item,
+  });
 
-    const handleSave = () => {
-        setIsModalOpen(false);
-    };
+  const stateName = watch("statesData.label") ?? "";
 
-    return (
-        <>
-            <IconButton className='!bg-primary !h-7 !w-7 !cursor-pointer' onClick={() => setIsModalOpen(true)}>
-                <MdEdit size={20} />
-            </IconButton>
+  const editStaffMutation = api.post.editStaff.useMutation();
+	const { data: departmentData } = api.get.getAllDepartments.useQuery();
+  const { data: statesData } = api.get.getAllStates.useQuery();
+  const { data: locationsData = [], refetch } =
+    api.get.getAllLocations.useQuery({
+			stateName
+		});
 
-            <Modal
-                title="Add Staff"
-                description="Make changes to your profile."
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleSave}
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const onSubmit: SubmitHandler<StaffItem> = async (data) => {
+    try {
+      const submissionData = {
+				id: data.id,
+				name: data.name,
+				empNo: data.empNo,
+				designation: data.designation,
+				nature_of_employment: data.nature_of_employment,
+				department: data.departmentData?.value,
+				stateId: data.statesData?.value,
+				locationId: data.locationData?.value,
+				updatedBy: userData.data?.user.id ?? 1,
+				isactive: true,
+				updatedAt: new Date().toISOString().split("T")[0] ?? "",
+      };
+
+      await editStaffMutation.mutateAsync(submissionData);
+      reset();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding staff:", error);
+    }
+  };
+
+  useEffect(() => {
+		console.log(stateName, "=====")
+    void refetch();
+  }, [refetch, stateName]);
+
+  return (
+    <>
+      <IconButton
+        className="!h-7 !w-7 !cursor-pointer !bg-primary"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <MdEdit size={20} />
+      </IconButton>
+
+      <Modal
+        title="Edit Staff"
+        description="Make changes to your profile."
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      >
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Name Field */}
+          <div>
+            <label className="text-sm">
+              Name
+            </label>
+            <input
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="Enter staff name"
+              {...register("name", { required: "Name is required" })}
+            />
+            {errors.name && (
+              <span className="text-xs text-red-500">
+                {errors.name.message}
+              </span>
+            )}
+          </div>
+
+          {/* Employee Number Field */}
+          <div>
+            <label className="text-sm">
+              Employee Number
+            </label>
+            <input
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="Enter employee number"
+              {...register("empNo", {
+                required: "Employee number is required",
+              })}
+            />
+            {errors.empNo && (
+              <span className="text-xs text-red-500">
+                {errors.empNo.message}
+              </span>
+            )}
+          </div>
+
+          {/* State Dropdown */}
+          <div>
+            <label className="text-sm">
+              State
+            </label>
+            <Controller
+              name="statesData"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onChange={field.onChange}
+									defaultValue={item.statesData}
+                  options={statesData}
+                  placeholder="Select a state"
+                  isClearable
+                  aria-invalid={!!errors.state}
+                />
+              )}
+            />
+
+            {errors.state && (
+              <span className="text-xs text-red-500">
+                {errors.state.message}
+              </span>
+            )}
+          </div>
+
+          {/* Location Dropdown */}
+          <div>
+            <label className="text-sm">
+              Location
+            </label>
+            <Controller
+              name="locationData"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onChange={field.onChange}
+									defaultValue={item.locationData}
+                  options={locationsData}
+                  placeholder="Select a location"
+                  isClearable
+                  aria-invalid={!!errors.location}
+                />
+              )}
+            />
+            {errors.location && (
+              <span className="text-xs text-red-500">
+                {errors.location.message}
+              </span>
+            )}
+          </div>
+
+          {/* Designation Field */}
+          <div>
+            <label className="text-sm">
+              Designation
+            </label>
+            <input
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="Enter designation"
+              {...register("designation", {
+                required: "Designation is required",
+              })}
+            />
+            {errors.designation && (
+              <span className="text-xs text-red-500">
+                {errors.designation.message}
+              </span>
+            )}
+          </div>
+
+          <div>
+            <label className="text-sm">
+              Department
+            </label>
+            <Controller
+              name="departmentData"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onChange={field.onChange}
+									defaultValue={item.departmentData}
+                  options={departmentData}
+                  placeholder="Select a Department"
+                  isClearable
+                  aria-invalid={!!errors.department}
+                />
+              )}
+            />
+            {errors.department && (
+              <span className="text-xs text-red-500">
+                {errors.department.message}
+              </span>
+            )}
+          </div>
+
+          {/* Nature of Employment */}
+          <div>
+            <label className="text-sm">Nature of Employment</label>
+            <input
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="Enter employment type"
+              {...register("nature_of_employment")}
+            />
+          </div>
+
+          <Flex gap="3" mt="4" justify="end">
+            <Button
+              onClick={() => setIsModalOpen(false)}
+              type="button"
+              className="!cursor-pointer"
+              variant="soft"
+              color="gray"
             >
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Name
-                    </Text>
-                    <TextField.Root defaultValue={item?.name} placeholder="Enter your full name" />
-                </label>
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Department
-                    </Text>
-                    <TextField.Root defaultValue={item?.departmentname ?? ''} placeholder="Enter your Department" />
-                </label>
-            </Modal>
-        </>
-    );
+              Cancel
+            </Button>
+            <Button type="submit" className="!cursor-pointer">
+              Save
+            </Button>
+          </Flex>
+        </form>
+      </Modal>
+    </>
+  );
 };
 
 export default EditStaff;

@@ -3,11 +3,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler ,Controller} from "react-hook-form";
 import { TextField, IconButton, Button, Flex, Dialog } from '@radix-ui/themes';
 import Modal from '../_components/Modal';
 import { BiPlus } from 'react-icons/bi';
 import { api } from '~/trpc/react';
+import Select from 'react-select'
+
 interface DonorFormData {
     name: string;
     costCenter?: number;
@@ -25,15 +27,16 @@ interface DonorFormData {
 const AddDonors: React.FC = () => {
     const donorMutation = api.post.addDonor.useMutation();
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const { data: costCentersData } = api.get.getCostCenters.useQuery({});
     const {
         register,
+        control,
         handleSubmit,
         formState: { errors },
         reset,
     } = useForm<DonorFormData>({
         defaultValues: {
-            isactive: true,
+            isactive: false,
             createdBy: 1, // Replace with the logged-in user ID
             createdAt: new Date().toISOString().split('T')[0], // Default to today's date (YYYY-MM-DD)
         },
@@ -44,6 +47,8 @@ const AddDonors: React.FC = () => {
         try {
             const submissionData = {
                 ...data,
+                id:1,
+                costCenter:Number(data?.costCenter?.value),
                 totalBudget: Number(data?.totalBudget),
                 budgetReceived: Number(data?.budgetReceived),
                 finYear: Number(data?.finYear),
@@ -56,6 +61,12 @@ const AddDonors: React.FC = () => {
             console.error("Error adding donor:", error);
         }
     };
+
+        // Options for react-select
+        const costCentersOptions = costCentersData?.costCenters?.map((costCenter: any) => ({
+            value:costCenter?.id,
+            label: costCenter?.name,
+        }));
 
     return (
         <>
@@ -86,16 +97,29 @@ const AddDonors: React.FC = () => {
                         )}
                     </div>
 
+                    {/* Cost Center Dropdown */}
                     <div>
                         <label className='text-sm'>
-                            Cost Center <span className='text-red-400'>*</span>
+                        Cost Center <span className='text-red-400'>*</span>
                         </label>
-                        <input
-                            className="border rounded-lg px-3 py-2 text-sm w-full outline-none mt-1"
-                            placeholder="Enter cost center"
-                            type="number"
-                            {...register("costCenter", { valueAsNumber: true })}
+                        <Controller
+                            name="costCenter"
+                            control={control}
+                            render={({ field }) => (
+                                <Select
+                                    {...field}
+                                    options={costCentersOptions || []}
+                                    placeholder="Select a cost center"
+                                    isClearable
+                                    aria-invalid={!!errors.costCenter}
+                                />
+                            )}
                         />
+
+
+                        {errors.costCenter && (
+                            <span className='text-red-500 text-xs'>{errors.costCenter.message}</span>
+                        )}
                     </div>
 
                     <div>

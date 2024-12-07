@@ -1,14 +1,26 @@
 
 import React, { useState } from 'react';
-import { TextField, Text, IconButton } from '@radix-ui/themes';
+import {  IconButton, Flex, Button} from '@radix-ui/themes';
 import Modal from '../_components/Modal';
 import { MdDelete } from "react-icons/md";
 import type { ItemDetailProps} from "./donor";
+import { api } from "~/trpc/react";
 
 
 const DeleteDonor: React.FC<ItemDetailProps> = ({ item }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const deleteDonorMutation = api.delete.deleteDonor.useMutation()
+
+    const handleDelete = async () => {
+      try {
+        await deleteDonorMutation.mutateAsync({ id: item.id })
+        setIsModalOpen(false);
+      } catch (error) {
+        console.error("Error adding staff:", error);
+      }
+    };
+  
     const handleSave = () => {
         setIsModalOpen(false);
     };
@@ -26,18 +38,20 @@ const DeleteDonor: React.FC<ItemDetailProps> = ({ item }) => {
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSave}
             >
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Name
-                    </Text>
-                    <TextField.Root defaultValue={item?.name} placeholder="Enter your Full Name" />
-                </label>
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Description
-                    </Text>
-                    <TextField.Root defaultValue={item?.totalBudget.toString()} placeholder="Enter your TotalBudget" />
-                </label>
+               <Flex gap="3" mt="4" justify="end">
+            <Button
+              onClick={() => setIsModalOpen(false)}
+              type="button"
+              className="!cursor-pointer"
+              variant="soft"
+              color="gray"
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleDelete} color="red" className="!cursor-pointer">
+              Delete
+            </Button>
+          </Flex>
             </Modal>
         </>
     );

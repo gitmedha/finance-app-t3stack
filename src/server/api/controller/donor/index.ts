@@ -82,14 +82,13 @@ export const addDonor = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      // Convert numeric fields to strings for the database
+      // Ensure the input is correctly formatted for the DB
       const formattedInput = {
         ...input,
-        totalBudget: input.totalBudget.toString(),
-        budgetReceived: input.budgetReceived.toString(),
-        id:undefined
+        totalBudget: input.totalBudget,
+        budgetReceived: input.budgetReceived,
       };
-      console.log(formattedInput)
+      console.log(formattedInput); // Useful for debugging
 
       // Insert new donor into the database
       const result = await ctx.db.insert(donorMaster).values(formattedInput);
@@ -99,8 +98,103 @@ export const addDonor = protectedProcedure
         donor: result[0], // Return the created donor
       };
     } catch (error) {
-      console.log(error);
       console.error("Error adding donor:", error);
       throw new Error("Failed to add donor. Please try again.");
+    }
+  });
+
+
+export const editDonor = protectedProcedure
+  .input(
+    z.object({
+      id: z.number().min(1, "Donor ID is required"), // Ensure the donor ID is provided
+      name: z.string().min(1, "Name is required").optional(),
+      costCenter: z.number().optional(),
+      finYear: z.number().min(2000, "Invalid min financial year").max(3100, "Invalid max financial year").optional(),
+      totalBudget: z.number().positive("Total budget must be greater than 0").optional(),
+      budgetReceived: z.number().positive("Budget received must be greater than 0").optional(),
+      currency: z.string().min(1, "Currency is required").optional(),
+      notes: z.string().optional().nullable(),
+      description: z.string().optional().nullable(),
+      isactive: z.boolean().optional(),
+      type: z.string().optional(),
+      updatedBy: z.number().min(1, "Invalid updater ID"),
+      updatedAt: z.string(),
+    })
+  )
+  .mutation(async ({ ctx, input }) => {
+    try {
+      console.log("final",input);
+      
+      const { id, updatedBy, updatedAt,  ...updatedFields } = input;
+
+      // Check if the donor exists before updating
+      const existingDonor = await ctx.db.query.donorMasterInFinanceProject.findFirst({where:eq(donorMaster.id,id)})
+   
+      if (!existingDonor) {
+        throw new Error("Donor not found");
+      }
+
+
+      // Update donor in the database
+      const result = await ctx.db
+        .update(donorMaster)
+        .set({
+          ...updatedFields,
+          updatedBy,
+          updatedAt, 
+
+        })
+        .where(eq( donorMaster.id,id))
+        .returning();
+      
+      return {
+        success: true,
+        message: "Donor updated successfully",
+        donor: result[0], // Return the updated donor
+      };
+    } catch (error) {
+      console.error("Error editing donor:", error);
+      throw new Error("Failed to update donor. Please try again.");
+    }
+  });
+
+  export const deleteDonor = protectedProcedure.input(
+    z.object({
+      id: z.number().min(1, "Donor ID is required"), // Donor ID to locate the record
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    try {
+      const { id } = input;
+  
+      // Check if the donor member exists
+      const existingStaff =
+        await ctx.db.query.staffMasterInFinanceProject.findFirst({
+          where: eq(donorMaster.id, id),
+        });
+  
+      if (!existingStaff) {
+        throw new Error("Donor member not found");
+      }
+  
+      // Update donor member details
+      const updatedStaff = await ctx.db
+        .update(donorMaster)
+        .set({
+          isactive: false
+        })
+        .where(eq(donorMaster.id, id))
+        .returning(); // Correct usage of eq()
+      // .returning("*");
+  
+      return {
+        success: true,
+        message: "Donor member deleted successfully",
+        donor: updatedStaff[0], // Return the updated donor record
+      };
+    } catch (error) {
+      console.error("Error deleting donor:", error);
+      throw new Error("Failed to delete donor. Please try again.");
     }
   });

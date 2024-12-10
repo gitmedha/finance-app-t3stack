@@ -1,4 +1,3 @@
-
 import { and, count, eq, ilike } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -6,71 +5,101 @@ import {
   protectedProcedure,
 } from "~/server/api/trpc";
 import { db } from "~/server/db";
-import { donorMasterInFinanceProject as donorMaster } from "~/server/db/schema";
+import { donorMasterInFinanceProject as donorMaster, costCenterInFinanceProject as costCenterMaster } from "~/server/db/schema";
 
-export const getDonors = protectedProcedure.input(z.object({
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(10),
-  searchTerm: z.string().optional().default(""), // Optional search term
-  type: z.string().optional().default(""), // Optional search term
-  status: z.string().optional().default(""), // Optional search term
-})).query(async ({ ctx, input }) => {
-  const { page, limit, searchTerm, type, status } = input;
-  const offset = (page - 1) * limit;
-  // Apply the search condition only if searchTerm is not an empty string
-  const searchCondition = searchTerm
-    ? ilike(donorMaster.name, `%${searchTerm}%`)
-    : undefined;
-  const typeCondition = type ? eq(donorMaster.type, type) : undefined
-  const statusCondition = status ?  eq(donorMaster.isactive, (status === 'Active')) : undefined
+export const getDonors = protectedProcedure
+  .input(
+    z.object({
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(100).default(10),
+      searchTerm: z.string().optional().default(""), // Optional search term
+      type: z.string().optional().default(""), // Optional search term
+      status: z.string().optional().default(""), // Optional search term
+    }),
+  )
+  .query(async ({ ctx, input }) => {
+    const { page, limit, searchTerm, type, status } = input;
+    const offset = (page - 1) * limit;
+    // Apply the search condition only if searchTerm is not an empty string
+    const searchCondition = searchTerm
+      ? ilike(donorMaster.name, `%${searchTerm}%`)
+      : undefined;
+    const typeCondition = type ? eq(donorMaster.type, type) : undefined;
+    const statusCondition = status
+      ? eq(donorMaster.isactive, status === "Active")
+      : undefined;
 
-  const donors = await ctx.db.select({
-    id:donorMaster.id,
-    name:donorMaster.name,
-    costCenter:donorMaster.costCenter,
-    finYear:donorMaster.finYear,
-    totalBudget:donorMaster.totalBudget,
-    budgetReceived:donorMaster.budgetReceived,
-    currency:donorMaster.currency,
-    notes:donorMaster.notes,
-    description:donorMaster.description,
-    isactive:donorMaster.isactive,
-    createdAt:donorMaster.createdAt,
-    updatedAt:donorMaster.updatedAt,
-    createdBy:donorMaster.createdBy,
-    updatedBy:donorMaster.updatedBy,
-    type:donorMaster.type,
-    // count: count()
-  }).from(donorMaster).where(and(
-    searchCondition,
-    typeCondition,
-    statusCondition
-  )).offset(offset).limit(limit)
+    const donors = await ctx.db
+      .select({
+        id: donorMaster.id,
+        name: donorMaster.name,
+        costCenter: donorMaster.costCenter,
+        finYear: donorMaster.finYear,
+        totalBudget: donorMaster.totalBudget,
+        budgetReceived: donorMaster.budgetReceived,
+        currency: donorMaster.currency,
+        notes: donorMaster.notes,
+        description: donorMaster.description,
+        isactive: donorMaster.isactive,
+        createdAt: donorMaster.createdAt,
+        updatedAt: donorMaster.updatedAt,
+        createdBy: donorMaster.createdBy,
+        updatedBy: donorMaster.updatedBy,
+        type: donorMaster.type,
+        costCenterName: costCenterMaster.name
+        // count: count()
+      })
+      .from(donorMaster)
+      .leftJoin(
+        costCenterMaster,
+        and(
+          eq(costCenterMaster.isactive, true),
+          eq(costCenterMaster.id, donorMaster.costCenter),
+        ),
+      )
+      .where(and(searchCondition, typeCondition, statusCondition))
+      .offset(offset)
+      .limit(limit);
 
-  const totalCountResult = await db.select({ count: count() }).from(donorMaster).where(and(
-    searchCondition,
-    typeCondition,
-    statusCondition
-  )); // Count with filter if searchCondition is defined
+    const totalCountResult = await db
+      .select({ count: count() })
+      .from(donorMaster)
+      .where(and(searchCondition, typeCondition, statusCondition)); // Count with filter if searchCondition is defined
 
-  const totalCount = totalCountResult[0]?.count ?? 0;
+    const totalCount = totalCountResult[0]?.count ?? 0;
 
-  return {
-    donors,
-    totalCount,
-    totalPages: Math.ceil(totalCount / limit),
-  };
-})
+    const updatedDonors = [];
+    
+    for (const donor of donors) {
+      const costCenterData = {
+        value: donor.costCenter,
+        label: donor.costCenterName
+      }
 
+      updatedDonors.push({
+        ...donor,
+        costCenterData
+      })
+    }
+
+    return {
+      donors: updatedDonors,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+    };
+  });
 
 export const addDonor = protectedProcedure
   .input(
     z.object({
       name: z.string().min(1, "Name is required"),
       costCenter: z.number().optional(),
-      finYear: z.number().min(2000, "Invalid min financial year").max(3100, "Invalid max financial year"),
-      totalBudget: z.number().positive("Total budget must be greater than 0"),
-      budgetReceived: z.number().positive("Budget received must be greater than 0"),
+      finYear: z
+        .number()
+        .min(2000, "Invalid min financial year")
+        .max(3100, "Invalid max financial year"),
+      totalBudget: z.string(),
+      budgetReceived: z.string(),
       currency: z.string().min(1, "Currency is required"),
       notes: z.string().optional().nullable(),
       description: z.string().optional().nullable(),
@@ -78,15 +107,15 @@ export const addDonor = protectedProcedure
       createdBy: z.number().min(1, "Invalid creator ID"),
       type: z.string().optional(),
       createdAt: z.string(),
-    })
+    }),
   )
   .mutation(async ({ ctx, input }) => {
     try {
       // Ensure the input is correctly formatted for the DB
       const formattedInput = {
         ...input,
-        totalBudget: input.totalBudget,
-        budgetReceived: input.budgetReceived,
+        totalBudget: parseFloat(input.totalBudget).toFixed(2),
+        budgetReceived: parseFloat(input.budgetReceived).toFixed(2),
       };
       console.log(formattedInput); // Useful for debugging
 
@@ -103,16 +132,19 @@ export const addDonor = protectedProcedure
     }
   });
 
-
 export const editDonor = protectedProcedure
   .input(
     z.object({
       id: z.number().min(1, "Donor ID is required"), // Ensure the donor ID is provided
       name: z.string().min(1, "Name is required").optional(),
       costCenter: z.number().optional(),
-      finYear: z.number().min(2000, "Invalid min financial year").max(3100, "Invalid max financial year").optional(),
-      totalBudget: z.number().positive("Total budget must be greater than 0").optional(),
-      budgetReceived: z.number().positive("Budget received must be greater than 0").optional(),
+      finYear: z
+        .number()
+        .min(2000, "Invalid min financial year")
+        .max(3100, "Invalid max financial year")
+        .optional(),
+      totalBudget: z.string(),
+      budgetReceived: z.string(),
       currency: z.string().min(1, "Currency is required").optional(),
       notes: z.string().optional().nullable(),
       description: z.string().optional().nullable(),
@@ -120,21 +152,21 @@ export const editDonor = protectedProcedure
       type: z.string().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
-    })
+    }),
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      console.log("final",input);
-      
-      const { id, updatedBy, updatedAt,  ...updatedFields } = input;
+      const { id, updatedBy, updatedAt, ...updatedFields } = input;
 
       // Check if the donor exists before updating
-      const existingDonor = await ctx.db.query.donorMasterInFinanceProject.findFirst({where:eq(donorMaster.id,id)})
-   
+      const existingDonor =
+        await ctx.db.query.donorMasterInFinanceProject.findFirst({
+          where: eq(donorMaster.id, id),
+        });
+
       if (!existingDonor) {
         throw new Error("Donor not found");
       }
-
 
       // Update donor in the database
       const result = await ctx.db
@@ -142,12 +174,11 @@ export const editDonor = protectedProcedure
         .set({
           ...updatedFields,
           updatedBy,
-          updatedAt, 
-
+          updatedAt,
         })
-        .where(eq( donorMaster.id,id))
+        .where(eq(donorMaster.id, id))
         .returning();
-      
+
       return {
         success: true,
         message: "Donor updated successfully",
@@ -159,7 +190,8 @@ export const editDonor = protectedProcedure
     }
   });
 
-  export const deleteDonor = protectedProcedure.input(
+export const deleteDonor = protectedProcedure
+  .input(
     z.object({
       id: z.number().min(1, "Donor ID is required"), // Donor ID to locate the record
     }),
@@ -167,27 +199,27 @@ export const editDonor = protectedProcedure
   .mutation(async ({ ctx, input }) => {
     try {
       const { id } = input;
-  
+
       // Check if the donor member exists
       const existingStaff =
         await ctx.db.query.staffMasterInFinanceProject.findFirst({
           where: eq(donorMaster.id, id),
         });
-  
+
       if (!existingStaff) {
         throw new Error("Donor member not found");
       }
-  
+
       // Update donor member details
       const updatedStaff = await ctx.db
         .update(donorMaster)
         .set({
-          isactive: false
+          isactive: false,
         })
         .where(eq(donorMaster.id, id))
         .returning(); // Correct usage of eq()
       // .returning("*");
-  
+
       return {
         success: true,
         message: "Donor member deleted successfully",

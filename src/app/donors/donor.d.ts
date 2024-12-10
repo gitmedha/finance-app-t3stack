@@ -1,3 +1,5 @@
+import { type ISelectItem } from "../common/types/genericField";
+
 // Use a type-only export to avoid conflicts with isolatedModules
 export type { Donors, GetDonorsResponse, FilterOptions, ItemDetailProps, DonorFilterFormProps, SelectValue };
 
@@ -6,8 +8,8 @@ interface Donors {
   name: string;
   costCenter: number | null;
   finYear: number;
-  totalBudget: number | string;
-  budgetReceived: number | string;
+  totalBudget: string;
+  budgetReceived: string;
   currency: string;
   notes: string | null;
   description: string | null;
@@ -17,6 +19,8 @@ interface Donors {
   updatedAt: string | null;
   createdBy: number;
   updatedBy: number | null;
+  costCenterData: ISelectItem;
+  costCenterName: string;
 }
 
 interface GetDonorsResponse {

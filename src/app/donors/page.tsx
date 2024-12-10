@@ -126,7 +126,7 @@ export default function Donor() {
                   className="border-b text-sm hover:bg-gray-100 transition-colors"
                 >
                   <td className="p-2">{item.name}</td>
-                  <td className="p-2">{item.costCenter}</td>
+                  <td className="p-2">{item.costCenterName}</td>
                   <td className="p-2">{item.finYear}</td>
                   <td className="p-2">{item.totalBudget}</td>
                   <td className="p-2">{item.budgetReceived}</td>

@@ -46,18 +46,3 @@ export const getAllLocations = protectedProcedure
     });
   });
 
-export const getAllDepartments = protectedProcedure.query(async ({ ctx }) => {
-  const departments = await ctx.db
-    .select({
-      id: departmentMasterInFinanceProject.id,
-      name: departmentMasterInFinanceProject.departmentname,
-    })
-    .from(departmentMasterInFinanceProject);
-
-  return departments.map((department) => {
-    return {
-      value: department.id,
-      label: department.name,
-    };
-  });
-});

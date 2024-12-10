@@ -60,3 +60,20 @@ export const getCostCenters = protectedProcedure.input(z.object({
     totalPages: Math.ceil(totalCount / limit),
   };
 })
+
+
+export const getAllCostCenters = protectedProcedure.query(async ({ ctx }) => {
+  const costCenters = await ctx.db
+    .select({
+      id: costCenter.id,
+      name: costCenter.name,
+    })
+    .from(costCenter);
+
+  return costCenters.map((center) => {
+    return {
+      value: center.id,
+      label: center.name,
+    };
+  });
+});

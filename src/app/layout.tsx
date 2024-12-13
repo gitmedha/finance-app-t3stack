@@ -42,13 +42,15 @@ const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             Loading...
           </p>
           <p className=" text-sm font-semibold text-primary/80">
-            We{`&apos;`}re preparing your content.
+            We are preparing your content.
           </p>
         </div>
       </div>}
       {session && <AppBar />}
       
+      <div className="mt-20">
       {children}
+      </div>
     </>
   );
 };

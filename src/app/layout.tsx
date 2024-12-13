@@ -48,7 +48,9 @@ const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </div>}
       {session && <AppBar />}
       
+      <div className="mt-20">
       {children}
+      </div>
     </>
   );
 };

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { LuLogOut } from "react-icons/lu";
 import { FaHandHoldingHeart, FaUser } from "react-icons/fa";
 import { GiExpense, GiOfficeChair, GiMoneyStack } from "react-icons/gi";
@@ -15,18 +16,34 @@ const AppBar = () => {
   const { data: session } = useSession();
   const pathname = usePathname(); // Get the current path
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Handle scroll event
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const menus = [
-    { menu: 'Home', path: '/home', icon: <IoHome /> },
-    { menu: 'Budget', path: '/budget', icon: <HiBanknotes /> },
-    { menu: 'Donors', path: '/donors', icon: <FaHandHoldingHeart /> },
-    { menu: 'Departments', path: '/departments', icon: <GiOfficeChair /> },
-    { menu: 'Cost Centers', path: '/cost-centers', icon: <GiMoneyStack /> },
-    { menu: 'Expenses', path: '/expenses', icon: <GiExpense /> },
-    { menu: 'Staff', path: '/staff', icon: <FaUser /> },
+    { menu: "Home", path: "/home", icon: <IoHome /> },
+    { menu: "Budget", path: "/budget", icon: <HiBanknotes /> },
+    { menu: "Donors", path: "/donors", icon: <FaHandHoldingHeart /> },
+    { menu: "Departments", path: "/departments", icon: <GiOfficeChair /> },
+    { menu: "Cost Centers", path: "/cost-centers", icon: <GiMoneyStack /> },
+    { menu: "Expenses", path: "/expenses", icon: <GiExpense /> },
+    { menu: "Staff", path: "/staff", icon: <FaUser /> },
   ];
 
   return (
-    <nav className="shadow-lg bg-primary">
+    <nav
+      className={`fixed top-0 left-0 w-full z-50 transition-all ${
+        isScrolled ? "shadow-lg bg-primary/90" : "bg-primary"
+      }`}
+    >
       <div className="container mx-auto flex justify-between items-center py-1">
         <div className="flex justify-center items-center">
           <Image
@@ -43,7 +60,9 @@ const AppBar = () => {
               <Link
                 href={menu.path}
                 className={`text-white space-x-1 flex justify-start items-center ${
-                  pathname === menu.path ? 'font-semibold border-b-2 border-white' : ''
+                  pathname === menu.path
+                    ? "font-semibold border-b-2 border-white"
+                    : ""
                 }`}
               >
                 <span>{menu.icon}</span>
@@ -54,7 +73,9 @@ const AppBar = () => {
         </ul>
 
         <div className="flex justify-start items-center text-white space-x-2">
-          <span className="font-medium capitalize">Hi, {session?.user.fullName}</span>
+          <span className="font-medium capitalize">
+            Hi, {session?.user.fullName}
+          </span>
 
           <IconButton
             onClick={() => signOut()}

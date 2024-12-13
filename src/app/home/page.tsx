@@ -11,7 +11,7 @@ export default function Home() {
     return (
         <div className="mt-4 h-[100vh] gap-4 p-2">
             <AppMatrics />
-            <div className="mt-3 h-[calc(100%)] grid grid-cols-2 gap-4">
+            <div className="mt-3 grid grid-cols-2 gap-4">
                 <ActualQ1 />
                 <ActualQ2 />
                 <ActualQ3 />

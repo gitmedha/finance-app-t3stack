@@ -16,6 +16,7 @@ interface ItemDetailProps {
 
 const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
   const userData = useSession();
+  const apiContext = api.useContext();
   const {
     register,
     control,
@@ -27,9 +28,18 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
     defaultValues: item,
   });
 
-  const stateName = watch("statesData.label") ?? "";
+  const stateName = watch("statesData")?.label ?? "";
 
-  const editStaffMutation = api.post.editStaff.useMutation();
+  const { mutate: editStaff } = api.post.editStaff.useMutation({
+    async onSuccess() {
+      await apiContext.get.getStaffs.invalidate();
+      reset();
+      setIsModalOpen(false);
+    },
+    onError(err) {
+      console.error("Error adding staff:", err);
+    },
+  });
 	const { data: departmentData } = api.get.getAllDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
   const { data: locationsData = [], refetch } =
@@ -55,17 +65,19 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
 				updatedAt: new Date().toISOString().split("T")[0] ?? "",
       };
 
-      await editStaffMutation.mutateAsync(submissionData);
-      reset();
-      setIsModalOpen(false);
+      editStaff(submissionData);
+      // reset();
+      // await apiContext.get.getStaffs.invalidate();
+      // setIsModalOpen(false);
     } catch (error) {
       console.error("Error adding staff:", error);
     }
   };
 
   useEffect(() => {
-		console.log(stateName, "=====")
-    void refetch();
+    if (stateName) {
+      void refetch();
+    }
   }, [refetch, stateName]);
 
   return (

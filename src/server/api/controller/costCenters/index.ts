@@ -9,8 +9,8 @@ import { db } from "~/server/db";
 import { costCenterInFinanceProject as costCenter } from "~/server/db/schema";
 
 export const getCostCenters = protectedProcedure.input(z.object({
-  page: z.number().min(1).default(1).optional(),
-  limit: z.number().min(1).max(100).default(10).optional(),
+  page: z.number().min(1).default(1),
+  limit: z.number().min(1).max(100).default(10),
   searchTerm: z.string().optional().default("").optional(), // Optional search term
   type: z.string().optional().default("").optional(), // Optional search term
   status: z.string().optional().default("").optional(), // Optional search term

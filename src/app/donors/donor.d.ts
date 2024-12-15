@@ -20,7 +20,7 @@ interface Donors {
   createdBy: number;
   updatedBy: number | null;
   costCenterData: ISelectItem;
-  costCenterName: string;
+  costCenterName: string | null;
 }
 
 interface GetDonorsResponse {

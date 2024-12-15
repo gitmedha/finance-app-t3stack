@@ -4,7 +4,7 @@ import { protectedProcedure } from "~/server/api/trpc";
 import {
   locationMasterInFinanceProject,
   statesMasterInFinanceProject,
-  departmentMasterInFinanceProject
+  // departmentMasterInFinanceProject
 } from "~/server/db/schema";
 
 export const getAllStates = protectedProcedure.query(async ({ ctx }) => {
@@ -26,7 +26,7 @@ export const getAllStates = protectedProcedure.query(async ({ ctx }) => {
 export const getAllLocations = protectedProcedure
   .input(
     z.object({
-      stateName: z.string().optional().default(""),
+      stateName: z.string().default(""),
     }),
   )
   .query(async ({ ctx, input }) => {

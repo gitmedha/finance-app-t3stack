@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { type FC } from "react";
 
 // Define types for maricsList items
 interface MetricItem {

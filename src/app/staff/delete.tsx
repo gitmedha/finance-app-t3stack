@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Text, IconButton, Flex, Button } from "@radix-ui/themes";
+import { IconButton, Flex, Button } from "@radix-ui/themes";
 import Modal from "../_components/Modal";
 import { MdDelete } from "react-icons/md";
 import type { StaffItem } from "./staff";

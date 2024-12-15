@@ -24,7 +24,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
 
   useEffect(() => {
     if (data && data.departments.length === 0) {
-      refetch(); // Trigger refetch if departments are empty
+      void refetch(); // Trigger refetch if departments are empty
     }
   }, [data, refetch]);
 

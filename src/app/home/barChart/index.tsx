@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Define types for props
@@ -7,12 +7,12 @@ interface BarchartDashboardProps {
 }
 
 // Define types for mock data items
-interface ChartDataItem {
-  MonthName: string;
-  Project: number;
-  Organization: number;
-  Miscellaneous: number;
-}
+// interface ChartDataItem {
+//   MonthName: string;
+//   Project: number;
+//   Organization: number;
+//   Miscellaneous: number;
+// }
 
 // Mock data
 const mockData = [

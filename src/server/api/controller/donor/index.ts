@@ -72,8 +72,8 @@ export const getDonors = protectedProcedure
     
     for (const donor of donors) {
       const costCenterData = {
-        value: donor.costCenter,
-        label: donor.costCenterName
+        value: donor.costCenter ?? 1,
+        label: donor.costCenterName ?? ""
       }
 
       updatedDonors.push({

@@ -24,6 +24,7 @@ interface StaffFormData {
 
 const AddStaff: React.FC = () => {
   const userData = useSession();
+  const apiContext = api.useContext();
   const {
     register,
     control,
@@ -59,6 +60,7 @@ const AddStaff: React.FC = () => {
         department: Number(data.department.value),
       };
       await addStaffMutation.mutateAsync(submissionData);
+      await apiContext.get.getStaffs.invalidate();
       reset();
       setIsModalOpen(false);
     } catch (error) {

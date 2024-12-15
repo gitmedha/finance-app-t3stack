@@ -1,6 +1,5 @@
-import { and, count, eq, ilike } from "drizzle-orm";
-import { string, z } from "zod";
-import { type StaffItem } from "~/app/staff/staff";
+import { and, count, desc, eq, ilike } from "drizzle-orm";
+import { z } from "zod";
 import {
   //   createTRPCRouter,
   protectedProcedure,
@@ -90,6 +89,7 @@ export const getStaffs = protectedProcedure
           designationCondition,
         ),
       )
+      .orderBy(desc(staffMaster.createdAt))
       .offset(offset)
       .limit(limit);
 

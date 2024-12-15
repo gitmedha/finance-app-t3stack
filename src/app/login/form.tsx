@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation"; // Corrected import
 import { Button } from "@radix-ui/themes";
 import { signIn } from "next-auth/react";

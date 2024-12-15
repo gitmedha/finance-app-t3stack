@@ -1,8 +1,7 @@
 // components/Modal.tsx
 
-import React, { FC, ReactNode } from 'react';
-import { Dialog,  Button } from '@radix-ui/themes';
-import { Flex } from '@radix-ui/themes';
+import React, { type FC, type ReactNode } from 'react';
+import { Dialog } from '@radix-ui/themes';
 import clsx from 'clsx';
 
 interface ModalProps {

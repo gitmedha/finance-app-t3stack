@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
-import { TextField, IconButton, Button, Flex, Dialog } from "@radix-ui/themes";
+import { IconButton, Button, Flex } from "@radix-ui/themes";
 import Modal from "../_components/Modal";
 import { BiPlus } from "react-icons/bi";
 import { api } from "~/trpc/react";

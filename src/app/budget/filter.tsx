@@ -2,17 +2,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from '~/trpc/react';
 import { useEffect } from 'react';
-
-interface FilterOptions {
-  department: string | number;  // Allow department to be string or number
-  departmentname: string;
-  year: string | number;
-}
-
-interface BudgetFilterFormProps {
-  filters: FilterOptions;
-  handleSelect: (name: string, value: string | number | object) => void;
-}
+import type { BudgetFilterFormProps } from "./budget";
 
 const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect }) => {
 
@@ -50,7 +40,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
             <DropdownMenu.Item
               className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-              onSelect={() => handleSelect('department', '')} // Reset department
+              onSelect={() => handleSelect('department', "")} // Reset department
             >
               All
             </DropdownMenu.Item>
@@ -58,7 +48,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
               <DropdownMenu.Item
                 key={dep.id}
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                onSelect={() => handleSelect('department', dep)} // Pass the whole department object
+                onSelect={() => handleSelect('department', dep.id)} // Pass the whole department object
               >
                 {dep.departmentname}
               </DropdownMenu.Item>

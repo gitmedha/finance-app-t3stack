@@ -1,60 +1,18 @@
-// 'use client';
-
-// import { useState } from "react";
-// import BHead from "./bHead";
-// import BudgetFilterForm from "./filter";
-
-// const sections = [
-//   'PERSONNEL',
-//   'PROGRAM ACTIVITIES',
-//   'TRAVEL ',
-//   'PROGRAM OFFICE',
-//   'CAPITAL COST',
-//   'OVERHEADS',
-// ];
-
-// const Budget: React.FC = () => {
-//   const [filters, setFilters] = useState({
-//     department: '',  // Set to an empty string initially
-//     departmentname: '',
-//     year: '',
-//   });
-
-//   const handleSelect = (name: string, value: string | object) => {
-//     if (name === 'department') {
-//       // Ensure department is a string (department ID should be a string)
-//       setFilters((prev) => ({
-//         ...prev,
-//         [name]: value ? String((value as any)?.id) : '', // Convert to string and handle reset case
-//         departmentname: (value as any)?.departmentname ?? '', // Set department name
-//       }));
-//     } else if (name === 'year') {
-//       setFilters((prev) => ({
-//         ...prev,
-//         [name]: value as string, // Ensure year is set as a string
-//       }));
-//     }
-//   };
-
-//   return (
-//     <div className="mt-10 overflow-hidden m-2 p-2">
-//       <BudgetFilterForm filters={filters} handleSelect={handleSelect} />
-//       {sections.map((section) => (
-//         <BHead key={section} section={section} />
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default Budget;
-
-
-
 'use client';
 
 import { useState } from "react";
 import BHead from "./bHead";
 import BudgetFilterForm from "./filter";
+
+// Define types for filters
+interface Filters {
+  department: string; // Department ID as string
+  departmentname: string; // Department name as string
+  year: string; // Year as string
+}
+
+// Define the structure of the value passed to handleSelect
+type HandleSelectValue = { id: string; departmentname: string } | string | number;
 
 const sections = [
   'PERSONNEL',
@@ -66,24 +24,25 @@ const sections = [
 ];
 
 const Budget: React.FC = () => {
-  const [filters, setFilters] = useState({
-    department: '', // Can be an empty string or number
+  // Explicitly define the type for filters
+  const [filters, setFilters] = useState<Filters>({
+    department: '', // Default to an empty string
     departmentname: '',
     year: '',
   });
 
-  const handleSelect = (name: string, value: string | number | object) => {
-    if (name === 'department') {
-      // Ensure department is a string (department ID should be a string)
+  const handleSelect = (name: string, value: HandleSelectValue) => {
+    if (name === 'department' && typeof value === 'object' && value !== null) {
+      const departmentValue = value as { id: string; departmentname: string }; // Narrow type
       setFilters((prev) => ({
         ...prev,
-        [name]: value ? String((value as any)?.id) : '', // Convert to string and handle reset case
-        departmentname: (value as any)?.departmentname ?? '', // Set department name
+        department: departmentValue.id, // Use the explicit type
+        departmentname: departmentValue.departmentname, // Extract department name
       }));
-    } else if (name === 'year') {
+    } else if (name === 'year' && typeof value === 'string') {
       setFilters((prev) => ({
         ...prev,
-        [name]: value as string, // Ensure year is set as a string
+        [name]: value, // Year is a string
       }));
     }
   };

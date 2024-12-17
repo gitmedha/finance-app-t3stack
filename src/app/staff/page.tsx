@@ -12,7 +12,7 @@ import AddStaff from './add';
 import { api } from "~/trpc/react";
 import type { GetStaffsResponse, StaffItem } from "./staff";
 
-const cols = ['Name', 'Emp ID', "Nature of Employment", 'Designation', 'Department', 'State', 'Program', 'Location', 'Joining Date', 'Status', 'Actions']
+const cols = ['Name', 'Emp ID', "Emp Type", 'Designation', 'Department', 'State', 'Program', 'Location', 'DOJ', 'Status', 'Actions']
 
 export default function Staff() {
   const [limit, setLimit] = useState<number>(10); // Default limit

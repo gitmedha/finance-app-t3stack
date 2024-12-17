@@ -229,9 +229,9 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
             )}
           </div>
 
-          {/* Nature of Employment */}
+          {/* Emp Type */}
           <div>
-            <label className="text-sm">Nature of Employment</label>
+            <label className="text-sm">Emp Type</label>
             <input
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="Enter employment type"

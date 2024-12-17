@@ -20,6 +20,7 @@ const AddCostCenters: React.FC = () => {
             </IconButton>
 
             <Modal
+                className=''
                 title="Add Cost Centers"
                 description="Make changes to your profile."
                 isOpen={isModalOpen}

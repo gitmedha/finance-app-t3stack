@@ -90,6 +90,7 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
       </IconButton>
 
       <Modal
+        className=''
         title="Edit Staff"
         description="Make changes to your profile."
         isOpen={isModalOpen}

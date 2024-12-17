@@ -20,6 +20,7 @@ const AddDonor: React.FC = () => {
             </IconButton>
 
             <Modal
+                className=''
                 title="Add Donor"
                 description="Make changes to your profile."
                 isOpen={isModalOpen}

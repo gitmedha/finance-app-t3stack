@@ -80,6 +80,7 @@ const AddDepartment: React.FC = () => {
       </IconButton>
 
       <Modal
+        className=''
         title="Add Department"
         description=""
         isOpen={isModalOpen}

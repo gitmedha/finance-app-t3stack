@@ -99,9 +99,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section }) => {
                 </th>
 
                 <th scope="col" className="border p-2">
-                  Actual Q1
-                </th>
-                <th scope="col" className="border p-2">
                   Jul
                 </th>
                 <th scope="col" className="border p-2">
@@ -111,10 +108,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section }) => {
                   Sep
                 </th>
 
-                <th scope="col" className="border p-2">
-                  Actual Q2
-
-                </th>
                 <th scope="col" className="border p-2">
                   Oct
                 </th>
@@ -126,9 +119,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section }) => {
                 </th>
 
                 <th scope="col" className="border p-2">
-                  Actual Q3
-                </th>
-                <th scope="col" className="border p-2">
                   Jan
                 </th>
                 <th scope="col" className="border p-2">
@@ -137,15 +127,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section }) => {
                 <th scope="col" className="border p-2">
                   Mar
                 </th>
-                <th scope="col" className="border p-2">
-                  Actual Q4
-                </th>
-                <th scope="col" className="border p-2">
-                  Annual Total
-                </th>
-                <th scope="col" className="border p-2">
-                  Annual Actual
-                </th>
+               
               </tr>
             </thead>
             <tbody>
@@ -168,7 +150,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section }) => {
                       }
                     />
                   </td>
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map(
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
                     (it) => {
                       return (
                         <td key={it} className="border p-2">

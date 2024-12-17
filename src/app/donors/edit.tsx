@@ -107,6 +107,7 @@ const EditDonor: React.FC<ItemDetailProps> = ({ item }) => {
       </IconButton>
 
       <Modal
+        className=''
         title="Edit Donor"
         description="Make changes to your donor."
         isOpen={isModalOpen}

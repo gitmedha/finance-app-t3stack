@@ -88,7 +88,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section }) => {
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
       >
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
-          <h1>{section}</h1>
+          <h1 className=" uppercase ">{section}</h1>
           <div className="flex items-center space-x-2">
             <p className="text-sm">Avg Cost: Q1: XXX Q2: XXX Q3: XXX Q4: XXX</p>
             {/* Rotate arrow when details are open */}
@@ -157,12 +157,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section }) => {
                 <th scope="col" className="border p-2">
                   Mar
                 </th>
-                <th scope="col" className="border p-2">
-                  Annual Total
-                </th>
-                <th scope="col" className="border p-2">
-                  Annual Actual
-                </th>
+               
               </tr>
             </thead>
             <tbody>

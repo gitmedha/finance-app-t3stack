@@ -79,6 +79,7 @@ const AddDonors: React.FC = () => {
       </IconButton>
 
       <Modal
+        className=''
         title="Add Donor"
         description=""
         isOpen={isModalOpen}

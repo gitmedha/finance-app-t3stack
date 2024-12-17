@@ -107,7 +107,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
               <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
                 <th className="border p-2">Particulars</th>
                 <th scope="col" className="border p-2">
-                  Quantity
+                  Qty
                 </th>
                 <th scope="col" className="border p-2">
                   Rate
@@ -126,7 +126,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                 </th>
 
                 <th scope="col" className="border p-2">
-                  Quantity
+                  Qty
                 </th>
                 <th scope="col" className="border p-2">
                   Rate
@@ -145,7 +145,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                 </th>
 
                 <th scope="col" className="border p-2">
-                  Quantity
+                  Qty
                 </th>
                 <th scope="col" className="border p-2">
                   Rate
@@ -163,16 +163,13 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                   Dec
                 </th>
                 <th scope="col" className="border p-2">
-                  Quantity
+                  Qty
                 </th>
                 <th scope="col" className="border p-2">
                   Rate
                 </th>
                 <th scope="col" className="border p-2">
                   Amount
-                </th>
-                <th scope="col" className="border p-2">
-                  Oct
                 </th>
                 <th scope="col" className="border p-2">
                   Jan
@@ -184,19 +181,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                   Mar
                 </th>
                 <th scope="col" className="border p-2">
-                  Overall
-                </th>
-                <th scope="col" className="border p-2">
-                  Total
-                </th>
-                <th scope="col" className="border p-2">
-                  Annual Actual
-                </th>
-                <th scope="col" className="border p-2">
-                  Details / Explanation
-                </th>
-                <th scope="col" className="border p-2">
-                  Additional remarks if any
+                  Notes
                 </th>
               </tr>
             </thead>
@@ -220,7 +205,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                       }
                     />
                   </td>
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19].map(
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map(
                     (it) => {
                       return (
                         <td key={it} className="border p-2">

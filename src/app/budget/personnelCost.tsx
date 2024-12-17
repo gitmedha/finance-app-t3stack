@@ -146,15 +146,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section }) => {
                 <th scope="col" className="border p-2">
                   Mar
                 </th>
-                <th scope="col" className="border p-2">
-                  Total Number/Count
-                </th>
-                <th scope="col" className="border p-2">
-                  Annual Total
-                </th>
-                <th scope="col" className="border p-2">
-                  Annual Actual
-                </th>
+               
               </tr>
             </thead>
             <tbody>

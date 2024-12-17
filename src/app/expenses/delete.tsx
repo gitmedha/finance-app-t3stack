@@ -35,6 +35,7 @@ const DeleteExpense: React.FC<ItemDetailProps> = ({ item }) => {
             </IconButton>
 
             <Modal
+                className=''
                 title="Delete Expense"
                 description="Are You sure you want to delete ?"
                 isOpen={isModalOpen}

@@ -22,7 +22,7 @@ const AddCostCenters: React.FC = () => {
             <Modal
                 className=''
                 title="Add Cost Centers"
-                description="Make changes to your profile."
+                description=""
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSave}

@@ -109,7 +109,7 @@ const EditDonor: React.FC<ItemDetailProps> = ({ item }) => {
       <Modal
         className=''
         title="Edit Donor"
-        description="Make changes to your donor."
+        description=""
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
@@ -119,6 +119,7 @@ const EditDonor: React.FC<ItemDetailProps> = ({ item }) => {
             e.preventDefault();
             void handleSave();
           }}
+          className="grid gap-2 grid-cols-2"
         >
           <label>
             <Text as="div" size="2" mb="1" weight="bold">
@@ -244,7 +245,7 @@ const EditDonor: React.FC<ItemDetailProps> = ({ item }) => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="!cursor-pointer">
+            <Button type="submit" className="!cursor-pointer !bg-primary text-white">
               Save
             </Button>
           </Flex>

@@ -22,7 +22,7 @@ const AddDonor: React.FC = () => {
             <Modal
                 className=''
                 title="Add Donor"
-                description="Make changes to your profile."
+                description=""
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSave}

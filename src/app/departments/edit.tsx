@@ -160,7 +160,8 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item }) => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="!cursor-pointer">
+
+            <Button type="submit" className="!cursor-pointer !bg-primary text-white">
               Save
             </Button>
           </Flex>

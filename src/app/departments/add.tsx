@@ -160,7 +160,7 @@ const AddDepartment: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="!cursor-pointer">
+            <Button type="submit" className="!cursor-pointer !bg-primary text-white">
               Save
             </Button>
           </Flex>

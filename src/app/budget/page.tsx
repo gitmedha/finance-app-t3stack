@@ -1,31 +1,24 @@
 'use client';
 
 import { useState } from "react";
-import BHead from "./bHead";
 import BudgetFilterForm from "./filter";
+import PersonnelCost from "./personnelCost";
+import ActivityBudget from "./activityBudget";
+import TravelBudget from "./travel";
+import ProgramOffice from "./programOffice";
+import CapitalCost from "./capitalCost";
+import OverHeads from "./overheads";
+import type { FilterOptions } from "./budget";
 
 // Define types for filters
-interface Filters {
-  department: string; // Department ID as string
-  departmentname: string; // Department name as string
-  year: string; // Year as string
-}
+
 
 // Define the structure of the value passed to handleSelect
 type HandleSelectValue = { id: string; departmentname: string } | string | number;
 
-const sections = [
-  'PERSONNEL',
-  'PROGRAM ACTIVITIES',
-  'TRAVEL ',
-  'PROGRAM OFFICE',
-  'CAPITAL COST',
-  'OVERHEADS',
-];
-
 const Budget: React.FC = () => {
   // Explicitly define the type for filters
-  const [filters, setFilters] = useState<Filters>({
+  const [filters, setFilters] = useState<FilterOptions>({
     department: '', // Default to an empty string
     departmentname: '',
     year: '',
@@ -50,9 +43,12 @@ const Budget: React.FC = () => {
   return (
     <div className="mt-10 overflow-hidden m-2 p-2">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} />
-      {sections.map((section) => (
-        <BHead key={section} section={section} />
-      ))}
+      <PersonnelCost section='PERSONNEL' />
+      <ActivityBudget section='Activity Consolidate' />
+      <TravelBudget section='Travel' />
+      <ProgramOffice section='PROGRAM OFFICE' />
+      <CapitalCost section='CAPITAL COST' />
+      <OverHeads section='OVERHEADS' />
     </div>
   );
 };

@@ -9,6 +9,7 @@ import { BiPlus } from "react-icons/bi";
 import { api } from "~/trpc/react";
 import Select from "react-select";
 import { type ISelectItem } from "../common/types/genericField";
+
 interface StaffFormData {
   name: string;
   empNo: string;
@@ -72,14 +73,6 @@ const AddStaff: React.FC = () => {
     void refetch();
   }, [refetch, stateName]);
 
-  //   Options for react-select
-  //   const stateOptions = statesData?.map(
-  //     (state: { id: number; name: string }) => ({
-  //       value: state.id,
-  //       label: state.name,
-  //     }),
-  //   );
-
   return (
     <>
       <IconButton
@@ -91,6 +84,7 @@ const AddStaff: React.FC = () => {
 
       <Modal
         title="Add Staff"
+        className=""
         description=""
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

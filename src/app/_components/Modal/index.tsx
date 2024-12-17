@@ -12,6 +12,7 @@ interface ModalProps {
   onSave?: () => void;
   children?: ReactNode;
   isLoading?: boolean;
+  className:string;
 }
 
 const Modal: FC<ModalProps> = ({
@@ -21,6 +22,7 @@ const Modal: FC<ModalProps> = ({
   onClose,
   // onSave,
   children,
+  className=""
   // isLoading = false
 }) => {
   return (
@@ -29,8 +31,8 @@ const Modal: FC<ModalProps> = ({
       <Dialog.Content className={clsx(
         "transition-transform duration-900 ease-out transform",
         isOpen ? "opacity-100 scale-100" : "opacity-35 scale-95",
-        "bg-white p-6 rounded-md shadow-lg max-w-[450px] w-full mx-auto mt-20"
-      )} maxWidth="450px">
+      `bg-white p-6 rounded-md shadow-lg max-w-[450px] w-full mx-auto mt-20 ${className}`
+      )}>
         <Dialog.Title>{title}</Dialog.Title>
        {description && <Dialog.Description size="2" mb="4">
           {description}

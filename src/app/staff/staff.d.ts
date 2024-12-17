@@ -6,6 +6,7 @@ export type {
   GetStaffsResponse,
   FilterOptions,
   StaffFilterFormProps,
+  StaffFormData
 };
 
 interface StaffItem {
@@ -51,6 +52,18 @@ interface StaffItem {
   departmentData?: ISelectItem;
   statesData?: ISelectItem;
   locationData?: ISelectItem;
+}
+interface StaffFormData {
+  name: string;
+  empNo: string;
+  state: ISelectItem;
+  location: ISelectItem;
+  department: ISelectItem;
+  designation: string;
+  isactive: boolean;
+  natureOfEmployment: string;
+  createdBy: number;
+  createdAt: string; // Date in ISO format
 }
 
 interface GetStaffsResponse {

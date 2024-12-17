@@ -19,6 +19,7 @@ const DeleteCostCenters: React.FC<ItemDetailProps> = ({ item }) => {
             </IconButton>
 
             <Modal
+                className=''
                 title="Delete Cost Centers"
                 description="Are You sure you want to delete ?"
                 isOpen={isModalOpen}

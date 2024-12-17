@@ -4,11 +4,10 @@ import { type ISelectItem } from "../common/types/genericField";
 export type { FilterOptions, BudgetFilterFormProps };
 
 interface FilterOptions {
-  department: string | number;  // Allow department to be string or number
-  departmentname: string;
-  year: string;
+  department: string; // Department ID as string
+  departmentname: string; // Department name as string
+  year: string; // Year as string
 }
-
 interface BudgetFilterFormProps {
   filters: FilterOptions;
   handleSelect: (name: string, value: number | string) => void;

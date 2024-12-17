@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-interface BHeadProps {
+interface ActivityBudgetProps {
   section: string;
 }
 
@@ -13,15 +13,28 @@ interface LevelData {
 
 type TableData = Record<string, LevelData>;
 
-const levels = [
-  "Assistant",
-  "Manager",
-  "Senior Manager",
-  "AVP",
-  "VP",
-  "CXO/Director",
-  "Others - Interns, Volunteers, PTCs",
-  "Staff Benefits - EPF/PDA/PDS/Laptop/Bonus",
+const particulars = [
+  "Venue charges & maintenance",
+  "Meals & refreshment",
+  "Equipments on rent",
+  "Printing, stationary & materials",
+  "Poster, banners, collaterals",
+  "Photo & videography",
+  "Gifts & rewards",
+  "Stipend & remuneration",
+  "Local conveyance (External)",
+  "Outstation travel (External)",
+  "Accomodation (External)",
+  "Per diem for employees (External)",
+  "Professional services (e.g. event management)",
+  "Tent, decoration & catering services",
+  "Carriage & transportation",
+  "Promotion, advertising & campaign",
+  "Telecommunication expenses",
+  "Branding materials & supplies",
+  "License, permit and taxes",
+  "Capex & asset purchase",
+  "Misc & others"
 ];
 
 const months = [
@@ -39,11 +52,11 @@ const months = [
   "Mar",
 ];
 
-const BHead: React.FC<BHeadProps> = ({ section }) => {
+const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
   // Initialize table data
 
   const [tableData, setTableData] = useState<TableData>(
-    levels.reduce((acc, level) => {
+    particulars.reduce((acc, level) => {
       acc[level] = {
         Count: "",
         ...months.reduce((mAcc, month) => ({ ...mAcc, [month]: "" }), {}),
@@ -75,7 +88,7 @@ const BHead: React.FC<BHeadProps> = ({ section }) => {
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
       >
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
-          <h1>{section}</h1>
+          <h1 className=" uppercase ">{section}</h1>
           <div className="flex items-center space-x-2">
             <p className="text-sm">Avg Cost: Q1: XXX Q2: XXX Q3: XXX Q4: XXX</p>
             {/* Rotate arrow when details are open */}
@@ -89,65 +102,91 @@ const BHead: React.FC<BHeadProps> = ({ section }) => {
 
         <div className="bg-gray-50">
           {/* Table */}
-          <table className="mt-4 w-full table-auto border-collapse">
+          <table className="w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                <th className="border p-2">Level</th>
+                <th className="border p-2">Particulars</th>
                 <th scope="col" className="border p-2">
-                  #
+                  Qty
                 </th>
                 <th scope="col" className="border p-2">
-                  Apr{" "}
+                  Rate
                 </th>
                 <th scope="col" className="border p-2">
-                  May{" "}
+                  Amount
                 </th>
                 <th scope="col" className="border p-2">
-                  Jun{" "}
-                </th>
-
-                <th scope="col" className="border p-2">
-                  #
+                  Apr
                 </th>
                 <th scope="col" className="border p-2">
-                  Jul{" "}
+                  May
                 </th>
                 <th scope="col" className="border p-2">
-                  Aug{" "}
-                </th>
-                <th scope="col" className="border p-2">
-                  Sep{" "}
+                  Jun
                 </th>
 
                 <th scope="col" className="border p-2">
-                  #
+                  Qty
                 </th>
                 <th scope="col" className="border p-2">
-                  Oct{" "}
+                  Rate
                 </th>
                 <th scope="col" className="border p-2">
-                  Nov{" "}
+                  Amount
                 </th>
                 <th scope="col" className="border p-2">
-                  Dec{" "}
+                  Jul
+                </th>
+                <th scope="col" className="border p-2">
+                  Aug
+                </th>
+                <th scope="col" className="border p-2">
+                  Sep
                 </th>
 
                 <th scope="col" className="border p-2">
-                  #
+                  Qty
                 </th>
                 <th scope="col" className="border p-2">
-                  Jan{" "}
+                  Rate
                 </th>
                 <th scope="col" className="border p-2">
-                  Feb{" "}
+                  Amount
                 </th>
                 <th scope="col" className="border p-2">
-                  Mar{" "}
+                  Oct
+                </th>
+                <th scope="col" className="border p-2">
+                  Nov
+                </th>
+                <th scope="col" className="border p-2">
+                  Dec
+                </th>
+                <th scope="col" className="border p-2">
+                  Qty
+                </th>
+                <th scope="col" className="border p-2">
+                  Rate
+                </th>
+                <th scope="col" className="border p-2">
+                  Amount
+                </th>
+                <th scope="col" className="border p-2">
+                  Jan
+                </th>
+                <th scope="col" className="border p-2">
+                  Feb
+                </th>
+                <th scope="col" className="border p-2">
+                  Mar
+                </th>
+                <th scope="col" className="border p-2">
+                  Notes
                 </th>
               </tr>
             </thead>
             <tbody>
-              {levels.map((level) => (
+              {particulars.map((level) => (
                 <tr
                   key={level}
                   className="text-sm transition hover:bg-gray-100"
@@ -166,7 +205,7 @@ const BHead: React.FC<BHeadProps> = ({ section }) => {
                       }
                     />
                   </td>
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map(
                     (it) => {
                       return (
                         <td key={it} className="border p-2">
@@ -190,4 +229,4 @@ const BHead: React.FC<BHeadProps> = ({ section }) => {
   );
 };
 
-export default BHead;
+export default ActivityBudget;

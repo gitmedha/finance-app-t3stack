@@ -20,6 +20,7 @@ const AddExpense: React.FC = () => {
             </IconButton>
 
             <Modal
+                className=''
                 title="Add Expense"
                 description="Make changes to your profile."
                 isOpen={isModalOpen}

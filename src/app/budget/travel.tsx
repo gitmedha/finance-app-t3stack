@@ -100,7 +100,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section }) => {
 
         <hr className="my-2 scale-x-150" />
 
-        <div className="bg-gray-50">
+        <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
           <table className="w-full table-auto border-collapse">
             <thead>

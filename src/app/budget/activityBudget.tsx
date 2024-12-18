@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { BiComment } from "react-icons/bi";
 
 interface ActivityBudgetProps {
   section: string;
@@ -100,7 +101,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
 
         <hr className="my-2 scale-x-150" />
 
-        <div className="bg-gray-50">
+        <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
           <table className="w-full table-auto border-collapse">
             <thead>
@@ -205,7 +206,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                       }
                     />
                   </td>
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map(
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23].map(
                     (it) => {
                       return (
                         <td key={it} className="border p-2">
@@ -217,6 +218,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                       );
                     },
                   )}
+                  <td className="border p-2">
+                      <BiComment className="text-xl" />
+                  </td>
                 </tr>
               ))}
             </tbody>

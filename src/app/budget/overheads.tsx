@@ -99,7 +99,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section }) => {
 
         <hr className="my-2 scale-x-150" />
 
-        <div className="bg-gray-50">
+        <div className="bg-gray-50 overflow-scroll">
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">

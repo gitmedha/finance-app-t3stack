@@ -19,7 +19,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-1 ">
       {/* Salary Field */}
       <div>
         <label className="text-sm">Salary</label>
@@ -71,6 +71,16 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
         <input
           type="number"
           placeholder="Enter EPF amount"
+        //   {...register("epf")}
+          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm">PGW PLD</label>
+        <input
+          type="number"
+          placeholder="Enter PGW PLD amount"
         //   {...register("epf")}
           className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
         />

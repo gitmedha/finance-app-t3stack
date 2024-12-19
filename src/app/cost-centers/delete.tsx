@@ -38,6 +38,7 @@ const DeleteCostCenter: React.FC<ItemDetailProps> = ({ item, refetch }) => {
         description="Are you sure you want to delete this cost center?"
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        className={""}
       >
         <Flex gap="3" mt="4" justify="end">
           <Button

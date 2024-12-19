@@ -1,89 +1,41 @@
-// 'use client';
-
-// import { useState } from "react";
-// import BHead from "./bHead";
-// import BudgetFilterForm from "./filter";
-
-// const sections = [
-//   'PERSONNEL',
-//   'PROGRAM ACTIVITIES',
-//   'TRAVEL ',
-//   'PROGRAM OFFICE',
-//   'CAPITAL COST',
-//   'OVERHEADS',
-// ];
-
-// const Budget: React.FC = () => {
-//   const [filters, setFilters] = useState({
-//     department: '',  // Set to an empty string initially
-//     departmentname: '',
-//     year: '',
-//   });
-
-//   const handleSelect = (name: string, value: string | object) => {
-//     if (name === 'department') {
-//       // Ensure department is a string (department ID should be a string)
-//       setFilters((prev) => ({
-//         ...prev,
-//         [name]: value ? String((value as any)?.id) : '', // Convert to string and handle reset case
-//         departmentname: (value as any)?.departmentname ?? '', // Set department name
-//       }));
-//     } else if (name === 'year') {
-//       setFilters((prev) => ({
-//         ...prev,
-//         [name]: value as string, // Ensure year is set as a string
-//       }));
-//     }
-//   };
-
-//   return (
-//     <div className="mt-10 overflow-hidden m-2 p-2">
-//       <BudgetFilterForm filters={filters} handleSelect={handleSelect} />
-//       {sections.map((section) => (
-//         <BHead key={section} section={section} />
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default Budget;
-
-
-
 'use client';
 
 import { useState } from "react";
-import BHead from "./bHead";
 import BudgetFilterForm from "./filter";
+import PersonnelCost from "./personnelCost";
+import ActivityBudget from "./activityBudget";
+import TravelBudget from "./travel";
+import ProgramOffice from "./programOffice";
+import CapitalCost from "./capitalCost";
+import OverHeads from "./overheads";
+import type { FilterOptions } from "./budget";
 
-const sections = [
-  'PERSONNEL',
-  'PROGRAM ACTIVITIES',
-  'TRAVEL ',
-  'PROGRAM OFFICE',
-  'CAPITAL COST',
-  'OVERHEADS',
-];
+// Define types for filters
+
+
+// Define the structure of the value passed to handleSelect
+type HandleSelectValue = { id: string; departmentname: string } | string | number;
 
 const Budget: React.FC = () => {
-  const [filters, setFilters] = useState({
-    department: '', // Can be an empty string or number
+  // Explicitly define the type for filters
+  const [filters, setFilters] = useState<FilterOptions>({
+    department: '', // Default to an empty string
     departmentname: '',
     year: '',
   });
 
-  const handleSelect = (name: string, value: string | number | object) => {
-    if (name === 'department') {
-      // Ensure department is a string (department ID should be a string)
+  const handleSelect = (name: string, value: HandleSelectValue) => {
+    if (name === 'department' && typeof value === 'object' && value !== null) {
+      const departmentValue = value as { id: string; departmentname: string }; // Narrow type
       setFilters((prev) => ({
         ...prev,
-        [name]: value ? String((value as any)?.id) : '', // Convert to string and handle reset case
-        departmentname: (value as any)?.departmentname ?? '', // Set department name
+        department: departmentValue.id, // Use the explicit type
+        departmentname: departmentValue.departmentname, // Extract department name
       }));
-    } else if (name === 'year') {
+    } else if (name === 'year' && typeof value === 'string') {
       setFilters((prev) => ({
         ...prev,
-        [name]: value as string, // Ensure year is set as a string
+        [name]: value, // Year is a string
       }));
     }
   };
@@ -91,9 +43,12 @@ const Budget: React.FC = () => {
   return (
     <div className="mt-10 overflow-hidden m-2 p-2">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} />
-      {sections.map((section) => (
-        <BHead key={section} section={section} />
-      ))}
+      <PersonnelCost section='PERSONNEL' />
+      <ActivityBudget section='Activity Consolidate' />
+      <TravelBudget section='Travel' />
+      <ProgramOffice section='PROGRAM OFFICE' />
+      <CapitalCost section='CAPITAL COST' />
+      <OverHeads section='OVERHEADS' />
     </div>
   );
 };

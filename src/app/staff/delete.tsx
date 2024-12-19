@@ -17,7 +17,7 @@ const DeleteStaff: React.FC<ItemDetailProps> = ({ item, refetchStaffs }) => {
   const handleDelete = async () => {
     try {
       await deleteStaffMutation.mutateAsync({ id: item.id })
-      refetchStaffs()
+      refetchStaffs();
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error adding staff:", error);
@@ -34,6 +34,7 @@ const DeleteStaff: React.FC<ItemDetailProps> = ({ item, refetchStaffs }) => {
       </IconButton>
 
       <Modal
+        className=''
         title="Delete Staff"
         description="Are you sure you want to delete this staff?"
         isOpen={isModalOpen}

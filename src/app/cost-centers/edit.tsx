@@ -79,6 +79,7 @@ const EditCostCenters: React.FC<ItemDetailProps> = ({ item, refetch }) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
+        className={""}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Name Field */}

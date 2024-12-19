@@ -38,6 +38,7 @@ const DeleteDepartment: React.FC<ItemDetailProps> = ({ item, refetch }) => {
         description="Are you sure you want to delete this departmet?"
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        className={""}
       >
         <Flex gap="3" mt="4" justify="end">
           <Button

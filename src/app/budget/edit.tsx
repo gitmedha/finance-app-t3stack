@@ -32,6 +32,7 @@ const EditBudget: React.FC<ItemDetailProps> = ({ item }) => {
             </IconButton>
 
             <Modal
+                className=''
                 title="Add Budget"
                 description="Make changes to your profile."
                 isOpen={isModalOpen}

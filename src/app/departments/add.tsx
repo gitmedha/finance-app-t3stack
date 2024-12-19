@@ -83,6 +83,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
       </IconButton>
 
       <Modal
+        className=''
         title="Add Department"
         description=""
         isOpen={isModalOpen}
@@ -162,7 +163,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="!cursor-pointer">
+            <Button type="submit" className="!cursor-pointer !bg-primary text-white">
               Save
             </Button>
           </Flex>

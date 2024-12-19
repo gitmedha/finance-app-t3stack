@@ -39,35 +39,35 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
   };
 
   const { mutate: editDepartment } = api.post.editDepartment.useMutation({
-      async onSuccess() {
-        refetch()
-        reset();
-        setIsModalOpen(false);
-      },
-      onError(err) {
-        console.error("Error adding staff:", err);
-      },
-    });
+    async onSuccess() {
+      refetch();
+      reset();
+      setIsModalOpen(false);
+    },
+    onError(err) {
+      console.error("Error adding staff:", err);
+    },
+  });
 
   const onSubmit: SubmitHandler<Department> = async (data) => {
-      try {
-        const submissionData = {
-          id: data.id,
-          departmentname: data.departmentname,
-          deptCode: Number(data.deptCode),
-          type: data.typeData.value ?? item.typeData.value,
-          updatedBy: userData.data?.user.id ?? 1,
-          isactive: true,
-          updatedAt: new Date().toISOString().split("T")[0] ?? "",
-        };
-        editDepartment(submissionData);
-        await apiContext.get.getAllDepartments.invalidate();
-        reset();
-        setIsModalOpen(false);
-      } catch (error) {
-        console.error("Error adding staff:", error);
-      }
-    };
+    try {
+      const submissionData = {
+        id: data.id,
+        departmentname: data.departmentname,
+        deptCode: Number(data.deptCode),
+        type: data.typeData.value ?? item.typeData.value,
+        updatedBy: userData.data?.user.id ?? 1,
+        isactive: true,
+        updatedAt: new Date().toISOString().split("T")[0] ?? "",
+      };
+      editDepartment(submissionData);
+      await apiContext.get.getAllDepartments.invalidate();
+      reset();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding staff:", error);
+    }
+  };
 
   return (
     <>
@@ -79,6 +79,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
       </IconButton>
 
       <Modal
+        className=""
         title="Add Departments"
         description="Make changes to your profile."
         isOpen={isModalOpen}
@@ -160,7 +161,11 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="!cursor-pointer">
+
+            <Button
+              type="submit"
+              className="!cursor-pointer !bg-primary text-white"
+            >
               Save
             </Button>
           </Flex>

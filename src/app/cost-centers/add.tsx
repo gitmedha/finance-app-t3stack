@@ -58,7 +58,7 @@ const AddCostCenter: React.FC<AddCostCenterProps> = ({ refetch }) => {
         createdAt: new Date().toISOString().split("T")[0] ?? "",
       };
       await addCostCenterMutation.mutateAsync(submissionData);
-      refetch()
+      refetch();
       reset();
       setIsModalOpen(false);
     } catch (error) {
@@ -88,6 +88,7 @@ const AddCostCenter: React.FC<AddCostCenterProps> = ({ refetch }) => {
         description=""
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        className={""}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Name Field */}

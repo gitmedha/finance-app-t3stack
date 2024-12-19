@@ -22,9 +22,13 @@ interface StaffFormData {
   createdAt: string; // Date in ISO format
 }
 
-const AddStaff: React.FC = () => {
+interface AddStaffProps {
+  refetchStaffs: () => void;
+}
+
+
+const AddStaff: React.FC<AddStaffProps> = ({ refetchStaffs }) => {
   const userData = useSession();
-  const apiContext = api.useContext();
   const {
     register,
     control,
@@ -60,7 +64,7 @@ const AddStaff: React.FC = () => {
         department: Number(data.department.value),
       };
       await addStaffMutation.mutateAsync(submissionData);
-      await apiContext.get.getStaffs.invalidate();
+      refetchStaffs()
       reset();
       setIsModalOpen(false);
     } catch (error) {

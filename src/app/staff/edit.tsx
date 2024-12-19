@@ -12,11 +12,11 @@ import { type StaffItem } from "./staff";
 
 interface ItemDetailProps {
   item: StaffItem;
+  refetchStaffs: () => void;
 }
 
-const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
+const EditStaff: React.FC<ItemDetailProps> = ({ item, refetchStaffs }) => {
   const userData = useSession();
-  const apiContext = api.useContext();
   const {
     register,
     control,
@@ -32,7 +32,7 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
 
   const { mutate: editStaff } = api.post.editStaff.useMutation({
     async onSuccess() {
-      await apiContext.get.getStaffs.invalidate();
+      refetchStaffs();
       reset();
       setIsModalOpen(false);
     },
@@ -40,29 +40,29 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
       console.error("Error adding staff:", err);
     },
   });
-	const { data: departmentData } = api.get.getAllDepartments.useQuery();
+  const { data: departmentData } = api.get.getAllDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
   const { data: locationsData = [], refetch } =
     api.get.getAllLocations.useQuery({
-			stateName
-		});
+      stateName,
+    });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
     try {
       const submissionData = {
-				id: data.id,
-				name: data.name,
-				empNo: data.empNo,
-				designation: data.designation,
-				nature_of_employment: data.nature_of_employment,
-				department: data.departmentData?.value,
-				stateId: data.statesData?.value,
-				locationId: data.locationData?.value,
-				updatedBy: userData.data?.user.id ?? 1,
-				isactive: true,
-				updatedAt: new Date().toISOString().split("T")[0] ?? "",
+        id: data.id,
+        name: data.name,
+        empNo: data.empNo,
+        designation: data.designation,
+        nature_of_employment: data.nature_of_employment,
+        department: data.departmentData?.value,
+        stateId: data.statesData?.value,
+        locationId: data.locationData?.value,
+        updatedBy: userData.data?.user.id ?? 1,
+        isactive: true,
+        updatedAt: new Date().toISOString().split("T")[0] ?? "",
       };
 
       editStaff(submissionData);
@@ -98,9 +98,7 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Name Field */}
           <div>
-            <label className="text-sm">
-              Name
-            </label>
+            <label className="text-sm">Name</label>
             <input
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="Enter staff name"
@@ -115,9 +113,7 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
 
           {/* Employee Number Field */}
           <div>
-            <label className="text-sm">
-              Employee Number
-            </label>
+            <label className="text-sm">Employee Number</label>
             <input
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="Enter employee number"
@@ -134,16 +130,14 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
 
           {/* State Dropdown */}
           <div>
-            <label className="text-sm">
-              State
-            </label>
+            <label className="text-sm">State</label>
             <Controller
               name="statesData"
               control={control}
               render={({ field }) => (
                 <Select
                   onChange={field.onChange}
-									defaultValue={item.statesData}
+                  defaultValue={item.statesData}
                   options={statesData}
                   placeholder="Select a state"
                   isClearable
@@ -161,16 +155,14 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
 
           {/* Location Dropdown */}
           <div>
-            <label className="text-sm">
-              Location
-            </label>
+            <label className="text-sm">Location</label>
             <Controller
               name="locationData"
               control={control}
               render={({ field }) => (
                 <Select
                   onChange={field.onChange}
-									defaultValue={item.locationData}
+                  defaultValue={item.locationData}
                   options={locationsData}
                   placeholder="Select a location"
                   isClearable
@@ -187,9 +179,7 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
 
           {/* Designation Field */}
           <div>
-            <label className="text-sm">
-              Designation
-            </label>
+            <label className="text-sm">Designation</label>
             <input
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="Enter designation"
@@ -205,16 +195,14 @@ const EditStaff: React.FC<ItemDetailProps> = ({ item }) => {
           </div>
 
           <div>
-            <label className="text-sm">
-              Department
-            </label>
+            <label className="text-sm">Department</label>
             <Controller
               name="departmentData"
               control={control}
               render={({ field }) => (
                 <Select
                   onChange={field.onChange}
-									defaultValue={item.departmentData}
+                  defaultValue={item.departmentData}
                   options={departmentData}
                   placeholder="Select a Department"
                   isClearable

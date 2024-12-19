@@ -12,9 +12,10 @@ import { type Department } from "./department";
 
 interface ItemDetailProps {
   item: Department;
+  refetch: () => void;
 }
 
-const EditDepartments: React.FC<ItemDetailProps> = ({ item }) => {
+const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
   const apiContext = api.useContext();
   const userData = useSession();
   const {
@@ -39,7 +40,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item }) => {
 
   const { mutate: editDepartment } = api.post.editDepartment.useMutation({
       async onSuccess() {
-        await apiContext.get.getAllDepartments.invalidate();
+        refetch()
         reset();
         setIsModalOpen(false);
       },

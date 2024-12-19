@@ -7,7 +7,7 @@ import { MdEdit } from "react-icons/md";
 import type { Donors, ItemDetailProps } from "./donor";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
-import Select, { type SingleValue, type ActionMeta } from "react-select";
+import Select, { type SingleValue } from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { type ISelectItem } from "../common/types/genericField";
 

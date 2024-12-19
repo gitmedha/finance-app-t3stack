@@ -19,9 +19,12 @@ interface DepartmentFormData {
   type: SelectItemDto;
 }
 
-const AddDepartment: React.FC = () => {
+interface AddDepartmentProps {
+  refetch: () => void;
+}
+
+const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
   const userData = useSession();
-  const apiContext = api.useContext();
 
   const types = [
     { value: "Sub Department", label: "Sub Department" },
@@ -54,7 +57,7 @@ const AddDepartment: React.FC = () => {
         createdAt: new Date().toISOString().split("T")[0] ?? "",
       };
       await addDepartmentMutation.mutateAsync(submissionData);
-      await apiContext.get.getAllDepartments.invalidate();
+      refetch()
       reset();
       setIsModalOpen(false);
     } catch (error) {

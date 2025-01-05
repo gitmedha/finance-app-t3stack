@@ -5,17 +5,19 @@ import { Button, Flex } from "@radix-ui/themes";
 import { api } from "~/trpc/react";
 import Select from "react-select";
 import { type ISelectItem } from "../../common/types/genericField";
+import useStaff from "../store/staffStore";
 
 interface ItemDetailProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  refetchStaffs: () => void;
 }
 
 interface StaffFormData {
   name: string;
   empNo: string;
-  state: ISelectItem;
-  location: ISelectItem;
-  department: ISelectItem;
+  stateData: ISelectItem;
+  locationData: ISelectItem;
+  departmenData: ISelectItem;
   designation: string;
   isactive: boolean;
   natureOfEmployment: string;
@@ -23,22 +25,39 @@ interface StaffFormData {
   createdAt: string; // Date in ISO format
 }
 
-const BasicDetails: React.FC<ItemDetailProps> = ({ setIsModalOpen }) => {
+const BasicDetails: React.FC<ItemDetailProps> = ({
+  setIsModalOpen,
+  refetchStaffs,
+}) => {
   const userData = useSession();
   const apiContext = api.useContext();
+  const { setActiveStaffId, activeStaffDetails, setActiveStaffDetails } = useStaff();
   const {
     register,
     control,
     handleSubmit,
     watch,
     formState: { errors },
-    reset,
   } = useForm<StaffFormData>({
-    defaultValues: {},
+    defaultValues: activeStaffDetails,
   });
-  const stateName = watch("state");
+  const stateName = watch("stateData");
 
-  const addStaffMutation = api.post.addStaff.useMutation();
+  // const addStaffMutation = api.post.addStaff.useMutation();
+
+  const { mutate: addStaff } = api.post.addStaff.useMutation({
+    async onSuccess(data) {
+      await apiContext.get.getStaffs.invalidate();
+      if (data.staff) {
+        setActiveStaffId(data.staff?.id);
+      }
+      refetchStaffs();
+    },
+    onError(err) {
+      console.error("Error adding staff:", err);
+    },
+  });
+
   const { data: departmentData } = api.get.getAllDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
   const { data: locationsData = [], refetch } =
@@ -53,14 +72,13 @@ const BasicDetails: React.FC<ItemDetailProps> = ({ setIsModalOpen }) => {
         createdBy: userData.data?.user.id ?? 1,
         isactive: true,
         createdAt: new Date().toISOString().split("T")[0] ?? "",
-        stateId: Number(data.state.value),
-        locationId: Number(data.location.value),
-        department: Number(data.department.value),
+        stateId: Number(data.stateData.value),
+        locationId: Number(data.locationData.value),
+        departmentId: Number(data.departmenData.value),
       };
-      await addStaffMutation.mutateAsync(submissionData);
-      await apiContext.get.getStaffs.invalidate();
-      reset();
-      setIsModalOpen(false);
+      setActiveStaffDetails(submissionData);
+      addStaff(submissionData);
+      // reset(submissionData);
     } catch (error) {
       console.error("Error adding staff:", error);
     }
@@ -110,7 +128,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({ setIsModalOpen }) => {
           State <span className="text-red-400">*</span>
         </label>
         <Controller
-          name="state"
+          name="stateData"
           control={control}
           render={({ field }) => (
             <Select
@@ -118,13 +136,13 @@ const BasicDetails: React.FC<ItemDetailProps> = ({ setIsModalOpen }) => {
               options={statesData}
               placeholder="Select a state"
               isClearable
-              aria-invalid={!!errors.state}
+              aria-invalid={!!errors.stateData}
             />
           )}
         />
 
-        {errors.state && (
-          <span className="text-xs text-red-500">{errors.state.message}</span>
+        {errors.stateData && (
+          <span className="text-xs text-red-500">{errors.stateData.message}</span>
         )}
       </div>
 
@@ -134,7 +152,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({ setIsModalOpen }) => {
           Location <span className="text-red-400">*</span>
         </label>
         <Controller
-          name="location"
+          name="locationData"
           control={control}
           render={({ field }) => (
             <Select
@@ -142,13 +160,13 @@ const BasicDetails: React.FC<ItemDetailProps> = ({ setIsModalOpen }) => {
               options={locationsData}
               placeholder="Select a location"
               isClearable
-              aria-invalid={!!errors.location}
+              aria-invalid={!!errors.locationData}
             />
           )}
         />
-        {errors.location && (
+        {errors.locationData && (
           <span className="text-xs text-red-500">
-            {errors.location.message}
+            {errors.locationData.message}
           </span>
         )}
       </div>
@@ -177,7 +195,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({ setIsModalOpen }) => {
           Department <span className="text-red-400">*</span>
         </label>
         <Controller
-          name="department"
+          name="departmenData"
           control={control}
           render={({ field }) => (
             <Select
@@ -185,13 +203,13 @@ const BasicDetails: React.FC<ItemDetailProps> = ({ setIsModalOpen }) => {
               options={departmentData}
               placeholder="Select a Department"
               isClearable
-              aria-invalid={!!errors.department}
+              aria-invalid={!!errors.departmenData}
             />
           )}
         />
-        {errors.department && (
+        {errors.departmenData && (
           <span className="text-xs text-red-500">
-            {errors.department.message}
+            {errors.departmenData.message}
           </span>
         )}
       </div>

@@ -582,20 +582,20 @@ export const salaryDetailsInFinanceProject = financeProject.table("salary_detail
 },
 (table) => {
   return {
-    salaryDetailsCreatedByFkey: foreignKey({
-      columns: [table.createdBy],
-      foreignColumns: [table.id],
-      name: "salary_details_created_by_fkey"
-    }),
-    salaryDetailsUpdatedByFkey: foreignKey({
-      columns: [table.updatedBy],
-      foreignColumns: [table.id],
-      name: "salary_details_updated_by_fkey"
-    }),
     salaryDetailsEmpIdFkey: foreignKey({
       columns: [table.empId],
       foreignColumns: [staffMasterInFinanceProject.id],
       name: "salary_details_emp_id_fkey"
     }).onUpdate("cascade").onDelete("cascade"),
+    salaryDetailsCreatedByFkey: foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [userMasterInFinanceProject.id],
+      name: "salary_details_created_by_fkey"
+    }),
+    salaryDetailsUpdatedByFkey: foreignKey({
+      columns: [table.updatedBy],
+      foreignColumns: [userMasterInFinanceProject.id],
+      name: "salary_details_updated_by_fkey"
+    }),
   }
 });

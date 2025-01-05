@@ -9,7 +9,8 @@ import {
   departmentMasterInFinanceProject as departmentMaster,
   staffMasterInFinanceProject as staffMaster,
   statesMasterInFinanceProject as stateMaster,
-  locationMasterInFinanceProject as locationMaster
+  locationMasterInFinanceProject as locationMaster,
+  salaryDetailsInFinanceProject as salaryMaster,
 } from "~/server/db/schema";
 
 export const getStaffs = protectedProcedure
@@ -57,6 +58,13 @@ export const getStaffs = protectedProcedure
         location: locationMaster.cityName,
         locationId: locationMaster.id,
         designation: staffMaster.designation,
+        salaryDetailsId: salaryMaster.id,
+        salary: salaryMaster.salary,
+        insurance: salaryMaster.insurance,
+        bonus: salaryMaster.bonus,
+        gratuity: salaryMaster.gratuity,
+        epf: salaryMaster.epf,
+        pgwPld: salaryMaster.pgwPld,
         // count: count()
       })
       .from(staffMaster)
@@ -81,6 +89,7 @@ export const getStaffs = protectedProcedure
           eq(locationMaster.id, staffMaster.locationId),
         ),
       )
+      .leftJoin(salaryMaster, and(eq(salaryMaster.empId, staffMaster.id)))
       .where(
         and(
           searchCondition,
@@ -113,24 +122,24 @@ export const getStaffs = protectedProcedure
     for (const staff of staffs) {
       const statesData = {
         value: staff.stateId,
-				label: staff.state
-      }
+        label: staff.state,
+      };
 
       const locationData = {
         value: staff.locationId,
-				label: staff.location
-      }
+        label: staff.location,
+      };
 
       const departmentData = {
         value: staff.department,
-				label: staff.departmentname
-      }
+        label: staff.departmentname,
+      };
 
       updatedStaffs.push({
         ...staff,
         statesData,
         locationData,
-        departmentData
+        departmentData,
       });
     }
 
@@ -148,7 +157,7 @@ export const addStaff = protectedProcedure
       empNo: z.string().min(1, "Employee number is required"),
       stateId: z.number().min(1, "State is required"),
       locationId: z.number().min(1, "Location is required"),
-      department: z.number().min(1, "Department is required"),
+      departmentId: z.number().min(1, "Department is required"),
       designation: z.string().min(1, "Designation is required"),
       isactive: z.boolean(),
       natureOfEmployment: z.string().optional(),
@@ -163,13 +172,19 @@ export const addStaff = protectedProcedure
       // Format data for insertion
       const formattedInput = {
         ...input,
+        department: input.departmentId
         // id: undefined, // Ensure ID is not manually set
         // state: undefined, // Ensure no conflicting state field
         // location: undefined, // Ensure no conflicting location field
       };
 
       // Insert new staff member into the database
-      const result = await ctx.db.insert(staffMaster).values(formattedInput);
+      const result = await ctx.db
+        .insert(staffMaster)
+        .values(formattedInput)
+        .returning({
+          id: staffMaster.id,
+        });
       return {
         success: true,
         message: "Staff member added successfully",
@@ -222,8 +237,9 @@ export const editStaff = protectedProcedure
           updatedAt,
         })
         .where(eq(staffMaster.id, id))
-        .returning(); // Correct usage of eq()
-      // .returning("*");
+        .returning({
+          id: staffMaster.id,
+        });
 
       return {
         success: true,
@@ -249,42 +265,43 @@ export const getDesignation = protectedProcedure.query(async ({ ctx }) => {
   };
 });
 
-export const deleteStaff = protectedProcedure.input(
-  z.object({
-    id: z.number().min(1, "Staff ID is required"), // Staff ID to locate the record
-  }),
-)
-.mutation(async ({ ctx, input }) => {
-  try {
-    const { id } = input;
+export const deleteStaff = protectedProcedure
+  .input(
+    z.object({
+      id: z.number().min(1, "Staff ID is required"), // Staff ID to locate the record
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    try {
+      const { id } = input;
 
-    // Check if the staff member exists
-    const existingStaff =
-      await ctx.db.query.staffMasterInFinanceProject.findFirst({
-        where: eq(staffMaster.id, id),
-      });
+      // Check if the staff member exists
+      const existingStaff =
+        await ctx.db.query.staffMasterInFinanceProject.findFirst({
+          where: eq(staffMaster.id, id),
+        });
 
-    if (!existingStaff) {
-      throw new Error("Staff member not found");
+      if (!existingStaff) {
+        throw new Error("Staff member not found");
+      }
+
+      // Update staff member details
+      const updatedStaff = await ctx.db
+        .update(staffMaster)
+        .set({
+          isactive: false,
+        })
+        .where(eq(staffMaster.id, id))
+        .returning(); // Correct usage of eq()
+      // .returning("*");
+
+      return {
+        success: true,
+        message: "Staff member deleted successfully",
+        staff: updatedStaff[0], // Return the updated staff record
+      };
+    } catch (error) {
+      console.error("Error deleting staff:", error);
+      throw new Error("Failed to delete staff. Please try again.");
     }
-
-    // Update staff member details
-    const updatedStaff = await ctx.db
-      .update(staffMaster)
-      .set({
-        isactive: false
-      })
-      .where(eq(staffMaster.id, id))
-      .returning(); // Correct usage of eq()
-    // .returning("*");
-
-    return {
-      success: true,
-      message: "Staff member deleted successfully",
-      staff: updatedStaff[0], // Return the updated staff record
-    };
-  } catch (error) {
-    console.error("Error deleting staff:", error);
-    throw new Error("Failed to delete staff. Please try again.");
-  }
-});
+  });

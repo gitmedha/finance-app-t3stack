@@ -131,7 +131,7 @@ export default function Staff() {
               selectedLimit={limit}
               onLimitChange={handleLimitChange}
             />
-            <AddStaff />
+            <AddStaff refetch={refetch}/>
           </div>
         </div>
 
@@ -189,7 +189,7 @@ export default function Staff() {
                       </span>
                     </td>
                     <td className="space-x-2 p-1">
-                      <EditStaff item={item} />
+                      <EditStaff item={item} refetch={refetch} />
                       <DeleteStaff item={item} refetchStaffs={refetch} />
                     </td>
                   </tr>

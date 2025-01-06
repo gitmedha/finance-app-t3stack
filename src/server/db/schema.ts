@@ -561,3 +561,41 @@ export const tallyDonorInFinanceProject = financeProject.table(
     };
   },
 );
+
+export const salaryDetailsInFinanceProject = financeProject.table("salary_details", {
+  id: integer("id").default(sql`nextval('finance_project.salary_details_id_seq'::regclass)`).primaryKey().notNull(),
+  empId: integer("emp_id").notNull(),
+  salary: numeric("salary", { precision: 8, scale:  2 }).notNull(),
+  insurance: numeric("insurance", { precision: 8, scale:  2 }),
+  bonus: numeric("bonus", { precision: 8, scale:  2 }),
+  gratuity: numeric("gratuity", { precision: 8, scale:  2 }),
+  epf: numeric("epf", { precision: 8, scale:  2 }),
+  pgwPld: numeric("pgw_pld", { precision: 8, scale:  2 }),
+  type: varchar("type", { length: 255 }),
+  isactive: boolean("isactive").notNull(),
+  description: varchar("description", { length: 255 }),
+  notes: varchar("Notes", { length: 255 }),
+  createdAt: date("created_at").notNull(),
+  updatedAt: date("updated_at"),
+  createdBy: integer("created_by").notNull(),
+  updatedBy: integer("updated_by"),
+},
+(table) => {
+  return {
+    salaryDetailsEmpIdFkey: foreignKey({
+      columns: [table.empId],
+      foreignColumns: [staffMasterInFinanceProject.id],
+      name: "salary_details_emp_id_fkey"
+    }).onUpdate("cascade").onDelete("cascade"),
+    salaryDetailsCreatedByFkey: foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [userMasterInFinanceProject.id],
+      name: "salary_details_created_by_fkey"
+    }),
+    salaryDetailsUpdatedByFkey: foreignKey({
+      columns: [table.updatedBy],
+      foreignColumns: [userMasterInFinanceProject.id],
+      name: "salary_details_updated_by_fkey"
+    }),
+  }
+});

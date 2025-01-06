@@ -1,7 +1,4 @@
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { getDesignation, getStaffs } from "../controller/staff";
 import { getDonors } from "../controller/donor";
 import { getCostCenters, getAllCostCenters } from "../controller/costCenters";

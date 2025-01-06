@@ -1,46 +1,66 @@
-
-import React, { useState } from 'react';
-import { TextField, Text, IconButton } from '@radix-ui/themes';
-import Modal from '../_components/Modal';
+import React, { useState } from "react";
+import { IconButton, Flex, Button } from "@radix-ui/themes";
+import Modal from "../_components/Modal";
 import { MdDelete } from "react-icons/md";
-import type { ItemDetailProps } from "./cost-center";
+import { api } from "~/trpc/react";
+import { type costCenters } from "./cost-center";
+interface ItemDetailProps {
+  item: costCenters;
+  refetch: () => void;
+}
 
-const DeleteCostCenters: React.FC<ItemDetailProps> = ({ item }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const DeleteCostCenter: React.FC<ItemDetailProps> = ({ item, refetch }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleSave = () => {
-        setIsModalOpen(false);
-    };
+  const deleteCostCenterMutation = api.delete.deleteCostCenter.useMutation();
 
-    return (
-        <>
-            <IconButton className='!bg-primary !h-7 !w-7 !cursor-pointer' onClick={() => setIsModalOpen(true)}>
-                <MdDelete size={20} />
-            </IconButton>
+  const handleDelete = async () => {
+    try {
+      await deleteCostCenterMutation.mutateAsync({ id: item.id });
+      refetch();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error delete cost center:", error);
+    }
+  };
 
-            <Modal
-                className=''
-                title="Delete Cost Centers"
-                description="Are You sure you want to delete ?"
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleSave}
-            >
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Name
-                    </Text>
-                    <TextField.Root defaultValue={item?.name ?? ''} placeholder="Enter your Name" />
-                </label>
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Description
-                    </Text>
-                    <TextField.Root defaultValue={item?.description ?? ''} placeholder="Enter your Description" />
-                </label>
-            </Modal>
-        </>
-    );
+  return (
+    <>
+      <IconButton
+        className="!h-7 !w-7 !cursor-pointer !bg-primary"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <MdDelete size={20} />
+      </IconButton>
+
+      <Modal
+        title="Delete Cost Center"
+        description="Are you sure you want to delete this cost center?"
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        className={""}
+      >
+        <Flex gap="3" mt="4" justify="end">
+          <Button
+            onClick={() => setIsModalOpen(false)}
+            type="button"
+            className="!cursor-pointer"
+            variant="soft"
+            color="gray"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            color="red"
+            className="!cursor-pointer"
+          >
+            Delete
+          </Button>
+        </Flex>
+      </Modal>
+    </>
+  );
 };
 
-export default DeleteCostCenters;
+export default DeleteCostCenter;

@@ -1,46 +1,66 @@
-
-import React, { useState } from 'react';
-import { TextField, Text, IconButton } from '@radix-ui/themes';
-import Modal from '../_components/Modal';
+import React, { useState } from "react";
+import { IconButton, Flex, Button } from "@radix-ui/themes";
+import Modal from "../_components/Modal";
 import { MdDelete } from "react-icons/md";
-import type { ItemDetailProps } from './department';
+import { api } from "~/trpc/react";
+import { type Department } from "./department";
+interface ItemDetailProps {
+  item: Department;
+  refetch: () => void;
+}
 
-const DeleteDepartment: React.FC<ItemDetailProps> = ({ item }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const DeleteDepartment: React.FC<ItemDetailProps> = ({ item, refetch }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleSave = () => {
-        setIsModalOpen(false);
-    };
+  const deleteDepartmentMutation = api.delete.deleteDepartment.useMutation();
 
-    return (
-        <>
-            <IconButton className='!bg-primary !h-7 !w-7 !cursor-pointer' onClick={() => setIsModalOpen(true)}>
-                <MdDelete size={20} />
-            </IconButton>
+  const handleDelete = async () => {
+    try {
+      await deleteDepartmentMutation.mutateAsync({ id: item.id });
+      refetch();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error delete department:", error);
+    }
+  };
 
-            <Modal
-                className=''
-                title="Delete Department"
-                description="Are You sure you want to delete ?"
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleSave}
-            >
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Name
-                    </Text>
-                    <TextField.Root defaultValue={item?.departmentname} placeholder="Enter your Full Name" />
-                </label>
-                <label>
-                    <Text as="div" size="2" mb="1" weight="bold">
-                        Description
-                    </Text>
-                    <TextField.Root defaultValue={item?.description ?? ''} placeholder="Enter your Description" />
-                </label>
-            </Modal>
-        </>
-    );
+  return (
+    <>
+      <IconButton
+        className="!h-7 !w-7 !cursor-pointer !bg-primary"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <MdDelete size={20} />
+      </IconButton>
+
+      <Modal
+        title="Delete Department"
+        description="Are you sure you want to delete this departmet?"
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        className={""}
+      >
+        <Flex gap="3" mt="4" justify="end">
+          <Button
+            onClick={() => setIsModalOpen(false)}
+            type="button"
+            className="!cursor-pointer"
+            variant="soft"
+            color="gray"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            color="red"
+            className="!cursor-pointer"
+          >
+            Delete
+          </Button>
+        </Flex>
+      </Modal>
+    </>
+  );
 };
 
 export default DeleteDepartment;

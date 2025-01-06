@@ -52,6 +52,13 @@ interface StaffItem {
   departmentData?: ISelectItem;
   statesData?: ISelectItem;
   locationData?: ISelectItem;
+  salary: string;
+  insurance: string | null;
+  bonus: string | null;
+  gratuity: string | null;
+  epf: string | null;
+  pgwPld: string | null;
+  salaryDetailsId: number | null;
 }
 interface StaffFormData {
   name: string;
@@ -64,6 +71,15 @@ interface StaffFormData {
   natureOfEmployment: string;
   createdBy: number;
   createdAt: string; // Date in ISO format
+}
+
+interface SalaryDetails {
+  salary: string;
+  insurance: string | null;
+  bonus: string | null;
+  gratuity: string | null;
+  epf: string | null;
+  pgw_pld: string | null;
 }
 
 interface GetStaffsResponse {

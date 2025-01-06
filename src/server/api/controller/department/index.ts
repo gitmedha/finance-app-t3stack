@@ -57,17 +57,17 @@ export const getDepartments = protectedProcedure
       .where(and(searchCondition, statusCondition, typeCondition)); // Count with filter if searchCondition is defined
 
     const totalCount = totalCountResult[0]?.count ?? 0;
-    const updatedDepartment = []
+    const updatedDepartment = [];
     for (const department of departments) {
       const typeData = {
         value: department.type ?? "",
-        label: department.type ?? ""
-      }
+        label: department.type ?? "",
+      };
 
       updatedDepartment.push({
         ...department,
-        typeData
-      })
+        typeData,
+      });
     }
 
     return {
@@ -155,17 +155,17 @@ export const editDepartment = protectedProcedure
     try {
       const { id, updatedBy, updatedAt, ...fieldsToUpdate } = input;
 
-      // Check if the department member exists
-      const existingStaff =
+      // Check if the department exists
+      const existingDepartment =
         await ctx.db.query.departmentMasterInFinanceProject.findFirst({
           where: eq(departmentMaster.id, id),
         });
 
-      if (!existingStaff) {
-        throw new Error("Department member not found");
+      if (!existingDepartment) {
+        throw new Error("Department not found");
       }
 
-      // Update departmet member details
+      // Update departmet details
       const updatedDepartment = await ctx.db
         .update(departmentMaster)
         .set({
@@ -179,11 +179,52 @@ export const editDepartment = protectedProcedure
 
       return {
         success: true,
-        message: "Department member updated successfully",
-        staff: updatedDepartment[0], // Return the updated department record
+        message: "Department updated successfully",
+        department: updatedDepartment[0], // Return the updated department record
       };
     } catch (error) {
       console.error("Error updating department:", error);
       throw new Error("Failed to update department. Please try again.");
+    }
+  });
+
+export const deleteDepartment = protectedProcedure
+  .input(
+    z.object({
+      id: z.number().min(1, "Department ID is required"), // Department ID to locate the record
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    try {
+      const { id } = input;
+
+      // Check if the department exists
+      const existingDepartment =
+        await ctx.db.query.departmentMasterInFinanceProject.findFirst({
+          where: eq(departmentMaster.id, id),
+        });
+
+      if (!existingDepartment) {
+        throw new Error("department not found");
+      }
+
+      // Update staff department details
+      const updatedDepartment = await ctx.db
+        .update(departmentMaster)
+        .set({
+          isactive: false,
+        })
+        .where(eq(departmentMaster.id, id))
+        .returning(); // Correct usage of eq()
+      // .returning("*");
+
+      return {
+        success: true,
+        message: "Department member deleted successfully",
+        department: updatedDepartment[0], // Return the updated department record
+      };
+    } catch (error) {
+      console.error("Error deleting department:", error);
+      throw new Error("Failed to delete department. Please try again.");
     }
   });

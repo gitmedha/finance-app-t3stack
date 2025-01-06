@@ -12,9 +12,10 @@ import { type Department } from "./department";
 
 interface ItemDetailProps {
   item: Department;
+  refetch: () => void;
 }
 
-const EditDepartments: React.FC<ItemDetailProps> = ({ item }) => {
+const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
   const apiContext = api.useContext();
   const userData = useSession();
   const {
@@ -39,7 +40,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item }) => {
 
   const { mutate: editDepartment } = api.post.editDepartment.useMutation({
     async onSuccess() {
-      await apiContext.get.getAllDepartments.invalidate();
+      refetch();
       reset();
       setIsModalOpen(false);
     },
@@ -78,7 +79,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item }) => {
       </IconButton>
 
       <Modal
-        className=''
+        className=""
         title="Add Departments"
         description="Make changes to your profile."
         isOpen={isModalOpen}
@@ -161,7 +162,10 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item }) => {
               Cancel
             </Button>
 
-            <Button type="submit" className="!cursor-pointer !bg-primary text-white">
+            <Button
+              type="submit"
+              className="!cursor-pointer !bg-primary text-white"
+            >
               Save
             </Button>
           </Flex>

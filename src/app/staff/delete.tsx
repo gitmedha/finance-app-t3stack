@@ -6,9 +6,10 @@ import type { StaffItem } from "./staff";
 import { api } from "~/trpc/react";
 interface ItemDetailProps {
   item: StaffItem;
+  refetchStaffs: () => void;
 }
 
-const DeleteStaff: React.FC<ItemDetailProps> = ({ item }) => {
+const DeleteStaff: React.FC<ItemDetailProps> = ({ item, refetchStaffs }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const deleteStaffMutation = api.delete.deleteStaff.useMutation()
@@ -16,6 +17,7 @@ const DeleteStaff: React.FC<ItemDetailProps> = ({ item }) => {
   const handleDelete = async () => {
     try {
       await deleteStaffMutation.mutateAsync({ id: item.id })
+      refetchStaffs();
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error adding staff:", error);

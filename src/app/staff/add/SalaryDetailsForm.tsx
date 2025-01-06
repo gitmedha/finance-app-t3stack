@@ -2,31 +2,74 @@
 import React from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { type StaffItem } from "../staff";
+import { api } from "~/trpc/react";
+import { useSession } from "next-auth/react";
+import useStaff from "../store/staffStore";
 
 interface SalaryDetailsFormProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  refetch: () => void;
 }
 
-const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm<StaffItem>({
+const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
+  setIsModalOpen,
+  refetch
+}) => {
+  const { activeStaffId } = useStaff();
+  const userData = useSession();
+  const {
+    register,
+    handleSubmit,
+    reset
+  } = useForm<StaffItem>({
     defaultValues: {}, // Pre-populate the form fields with item data
   });
 
+  const { mutate: createSalaryDetails } =
+    api.post.addStaffSalaryDetails.useMutation({
+      async onSuccess() {
+        refetch();
+      },
+      onError(err) {
+        console.error("Error adding staff:", err);
+      },
+    });
+
   const onSubmit: SubmitHandler<StaffItem> = (data) => {
-    console.log("Form submitted data:", data);
-    // Perform any API calls or actions needed here
-    setIsModalOpen(false); // Close modal after submitting
+    try {
+      const submissionData = {
+        ...data,
+        salary: data.salary,
+        empId: activeStaffId ?? 0,
+        insurance: data.insurance,
+        bonus: data.bonus,
+        gratuity: data.gratuity,
+        epf: data.epf,
+        pgwPld: data.pgwPld,
+        createdBy: userData.data?.user.id ?? 1,
+        isactive: true,
+        createdAt: new Date().toISOString().split("T")[0] ?? "",
+      };
+
+      createSalaryDetails(submissionData);
+
+      // reset(submissionData);
+      // await apiContext.get.getStaffs.invalidate();
+      // setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding staff:", error);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-1 ">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
       {/* Salary Field */}
       <div>
         <label className="text-sm">Salary INR</label>
         <input
           type="number"
           placeholder="Enter salary"
-        //   {...register("salary", { required: "Salary is required" })}
+          {...register("salary", { required: "Salary is required" })}
           className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
         />
         {/* {errors.salary && <span className="text-xs text-red-500">{errors.salary.message}</span>} */}
@@ -38,7 +81,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
         <input
           type="number"
           placeholder="Enter insurance amount"
-        //   {...register("insurance")}
+          {...register("insurance")}
           className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
         />
       </div>
@@ -49,7 +92,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
         <input
           type="number"
           placeholder="Enter bonus amount"
-        //   {...register("bonus")}
+          {...register("bonus")}
           className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
         />
       </div>
@@ -60,7 +103,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
         <input
           type="number"
           placeholder="Enter gratuity amount"
-        //   {...register("gratuity")}
+          {...register("gratuity")}
           className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
         />
       </div>
@@ -71,7 +114,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
         <input
           type="number"
           placeholder="Enter EPF amount"
-        //   {...register("epf")}
+          {...register("epf")}
           className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
         />
       </div>
@@ -81,7 +124,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
         <input
           type="number"
           placeholder="Enter PGW PLD amount"
-        //   {...register("epf")}
+          {...register("pgwPld")}
           className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
         />
       </div>
@@ -97,7 +140,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
         </button>
         <button
           type="submit"
-          className="rounded-lg bg-primary px-4 py-2 text-sm text-white hover:bg-primary-dark"
+          className="hover:bg-primary-dark rounded-lg bg-primary px-4 py-2 text-sm text-white"
         >
           Save
         </button>

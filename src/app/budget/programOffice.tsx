@@ -142,7 +142,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section }) => {
                 <th scope="col" className="border p-2">
                   Mar
                 </th>
-              
+
               </tr>
             </thead>
             <tbody>
@@ -190,3 +190,39 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section }) => {
 };
 
 export default ProgramOffice;
+
+
+
+// [
+//   {
+//     budgetType: "",
+//     budgetCategory: "",
+//     budgetbymonth: [
+//       {
+//         month: "01/2023",
+//         budget: 10000
+//       },
+//       {
+//         month: "02/2023",
+//         budget: 10000
+//       },
+//       {
+//         month: "03/2023",
+//         budget: 10000
+//       },
+//       {
+//         month: "04/2024",
+//         budget: 10000
+//       },
+//       {
+//         month: "05/2024",
+//         budget: 10000
+//       },
+//       {
+//         month: "06/2024",
+//         budget: 10000
+//       },
+
+//     ]
+//   }
+// ]

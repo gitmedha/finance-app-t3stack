@@ -22,7 +22,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-1 ">
       {/* Salary Field */}
       <div>
-        <label className="text-sm">Salary</label>
+        <label className="text-sm">Salary INR</label>
         <input
           type="number"
           placeholder="Enter salary"
@@ -34,7 +34,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
 
       {/* Insurance */}
       <div>
-        <label className="text-sm">Insurance</label>
+        <label className="text-sm">Insurance INR</label>
         <input
           type="number"
           placeholder="Enter insurance amount"
@@ -45,7 +45,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
 
       {/* Bonus */}
       <div>
-        <label className="text-sm">Bonus</label>
+        <label className="text-sm">Bonus INR</label>
         <input
           type="number"
           placeholder="Enter bonus amount"
@@ -56,7 +56,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
 
       {/* Gratuity */}
       <div>
-        <label className="text-sm">Gratuity</label>
+        <label className="text-sm">Gratuity INR</label>
         <input
           type="number"
           placeholder="Enter gratuity amount"
@@ -67,7 +67,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
 
       {/* EPF */}
       <div>
-        <label className="text-sm">EPF</label>
+        <label className="text-sm">EPF INR</label>
         <input
           type="number"
           placeholder="Enter EPF amount"
@@ -77,7 +77,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({ setIsModalOpen })
       </div>
 
       <div>
-        <label className="text-sm">PGW PLD</label>
+        <label className="text-sm">PGW PLD INR</label>
         <input
           type="number"
           placeholder="Enter PGW PLD amount"

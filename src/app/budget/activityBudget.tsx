@@ -1,7 +1,9 @@
 "use client";
 
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import React, { useState } from "react";
 import { BiComment } from "react-icons/bi";
+import { RiArrowDropDownLine } from "react-icons/ri";
 
 interface ActivityBudgetProps {
   section: string;
@@ -53,8 +55,40 @@ const months = [
   "Mar",
 ];
 
+
+const activitys = [
+  "Venue charges & maintenance",
+  "Meals & refreshment",
+  "Equipments on rent",
+  "Printing, stationary & materials",
+  "Poster, banners, collaterals",
+  "Photo & videography",
+  "Gifts & rewards",
+  "Stipend & remuneration",
+  "Local conveyance (External)",
+  "Outstation travel (External)",
+  "Accomodation (External)",
+  "Per diem for employees (External)",
+  "Professional services (e.g. event management)",
+  "Tent, decoration & catering services",
+  "Carriage & transportation",
+  "Promotion, advertising & campaign",
+  "Telecommunication expenses",
+  "Branding materials & supplies",
+  "License, permit and taxes",
+  "Capex & asset purchase",
+  "Misc & others",
+  "DSE Shoshin",
+  "Poly-Enrollment Drive",
+  "Poly-Placement Drive",
+  "Industry Engagement",
+  "TCPO Workshop",
+  "DSE Faculty workshop"
+];
+
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
   // Initialize table data
+  const [selectedActivity, setSelectedActivity] = useState<string>(""); // State for selected activity
 
   const [tableData, setTableData] = useState<TableData>(
     particulars.reduce((acc, level) => {
@@ -83,6 +117,11 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
     }));
   };
 
+
+  const handleactivitySelect = (activity: string) => {
+    setSelectedActivity(activity);
+  };
+
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -100,7 +139,30 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
         </summary>
 
         <hr className="my-2 scale-x-150" />
-
+        <div className='flex justify-end items-center m-2'>
+          <div className="w-52">
+            {/* activity Dropdown */}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                  <span>{selectedActivity || "Select Activity"}</span>
+                  <RiArrowDropDownLine size={30} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+                {activitys.map((activity) => (
+                  <DropdownMenu.Item
+                    key={activity}
+                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                    onSelect={() => handleactivitySelect(activity)}
+                  >
+                    {activity}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          </div>
+        </div>
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
           <table className="w-full table-auto border-collapse">
@@ -219,7 +281,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                     },
                   )}
                   <td className="border p-2">
-                      <BiComment className="text-xl" />
+                    <BiComment className="text-xl" />
                   </td>
                 </tr>
               ))}

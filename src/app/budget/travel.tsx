@@ -1,6 +1,7 @@
 "use client";
-
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import React, { useState } from "react";
+import { RiArrowDropDownLine } from 'react-icons/ri';
 
 interface TravelBudgetProps {
   section: string;
@@ -52,8 +53,16 @@ const months = [
   "Mar",
 ];
 
+const travels = [
+  'Accomodation',
+  'Local Conveyance',
+  'Per Diem',
+  'Tour & Travel'
+]
+
 const TravelBudget: React.FC<TravelBudgetProps> = ({ section }) => {
   // Initialize table data
+  const [selectedTravel, setSelectedTravel] = useState<string>(""); // State for selected activity
 
   const [tableData, setTableData] = useState<TableData>(
     particulars.reduce((acc, level) => {
@@ -82,6 +91,11 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section }) => {
     }));
   };
 
+  const handleactivitySelect = (activity: string) => {
+    setSelectedTravel(activity);
+  };
+
+
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -99,7 +113,30 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section }) => {
         </summary>
 
         <hr className="my-2 scale-x-150" />
-
+        <div className='flex justify-end items-center m-2'>
+          <div className="w-52">
+            {/* activity Dropdown */}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                  <span>{selectedTravel || "Select Travel"}</span>
+                  <RiArrowDropDownLine size={30} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+                {travels.map((travel) => (
+                  <DropdownMenu.Item
+                    key={travel}
+                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                    onSelect={() => handleactivitySelect(travel)}
+                  >
+                    {travel}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          </div>
+        </div>
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
           <table className="w-full table-auto border-collapse">
@@ -157,7 +194,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section }) => {
                 <th scope="col" className="border p-2">
                   Mar
                 </th>
-               
+
               </tr>
             </thead>
             <tbody>

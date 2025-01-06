@@ -44,7 +44,7 @@ const Budget: React.FC = () => {
     <div className="mt-10 overflow-hidden m-2 p-2">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} />
       <PersonnelCost section='PERSONNEL' />
-      <ActivityBudget section='Activity Consolidate' />
+      <ActivityBudget section='PROGRAM Activities' />
       <TravelBudget section='Travel' />
       <ProgramOffice section='PROGRAM OFFICE' />
       <CapitalCost section='CAPITAL COST' />

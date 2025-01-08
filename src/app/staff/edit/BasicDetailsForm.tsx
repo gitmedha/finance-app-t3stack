@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
 import { Button, Flex } from "@radix-ui/themes";
@@ -31,11 +31,12 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   } = useForm<StaffItem>({
     defaultValues: item,
   });
-
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const stateName = watch("statesData")?.label ?? "";
 
   const { mutate: editStaff } = api.post.editStaff.useMutation({
     async onSuccess(data) {
+      setIsLoading(false); // Stop loading on success
       await apiContext.get.getStaffs.invalidate();
       if (data.staff) {
         setActiveStaffId(data.staff?.id);
@@ -43,9 +44,11 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       refetchStaffs();
     },
     onError(err) {
+      setIsLoading(false); // Stop loading on error
       console.error("Error adding staff:", err);
     },
   });
+
   const { data: departmentData } = api.get.getAllDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
   const { data: locationsData = [], refetch } =
@@ -55,6 +58,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
     try {
+      setIsLoading(true); // Start loading
       const submissionData = {
         id: data.id,
         name: data.name,
@@ -71,10 +75,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
       editStaff(submissionData);
       reset(submissionData);
-      // reset();
-      // await apiContext.get.getStaffs.invalidate();
-      // setIsModalOpen(false);
     } catch (error) {
+      setIsLoading(false); // Stop loading on error
       console.error("Error adding staff:", error);
     }
   };
@@ -213,21 +215,24 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       </div>
 
       <Flex gap="3" mt="4" justify="end">
-        <Button
+      <Button
           onClick={() => setIsModalOpen(false)}
           type="button"
           className="!cursor-pointer"
           variant="soft"
           color="gray"
+          disabled={isLoading} // Disable button while loading
         >
           Cancel
         </Button>
         <Button
           type="submit"
           className="!cursor-pointer !bg-primary text-white"
+          disabled={isLoading} // Disable button while loading
         >
-          Save
+          {isLoading ? "Saving..." : "Save"} {/* Change button text */}
         </Button>
+
       </Flex>
     </form>
   );

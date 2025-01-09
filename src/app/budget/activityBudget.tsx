@@ -1,7 +1,8 @@
 "use client";
-
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import React, { useState } from "react";
 import { BiComment } from "react-icons/bi";
+import { RiArrowDropDownLine } from 'react-icons/ri';
 
 interface ActivityBudgetProps {
   section: string;
@@ -14,6 +15,22 @@ interface LevelData {
 
 type TableData = Record<string, LevelData>;
 
+const subProgramActivites = [
+  "Certificate Event",
+  "Faculty Workshop",
+  "Alumni Engagement",
+  "AI and Placement Drive",
+  "ITI Diagnostic",
+  "Divisional workshop",
+  "Divisional Industry workshop",
+  "MSDF Event",
+  "DSE Shoshin",
+  "Poly-Enrollment Drive",
+  "Poly-Placement Drive",
+  "Industry Engagement",
+  "TCPO Workshop",
+  "DSE Faculty workshop"
+]
 const particulars = [
   "Venue charges & maintenance",
   "Meals & refreshment",
@@ -65,7 +82,10 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
       return acc;
     }, {} as TableData),
   );
-
+  const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.localeCompare(b))[0])
+  const handleSelect = (val: string) => {
+    setFilter(val)
+  }
   // Handle input changes with strict typing
   const handleInputChange = (
     level: string,
@@ -99,8 +119,31 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
           </div>
         </summary>
 
-        <hr className="my-2 scale-x-150" />
+        <div className='w-72 mt-3 z-10'>
+          <DropdownMenu.Root >
+            <DropdownMenu.Trigger asChild>
+              <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
+                <span>{filter} </span>
+                <RiArrowDropDownLine size={30} />
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content
+              className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
+            >
+              {subProgramActivites.sort((a, b) => a.localeCompare(b)).map((val, ind) => (
+                <DropdownMenu.Item
+                  key={ind}
+                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                  onSelect={() => handleSelect(val)} // Pass entire department object
+                >
+                  {val}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
 
+        </div>
+        <hr className="my-2 scale-x-150" />
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
           <table className="w-full table-auto border-collapse">
@@ -219,7 +262,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
                     },
                   )}
                   <td className="border p-2">
-                      <BiComment className="text-xl" />
+                    <BiComment className="text-xl" />
                   </td>
                 </tr>
               ))}

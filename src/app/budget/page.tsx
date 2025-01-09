@@ -14,7 +14,11 @@ import type { FilterOptions } from "./budget";
 
 
 // Define the structure of the value passed to handleSelect
-type HandleSelectValue = { id: string; departmentname: string } | string | number;
+type HandleSelectValue =
+  | { id: string | number; departmentname: string } // For department objects
+  | string // For simple string values
+  | number; // For numeric values
+
 
 const Budget: React.FC = () => {
   // Explicitly define the type for filters
@@ -44,7 +48,7 @@ const Budget: React.FC = () => {
     <div className="mt-10 overflow-hidden m-2 p-2">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} />
       <PersonnelCost section='PERSONNEL' />
-      <ActivityBudget section='Activity Consolidate' />
+      <ActivityBudget section='Program Activities' />
       <TravelBudget section='Travel' />
       <ProgramOffice section='PROGRAM OFFICE' />
       <CapitalCost section='CAPITAL COST' />

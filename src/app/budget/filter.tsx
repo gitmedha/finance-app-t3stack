@@ -1,11 +1,10 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { api } from '~/trpc/react';
 import { useEffect } from 'react';
 import type { BudgetFilterFormProps } from "./budget";
 import { Button } from '@radix-ui/themes';
-
-const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect }) => {
+import { api } from "~/trpc/react";
+const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect,budgetId,setBugetId }) => {
 
   // Fetch data for departments
   const { data, refetch } = api.get.getDepartments.useQuery(
@@ -35,6 +34,29 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     }
   }, [data]);
 
+  // creating the budget
+  const createBudgetMutation = api.post.createBudget.useMutation();
+  const handelCreateBudget = () => {
+    if (!filters.year || !filters.department) {
+      console.error("Year and department are required to create a budget.");
+      return;
+    }
+    const input = {
+      financialYear: filters.year,
+      createdBy: 1,
+      departmentId: parseInt(filters.department),
+      createdAt: "2022-11-20",
+    };
+    createBudgetMutation.mutate(input, {
+      onSuccess: (data) => {
+        console.log("Budget created successfully:", data);
+        setBugetId(data[0]? data[0].id : null)
+      },
+      onError: (error) => {
+        console.error("Error creating budget:", error);
+      },
+    });
+  };
 
   return (
     <div className='flex justify-between'>
@@ -92,27 +114,35 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         </div>
       </div>
       <div className='flex justify-end items-center space-x-2'>
-        <Button
-          type="button"
-          className="!cursor-pointer !text-white !bg-primary px-2"
-          variant="soft"
-        >
-          Save
-        </Button>
-        <Button
-          type="button"
-          className="!cursor-pointer !text-white !bg-primary px-2"
-          variant="soft"
-        >
-          Submit
-        </Button>
-        <Button
-          type="button"
-          className="!cursor-pointer !text-white !bg-primary px-2"
-          variant="soft"
-        >
-          Approve
-        </Button>
+        {
+          !budgetId && <Button
+            type="button"
+            className="!cursor-pointer !text-white !bg-primary px-2"
+            variant="soft"
+            onClick={handelCreateBudget}
+          >
+            Create Budget
+          </Button>
+        }
+        {
+          budgetId && <div className='flex justify-end items-center space-x-2'>
+            <Button
+              type="button"
+              className="!cursor-pointer !text-white !bg-primary px-2"
+              variant="soft"
+            >
+              Submit
+            </Button>
+            <Button
+              type="button"
+              className="!cursor-pointer !text-white !bg-primary px-2"
+              variant="soft"
+            >
+              Approve
+            </Button>
+          </div>
+        }
+        
       </div>
     </div>
   );

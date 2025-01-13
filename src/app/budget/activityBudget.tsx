@@ -1,108 +1,335 @@
 "use client";
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import React, { useState } from "react";
+import { Button } from '@radix-ui/themes';
+import React, { useEffect, useState } from "react";
 import { BiComment } from "react-icons/bi";
 import { RiArrowDropDownLine } from 'react-icons/ri';
+import { api } from '~/trpc/react';
 
 interface ActivityBudgetProps {
   section: string;
+  categoryId: number;
+  budgetId: number;
+  deptId: string;
 }
 
+interface subProgramActivitesSchema{
+  map:number
+  name:string
+}
 interface LevelData {
+  budgetDetailsId: number
   Count: string | number;
   [month: string]: string | number;
 }
 
 type TableData = Record<string, LevelData>;
 
-const subProgramActivites = [
-  "Certificate Event",
-  "Faculty Workshop",
-  "Alumni Engagement",
-  "AI and Placement Drive",
-  "ITI Diagnostic",
-  "Divisional workshop",
-  "Divisional Industry workshop",
-  "MSDF Event",
-  "DSE Shoshin",
-  "Poly-Enrollment Drive",
-  "Poly-Placement Drive",
-  "Industry Engagement",
-  "TCPO Workshop",
-  "DSE Faculty workshop"
+const subProgramActivites:subProgramActivitesSchema[] = [
+  {map:1,name:"Certificate Event"},
+  {map:2,name:"Faculty Workshop"},
+  {map:3,name:"Alumni Engagement"},
+  {map:4, name: "AI and Placement Drive"},
+  {map:5, name: "ITI Diagnostic"},
+  {map:6, name: "Divisional workshop"},
+  {map:7, name: "Divisional Industry workshop"},
+  {map:8, name: "MSDF Event"},
+  {map:9, name: "DSE Shoshin"},
+  {map:10, name: "Poly-Enrollment Drive"},
+  {map:11,name:"Poly-Placement12rive"},
+  {map:12, name: "Industry Engagement"},
+  {map:13,name:"TCPO Workshop"},
+  {map:14,name:"DSE Faculty workshop"}
 ]
-const particulars = [
-  "Venue charges & maintenance",
-  "Meals & refreshment",
-  "Equipments on rent",
-  "Printing, stationary & materials",
-  "Poster, banners, collaterals",
-  "Photo & videography",
-  "Gifts & rewards",
-  "Stipend & remuneration",
-  "Local conveyance (External)",
-  "Outstation travel (External)",
-  "Accomodation (External)",
-  "Per diem for employees (External)",
-  "Professional services (e.g. event management)",
-  "Tent, decoration & catering services",
-  "Carriage & transportation",
-  "Promotion, advertising & campaign",
-  "Telecommunication expenses",
-  "Branding materials & supplies",
-  "License, permit and taxes",
-  "Capex & asset purchase",
-  "Misc & others"
-];
+
 
 const months = [
+  "Qty1",
+  "Rate1",
+  "Amount1",
   "Apr",
   "May",
   "Jun",
+  "Qty2",
+  "Rate2",
+  "Amount2",
   "Jul",
   "Aug",
   "Sep",
+  "Qty3",
+  "Rate3",
+  "Amount3",
   "Oct",
   "Nov",
   "Dec",
+  "Qty4",
+  "Rate4",
+  "Amount4",
   "Jan",
   "Feb",
   "Mar",
 ];
 
-const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
-  // Initialize table data
+const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId }) => {
+  const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
 
-  const [tableData, setTableData] = useState<TableData>(
-    particulars.reduce((acc, level) => {
-      acc[level] = {
-        Count: "",
-        ...months.reduce((mAcc, month) => ({ ...mAcc, [month]: "" }), {}),
-      };
-      return acc;
-    }, {} as TableData),
-  );
-  const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.localeCompare(b))[0])
-  const handleSelect = (val: string) => {
+  const [tableData, setTableData] = useState<TableData>({});
+  const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
+  const handleSelect = (val: subProgramActivitesSchema) => {
     setFilter(val)
   }
+  const isSaveDisabled = () => {
+    return Object.values(tableData).some((subData) => {
+      return months.some((month) => {
+        return !subData[month]?.toString().trim(); 
+      });
+    });
+  };
+  const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+    budgetId,
+    catId: categoryId,
+    deptId: Number(deptId),
+    activity:(filter?.map)?.toString()
+  },{
+    enabled:!!filter
+  });
+  useEffect(() => {
+    const initialData: TableData = {};
+    if (data?.subCategories) {
+      data.subCategories.forEach((sub) => {
+        initialData[sub.subCategoryId] = {
+          Count:"",
+          Qty1:0,
+          Rate1:"",
+          Amount1:"",
+          Apr:"",
+          May:"",
+          Jun:"",
+          Qty2:0,
+          Rate2:"",
+          Amount2:"",
+          Jul:"",
+          Aug:"",
+          Sep:"",
+          Qty3:0,
+          Rate3:"",
+          Amount3:"",
+          Oct:"",
+          Nov:"",
+          Dec:"",
+          Qty4:"",
+          Rate4:"",
+          Amount4:"",
+          Jan:"",
+          Feb:"",
+          Mar:"",
+          budgetDetailsId:0
+        };
+      });
+    }
+    if (categoriesBudgetDetails) {
+      categoriesBudgetDetails.forEach((item) => {
+        initialData[item.subcategoryId] = {
+          Count: item.total,
+          Apr: item.april ? item.april : "",
+          May: item.may ? item.may : "",
+          Jun: item.june ? item.june : "",
+          Jul: item.july ? item.july : "",
+          Aug: item.august ? item.august : "",
+          Sep: item.september ? item.september : "",
+          Oct: item.october ? item.october : "",
+          Nov: item.november ? item.november : "",
+          Dec: item.december ? item.december : "",
+          Jan: item.january ? item.january : "",
+          Feb: item.february ? item.february : "",
+          Mar: item.march ? item.march : "",
+          Qty1: item.qty1 ? item.qty1 : "",
+          Rate1: item.rate1 ? item.rate1 : "",
+          Amount1: item.amount1 ? item.amount1 : "",
+          Qty2: item.qty2 ? item.qty2 : "",
+          Rate2: item.rate2 ? item.rate2 : "",
+          Amount2: item.amount2 ? item.amount2 : "",
+          Qty3: item.qty3 ? item.qty3 : "",
+          Rate3: item.rate3 ? item.rate3 : "",
+          Amount3: item.amount3 ? item.amount3 : "",
+          Qty4: item.qty4 ? item.qty4 : "",
+          Rate4: item.rate4 ? item.rate4 : "",
+          Amount4: item.amount4 ? item.amount4 : "",
+          budgetDetailsId:item.id
+        };
+      });
+      setTableData(initialData);
+    }
+    else {
+      // If categoriesBudgetDetails is not available, initialize with empty data
+      setTableData({});
+    }
+  }, [categoriesBudgetDetails]);
   // Handle input changes with strict typing
   const handleInputChange = (
-    level: string,
+    subCategoryId: number,
     field: string,
-    value: string | number,
+    value: string
   ) => {
-    setTableData((prev) => ({
-      ...prev,
-      [level]: {
-        // Provide a default structure for safety
-        Count: prev[level]?.Count ?? "",
-        ...prev[level],
-        [field]: value,
-      },
-    }));
+    setTableData((prev) => {
+      const updatedData = { ...prev[subCategoryId], [field]: value };
+
+      // Automatically calculate the amount fields based on rate and qty
+      if (field === "Rate1" || field === "Qty1") {
+        updatedData.Amount1 = (
+          Number(updatedData.Rate1) * Number(updatedData.Qty1)
+        ).toFixed(2);
+      } else if (field === "Rate2" || field === "Qty2") {
+        updatedData.Amount2 = (
+          Number(updatedData.Rate2) * Number(updatedData.Qty2)
+        ).toFixed(2);
+      } else if (field === "Rate3" || field === "Qty3") {
+        updatedData.Amount3 = (
+          Number(updatedData.Rate3) * Number(updatedData.Qty3)
+        ).toFixed(2);
+      } else if (field === "Rate4" || field === "Qty4") {
+        updatedData.Amount4 = (
+          Number(updatedData.Rate4) * Number(updatedData.Qty4)
+        ).toFixed(2);
+      }
+
+      return {
+        ...prev,
+        [subCategoryId]: updatedData,
+      };
+    });
   };
 
+  const createBudgetDetails = api.post.addBudgetDetails.useMutation();
+  const handleSave = async () => {
+    const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
+      budgetid: budgetId, 
+      catid: categoryId,
+      subcategoryId: parseInt(subCategoryId, 10),
+      // need to be removed
+      unit: 1, 
+      rate: "1", 
+      total: "1", 
+      currency: "USD", 
+      notes: "",
+      description: "",
+      april: (data.Apr ?? "").toString(),
+      may: (data.May ?? "").toString(),
+      june: (data.Jun ?? "").toString(),
+      july: (data.Jul ?? "").toString(),
+      august: (data.Aug ?? "").toString(),
+      september: (data.Sep ?? "").toString(),
+      october: (data.Oct ?? "").toString(),
+      november: (data.Nov ?? "").toString(),
+      december: (data.Dec ?? "").toString(),
+      january: (data.Jan ?? "").toString(),
+      february: (data.Feb ?? "").toString(),
+      march: (data.Mar ?? "").toString(),
+      activity: (filter?.map??"").toString(),
+      deptId: 9,
+      clusterId: undefined,
+      createdBy: 3,
+      createdAt: "2022-12-11",
+      rate1:(data.rate1 ?? "").toString(),
+      rate2: (data.rate2 ?? "").toString(),
+      rate3: (data.rate3 ?? "").toString(),
+      rate4: (data.rate4 ?? "").toString(),
+      amount1: ((data.amount1 ?? "").toString()),
+      amount2: ((data.amount2 ?? "").toString()),
+      amount3: ((data.amount3 ?? "").toString()),
+      amount4: ((data.amount4 ?? "").toString()),
+      qty1: Number(data.Qty1),
+      qty2: Number(data.Qty2),
+      qty3: Number(data.Qty3),
+      qty4: Number(data.Qty4)
+    }));
+
+    try {
+      createBudgetDetails.mutate(
+        {
+          deptId: Number(deptId),
+          budgetId: budgetId,
+          catId: categoryId,
+          data: budgetDetails,
+        },
+        {
+          onSuccess: (data) => {
+            console.log("Budget created successfully:", data);
+          },
+          onError: (error) => {
+            console.error("Error creating budget:", error);
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Failed to save budget details:", error);
+      alert("Failed to save budget details. Please try again.");
+    }
+  };
+  const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
+  const handleUpdate = async () => {
+    const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
+      budgetDetailsId: data.budgetDetailsId,
+      catid: categoryId,
+      subcategoryId: parseInt(subCategoryId, 10),
+      // need to be removed
+      unit: 1,
+      rate: "1",
+      total: "1",
+      currency: "USD",
+      notes: "",
+      description: "",
+      april: (data.Apr ?? "").toString(),
+      may: (data.May ?? "").toString(),
+      june: (data.Jun ?? "").toString(),
+      july: (data.Jul ?? "").toString(),
+      august: (data.Aug ?? "").toString(),
+      september: (data.Sep ?? "").toString(),
+      october: (data.Oct ?? "").toString(),
+      november: (data.Nov ?? "").toString(),
+      december: (data.Dec ?? "").toString(),
+      january: (data.Jan ?? "").toString(),
+      february: (data.Feb ?? "").toString(),
+      march: (data.Mar ?? "").toString(),
+      activity: (filter?.map ?? "").toString(),
+      clusterId: undefined,
+      updatedBy: 3,
+      updatedAt: new Date().toISOString(),
+      rate1: (data.rate1 ?? "").toString(),
+      rate2: (data.rate2 ?? "").toString(),
+      rate3: (data.rate3 ?? "").toString(),
+      rate4: (data.rate4 ?? "").toString(),
+      amount1: ((data.amount1 ?? "").toString()),
+      amount2: ((data.amount2 ?? "").toString()),
+      amount3: ((data.amount3 ?? "").toString()),
+      amount4: ((data.amount4 ?? "").toString()),
+      qty1: Number(data.Qty1),
+      qty2: Number(data.Qty2),
+      qty3: Number(data.Qty3),
+      qty4: Number(data.Qty4)
+    }));
+    try {
+      updateBudgetDetails.mutate(
+        {
+          deptId: parseInt(deptId, 10),
+          budgetId,
+          catId: categoryId,
+          data: budgetDetails,
+        },
+        {
+          onSuccess: (data) => {
+            console.log("Budget updated successfully:", data);
+          },
+          onError: (error) => {
+            console.error("Error updating budget:", error);
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Failed to update budget details:", error);
+      alert("Failed to update budget details. Please try again.");
+    }
+  };
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -123,20 +350,20 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
           <DropdownMenu.Root >
             <DropdownMenu.Trigger asChild>
               <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
-                <span>{filter} </span>
+                <span>{filter?.name} </span>
                 <RiArrowDropDownLine size={30} />
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
               className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
             >
-              {subProgramActivites.sort((a, b) => a.localeCompare(b)).map((val, ind) => (
+              {subProgramActivites.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
                 <DropdownMenu.Item
                   key={ind}
                   className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
                   onSelect={() => handleSelect(val)} // Pass entire department object
                 >
-                  {val}
+                  {val.name}
                 </DropdownMenu.Item>
               ))}
             </DropdownMenu.Content>
@@ -230,37 +457,30 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
               </tr>
             </thead>
             <tbody>
-              {particulars.map((level) => (
+              {data?.subCategories.map((sub,key) => (
                 <tr
-                  key={level}
+                  key={sub.subCategoryId}
                   className="text-sm transition hover:bg-gray-100"
                 >
                   {/* Level Name */}
-                  <td className="border p-2 font-medium">{level}</td>
-
-                  {/* Count Input */}
-                  <td className="border p-2">
-                    <input
-                      type="number"
-                      className="w-full rounded border p-1"
-                      value={tableData[level]?.Count}
-                      onChange={(e) =>
-                        handleInputChange(level, "Count", e.target.value)
-                      }
-                    />
-                  </td>
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23].map(
-                    (it) => {
-                      return (
-                        <td key={it} className="border p-2">
-                          <input
-                            type="text"
-                            className="w-full rounded border p-1"
-                          />
-                        </td>
-                      );
-                    },
-                  )}
+                  <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                  {months.map((month,key) => (
+                    <td key={month} className="border p-2">
+                      <input
+                        disabled={key == 2 || key ==8 || key== 14 || key==20 }
+                        type={key%6 == 0 ?"number":"text"}
+                        className="w-full rounded border p-1"
+                        value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                        onChange={(e) =>
+                          handleInputChange(
+                            sub.subCategoryId,
+                            month,
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </td>
+                  ))}
                   <td className="border p-2">
                     <BiComment className="text-xl" />
                   </td>
@@ -269,6 +489,30 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section }) => {
             </tbody>
           </table>
         </div>
+        <div className="py-2 pr-4 flex flex-row-reverse ">
+          {
+            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 ?<Button
+              type="button"
+              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+              variant="soft"
+              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+              disabled={isSaveDisabled()}
+              onClick={() => handleUpdate()}
+            >
+              Edit
+            </Button> : <Button
+              type="button"
+              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+              variant="soft"
+              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+              disabled={isSaveDisabled()}
+              onClick={() => handleSave()}
+            >
+              Save
+            </Button>
+          }
+        </div>
+        {JSON.stringify(categoriesBudgetDetails) }
       </details>
 
       {/* Section Header */}

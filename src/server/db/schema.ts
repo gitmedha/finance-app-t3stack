@@ -271,7 +271,6 @@ export const budgetMasterInFinanceProject = financeProject.table("budget_master"
         foreignColumns: [departmentMasterInFinanceProject.id],
         name: "budget_master_departmentid_fkey"
       }),
-      budgetMasterVersionFinancialYearUnique: unique("budget_master_version_financial_year_unique").on(table.name, table.financialYear),
     }
   });
 
@@ -383,6 +382,7 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
   program: varchar("program", { length: 70 }),
   stateId: integer("state_id"),
   locationId: integer("location_id"),
+  level: integer("level"),
 },
   (table) => {
     return {
@@ -498,7 +498,7 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
   overhead: text("overhead"),
   deptId: integer("deptId"),
   clusterId: integer("clusterId"),
-  subcategoryId: integer("subcategory_id"),
+  subcategoryId: integer("subcategory_id").notNull(),
   april: numeric("april", { precision: 12, scale: 2 }),
   may: numeric("may", { precision: 12, scale: 2 }),
   june: numeric("june", { precision: 12, scale: 2 }),
@@ -516,6 +516,19 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
   q3: numeric("q3", { precision: 12, scale: 2 }),
   q4: numeric("q4", { precision: 12, scale: 2 }),
   activity: varchar("activity"),
+  qty: integer("qty"),
+  qty1: integer("qty1"),
+  rate1: numeric("rate1"),
+  amount1: numeric("amount1"),
+  qty2: integer("qty2"),
+  rate2: numeric("rate2"),
+  amount2: numeric("amount2"),
+  qty3: integer("qty3"),
+  rate3: numeric("rate3"),
+  amount3: numeric("amount3"),
+  qty4: integer("qty4"),
+  rate4: numeric("rate4"),
+  amount4: numeric("amount4"),
 },
   (table) => {
     return {

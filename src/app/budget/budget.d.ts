@@ -11,5 +11,7 @@ interface FilterOptions {
 interface BudgetFilterFormProps {
   filters: FilterOptions;
   handleSelect: (name: string, value: number | string | { id: number; departmentname: string }) => void;
+  budgetId:number|null
+  setBugetId:(val:number|null)=>void
 }
 

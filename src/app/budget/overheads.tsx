@@ -1,9 +1,12 @@
 "use client";
 
+import { Button } from "@radix-ui/themes";
 import React, { useState } from "react";
 
 interface OverHeadsProps {
   section: string;
+  // need to remove this 
+  categoryId: number
 }
 
 interface LevelData {
@@ -51,7 +54,7 @@ const months = [
   "Mar",
 ];
 
-const OverHeads: React.FC<OverHeadsProps> = ({ section }) => {
+const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId }) => {
   // Initialize table data
 
   const [tableData, setTableData] = useState<TableData>(
@@ -181,8 +184,16 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section }) => {
             </tbody>
           </table>
         </div>
+        <div className="py-2 pr-4 flex flex-row-reverse ">
+          <Button
+            type="button"
+            className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
+            variant="soft"
+          >
+            Save
+          </Button>
+        </div>
       </details>
-
       {/* Section Header */}
     </div>
   );

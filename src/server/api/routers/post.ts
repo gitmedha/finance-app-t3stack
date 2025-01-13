@@ -8,6 +8,7 @@ import {
   addStaffSalaryDetails,
   editStaffSalaryDetails,
 } from "../controller/salaryDetails";
+import { addBudgetDetails, createBudget, updateBudgetDetails } from "../controller/budget";
 
 export const postRouter = createTRPCRouter({
   login,
@@ -21,4 +22,7 @@ export const postRouter = createTRPCRouter({
   editCostCenter,
   addStaffSalaryDetails,
   editStaffSalaryDetails,
+  createBudget,
+  updateBudgetDetails,
+  addBudgetDetails,
 });

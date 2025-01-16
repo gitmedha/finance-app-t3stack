@@ -229,7 +229,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       february: (data.Feb ?? "").toString(),
       march: (data.Mar ?? "").toString(),
       activity: (filter?.map??"").toString(),
-      deptId: 9,
+      deptId: Number(deptId),
       clusterId: undefined,
       createdBy: userData.data?.user.id ?? 1,
       createdAt: new Date().toISOString(),
@@ -465,7 +465,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                   key={sub.subCategoryId}
                   className="text-sm transition hover:bg-gray-100"
                 >
-                  {/* Level Name */}
+
                   <td className="border p-2 font-medium">{sub.subCategoryName}</td>
                   {months.map((month,key) => (
                     <td key={month} className="border p-2">

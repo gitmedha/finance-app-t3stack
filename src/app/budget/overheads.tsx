@@ -31,7 +31,6 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
   const [tableData, setTableData] = useState<TableData>({});
 
-  // Handle input changes with strict typing
   const handleInputChange = (
     subCategoryId: number,
     month: string,
@@ -58,7 +57,6 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
     deptId: Number(deptId),
   });
   useEffect(() => {
-    // Initialize tableData with empty strings for all subcategories and months
     const initialData: TableData = {};
 
     if (data?.subCategories) {
@@ -84,7 +82,6 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
 
     // Populate tableData with data from categoriesBudgetDetails if available
     if (categoriesBudgetDetails) {
-      console.log(categoriesBudgetDetails)
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
           Count: item.total,

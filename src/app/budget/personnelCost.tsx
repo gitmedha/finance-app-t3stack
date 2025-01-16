@@ -18,16 +18,16 @@ interface LevelData {
 
 type TableData = Record<string, LevelData>;
 
-const salaryMap = [
-  { name: "Assistant", salary: 10000,id:7 ,level:1},
-  { name: "Associate", salary: 20000, id: 8, level: 2 },
-  { name: "Manager", salary: 30000, id: 9, level: 3 },
-  { name: "Senior Manager", salary: 40000, id: 10, level: 4 },
-  { name: "AVP", salary: 50000, id: 11, level: 5 },
-  { name: "VP", salary: 55000, id: 12, level: 6 },
-  { name: "SVP", salary: 30000, id: 13, level: 7 },
-  { name: "Others - Interns, Volunteers, PTCs", salary: 25000, id: 14, level: 8 },
-];
+// const salaryMap = [
+//   { name: "Assistant", salary: 10000,id:7 ,level:1},
+//   { name: "Associate", salary: 20000, id: 8, level: 2 },
+//   { name: "Manager", salary: 30000, id: 9, level: 3 },
+//   { name: "Senior Manager", salary: 40000, id: 10, level: 4 },
+//   { name: "AVP", salary: 50000, id: 11, level: 5 },
+//   { name: "VP", salary: 55000, id: 12, level: 6 },
+//   { name: "SVP", salary: 30000, id: 13, level: 7 },
+//   { name: "Others - Interns, Volunteers, PTCs", salary: 25000, id: 14, level: 8 },
+// ];
 
 const months = [
   "Qty1",

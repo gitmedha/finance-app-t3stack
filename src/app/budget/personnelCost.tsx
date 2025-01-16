@@ -18,6 +18,22 @@ interface LevelData {
 
 type TableData = Record<string, LevelData>;
 
+// trying to keep the avg values in case of needed 
+interface qty {
+  Apr: number
+  May: number,
+  Jun: number,
+  Jul: number,
+  Aug: number,
+  Sep: number,
+  Oct: number,
+  Nov: number,
+  Dec: number,
+  Jan: number,
+  Feb: number,
+  Mar: number
+}
+type avgQtySchema = Record<string, qty>
 // const salaryMap = [
 //   { name: "Assistant", salary: 10000,id:7 ,level:1},
 //   { name: "Associate", salary: 20000, id: 8, level: 2 },
@@ -48,7 +64,7 @@ const months = [
   "Mar",
 ];
 
-const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId ,budgetId}) => {
+const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId }) => {
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession()
   const { data: subCategories } = api.get.getSubCats.useQuery({ categoryId });
@@ -68,27 +84,24 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         (!!error || !categoriesBudgetDetails || categoriesBudgetDetails.length === 0),
     }
   );
+  const [avgQty, setAvgQty] = useState<avgQtySchema>({})
 
   useEffect(() => {
     if (subCategories && levelEmployeesCount) {
-      // Prepopulate tableData based on level employee counts and salary mapping
       const initialTableData: TableData = {};
-
+      const intialAvgQty: avgQtySchema = {}
       subCategories?.subCategories?.forEach((sub, index) => {
         const levelData = levelEmployeesCount?.find(
-          (level) => level.level === index + 1 // Assuming levelId is in the same order
+          (level) => level.level === index + 1
         );
 
         const employeeCount = levelData ? levelData.employeeCount : 0;
-
-        // Find the salary for the subcategory
-        // const salary = salaryMap.find(s => s.name === sub.subCategoryName)?.salary ?? 0;
         const salarySum = levelData?.salarySum ? Number(levelData?.salarySum) : 0;
-        const epfSum = levelData?.epfSum?  Number(levelData?.epfSum) : 0;
-        const insuranceSum = levelData?.insuranceSum? Number(levelData?.insuranceSum ) : 0;
-        const pwgPldSum = levelData?.pgwPldSum ? Number(levelData?.pgwPldSum ): 0;
-        const bonusSum = levelData?.bonusSum ? Number(levelData?.bonusSum ): 0;
-        const gratuitySum = levelData?.gratuitySum ?  Number(levelData?.gratuitySum) : 0;
+        const epfSum = levelData?.epfSum ? Number(levelData?.epfSum) : 0;
+        const insuranceSum = levelData?.insuranceSum ? Number(levelData?.insuranceSum) : 0;
+        const pwgPldSum = levelData?.pgwPldSum ? Number(levelData?.pgwPldSum) : 0;
+        const bonusSum = levelData?.bonusSum ? Number(levelData?.bonusSum) : 0;
+        const gratuitySum = levelData?.gratuitySum ? Number(levelData?.gratuitySum) : 0;
         console.log(salarySum, epfSum, insuranceSum, pwgPldSum, bonusSum, gratuitySum)
         console.log(salarySum + epfSum + insuranceSum)
         // Initialize level data with the correct employee count for Qty1, Qty2, Qty3, Qty4
@@ -112,8 +125,22 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           Mar: salarySum + epfSum,
           budgetDetailsId: 0, // Default or placeholder value
         };
+        intialAvgQty[sub.subCategoryId] = {
+          Apr: (salarySum + epfSum + insuranceSum)/employeeCount,
+          May: (salarySum + epfSum + pwgPldSum) / employeeCount,
+          Jun: (salarySum + epfSum) / employeeCount,
+          Jul: (salarySum + epfSum) / employeeCount,
+          Aug: (salarySum + epfSum + pwgPldSum) / employeeCount,
+          Sep: (salarySum + epfSum) / employeeCount,
+          Oct: (salarySum + epfSum) / employeeCount,
+          Nov: (salarySum + epfSum + pwgPldSum) / employeeCount,
+          Dec: (salarySum + epfSum) / employeeCount,
+          Jan: (salarySum + epfSum + bonusSum) / employeeCount,
+          Feb: (salarySum + epfSum + gratuitySum) / employeeCount,
+          Mar: (salarySum + epfSum) / employeeCount,
+        }
       });
-
+      setAvgQty(intialAvgQty)
       setTableData(initialTableData);
     }
   }, [subCategories, levelEmployeesCount]);
@@ -146,7 +173,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       activity: undefined,
       deptId: 9,
       clusterId: undefined,
-      createdBy: userData.data?.user.id??1,
+      createdBy: userData.data?.user.id ?? 1,
       createdAt: "2022-12-11",
       qty1: Number(data.Qty1),
       qty2: Number(data.Qty2),
@@ -185,7 +212,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
       // Ensure subCategoryData exists
-      if (!subCategoryData) return updatedData;
+      if (!subCategoryData || !avgQty[subCategoryId]) return updatedData;
 
       // Update the value for the given month
       subCategoryData[month] = value;
@@ -195,24 +222,24 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         const qty = parseInt(value, 10) || 0; // Default to 0 if value is invalid
 
         if (month === "Qty1") {
-          subCategoryData.Apr = qty <= 1 ? Number(subCategoryData.Apr) : Number(subCategoryData.Apr) + (Number(subCategoryData.Apr) / (qty -1)) ;
-          subCategoryData.May = qty <= 1 ? Number(subCategoryData.May) : Number(subCategoryData.May) + (Number(subCategoryData.May) / (qty- 1));
-          subCategoryData.Jun = qty <= 1 ? Number(subCategoryData.Jun) : Number(subCategoryData.Jun) + (Number(subCategoryData.Jun) / (qty- 1));
+          subCategoryData.Apr = qty * avgQty[subCategoryId].Apr;
+          subCategoryData.May = qty *avgQty[subCategoryId].May;
+          subCategoryData.Jun = qty *avgQty[subCategoryId].Jun;
         }
         if (month === "Qty2") {
-          subCategoryData.Jul = qty <= 1 ? Number(subCategoryData.Jul) : Number(subCategoryData.Jul) + (Number(subCategoryData.Jul) / (qty- 1));
-          subCategoryData.Aug = qty <= 1 ? Number(subCategoryData.Aug) : Number(subCategoryData.Aug) + (Number(subCategoryData.Aug) / (qty- 1));
-          subCategoryData.Sep = qty <= 1 ? Number(subCategoryData.Sep) : Number(subCategoryData.Sep) + (Number(subCategoryData.Sep) / (qty- 1));
+          subCategoryData.Jul = qty *avgQty[subCategoryId].Jul;
+          subCategoryData.Aug = qty *avgQty[subCategoryId].Aug;
+          subCategoryData.Sep = qty * avgQty[subCategoryId].Sep;
         }
         if (month === "Qty3") {
-          subCategoryData.Oct = qty <= 1 ? Number(subCategoryData.Oct) : Number(subCategoryData.Oct) + (Number(subCategoryData.Oct) / (qty- 1));
-          subCategoryData.Nov = qty <= 1 ? Number(subCategoryData.Nov) : Number(subCategoryData.Nov) + (Number(subCategoryData.Nov) / (qty- 1));
-          subCategoryData.Dec = qty <= 1 ? Number(subCategoryData.Dec) : Number(subCategoryData.Dec) + (Number(subCategoryData.Dec) / (qty- 1));
+          subCategoryData.Oct = qty *avgQty[subCategoryId].Jan;
+          subCategoryData.Nov = qty *avgQty[subCategoryId].Jan;
+          subCategoryData.Dec = qty * avgQty[subCategoryId].Jan;
         }
         if (month === "Qty4") {
-          subCategoryData.Jan = qty <= 1 ? Number(subCategoryData.Jan) : Number(subCategoryData.Jan) + (Number(subCategoryData.Jan) / (qty- 1));
-          subCategoryData.Feb = qty <= 1 ? Number(subCategoryData.Feb) : Number(subCategoryData.Feb) + (Number(subCategoryData.Feb) / (qty- 1));
-          subCategoryData.Mar = qty <= 1 ? Number(subCategoryData.Mar) : Number(subCategoryData.Mar) + (Number(subCategoryData.Mar) / (qty- 1));
+          subCategoryData.Jan = qty * avgQty[subCategoryId].Jan;
+          subCategoryData.Feb = qty *avgQty[subCategoryId].Feb;
+          subCategoryData.Mar = qty * avgQty[subCategoryId].Mar;
         }
 
         // Update the count for this subcategory
@@ -226,6 +253,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   };
   useEffect(() => {
     const initialData: TableData = {};
+    const intialAvgQty: avgQtySchema = {}
     if (subCategories?.subCategories) {
       subCategories.subCategories.forEach((sub) => {
         initialData[sub.subCategoryId] = {
@@ -248,31 +276,110 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           Mar: "",
           budgetDetailsId: 0
         };
+        intialAvgQty[sub.subCategoryId] = {
+          Apr: 0,
+          May: 0,
+          Jun: 0,
+          Jul: 0,
+          Aug: 0,
+          Sep: 0,
+          Oct: 0,
+          Nov: 0,
+          Dec: 0,
+          Jan: 0,
+          Feb: 0,
+          Mar: 0,
+        }
       });
+      
     }
     if (categoriesBudgetDetails) {
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
           Count: item.total,
-          Apr: item.april ? item.april : "",
-          May: item.may ? item.may : "",
-          Jun: item.june ? item.june : "",
+          Apr: item.april ? item.april : "0",
+          May: item.may ? item.may : "0",
+          Jun: item.june ? item.june : "0",
           Jul: item.july ? item.july : "",
-          Aug: item.august ? item.august : "",
-          Sep: item.september ? item.september : "",
-          Oct: item.october ? item.october : "",
-          Nov: item.november ? item.november : "",
-          Dec: item.december ? item.december : "",
-          Jan: item.january ? item.january : "",
-          Feb: item.february ? item.february : "",
-          Mar: item.march ? item.march : "",
-          Qty1: item.qty1 ? item.qty1 : "",
-          Qty2: item.qty2 ? item.qty2 : "",
-          Qty3: item.qty3 ? item.qty3 : "",
-          Qty4: item.qty4 ? item.qty4 : "",
+          Aug: item.august ? item.august : "0",
+          Sep: item.september ? item.september : "0",
+          Oct: item.october ? item.october : "0",
+          Nov: item.november ? item.november : "0",
+          Dec: item.december ? item.december : "0",
+          Jan: item.january ? item.january : "0",
+          Feb: item.february ? item.february : "0",
+          Mar: item.march ? item.march : "0",
+          Qty1: item.qty1 ? item.qty1 : 0,
+          Qty2: item.qty2 ? item.qty2 : 0,
+          Qty3: item.qty3 ? item.qty3 : 0,
+          Qty4: item.qty4 ? item.qty4 : 0,
           budgetDetailsId: item.id
         };
+        intialAvgQty[item.subcategoryId] = {
+          Apr: Number(item.april)/(item.qty1 ? item.qty1 : 1),
+          May: Number(item.may) / (item.qty1 ? item.qty1 : 1),
+          Jun: Number(item.june) / (item.qty1 ? item.qty1 : 1),
+          Jul: Number(item.july) / (item.qty2 ? item.qty2 : 1),
+          Aug: Number(item.august) / (item.qty2 ? item.qty2 : 1),
+          Sep: Number(item.september) / (item.qty2 ? item.qty2 : 1),
+          Oct: Number(item.october) / (item.qty3 ? item.qty3 : 1),
+          Nov: Number(item.november) / (item.qty3 ? item.qty3 : 1),
+          Dec: Number(item.december) / (item.qty3 ? item.qty3: 1),
+          Jan: Number(item.january) / (item.qty4 ? item.qty4 : 1),
+          Feb: Number(item.february) / (item.qty4 ? item.qty4 : 1),
+          Mar: Number(item.march) / (item.qty4 ? item.qty4 : 1),
+        }
+        if (item.qty1 == 0 || !item.qty1)
+        {
+          const aprIn = document.getElementById(item.subcategoryId + "Apr") as HTMLInputElement;
+          const mayIn = document.getElementById(item.subcategoryId + "May") as HTMLInputElement;
+          const junIn = document.getElementById(item.subcategoryId + "Jun") as HTMLInputElement;
+          if (aprIn && mayIn && junIn) {
+            aprIn.disabled = false;
+            mayIn.disabled = false;
+            junIn.disabled = false;
+          } else {
+            console.error(`Input element with ID  not found.`);
+          }
+        }
+        if (item.qty2 == 0 || !item.qty2) {
+          const julIn = document.getElementById(item.subcategoryId + "Jul") as HTMLInputElement;
+          const augIn = document.getElementById(item.subcategoryId + "Aug") as HTMLInputElement;
+          const sepIn = document.getElementById(item.subcategoryId + "Sep") as HTMLInputElement;
+          if (julIn && augIn && sepIn) {
+            julIn.disabled = false;
+            augIn.disabled = false;
+            sepIn.disabled = false;
+          } else {
+            console.error(`Input element with ID  not found.`);
+          }          
+        }
+        if (item.qty3 == 0 || !item.qty3) {
+          const octIn = document.getElementById(item.subcategoryId + "Oct") as HTMLInputElement;
+          const novIn = document.getElementById(item.subcategoryId + "Nov") as HTMLInputElement;
+          const decIn = document.getElementById(item.subcategoryId + "Dec") as HTMLInputElement;
+          if (octIn && novIn && decIn) {
+            octIn.disabled = false;
+            novIn.disabled = false;
+            decIn.disabled = false;
+          } else {
+            console.error(`Input element with ID  not found.`);
+          }
+        }
+        if (item.qty4 == 0 || !item.qty4) {
+          const janIn = document.getElementById(item.subcategoryId + "Jan") as HTMLInputElement;
+          const febIn = document.getElementById(item.subcategoryId + "Feb") as HTMLInputElement;
+          const marIn = document.getElementById(item.subcategoryId + "Mar") as HTMLInputElement;
+          if (janIn && febIn && marIn) {
+            janIn.disabled = false;
+            febIn.disabled = false;
+            marIn.disabled = false;
+          } else {
+            console.error(`Input element with ID  not found.`);
+          }
+        }
       });
+      setAvgQty(intialAvgQty)
       setTableData(initialData);
     }
     else {
@@ -320,7 +427,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       qty1: Number(data.Qty1),
       qty2: Number(data.Qty2),
       qty3: Number(data.Qty3),
-      qty4: Number(data.Qty4)
+      qty4: Number(data.Qty4),
     }));
     try {
       updateBudgetDetails.mutate(
@@ -373,23 +480,24 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               {subCategories?.subCategories
                 ?.sort((a, b) => a.subCategoryId - b.subCategoryId)
                 .map((sub) => (
-                <tr key={sub.subCategoryId} className="text-sm transition hover:bg-gray-100">
-                  <td className="border p-2 font-medium">{sub.subCategoryName}</td>
-                  {months.map((month, idx) => (
-                    <td key={month} className="border p-2">
-                      <input
-                        type={idx % 4 === 0 ? "number" : "text"}
-                        className="w-full rounded border p-1"
-                        disabled={idx % 4 !== 0}
-                        value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(sub.subCategoryId, month, e.target.value)
-                        }
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
+                  <tr key={sub.subCategoryId} className="text-sm transition hover:bg-gray-100">
+                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    {months.map((month, idx) => (
+                      <td key={month} className="border p-2">
+                        <input
+                          type={idx % 4 === 0 ? "number" : "text"}
+                          className="w-full rounded border p-1"
+                          disabled={idx % 4 !== 0}
+                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                          id ={sub.subCategoryId+month}
+                          onChange={(e) =>
+                            handleInputChange(sub.subCategoryId, month, e.target.value)
+                          }
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

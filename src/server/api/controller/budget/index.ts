@@ -1,8 +1,8 @@
-import { and, count, eq, ilike, desc, isNull, } from "drizzle-orm";
+import { and, count, eq, ilike, desc, isNull, sql, isNotNull, } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
-import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject, categoryHierarchyInFinanceProject, categoryMasterInFinanceProject, staffMasterInFinanceProject } from "~/server/db/schema";
+import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject, categoryHierarchyInFinanceProject, categoryMasterInFinanceProject, salaryDetailsInFinanceProject, staffMasterInFinanceProject } from "~/server/db/schema";
 
 
 export const getCats = protectedProcedure
@@ -272,14 +272,30 @@ export const getLevelStaffCount = protectedProcedure
         try {
             const levelStats = await ctx.db
                 .select({
-                    level: staffMasterInFinanceProject.level, 
-                    count: count().as("count"), 
+                    level: staffMasterInFinanceProject.level,
+                    employeeCount: sql<number>`COUNT(${staffMasterInFinanceProject.id})`.as("employee_count"),
+                    salarySum: sql<number>`SUM(${salaryDetailsInFinanceProject.salary})`.as("salary_sum"),
+                    insuranceSum: sql<number>`SUM(${salaryDetailsInFinanceProject.insurance})`.as("insurance_sum"),
+                    bonusSum: sql<number>`SUM(${salaryDetailsInFinanceProject.bonus})`.as("bonus_sum"),
+                    gratuitySum: sql<number>`SUM(${salaryDetailsInFinanceProject.gratuity})`.as("gratuity_sum"),
+                    epfSum: sql<number>`SUM(${salaryDetailsInFinanceProject.epf})`.as("epf_sum"),
+                    pgwPldSum: sql<number>`SUM(${salaryDetailsInFinanceProject.pgwPld})`.as("pgw_pld_sum"),
                 })
                 .from(staffMasterInFinanceProject)
-                .where(eq(staffMasterInFinanceProject.department, input.deptId)) 
-                .groupBy(staffMasterInFinanceProject.level); 
+                .innerJoin(
+                    salaryDetailsInFinanceProject,
+                    eq(salaryDetailsInFinanceProject.empId, staffMasterInFinanceProject.id)
+                )
+                .where(
+                    and(
+                        eq(staffMasterInFinanceProject.department, input.deptId),
+                        isNotNull(salaryDetailsInFinanceProject.salary)
+                    )
+                )
+                .groupBy(staffMasterInFinanceProject.level);
 
-            return levelStats; 
+            return levelStats;
+
         } catch (error) {
             console.error("Error in getting staff level count:", error);
             throw new Error("Failed to get staff level count. Please try again.");

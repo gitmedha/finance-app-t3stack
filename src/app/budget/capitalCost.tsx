@@ -1,4 +1,5 @@
 import { Button } from "@radix-ui/themes";
+import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
 
@@ -22,6 +23,7 @@ const months = [
 ];
 
 const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId }) => {
+  const userData = useSession()
   const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
   const [tableData, setTableData] = useState<TableData>({});
 
@@ -133,18 +135,18 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       january: (data.Jan ?? "").toString(),
       february: (data.Feb ?? "").toString(),
       march: (data.Mar ?? "").toString(),
-      activity: "Some activity",
-      deptId: 9,
+      activity: "",
+      deptId: Number(deptId),
       clusterId: undefined,
-      createdBy: 3,
-      createdAt: "2022-12-11",
+      createdBy: userData.data?.user.id ?? 1,
+      createdAt: new Date().toISOString(),
     }));
 
     try {
       createBudgetDetails.mutate(
         {
-          deptId: 9,
-          budgetId: 8,
+          deptId: parseInt(deptId,10),
+          budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
         },
@@ -188,7 +190,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       march: (data.Mar ?? "").toString(),
       activity: "",
       clusterId: undefined,
-      updatedBy: 3,
+      updatedBy: userData.data?.user.id??1,
       updatedAt: new Date().toISOString(),
     }));
     console.log(tableData)
@@ -214,9 +216,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       alert("Failed to update budget details. Please try again.");
     }
   };
-
-
-
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;

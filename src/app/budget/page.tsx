@@ -78,7 +78,7 @@ const Budget: React.FC = () => {
           <TravelBudget section='Travel' />
           <ProgramOffice section='PROGRAM OFFICE' />
           <CapitalCost section='CAPITAL COST' categoryId={data?.categories[4] ? data?.categories[4].categoryId : 5} budgetId={budgetId} deptId={filters.department}/>
-          <OverHeads section='OVERHEADS' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} />
+          <OverHeads section='OVERHEADS' categoryId={data?.categories[5] ? data?.categories[5].categoryId : 6} budgetId={budgetId} deptId={filters.department} />
         </div>
       }
       

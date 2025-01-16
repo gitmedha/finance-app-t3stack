@@ -1,6 +1,7 @@
 "use client";
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Button } from '@radix-ui/themes';
+import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from "react";
 import { BiComment } from "react-icons/bi";
 import { RiArrowDropDownLine } from 'react-icons/ri';
@@ -71,6 +72,8 @@ const months = [
 ];
 
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId }) => {
+
+  const userData = useSession()
   const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
 
   const [tableData, setTableData] = useState<TableData>({});
@@ -100,29 +103,29 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         initialData[sub.subCategoryId] = {
           Count:"",
           Qty1:0,
-          Rate1:"",
-          Amount1:"",
-          Apr:"",
-          May:"",
-          Jun:"",
+          Rate1:"0",
+          Amount1:"0",
+          Apr:"0",
+          May:"0",
+          Jun:"0",
           Qty2:0,
-          Rate2:"",
-          Amount2:"",
-          Jul:"",
-          Aug:"",
-          Sep:"",
+          Rate2:"0",
+          Amount2:"0",
+          Jul:"0",
+          Aug:"0",
+          Sep:"0",
           Qty3:0,
-          Rate3:"",
-          Amount3:"",
-          Oct:"",
-          Nov:"",
-          Dec:"",
-          Qty4:"",
-          Rate4:"",
-          Amount4:"",
-          Jan:"",
-          Feb:"",
-          Mar:"",
+          Rate3:"0",
+          Amount3:"0",
+          Oct:"0",
+          Nov:"0",
+          Dec:"0",
+          Qty4:"0",
+          Rate4:"0",
+          Amount4:"0",
+          Jan:"0",
+          Feb:"0",
+          Mar:"0",
           budgetDetailsId:0
         };
       });
@@ -131,30 +134,30 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
           Count: item.total,
-          Apr: item.april ? item.april : "",
-          May: item.may ? item.may : "",
-          Jun: item.june ? item.june : "",
-          Jul: item.july ? item.july : "",
-          Aug: item.august ? item.august : "",
-          Sep: item.september ? item.september : "",
-          Oct: item.october ? item.october : "",
-          Nov: item.november ? item.november : "",
-          Dec: item.december ? item.december : "",
-          Jan: item.january ? item.january : "",
-          Feb: item.february ? item.february : "",
-          Mar: item.march ? item.march : "",
-          Qty1: item.qty1 ? item.qty1 : "",
-          Rate1: item.rate1 ? item.rate1 : "",
-          Amount1: item.amount1 ? item.amount1 : "",
-          Qty2: item.qty2 ? item.qty2 : "",
-          Rate2: item.rate2 ? item.rate2 : "",
-          Amount2: item.amount2 ? item.amount2 : "",
-          Qty3: item.qty3 ? item.qty3 : "",
-          Rate3: item.rate3 ? item.rate3 : "",
-          Amount3: item.amount3 ? item.amount3 : "",
-          Qty4: item.qty4 ? item.qty4 : "",
-          Rate4: item.rate4 ? item.rate4 : "",
-          Amount4: item.amount4 ? item.amount4 : "",
+          Apr: item.april  ? item.april : "0",
+          May: item.may ? item.may : "0",
+          Jun: item.june ? item.june : "0",
+          Jul: item.july ? item.july : "0",
+          Aug: item.august ? item.august : "0",
+          Sep: item.september ? item.september : "0",
+          Oct: item.october ? item.october : "0",
+          Nov: item.november ? item.november : "0",
+          Dec: item.december ? item.december : "0",
+          Jan: item.january ? item.january : "0",
+          Feb: item.february ? item.february : "0",
+          Mar: item.march ? item.march : "0",
+          Qty1: item.qty1 ? item.qty1 : "0",
+          Rate1: item.rate1 ? item.rate1 : "0",
+          Amount1: item.amount1 ? item.amount1 : "0",
+          Qty2: item.qty2 ? item.qty2 : "0",
+          Rate2: item.rate2 ? item.rate2 : "0",
+          Amount2: item.amount2 ? item.amount2 : "0",
+          Qty3: item.qty3 ? item.qty3 : "0",
+          Rate3: item.rate3 ? item.rate3 : "0",
+          Amount3: item.amount3 ? item.amount3 : "0",
+          Qty4: item.qty4 ? item.qty4 : "0",
+          Rate4: item.rate4 ? item.rate4 : "0",
+          Amount4: item.amount4 ? item.amount4 : "0",
           budgetDetailsId:item.id
         };
       });
@@ -228,8 +231,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       activity: (filter?.map??"").toString(),
       deptId: 9,
       clusterId: undefined,
-      createdBy: 3,
-      createdAt: "2022-12-11",
+      createdBy: userData.data?.user.id ?? 1,
+      createdAt: new Date().toISOString(),
       rate1:(data.rate1 ?? "").toString(),
       rate2: (data.rate2 ?? "").toString(),
       rate3: (data.rate3 ?? "").toString(),
@@ -293,7 +296,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       march: (data.Mar ?? "").toString(),
       activity: (filter?.map ?? "").toString(),
       clusterId: undefined,
-      updatedBy: 3,
+      updatedBy: userData.data?.user.id??1,
       updatedAt: new Date().toISOString(),
       rate1: (data.rate1 ?? "").toString(),
       rate2: (data.rate2 ?? "").toString(),
@@ -512,10 +515,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
             </Button>
           }
         </div>
-        {JSON.stringify(categoriesBudgetDetails) }
+        
       </details>
 
-      {/* Section Header */}
     </div>
   );
 };

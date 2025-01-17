@@ -43,7 +43,6 @@ export default function Staff() {
     { enabled: false },
   );
 
-  // Trigger refetch on page or limit change
   useEffect(() => {
     const fetchData = async () => {
       await refetch();

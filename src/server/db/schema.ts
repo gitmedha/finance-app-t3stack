@@ -380,9 +380,10 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
   designation: varchar("designation", { length: 155 }),
   natureOfEmployment: varchar("nature_of_employment", { length: 70 }),
   program: varchar("program", { length: 70 }),
-  stateId: integer("state_id"),
-  locationId: integer("location_id"),
+  stateId: varchar("state_id", { length: 255 }),
+  locationId: varchar("location_id", { length: 255 }),
   level: integer("level"),
+  email: varchar("email", { length: 255 }),
 },
   (table) => {
     return {
@@ -552,10 +553,10 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
         foreignColumns: [userMasterInFinanceProject.id],
         name: "budget_details_updated_by_fkey"
       }),
-      budgetDepartmentSubdepartmentidFkey: foreignKey({
+      budgetDetailsSubcategoryIdFkey: foreignKey({
         columns: [table.subcategoryId],
-        foreignColumns: [departmentMasterInFinanceProject.id],
-        name: "budget_department_subdepartmentid_fkey"
+        foreignColumns: [categoryMasterInFinanceProject.id],
+        name: "budget_details_subcategory_id_fkey"
       }),
     }
   });

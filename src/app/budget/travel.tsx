@@ -24,13 +24,19 @@ const subTravels: subTravelSchema[] = [
   { map: 2, name: "Local Conveyance" },
   { map: 3, name: "Per Deim" },
   { map: 4, name: "Tour & Travel" },
+  {map:0,name:"All"}
 ]
 interface LevelData {
   budgetDetailsId: number
   Count: string | number;
   [month: string]: string | number;
 }
-
+interface totalschema {
+  totalQ1: number
+  totalQ2: number
+  totalQ3: number
+  totalQ4: number
+}
 type TableData = Record<string, LevelData>;
 
 
@@ -54,17 +60,25 @@ const months = [
 ];
 
 const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId,searchSubCatId }) => {
-  // Initialize table data
   const userData = useSession()
-  const { data, refetch } = api.get.getSubCats.useQuery({ categoryId:searchSubCatId });
-
+  const [totalQty, setTotalQty] = useState<totalschema>({
+    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
+  })
+  const { data: subCategories } = api.get.getSubCats.useQuery({ categoryId:searchSubCatId });
   const [tableData, setTableData] = useState<TableData>({});
 
   const [filter, setFilter] = useState(subTravels.sort((a, b) => a.name.localeCompare(b.name))[0])
   const handleSelect = (val: subTravelSchema) => {
     setFilter(val)
   }
-
+  const updateTotalQtyVals = (which: string, difference: number) => {
+    setTotalQty((prev) => {
+      const updatedTotal = { ...prev };
+      updatedTotal[which as keyof typeof prev] += difference;
+      console.log(updatedTotal)
+      return updatedTotal;
+    });
+  };
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) => {
       return months.some((month) => {
@@ -72,7 +86,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
       });
     });
   };
-  const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  const { data: categoriesBudgetDetails, isLoading: categoryDetailsLoading, error } = api.get.getCatsBudgetDetails.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
@@ -80,10 +94,20 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
   }, {
     enabled: !!filter
   });
+  const { data: levelEmployeesCount } = api.get.getLevelStaffCount.useQuery(
+    {
+      deptId: Number(deptId),
+    },
+    {
+      enabled:
+        !categoryDetailsLoading &&
+        (!!error || !categoriesBudgetDetails || categoriesBudgetDetails.length === 0),
+    }
+  );
   useEffect(() => {
     const initialData: TableData = {};
-    if (data?.subCategories) {
-      data.subCategories.forEach((sub) => {
+    if (subCategories?.subCategories) {
+      subCategories.subCategories.forEach((sub) => {
         initialData[sub.subCategoryId] = {
           Count: "",
           Qty1: 0,
@@ -107,48 +131,86 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
       });
     }
     if (categoriesBudgetDetails) {
+      const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
-          Count: item.total,
-          Apr: item.april ? item.april : "0",
-          May: item.may ? item.may : "0",
-          Jun: item.june ? item.june : "0",
-          Jul: item.july ? item.july : "0",
-          Aug: item.august ? item.august : "0",
-          Sep: item.september ? item.september : "0",
-          Oct: item.october ? item.october : "0",
-          Nov: item.november ? item.november : "0",
-          Dec: item.december ? item.december : "0",
-          Jan: item.january ? item.january : "0",
-          Feb: item.february ? item.february : "0",
-          Mar: item.march ? item.march : "0",
-          Qty1: item.qty1 ? item.qty1 : "0",
-          Qty2: item.qty2 ? item.qty2 : "0",
-          Qty3: item.qty3 ? item.qty3 : "0",
-          Qty4: item.qty4 ? item.qty4 : "0",
-          budgetDetailsId: item.id
+          Count: Number(item.total),
+          Apr: item.april ? Number(item.april) : "0",
+          May: item.may ? Number(item.may) : "0",
+          Jun: item.june ? Number(item.june) : "0",
+          Jul: item.july ? Number(item.july) : "0",
+          Aug: item.august ? Number(item.august) : "0",
+          Sep: item.september ? Number(item.september) : "0",
+          Oct: item.october ? Number(item.october) : "0",
+          Nov: item.november ? Number(item.november) : "0",
+          Dec: item.december ? Number(item.december) : "0",
+          Jan: item.january ? Number(item.january) : "0",
+          Feb: item.february ? Number(item.february) : "0",
+          Mar: item.march ? Number(item.march) : "0",
+          Qty1: item.qty1 ? Number(item.qty1) : "0",
+          Qty2: item.qty2 ? Number(item.qty2) : "0",
+          Qty3: item.qty3 ? Number(item.qty3) : "0",
+          Qty4: item.qty4 ? Number(item.qty4) : "0",
+          budgetDetailsId: Number(item.id)
         };
+        totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+        totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+        totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+        totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
       });
       setTableData(initialData);
+      setTotalQty(totalQty)
     }
     else {
-      // If categoriesBudgetDetails is not available, initialize with empty data
       setTableData({});
     }
   }, [categoriesBudgetDetails]);
-
+  useEffect(() => {
+    if (subCategories && levelEmployeesCount) {
+      const initialTableData: TableData = {};
+      levelEmployeesCount.map((level, key) => {
+        initialTableData[level.level ? level.level : key + 7] = {
+          Count: level.employeeCount,
+          Qty1: level.employeeCount,
+          Qty2: level.employeeCount,
+          Qty3: level.employeeCount,
+          Qty4: level.employeeCount,
+          budgetDetailsId: 0,
+        };
+      })
+      setTableData(initialTableData);
+    }
+  }, [subCategories, levelEmployeesCount]);
   const handleInputChange = (
     subCategoryId: number,
     month: string,
     value: string,
   ) => {
-    setTableData((prev) => ({
-      ...prev,
-      [subCategoryId]: {
-        ...prev[subCategoryId],
-        [month]: value,
-      },
-    }));
+    setTableData((prev) => {
+      const updatedData = { ...prev };
+      const subCategoryData = updatedData[subCategoryId];
+      if (!subCategoryData) return updatedData;
+      if (month == "Apr" || month == "May" || month == "Jun") {
+        const diff = Number(value) - Number(subCategoryData[month]) 
+        updateTotalQtyVals("totalQ1", diff)
+      }
+      if (month == "Jul" || month == "Aug" || month == "Sep") {
+        const diff = Number(value) - Number(subCategoryData[month]) 
+        console.log(diff)
+        updateTotalQtyVals("totalQ2", diff)
+      }
+      if (month == "Oct" || month == "Nov" || month == "Dec") {
+        const diff = Number(value) - Number(subCategoryData[month]) 
+        updateTotalQtyVals("totalQ3", diff)
+      }
+      if (month == "Jan" || month == "Feb" || month == "Mar") {
+        const diff = Number(value) - Number(subCategoryData[month]) 
+        updateTotalQtyVals("totalQ4", diff)
+      }
+      subCategoryData[month] = value;
+      updatedData[subCategoryId] = subCategoryData;
+      return updatedData
+    });
   };
 
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
@@ -272,7 +334,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
           <h1 className=" uppercase ">{section}</h1>
           <div className="flex items-center space-x-2">
-            <p className="text-sm">Avg Cost: Q1: XXX Q2: XXX Q3: XXX Q4: XXX</p>
+            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
             {/* Rotate arrow when details are open */}
             <span className="text-lg font-bold transition-transform group-open:rotate-90">
               →
@@ -294,7 +356,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
               {subTravels.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
                 <DropdownMenu.Item
                   key={ind}
-                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm"
                   onSelect={() => handleSelect(val)} 
                 >
                   {val.name}
@@ -368,7 +430,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
               </tr>
             </thead>
             <tbody>
-              {data?.subCategories.map((sub) => (
+              {subCategories?.subCategories.map((sub) => (
                 <tr
                   key={sub.subCategoryId}
                   className="text-sm transition hover:bg-gray-100"
@@ -395,29 +457,32 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
             </tbody>
           </table>
         </div>
-        <div className="py-2 pr-4 flex flex-row-reverse ">
-          {
-            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 ? <Button
-              type="button"
-              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-              variant="soft"
-              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-              disabled={isSaveDisabled()}
-              onClick={() => handleUpdate()}
-            >
-              Edit
-            </Button> : <Button
-              type="button"
-              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-              variant="soft"
-              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-              disabled={isSaveDisabled()}
-              onClick={() => handleSave()}
-            >
-              Save
-            </Button>
-          }
-        </div>
+        {
+          filter?.map != 0 && <div className="py-2 pr-4 flex flex-row-reverse ">
+            {
+              categoriesBudgetDetails && categoriesBudgetDetails.length > 0 ? <Button
+                type="button"
+                className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+                variant="soft"
+                style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+                disabled={isSaveDisabled()}
+                onClick={() => handleUpdate()}
+              >
+                Edit
+              </Button> : <Button
+                type="button"
+                className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+                variant="soft"
+                style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+                disabled={isSaveDisabled()}
+                onClick={() => handleSave()}
+              >
+                Save
+              </Button>
+            }
+          </div>
+        }
+        
       </details>
     </div>
   );

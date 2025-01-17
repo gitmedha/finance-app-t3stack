@@ -17,35 +17,67 @@ interface LevelData {
 }
 
 type TableData = Record<string, LevelData>;
-
+interface totalschema {
+  totalQ1: number
+  totalQ2: number
+  totalQ3: number
+  totalQ4: number
+}
 const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
 const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId }) => {
   const userData = useSession()
+  const [totalQty, setTotalQty] = useState<totalschema>({
+    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
+  })
   const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
   const [tableData, setTableData] = useState<TableData>({});
-
+  const updateTotalQtyVals = (which: string, difference: number) => {
+    setTotalQty((prev) => {
+      const updatedTotal = { ...prev };
+      updatedTotal[which as keyof typeof prev] += difference;
+      console.log(updatedTotal)
+      return updatedTotal;
+    });
+  };
   const handleInputChange = (
     subCategoryId: number,
     month: string,
     value: string,
   ) => {
-    setTableData((prev) => ({
-      ...prev,
-      [subCategoryId]: {
-        ...prev[subCategoryId],
-        [month]: value,
-      },
-    }));
+    setTableData((prev) => {
+      const updatedData = { ...prev };
+      const subCategoryData = updatedData[subCategoryId];
+      if (!subCategoryData) return updatedData;
+      if (month == "Apr" || month == "May" || month == "Jun") {
+        const diff = Number(value) - Number(subCategoryData[month])
+        updateTotalQtyVals("totalQ1", diff)
+      }
+      if (month == "Jul" || month == "Aug" || month == "Sep") {
+        const diff = Number(value) - Number(subCategoryData[month])
+        console.log(diff)
+        updateTotalQtyVals("totalQ2", diff)
+      }
+      if (month == "Oct" || month == "Nov" || month == "Dec") {
+        const diff = Number(value) - Number(subCategoryData[month])
+        updateTotalQtyVals("totalQ3", diff)
+      }
+      if (month == "Jan" || month == "Feb" || month == "Mar") {
+        const diff = Number(value) - Number(subCategoryData[month])
+        updateTotalQtyVals("totalQ4", diff)
+      }
+      subCategoryData[month] = value;
+      updatedData[subCategoryId] = subCategoryData;
+      return updatedData
+    });
   };
 
-  // Check if all the month values in the tableData are filled
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) => {
       return months.some((month) => {
-        return !subData[month]?.toString().trim(); // Checks if any month is empty
+        return !subData[month]?.toString().trim(); 
       });
     });
   };
@@ -57,54 +89,54 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
   });
 
   useEffect(() => {
-    // Initialize tableData with empty strings for all subcategories and months
     const initialData: TableData = {};
 
     if (data?.subCategories) {
       data.subCategories.forEach((sub) => {
         initialData[sub.subCategoryId] = {
           Count: "",
-          Apr: "",
-          May: "",
-          Jun: "",
-          Jul: "",
-          Aug: "",
-          Sep: "",
-          Oct: "",
-          Nov: "",
-          Dec: "",
-          Jan: "",
-          Feb: "",
-          Mar: "",
-          budgetDetailsId: 0, 
+          Apr: "0",
+          May: "0",
+          Jun: "0",
+          Jul: "0",
+          Aug: "0",
+          Sep: "0",
+          Oct: "0",
+          Nov: "0",
+          Dec: "0",
+          Jan: "0",
+          Feb: "0",
+          Mar: "0",
+          budgetDetailsId: 0,
         };
       });
     }
-
-    // Populate tableData with data from categoriesBudgetDetails if available
     if (categoriesBudgetDetails) {
-      console.log(categoriesBudgetDetails)
+      const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
-          Count: item.total,
-          Apr: item.april ?? "",
-          May: item.may ?? "",
-          Jun: item.june ?? "",
-          Jul: item.july ?? "",
-          Aug: item.august ?? "",
-          Sep: item.september ?? "",
-          Oct: item.october ?? "",
-          Nov: item.november ?? "",
-          Dec: item.december ?? "",
-          Jan: item.january ?? "",
-          Feb: item.february ?? "",
-          Mar: item.march ?? "",
-          budgetDetailsId: item.id, 
+          Count: Number(item.total),
+          Apr: Number(item.april) ?? "0",
+          May: Number(item.may) ?? "0",
+          Jun: Number(item.june) ?? "0",
+          Jul: Number(item.july) ?? "0",
+          Aug: Number(item.august) ?? "0",
+          Sep: Number(item.september) ?? "0",
+          Oct: Number(item.october )?? "0",
+          Nov: Number(item.november) ?? "0",
+          Dec: Number(item.december) ?? "0",
+          Jan: Number(item.january) ?? "0",
+          Feb: Number(item.february) ?? "0",
+          Mar: Number(item.march )?? "0",
+          budgetDetailsId: Number(item.id),
         };
+        totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+        totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+        totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+        totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
       });
-
+      setTotalQty(totalQty)
     }
-
     setTableData(initialData);
   }, [data, categoriesBudgetDetails]);
 
@@ -217,8 +249,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     }
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  // if (isLoading) return <p>Loading...</p>;
+  // if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
@@ -226,7 +258,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary">
           <h1 className="uppercase">{section}</h1>
           <div className="flex items-center space-x-2">
-            <p className="text-sm">Avg Cost: Q1: XXX Q2: XXX Q3: XXX Q4: XXX</p>
+            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
             <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
           </div>
         </summary>

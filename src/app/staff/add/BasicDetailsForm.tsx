@@ -14,7 +14,9 @@ interface ItemDetailProps {
 
 interface StaffFormData {
   name: string;
+  email:string
   empNo: string;
+  levelData:ISelectItem
   stateData: ISelectItem;
   locationData: ISelectItem;
   departmenData: ISelectItem;
@@ -22,7 +24,7 @@ interface StaffFormData {
   isactive: boolean;
   natureOfEmployment: string;
   createdBy: number;
-  createdAt: string; // Date in ISO format
+  createdAt: string; 
 }
 
 const BasicDetails: React.FC<ItemDetailProps> = ({
@@ -60,10 +62,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const { data: departmentData } = api.get.getAllDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
-  const { data: locationsData = [], refetch } =
-    api.get.getAllLocations.useQuery({
-      stateName: stateName?.label,
-    });
+  const { data: locationsData = [], refetch } =api.get.getAllLocations.useQuery({stateName: stateName?.label,});
+  const{data:levelsData=[]} = api.get.getLevels.useQuery()
 
   const onSubmit: SubmitHandler<StaffFormData> = async (data) => {
     try {
@@ -72,13 +72,14 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         createdBy: userData.data?.user.id ?? 1,
         isactive: true,
         createdAt: new Date().toISOString().split("T")[0] ?? "",
-        stateId: Number(data.stateData.value),
-        locationId: Number(data.locationData.value),
+        stateId: data.stateData.value.toString(),
+        locationId: data.locationData.value.toString(),
         departmentId: Number(data.departmenData.value),
+        level:Number(data.levelData.value),
       };
       setActiveStaffDetails(submissionData);
       addStaff(submissionData);
-      // reset(submissionData);
+      // // reset(submissionData);
     } catch (error) {
       console.error("Error adding staff:", error);
     }
@@ -90,107 +91,157 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {/* Name Field */}
-      <div>
-        <label className="text-sm">
-          Name <span className="text-red-400">*</span>
-        </label>
-        <input
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-          placeholder="Enter staff name"
-          {...register("name", { required: "Name is required" })}
-        />
-        {errors.name && (
-          <span className="text-xs text-red-500">{errors.name.message}</span>
-        )}
-      </div>
-
-      {/* Employee Number Field */}
-      <div>
-        <label className="text-sm">
-          Employee Number <span className="text-red-400">*</span>
-        </label>
-        <input
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-          placeholder="Enter employee number"
-          {...register("empNo", {
-            required: "Employee number is required",
-          })}
-        />
-        {errors.empNo && (
-          <span className="text-xs text-red-500">{errors.empNo.message}</span>
-        )}
-      </div>
-
-      {/* State Dropdown */}
-      <div>
-        <label className="text-sm">
-          State <span className="text-red-400">*</span>
-        </label>
-        <Controller
-          name="stateData"
-          control={control}
-          render={({ field }) => (
-            <Select
-              onChange={field.onChange}
-              options={statesData}
-              placeholder="Select a state"
-              isClearable
-              aria-invalid={!!errors.stateData}
-            />
+      <div className="flex gap-2">
+        <div className="w-1/2">
+          <label className="text-sm">
+            Name <span className="text-red-400">*</span>
+          </label>
+          <input
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="Enter staff name"
+            {...register("name", { required: "Name is required" })}
+          />
+          {errors.name && (
+            <span className="text-xs text-red-500">{errors.name.message}</span>
           )}
-        />
-
-        {errors.stateData && (
-          <span className="text-xs text-red-500">{errors.stateData.message}</span>
-        )}
-      </div>
-
-      {/* Location Dropdown */}
-      <div>
-        <label className="text-sm">
-          Location <span className="text-red-400">*</span>
-        </label>
-        <Controller
-          name="locationData"
-          control={control}
-          render={({ field }) => (
-            <Select
-              onChange={field.onChange}
-              options={locationsData}
-              placeholder="Select a location"
-              isClearable
-              aria-invalid={!!errors.locationData}
-            />
+        </div>
+        {/* Employee Number Field */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            Employee Number <span className="text-red-400">*</span>
+          </label>
+          <input
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="Enter employee number"
+            {...register("empNo", {
+              required: "Employee number is required",
+            })}
+          />
+          {errors.empNo && (
+            <span className="text-xs text-red-500">{errors.empNo.message}</span>
           )}
-        />
-        {errors.locationData && (
-          <span className="text-xs text-red-500">
-            {errors.locationData.message}
-          </span>
-        )}
+        </div>
       </div>
-
-      {/* Designation Field */}
-      <div>
-        <label className="text-sm">
-          Designation <span className="text-red-400">*</span>
-        </label>
-        <input
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-          placeholder="Enter designation"
-          {...register("designation", {
-            required: "Designation is required",
-          })}
-        />
-        {errors.designation && (
-          <span className="text-xs text-red-500">
-            {errors.designation.message}
-          </span>
-        )}
+      <div className="flex gap-2">
+        <div className="w-1/2">
+          <label className="text-sm">
+            Email <span className="text-red-400">*</span>
+          </label>
+          <input
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="Enter staff email"
+            {...register("email", { required: "Email required is required" })}
+          />
+          {errors.name && (
+            <span className="text-xs text-red-500">{errors.name.message}</span>
+          )}
+        </div>
+        {/* Level Dropdown */}
+          <div className="w-1/2">
+            <label className="text-sm">
+              Level <span className="text-red-400">*</span>
+            </label>
+            <Controller
+              name="levelData"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onChange={field.onChange}
+                  options={levelsData}
+                  placeholder="Select Level"
+                  isClearable
+                  aria-invalid={!!errors.levelData}
+                />
+              )}
+            />
+            {errors.levelData && (
+              <span className="text-xs text-red-500">
+                {errors.levelData.message}
+              </span>
+            )}
+          </div>
+        
       </div>
-
-      <div>
+      <div className="flex gap-2">
+        {/* State Dropdown */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            State <span className="text-red-400">*</span>
+          </label>
+          <Controller
+            name="stateData"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                options={statesData}
+                placeholder="Select a state"
+                isClearable
+                aria-invalid={!!errors.stateData}
+              />
+            )}
+          />
+          {errors.stateData && (
+            <span className="text-xs text-red-500">{errors.stateData.message}</span>
+          )}
+        </div>
+        {/* Location Dropdown */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            Location <span className="text-red-400">*</span>
+          </label>
+          <Controller
+            name="locationData"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                options={locationsData}
+                placeholder="Select a location"
+                isClearable
+                aria-invalid={!!errors.locationData}
+              />
+            )}
+          />
+          {errors.locationData && (
+            <span className="text-xs text-red-500">
+              {errors.locationData.message}
+            </span>
+          )}
+        </div>
+      </div>
+          
+      <div className="flex gap-2">
+        {/* Designation Field */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            Designation <span className="text-red-400">*</span>
+          </label>
+          <input
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="Enter designation"
+            {...register("designation", {
+              required: "Designation is required",
+            })}
+          />
+          {errors.designation && (
+            <span className="text-xs text-red-500">
+              {errors.designation.message}
+            </span>
+          )}
+        </div>
+        {/* Emp Type */}
+        <div className="w-1/2">
+          <label className="text-sm">Emp Type</label>
+          <input
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="Enter employment type"
+            {...register("natureOfEmployment")}
+          />
+        </div>
+      </div>
+      {/* department */}
+      <div >
         <label className="text-sm">
           Department <span className="text-red-400">*</span>
         </label>
@@ -212,16 +263,6 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             {errors.departmenData.message}
           </span>
         )}
-      </div>
-
-      {/* Emp Type */}
-      <div>
-        <label className="text-sm">Emp Type</label>
-        <input
-          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-          placeholder="Enter employment type"
-          {...register("natureOfEmployment")}
-        />
       </div>
 
       <Flex gap="3" mt="4" justify="end">

@@ -258,13 +258,53 @@ export const getCatsBudgetDetails = protectedProcedure
         if (input.activity !== null && input.activity !== undefined && input.activity !="0") {
             baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
         } 
-
+        let result
         // Execute the query with all conditions
-        const result = await ctx.db
-            .select()
-            .from(budgetDetailsInFinanceProject)
-            .where(and(...baseConditions));
-
+        if(input.activity=="0"){
+            result = await ctx.db
+                .select({
+                    subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                    april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                    may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                    june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                    july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                    august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                    september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                    october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                    november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                    december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                    january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                    february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                    march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                    q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                    q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                    q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                    q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                    amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                    amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                    amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                    amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                    rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                    rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                    rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                    rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                    qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                    qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                    qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                    qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                    total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                })
+                .from(budgetDetailsInFinanceProject)
+                .where(and(...baseConditions))
+                .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+        }
+        else{
+            result = await ctx.db
+                .select()
+                .from(budgetDetailsInFinanceProject)
+                .where(and(...baseConditions));
+        }
         return result;
     });
 

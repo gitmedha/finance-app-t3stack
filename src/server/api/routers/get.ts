@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { getDesignation, getStaffs } from "../controller/staff";
+import { getDesignation, getLevels, getStaffs } from "../controller/staff";
 import { getDonors } from "../controller/donor";
 import { getCostCenters, getAllCostCenters } from "../controller/costCenters";
 import { getDepartments, getAllDepartments } from "../controller/department";
@@ -21,6 +21,7 @@ export const getRouter = createTRPCRouter({
   getBudgetMaster,
   getCatsBudgetDetails,
   getLevelStaffCount,
+  getLevels,
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";
   }),

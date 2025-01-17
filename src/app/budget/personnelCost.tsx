@@ -232,10 +232,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
-      // Ensure subCategoryData exists
       if (!subCategoryData || !avgQty[subCategoryId]) return updatedData;
 
-      console.log(subCategoryData[month], Number(value))
       if(month == "Apr" || month == "May" || month == "Jun"){
         const diff = Number(subCategoryData[month]) - Number(value)
         updateTotalQtyVals("totalQ1",diff)
@@ -293,9 +291,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           const julDiff = qty * avgQty[subCategoryId].Jan - Number(subCategoryData.Jan)
           const augDiff = qty * avgQty[subCategoryId].Feb - Number(subCategoryData.Feb)
           const sepDiff = qty * avgQty[subCategoryId].Mar - Number(subCategoryData.Mar)
-          updateTotalQtyVals("totalQ2", julDiff)
-          updateTotalQtyVals("totalQ2", augDiff)
-          updateTotalQtyVals("totalQ2", sepDiff)
+          updateTotalQtyVals("totalQ4", julDiff)
+          updateTotalQtyVals("totalQ4", augDiff)
+          updateTotalQtyVals("totalQ4", sepDiff)
           subCategoryData.Jan = qty * avgQty[subCategoryId].Jan;
           subCategoryData.Feb = qty *avgQty[subCategoryId].Feb;
           subCategoryData.Mar = qty * avgQty[subCategoryId].Mar;
@@ -354,38 +352,38 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       const totalQtyAfterBudgetDetails:totalschema = {totalQ1:0,totalQ2:0,totalQ3:0,totalQ4:0}
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
-          Count: item.total,
-          Apr: item.april ? item.april : "0",
-          May: item.may ? item.may : "0",
-          Jun: item.june ? item.june : "0",
-          Jul: item.july ? item.july : "",
-          Aug: item.august ? item.august : "0",
-          Sep: item.september ? item.september : "0",
-          Oct: item.october ? item.october : "0",
-          Nov: item.november ? item.november : "0",
-          Dec: item.december ? item.december : "0",
-          Jan: item.january ? item.january : "0",
-          Feb: item.february ? item.february : "0",
-          Mar: item.march ? item.march : "0",
-          Qty1: item.qty1 ? item.qty1 : 0,
-          Qty2: item.qty2 ? item.qty2 : 0,
-          Qty3: item.qty3 ? item.qty3 : 0,
-          Qty4: item.qty4 ? item.qty4 : 0,
-          budgetDetailsId: item.id
+          Count: Number(item.total),
+          Apr: item.april ? Number(item.april) : "0",
+          May: item.may ? Number(item.may) : "0",
+          Jun: item.june ? Number(item.june) : "0",
+          Jul: item.july ? Number(item.july) : "0",
+          Aug: item.august ? Number(item.august) : "0",
+          Sep: item.september ? Number(item.september) : "0",
+          Oct: item.october ? Number(item.october) : "0",
+          Nov: item.november ? Number(item.november) : "0",
+          Dec: item.december ? Number(item.december) : "0",
+          Jan: item.january ? Number(item.january) : "0",
+          Feb: item.february ? Number(item.february) : "0",
+          Mar: item.march ? Number(item.march) : "0",
+          Qty1: item.qty1 ? Number(item.qty1) : 0,
+          Qty2: item.qty2 ? Number(item.qty2) : 0,
+          Qty3: item.qty3 ? Number(item.qty3) : 0,
+          Qty4: item.qty4 ? Number(item.qty4) : 0,
+          budgetDetailsId: Number(item.id)
         };
         intialAvgQty[item.subcategoryId] = {
-          Apr: Number(item.april)/(item.qty1 ? item.qty1 : 1),
-          May: Number(item.may) / (item.qty1 ? item.qty1 : 1),
-          Jun: Number(item.june) / (item.qty1 ? item.qty1 : 1),
-          Jul: Number(item.july) / (item.qty2 ? item.qty2 : 1),
-          Aug: Number(item.august) / (item.qty2 ? item.qty2 : 1),
-          Sep: Number(item.september) / (item.qty2 ? item.qty2 : 1),
-          Oct: Number(item.october) / (item.qty3 ? item.qty3 : 1),
-          Nov: Number(item.november) / (item.qty3 ? item.qty3 : 1),
-          Dec: Number(item.december) / (item.qty3 ? item.qty3: 1),
-          Jan: Number(item.january) / (item.qty4 ? item.qty4 : 1),
-          Feb: Number(item.february) / (item.qty4 ? item.qty4 : 1),
-          Mar: Number(item.march) / (item.qty4 ? item.qty4 : 1),
+          Apr: Number(item.april) / (item.qty1 ? Number(item.qty1) : 1),
+          May: Number(item.may) / (item.qty1 ? Number(item.qty1) : 1),
+          Jun: Number(item.june) / (item.qty1 ? Number(item.qty1) : 1),
+          Jul: Number(item.july) / (item.qty2 ? Number(item.qty2) : 1),
+          Aug: Number(item.august) / (item.qty2 ? Number(item.qty2) : 1),
+          Sep: Number(item.september) / (item.qty2 ? Number(item.qty2) : 1),
+          Oct: Number(item.october) / (item.qty3 ? Number(item.qty3) : 1),
+          Nov: Number(item.november) / (item.qty3 ? Number(item.qty3 ): 1),
+          Dec: Number(item.december) / (item.qty3 ? Number(item.qty3): 1),
+          Jan: Number(item.january) / (item.qty4 ? Number(item.qty4 ): 1),
+          Feb: Number(item.february) / (item.qty4 ?  Number(item.qty4) : 1),
+          Mar: Number(item.march) / (item.qty4 ?  Number(item.qty4) : 1),
         }
         totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
         totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)

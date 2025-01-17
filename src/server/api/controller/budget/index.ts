@@ -199,9 +199,15 @@ export const addBudgetDetails = protectedProcedure
 
 
             // Insert data using Drizzle
-            await ctx.db.insert(budgetDetailsInFinanceProject).values(recordsToInsert);
+            const insertedRecords = await ctx.db.insert(budgetDetailsInFinanceProject).values(recordsToInsert).returning();
 
-            return { success: true, message: "Budget details added successfully" };
+            const response = insertedRecords.map((record) => ({
+                budgetDetailsId: record.id,
+                subcategoryId: record.subcategoryId,
+                categoryId: record.catid,
+            }));
+
+            return { success: true, message: "Budget details added successfully", data: response };
         } catch (error) {
             console.error("Error in adding budget details:", error);
             throw new Error("Failed to add budget details. Please try again.");
@@ -249,7 +255,7 @@ export const getCatsBudgetDetails = protectedProcedure
         ];
 
         // Add activity condition if it is not null or undefined
-        if (input.activity !== null && input.activity !== undefined) {
+        if (input.activity !== null && input.activity !== undefined && input.activity !="0") {
             baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
         } 
 

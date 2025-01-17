@@ -19,7 +19,7 @@ interface LevelData {
 type TableData = Record<string, LevelData>;
 
 // trying to keep the avg values in case of needed 
-interface qty {
+interface qtySchema {
   Apr: number
   May: number,
   Jun: number,
@@ -33,7 +33,13 @@ interface qty {
   Feb: number,
   Mar: number
 }
-type avgQtySchema = Record<string, qty>
+interface totalschema{
+  totalQ1:number
+  totalQ2:number
+  totalQ3:number
+  totalQ4:number
+}
+type avgQtySchema = Record<string, qtySchema>
 // const salaryMap = [
 //   { name: "Assistant", salary: 10000,id:7 ,level:1},
 //   { name: "Associate", salary: 20000, id: 8, level: 2 },
@@ -65,6 +71,9 @@ const months = [
 ];
 
 const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId }) => {
+  const[totalQty,setTotalQty] = useState<totalschema>({
+    totalQ1:0,totalQ2:0,totalQ3:0,totalQ4:0
+  })
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession()
   const { data: subCategories } = api.get.getSubCats.useQuery({ categoryId });
@@ -90,11 +99,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     if (subCategories && levelEmployeesCount) {
       const initialTableData: TableData = {};
       const intialAvgQty: avgQtySchema = {}
+      const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
       subCategories?.subCategories?.forEach((sub, index) => {
         const levelData = levelEmployeesCount?.find(
           (level) => level.level === index + 1
         );
-
         const employeeCount = levelData ? levelData.employeeCount : 0;
         const salarySum = levelData?.salarySum ? Number(levelData?.salarySum) : 0;
         const epfSum = levelData?.epfSum ? Number(levelData?.epfSum) : 0;
@@ -104,7 +113,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         const gratuitySum = levelData?.gratuitySum ? Number(levelData?.gratuitySum) : 0;
         console.log(salarySum, epfSum, insuranceSum, pwgPldSum, bonusSum, gratuitySum)
         console.log(salarySum + epfSum + insuranceSum)
-        // Initialize level data with the correct employee count for Qty1, Qty2, Qty3, Qty4
         initialTableData[sub.subCategoryId] = {
           Count: employeeCount,
           Qty1: employeeCount,
@@ -139,9 +147,14 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           Feb: (salarySum + epfSum + gratuitySum) / employeeCount,
           Mar: (salarySum + epfSum) / employeeCount,
         }
+        totalQtyAfterStaffCount.totalQ1 += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
+        totalQtyAfterStaffCount.totalQ2 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
+        totalQtyAfterStaffCount.totalQ3 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
+        totalQtyAfterStaffCount.totalQ4 += salarySum + epfSum + bonusSum + salarySum + epfSum + gratuitySum + salarySum + epfSum
       });
       setAvgQty(intialAvgQty)
       setTableData(initialTableData);
+      setTotalQty(totalQtyAfterStaffCount)
     }
   }, [subCategories, levelEmployeesCount]);
 
@@ -202,6 +215,14 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       alert("Failed to save budget details. Please try again.");
     }
   };
+  const updateTotalQtyVals = (which: string, difference: number) => {
+    setTotalQty((prev) => {
+      const updatedTotal = { ...prev };
+      updatedTotal[which as keyof typeof prev] += difference; 
+      console.log(updatedTotal)
+      return updatedTotal; 
+    });
+  };
 
   const handleInputChange = (
     subCategoryId: number,
@@ -214,39 +235,75 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       // Ensure subCategoryData exists
       if (!subCategoryData || !avgQty[subCategoryId]) return updatedData;
 
-      // Update the value for the given month
-      subCategoryData[month] = value;
-
-      // Check if it's a Qty field and recalculate corresponding months
+      console.log(subCategoryData[month], Number(value))
+      if(month == "Apr" || month == "May" || month == "Jun"){
+        const diff = Number(subCategoryData[month]) - Number(value)
+        updateTotalQtyVals("totalQ1",diff)
+      }
+      if (month == "Jul" || month == "Aug" || month == "Sep") {
+        const diff = Number(subCategoryData[month]) - Number(value)
+        console.log(diff)
+        updateTotalQtyVals("totalQ2", diff)
+      }
+      if (month == "Oct" || month == "Nov" || month == "Dec") {
+        const diff = Number(subCategoryData[month]) - Number(value)
+        updateTotalQtyVals("totalQ3", diff)
+      }
+      if (month == "Jan" || month == "Feb" || month == "Mar") {
+        const diff = Number(value) - Number(subCategoryData[month]) 
+        updateTotalQtyVals("totalQ4", diff)
+      }
       if (month === "Qty1" || month === "Qty2" || month === "Qty3" || month === "Qty4") {
-        const qty = parseInt(value, 10) || 0; // Default to 0 if value is invalid
+        const qty = parseInt(value, 10) || 0; 
 
         if (month === "Qty1") {
+          const aprDiff = qty * avgQty[subCategoryId].Apr - Number(subCategoryData.Apr)
+          const mayDiff = qty * avgQty[subCategoryId].May - Number(subCategoryData.May)
+          const jubDiff = qty * avgQty[subCategoryId].Jun - Number(subCategoryData.Jun)
+          updateTotalQtyVals("totalQ1",aprDiff)
+          updateTotalQtyVals("totalQ1", mayDiff)
+          updateTotalQtyVals("totalQ1", jubDiff)
           subCategoryData.Apr = qty * avgQty[subCategoryId].Apr;
           subCategoryData.May = qty *avgQty[subCategoryId].May;
           subCategoryData.Jun = qty *avgQty[subCategoryId].Jun;
         }
         if (month === "Qty2") {
+          const julDiff = qty * avgQty[subCategoryId].Jul - Number(subCategoryData.Jul)
+          const augDiff = qty * avgQty[subCategoryId].Aug - Number(subCategoryData.Aug)
+          const sepDiff = qty * avgQty[subCategoryId].Sep - Number(subCategoryData.Sep)
+          updateTotalQtyVals("totalQ2", julDiff)
+          updateTotalQtyVals("totalQ2", augDiff)
+          updateTotalQtyVals("totalQ2", sepDiff)
           subCategoryData.Jul = qty *avgQty[subCategoryId].Jul;
           subCategoryData.Aug = qty *avgQty[subCategoryId].Aug;
           subCategoryData.Sep = qty * avgQty[subCategoryId].Sep;
         }
         if (month === "Qty3") {
+          const julDiff = qty * avgQty[subCategoryId].Oct - Number(subCategoryData.Oct)
+          const augDiff = qty * avgQty[subCategoryId].Nov - Number(subCategoryData.Nov)
+          const sepDiff = qty * avgQty[subCategoryId].Dec - Number(subCategoryData.Dec)
+          updateTotalQtyVals("totalQ3", julDiff)
+          updateTotalQtyVals("totalQ3", augDiff)
+          updateTotalQtyVals("totalQ3", sepDiff)
           subCategoryData.Oct = qty *avgQty[subCategoryId].Jan;
           subCategoryData.Nov = qty *avgQty[subCategoryId].Jan;
           subCategoryData.Dec = qty * avgQty[subCategoryId].Jan;
         }
         if (month === "Qty4") {
+          const julDiff = qty * avgQty[subCategoryId].Jan - Number(subCategoryData.Jan)
+          const augDiff = qty * avgQty[subCategoryId].Feb - Number(subCategoryData.Feb)
+          const sepDiff = qty * avgQty[subCategoryId].Mar - Number(subCategoryData.Mar)
+          updateTotalQtyVals("totalQ2", julDiff)
+          updateTotalQtyVals("totalQ2", augDiff)
+          updateTotalQtyVals("totalQ2", sepDiff)
           subCategoryData.Jan = qty * avgQty[subCategoryId].Jan;
           subCategoryData.Feb = qty *avgQty[subCategoryId].Feb;
           subCategoryData.Mar = qty * avgQty[subCategoryId].Mar;
         }
-
-        // Update the count for this subcategory
-        subCategoryData.Count = qty;
-
-        updatedData[subCategoryId] = subCategoryData;
+       subCategoryData.Count = qty;
       }
+      subCategoryData[month] = value;
+      updatedData[subCategoryId] = subCategoryData;
 
       return updatedData;
     });
@@ -294,6 +351,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       
     }
     if (categoriesBudgetDetails) {
+      const totalQtyAfterBudgetDetails:totalschema = {totalQ1:0,totalQ2:0,totalQ3:0,totalQ4:0}
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
           Count: item.total,
@@ -329,6 +387,10 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           Feb: Number(item.february) / (item.qty4 ? item.qty4 : 1),
           Mar: Number(item.march) / (item.qty4 ? item.qty4 : 1),
         }
+        totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+        totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+        totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+        totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
         if (item.qty1 == 0 || !item.qty1)
         {
           const aprIn = document.getElementById(item.subcategoryId + "Apr") as HTMLInputElement;
@@ -381,9 +443,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       });
       setAvgQty(intialAvgQty)
       setTableData(initialData);
+      setTotalQty(totalQtyAfterBudgetDetails)
     }
     else {
-      // If categoriesBudgetDetails is not available, initialize with empty data
       setTableData({});
     }
   }, [categoriesBudgetDetails]);
@@ -457,7 +519,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
           <h1 className="uppercase">{section}</h1>
           <div className="flex items-center space-x-2">
-            <p className="text-sm">Avg Cost: Q1: XXX Q2: XXX Q3: XXX Q4: XXX</p>
+            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
             <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
           </div>
         </summary>

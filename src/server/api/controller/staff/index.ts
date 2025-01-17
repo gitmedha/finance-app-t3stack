@@ -18,10 +18,10 @@ export const getStaffs = protectedProcedure
     z.object({
       page: z.number().min(1).default(1),
       limit: z.number().min(1).max(100).default(10),
-      searchTerm: z.string().optional().default(""), // Optional search term
-      department: z.number().optional().default(0), // Optional search term
-      status: z.string().optional().default("Active"), // Optional search term
-      designation: z.string().optional().default(""), // Optional search term
+      searchTerm: z.string().optional().default(""), 
+      department: z.number().optional().default(0), 
+      status: z.string().optional().default("Active"), 
+      designation: z.string().optional().default(""), 
     }),
   )
   .query(async ({ ctx, input }) => {

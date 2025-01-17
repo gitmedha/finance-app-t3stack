@@ -80,9 +80,7 @@ const Budget: React.FC = () => {
           <CapitalCost section='CAPITAL COST' categoryId={data?.categories[4] ? data?.categories[4].categoryId : 5} budgetId={budgetId} deptId={filters.department}/>
           <OverHeads section='OVERHEADS' categoryId={data?.categories[5] ? data?.categories[5].categoryId : 6} budgetId={budgetId} deptId={filters.department} />
         </div>
-      }
-      
-      
+      }      
     </div>
   );
 };

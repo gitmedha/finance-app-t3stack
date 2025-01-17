@@ -40,7 +40,8 @@ const subProgramActivites:subProgramActivitesSchema[] = [
   {map:11,name:"Poly-Placement12rive"},
   {map:12, name: "Industry Engagement"},
   {map:13,name:"TCPO Workshop"},
-  {map:14,name:"DSE Faculty workshop"}
+  {map:14,name:"DSE Faculty workshop"},
+  {map:0,name:"All"}
 ]
 
 
@@ -130,6 +131,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         };
       });
     }
+    console.log(categoriesBudgetDetails)
     if (categoriesBudgetDetails) {
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {

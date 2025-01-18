@@ -11,6 +11,8 @@ import {
   statesMasterInFinanceProject as stateMaster,
   locationMasterInFinanceProject as locationMaster,
   salaryDetailsInFinanceProject as salaryMaster,
+  categoryHierarchyInFinanceProject,
+  categoryMasterInFinanceProject,
 } from "~/server/db/schema";
 
 export const getStaffs = protectedProcedure
@@ -18,13 +20,14 @@ export const getStaffs = protectedProcedure
     z.object({
       page: z.number().min(1).default(1),
       limit: z.number().min(1).max(100).default(10),
-      searchTerm: z.string().optional().default(""), // Optional search term
-      department: z.number().optional().default(0), // Optional search term
-      status: z.string().optional().default("Active"), // Optional search term
-      designation: z.string().optional().default(""), // Optional search term
+      searchTerm: z.string().optional().default(""), 
+      department: z.number().optional().default(0), 
+      status: z.string().optional().default("Active"), 
+      designation: z.string().optional().default(""), 
     }),
   )
   .query(async ({ ctx, input }) => {
+    console.log(input)
     const { page, limit, searchTerm, status, department, designation } = input;
     const offset = (page - 1) * limit;
     // Apply the search condition only if searchTerm is not an empty string
@@ -43,6 +46,8 @@ export const getStaffs = protectedProcedure
         id: staffMaster.id,
         name: staffMaster.name,
         empNo: staffMaster.empNo,
+        email:staffMaster.email,
+        level:staffMaster.level,
         isactive: staffMaster.isactive,
         notes: staffMaster.notes,
         nature_of_employment: staffMaster.natureOfEmployment,
@@ -155,11 +160,13 @@ export const addStaff = protectedProcedure
     z.object({
       name: z.string().min(1, "Name is required"),
       empNo: z.string().min(1, "Employee number is required"),
-      stateId: z.number().min(1, "State is required"),
-      locationId: z.number().min(1, "Location is required"),
+      stateId: z.string().min(1, "State is required"),
+      locationId: z.string().min(1, "Location is required"),
       departmentId: z.number().min(1, "Department is required"),
       designation: z.string().min(1, "Designation is required"),
       isactive: z.boolean(),
+      email:z.string().email(),
+      level:z.number(),
       natureOfEmployment: z.string().optional(),
       notes: z.string().optional().nullable(),
       description: z.string().optional().nullable(),
@@ -202,8 +209,8 @@ export const editStaff = protectedProcedure
       id: z.number().min(1, "Staff ID is required"), // Staff ID to locate the record
       name: z.string().optional(),
       empNo: z.string().optional(),
-      stateId: z.number().optional(),
-      locationId: z.number().optional(),
+      stateId: z.string().optional(),
+      locationId: z.string().optional(),
       department: z.number().optional(),
       designation: z.string().optional(),
       isactive: z.boolean().optional(),
@@ -305,3 +312,24 @@ export const deleteStaff = protectedProcedure
       throw new Error("Failed to delete staff. Please try again.");
     }
   });
+
+export const getLevels = protectedProcedure.query(async ({ ctx, input}) => {
+  const subCategories = await ctx.db
+    .select({
+      subCategoryId: categoryHierarchyInFinanceProject.catId,
+      subCategoryName: categoryMasterInFinanceProject.categoryname,
+    })
+    .from(categoryHierarchyInFinanceProject)
+    .innerJoin(
+      categoryMasterInFinanceProject,
+      eq(categoryHierarchyInFinanceProject.catId, categoryMasterInFinanceProject.id)
+    )
+    .where(eq(categoryHierarchyInFinanceProject.parentId, 1));
+  const levelsData = subCategories.map((subcategory) => ({
+    value: subcategory.subCategoryId,
+    label: subcategory.subCategoryName,
+  }));
+
+  return levelsData.length > 0 ? levelsData : undefined;
+});
+

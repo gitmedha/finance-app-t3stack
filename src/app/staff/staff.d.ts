@@ -25,9 +25,9 @@ interface StaffItem {
     department: number;
     departmentname: string | null;
     state: string | null;
-    stateId: number | null;
+    stateId: string | null;
     location: string | null;
-    locationId: number | null;
+    locationId: string | null;
     designation: string | null;
   }): unknown;
   id: number;
@@ -46,8 +46,8 @@ interface StaffItem {
   nature_of_employment?: string;
   state?: string;
   location?: string;
-  stateId?: number;
-  locationId?: number;
+  stateId?: string;
+  locationId?: string;
   program?: string;
   departmentData?: ISelectItem;
   statesData?: ISelectItem;

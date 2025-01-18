@@ -40,10 +40,9 @@ export default function Staff() {
 
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
     { page: currentPage, limit, searchTerm, ...filters },
-    { enabled: false }, // Disable automatic query execution
+    { enabled: false },
   );
 
-  // Trigger refetch on page or limit change
   useEffect(() => {
     const fetchData = async () => {
       await refetch();

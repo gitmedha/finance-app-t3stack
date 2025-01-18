@@ -168,13 +168,28 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
   useEffect(() => {
     if (subCategories && levelEmployeesCount) {
       const initialTableData: TableData = {};
-      levelEmployeesCount.map((level, key) => {
-        initialTableData[level.level ? level.level : key + 7] = {
-          Count: level.employeeCount,
-          Qty1: level.employeeCount,
-          Qty2: level.employeeCount,
-          Qty3: level.employeeCount,
-          Qty4: level.employeeCount,
+      subCategories?.subCategories?.forEach((sub, index) => {
+        const level = levelEmployeesCount?.find(
+          (l) => l.level === sub.subCategoryId
+        );
+        initialTableData[sub.subCategoryId] = {
+          Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
+          Qty1: level?.employeeCount ? Number(level?.employeeCount):0,
+          Qty2: level?.employeeCount ? Number(level?.employeeCount) : 0,
+          Qty3: level?.employeeCount ? Number(level?.employeeCount) : 0,
+          Qty4: level?.employeeCount ? Number(level?.employeeCount) : 0,
+          Apr:"0",
+          May:"0",
+          Jun:"0",
+          Jul:"0",
+          Aug:"0",
+          Sep:"0",
+          Oct:"0",
+          Nov:"0",
+          Dec:"0",
+          Jan:"0",
+          Feb:"0",
+          Mar:"0",
           budgetDetailsId: 0,
         };
       })
@@ -439,7 +454,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
                   {months.map((month, key) => (
                     <td key={month} className="border p-2">
                       <input
-                        type={key % 4 == 0 ? "number" : "text"}
+                        disabled={filter?.map == 0}
+                        type={key % 4 == 0 ? "number" : "text" }
                         className="w-full rounded border p-1"
                         value={tableData[sub.subCategoryId]?.[month] ?? ""}
                         onChange={(e) =>

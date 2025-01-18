@@ -515,7 +515,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                   {months.map((month,key) => (
                     <td key={month} className="border p-2">
                       <input
-                        disabled={key == 2 || key ==8 || key== 14 || key==20 }
+                        disabled={key == 2 || key ==8 || key== 14 || key==20 || filter?.map==0}
                         type={key%6 == 0 ?"number":"text"}
                         className="w-full rounded border p-1"
                         value={tableData[sub.subCategoryId]?.[month] ?? ""}

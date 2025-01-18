@@ -67,7 +67,7 @@ const Budget: React.FC = () => {
     }
   }, [budgetRes]);
   // get all main categories 
-  const { data, refetch } = api.get.getCats.useQuery();
+  const { data} = api.get.getCats.useQuery();
   return (
     <div className="mt-10 overflow-hidden m-2 p-2">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId}/>

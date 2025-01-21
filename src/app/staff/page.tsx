@@ -40,7 +40,7 @@ export default function Staff() {
 
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
     { page: currentPage, limit, searchTerm, ...filters },
-    { enabled: false },
+    // { enabled: false },
   );
 
   useEffect(() => {

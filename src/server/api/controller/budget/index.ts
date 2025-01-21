@@ -68,7 +68,6 @@ export const createBudget = protectedProcedure
                 .returning({
                     id: budgetMasterInFinanceProject.id,
                 });
-            console.log(result)
             return result;
         } catch (error) {
             console.error("Error in creating budget:", error);

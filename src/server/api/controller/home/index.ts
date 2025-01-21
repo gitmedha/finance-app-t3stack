@@ -1,7 +1,8 @@
 import { protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { and, count, eq, ilike, desc, isNull, sql, isNotNull, inArray} from "drizzle-orm";
-import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject } from "drizzle/schema";
+import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject } from "~/server/db/schema";
+import { db } from "~/server/db";
 
 
 export const getTotalBudgetSum = protectedProcedure
@@ -10,7 +11,6 @@ export const getTotalBudgetSum = protectedProcedure
     }))
     .query(async ({ ctx, input }) => {
         const { financialYear } = input;
-
         const budgetMasterIds = await ctx.db
             .select({
                 id: budgetMasterInFinanceProject.id,

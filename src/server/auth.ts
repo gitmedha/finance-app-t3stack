@@ -2,7 +2,7 @@ import { type DefaultSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
-import { userMasterInFinanceProject } from "./db/schema";
+import { userMasterInFinanceProject, staffMasterInFinanceProject, departmentMasterInFinanceProject } from "./db/schema";
 
 // Extend the Session interface to include custom properties on user
 interface UserInfo {
@@ -19,6 +19,8 @@ interface UserInfo {
   createdBy?: number | null;
   updatedBy?: number | null;
   phonenumber: number | string;
+  departmentName:string|null
+  departmentId:number|null
 }
 
 declare module "next-auth" {
@@ -36,6 +38,8 @@ declare module "next-auth" {
     createdBy?: number | null;
     updatedBy?: number | null;
     phonenumber: number | string;
+    departmentName: string | null
+    departmentId: number | null
   }
 
   interface Session extends DefaultSession {
@@ -53,11 +57,10 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials) return null;
-      
         const data = await db.query.userMasterInFinanceProject.findFirst({
           where: eq(userMasterInFinanceProject.email, credentials.email),
         });
-      
+
         // Ensure password match before returning user
         if (data && data.password === credentials.password) {
           const user: UserInfo = {
@@ -74,7 +77,22 @@ export const authOptions: NextAuthOptions = {
             createdBy: data.createdBy,
             updatedBy: data.updatedBy,
             phonenumber: data.phonenumber,
+            departmentId:null,
+            departmentName:null
           };
+          if(user.role == "2")
+          {
+            const departmentDetails = await db.select({
+              departmentId: departmentMasterInFinanceProject.id,
+              departmentName: departmentMasterInFinanceProject.departmentname
+            }).from(departmentMasterInFinanceProject)
+              .innerJoin(staffMasterInFinanceProject,
+                eq(staffMasterInFinanceProject.department, departmentMasterInFinanceProject.id)
+              ).where(eq(staffMasterInFinanceProject.email, credentials.email))
+            
+            user.departmentId =  departmentDetails[0]?.departmentId ?? null
+            user.departmentName = departmentDetails[0]?.departmentName??null
+          }
           return user;
         }
         // If authentication fails, log and return null
@@ -98,6 +116,8 @@ export const authOptions: NextAuthOptions = {
         token.createdBy = user.createdBy;
         token.updatedBy = user.updatedBy;
         token.phonenumber = user.phonenumber;
+        token.departmentId = user.departmentId;
+        token.departmentName = user.departmentName
       }
       return token;
     },
@@ -118,6 +138,8 @@ export const authOptions: NextAuthOptions = {
           createdBy: token.createdBy as number | undefined,
           updatedBy: token.updatedBy as number | undefined,
           phonenumber: token.phonenumber as number | string,
+          departmentId: token.departmentId as number,
+          departmentName: token.departmentName as string
         };
       }
       return session;

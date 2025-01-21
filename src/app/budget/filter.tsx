@@ -4,8 +4,9 @@ import { useEffect } from 'react';
 import type { BudgetFilterFormProps } from "./budget";
 import { Button } from '@radix-ui/themes';
 import { api } from "~/trpc/react";
+import { useSession } from 'next-auth/react';
 const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect,budgetId,setBugetId }) => {
-
+  const userData = useSession()
   // Fetch data for departments
   const { data, refetch } = api.get.getDepartments.useQuery(
     { page: 1, limit: 100, type: 'Department' },
@@ -61,6 +62,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   return (
     <div className='flex justify-between'>
       <div className="flex justify-start items-center space-x-2">
+        {JSON.stringify(userData)}
         <div className="w-52">
           {/* Department Dropdown */}
           <DropdownMenu.Root>

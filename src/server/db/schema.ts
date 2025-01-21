@@ -224,20 +224,6 @@ export const salaryDetailsInFinanceProject = financeProject.table("salary_detail
     }
   });
 
-export const locationMasterInFinanceProject = financeProject.table("location_master", {
-  id: serial("id").primaryKey().notNull(),
-  stateName: varchar("state_name", { length: 100 }).notNull(),
-  cityName: varchar("city_name", { length: 100 }).notNull(),
-  pinCode: varchar("pin_code", { length: 10 }),
-  region: varchar("region", { length: 50 }),
-  createdAt: timestamp("created_at", { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
-});
-
-export const roleMasterInFinanceProject = financeProject.table("role_master", {
-  id: serial("id").primaryKey().notNull(),
-  role: varchar("role", { length: 255 }).notNull(),
-});
-
 export const budgetMasterInFinanceProject = financeProject.table("budget_master", {
   id: serial("id").primaryKey().notNull(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -253,6 +239,7 @@ export const budgetMasterInFinanceProject = financeProject.table("budget_master"
   approvedBy: integer("approved_by"),
   approvedAt: timestamp("approved_at", { withTimezone: true, mode: 'string' }),
   departmentId: integer("department_id"),
+  status: varchar("status", { length: 50 }).default('draft'),
 },
   (table) => {
     return {
@@ -273,6 +260,20 @@ export const budgetMasterInFinanceProject = financeProject.table("budget_master"
       }),
     }
   });
+
+export const locationMasterInFinanceProject = financeProject.table("location_master", {
+  id: serial("id").primaryKey().notNull(),
+  stateName: varchar("state_name", { length: 100 }).notNull(),
+  cityName: varchar("city_name", { length: 100 }).notNull(),
+  pinCode: varchar("pin_code", { length: 10 }),
+  region: varchar("region", { length: 50 }),
+  createdAt: timestamp("created_at", { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const roleMasterInFinanceProject = financeProject.table("role_master", {
+  id: serial("id").primaryKey().notNull(),
+  role: varchar("role", { length: 255 }).notNull(),
+});
 
 export const statesMasterInFinanceProject = financeProject.table("states_master", {
   id: serial("id").primaryKey().notNull(),

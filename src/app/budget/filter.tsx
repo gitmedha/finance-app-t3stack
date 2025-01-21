@@ -5,12 +5,12 @@ import type { BudgetFilterFormProps } from "./budget";
 import { Button } from '@radix-ui/themes';
 import { api } from "~/trpc/react";
 import { useSession } from 'next-auth/react';
-const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect,budgetId,setBugetId }) => {
+const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect,budgetId,setBugetId,status }) => {
   const userData = useSession()
   // Fetch data for departments
   const { data, refetch } = api.get.getDepartments.useQuery(
     { page: 1, limit: 100, type: 'Department' },
-    { enabled: true }
+    { enabled: userData.data?.user.role == "1" }
   );
   // Define years from 2023-24 to 2029-30
   const years = [
@@ -22,6 +22,14 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
       void refetch(); // Trigger refetch if departments are empty
     }
   }, [data, refetch]);
+  
+  useEffect(()=>{
+    if (userData.data?.user.departmentId && userData.data?.user.departmentName )
+      handleSelect("department", { id: userData.data?.user.departmentId, departmentname: userData.data?.user.departmentName })
+    if (years[0])
+      handleSelect("year", years[0])
+  },[userData])
+  
   useEffect(() => {
     if (data?.departments?.length) {
       const sortedDepartments = [...data.departments].sort((a, b) =>
@@ -62,7 +70,6 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   return (
     <div className='flex justify-between'>
       <div className="flex justify-start items-center space-x-2">
-        {JSON.stringify(userData)}
         <div className="w-52">
           {/* Department Dropdown */}
           <DropdownMenu.Root>
@@ -72,20 +79,22 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
                 <RiArrowDropDownLine size={30} />
               </button>
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-              {data?.departments
-                ?.sort((a, b) => a.departmentname.localeCompare(b.departmentname)) // Sorting alphabetically by department name
-                .map((dep) => (
-                  <DropdownMenu.Item
-                    key={dep.id}
-                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                    onSelect={() => handleSelect("department", { id: dep.id, departmentname: dep.departmentname })} // Pass entire department object
-                  >
-                    {dep.departmentname}
-                  </DropdownMenu.Item>
-                ))}
+            {
+              userData.data?.user.role == "1" && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+                {data?.departments
+                  ?.sort((a, b) => a.departmentname.localeCompare(b.departmentname)) // Sorting alphabetically by department name
+                  .map((dep) => (
+                    <DropdownMenu.Item
+                      key={dep.id}
+                      className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                      onSelect={() => handleSelect("department", { id: dep.id, departmentname: dep.departmentname })} // Pass entire department object
+                    >
+                      {dep.departmentname}
+                    </DropdownMenu.Item>
+                  ))}
 
-            </DropdownMenu.Content>
+              </DropdownMenu.Content>
+            }
           </DropdownMenu.Root>
 
         </div>

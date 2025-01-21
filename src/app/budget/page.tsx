@@ -70,7 +70,7 @@ const Budget: React.FC = () => {
   const { data} = api.get.getCats.useQuery();
   return (
     <div className="mt-10 overflow-hidden m-2 p-2">
-      <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId}/>
+      <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId} status={budgetRes?.status ?? undefined}/>
       {
         budgetId && <div>
           <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} />

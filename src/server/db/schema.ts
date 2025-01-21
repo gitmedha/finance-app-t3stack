@@ -455,7 +455,7 @@ export const userMasterInFinanceProject = financeProject.table("user_master", {
   password: varchar("password", { length: 255 }).notNull(),
   email: varchar("email", { length: 100 }),
   fullName: text("full_name"),
-  role: text("role"),
+  role: integer("role"),
   isactive: boolean("isactive").notNull(),
   notes: varchar("notes", { length: 255 }),
   description: varchar("description", { length: 255 }),
@@ -477,6 +477,11 @@ export const userMasterInFinanceProject = financeProject.table("user_master", {
         columns: [table.updatedBy],
         foreignColumns: [table.id],
         name: "updated_by_fkey"
+      }),
+      fkRole: foreignKey({
+        columns: [table.role],
+        foreignColumns: [roleMasterInFinanceProject.id],
+        name: "fk_role"
       }),
       userMasterUsernameKey: unique("user_master_username_key").on(table.username),
     }

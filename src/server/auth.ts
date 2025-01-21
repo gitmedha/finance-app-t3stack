@@ -10,7 +10,7 @@ interface UserInfo {
   username: string;
   email?: string | null;
   fullName?: string | null;
-  role?: string | null;
+  role?: number | null;
   isactive: boolean;
   notes?: string | null;
   description?: string | null;
@@ -29,7 +29,7 @@ declare module "next-auth" {
     username: string;
     email?: string | null;
     fullName?: string | null;
-    role?: string | null;
+    role?: number | null;
     isactive: boolean;
     notes?: string | null;
     description?: string | null;
@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
             departmentId:null,
             departmentName:null
           };
-          if(user.role == "2")
+          if(user.role == 2)
           {
             const departmentDetails = await db.select({
               departmentId: departmentMasterInFinanceProject.id,
@@ -129,7 +129,7 @@ export const authOptions: NextAuthOptions = {
           username: token.username as string,
           email: token.email!,
           fullName: token.fullName as string,
-          role: token.role as string,
+          role: token.role as number,
           isactive: token.isactive as boolean,
           notes: token.notes as string | undefined,
           description: token.description as string | undefined,

@@ -224,6 +224,7 @@ export const getBudgetMaster = protectedProcedure
         const budget = await ctx.db
             .select({
                 budgetId: budgetMasterInFinanceProject.id,
+                status:budgetMasterInFinanceProject.status
             })
             .from(budgetMasterInFinanceProject)
             .where(
@@ -234,7 +235,8 @@ export const getBudgetMaster = protectedProcedure
             )
             .limit(1);
         return {
-            budgetId:budget [0]? budget[0].budgetId : null
+            budgetId:budget [0]? budget[0].budgetId : null,
+            status:budget[0]? budget[0].status : undefined
         };
     });
 export const getCatsBudgetDetails = protectedProcedure

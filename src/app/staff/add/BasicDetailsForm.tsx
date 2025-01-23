@@ -49,6 +49,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const { mutate: addStaff } = api.post.addStaff.useMutation({
     async onSuccess(data) {
+      setIsModalOpen(false)
       await apiContext.get.getStaffs.invalidate();
       if (data.staff) {
         setActiveStaffId(data.staff?.id);
@@ -72,8 +73,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         createdBy: userData.data?.user.id ?? 1,
         isactive: true,
         createdAt: new Date().toISOString().split("T")[0] ?? "",
-        stateId: data.stateData.value.toString(),
-        locationId: data.locationData.value.toString(),
+        stateId: data.stateData.label.toString(),
+        locationId: data.locationData.label.toString(),
         departmentId: Number(data.departmenData.value),
         level:Number(data.levelData.value),
       };

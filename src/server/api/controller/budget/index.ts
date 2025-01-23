@@ -477,7 +477,23 @@ export const updateBudgetDetails = protectedProcedure
             throw new Error("Failed to update budget details. Please try again.");
         }
     });
-
+    // i am just updating the status without checking do we have all subcategory and activiy data
+    export const updateStatusBudgetDetails = protectedProcedure
+    .input(z.object({
+        budgetId:z.number(),
+        status:z.string()
+    })) 
+    .mutation(async({ctx,input})=>{
+        const {status,budgetId} = input
+        const updatedStatus = await ctx.db
+        .update(budgetMasterInFinanceProject)
+        .set({status})
+        .where(eq(budgetMasterInFinanceProject.id,budgetId))
+        if(updatedStatus)
+            return {message:"status update successfull"}
+        else
+            return { message: "status update was not successfull" }
+    })
 
 
 

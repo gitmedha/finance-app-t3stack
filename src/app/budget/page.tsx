@@ -10,6 +10,7 @@ import CapitalCost from "./capitalCost";
 import OverHeads from "./overheads";
 import type { FilterOptions } from "./budget";
 import { api } from "~/trpc/react";
+import { useSession } from "next-auth/react";
 
 // Define types for filters
 
@@ -23,9 +24,11 @@ type HandleSelectValue =
 
 const Budget: React.FC = () => {
   // Explicitly define the type for filters
+  const userData = useSession()
+  const [status,setStatus] = useState<string|undefined>(undefined)
   const [filters, setFilters] = useState<FilterOptions>({
-    department: '', 
-    departmentname: '',
+    department: userData.data?.user.departmentId?.toString() ?? '', 
+    departmentname: userData.data?.user.departmentName ?? " ",
     year: '',
   });
   const [budgetId,setBudgetId] = useState<number|null>(null)
@@ -62,18 +65,20 @@ const Budget: React.FC = () => {
   useEffect(() => {
     if (budgetRes) {
       setBudgetId(budgetRes.budgetId ?? null); // Set null if no budgetId
+      setStatus(budgetRes.status ?? undefined)
     } else {
       setBudgetId(null);
+      setStatus(undefined)
     }
   }, [budgetRes]);
   // get all main categories 
   const { data} = api.get.getCats.useQuery();
   return (
     <div className="mt-10 overflow-hidden m-2 p-2">
-      <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId} status={budgetRes?.status ?? undefined}/>
+      <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId} status={status} setStatus={setStatus}/>
       {
         budgetId && <div>
-          <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} />
+          <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} />
           <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} />
           <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} />
           <ProgramOffice section='PROGRAM OFFICE' categoryId={data?.categories[3] ? data?.categories[3].categoryId : 4} budgetId={budgetId} deptId={filters.department}/>

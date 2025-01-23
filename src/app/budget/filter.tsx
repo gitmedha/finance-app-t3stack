@@ -5,24 +5,48 @@ import type { BudgetFilterFormProps } from "./budget";
 import { Button } from '@radix-ui/themes';
 import { api } from "~/trpc/react";
 import { useSession } from 'next-auth/react';
-const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect,budgetId,setBugetId,status }) => {
+const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect,budgetId,setBugetId,status,setStatus }) => {
   const userData = useSession()
   // Fetch data for departments
   const { data, refetch } = api.get.getDepartments.useQuery(
     { page: 1, limit: 100, type: 'Department' },
-    { enabled: userData.data?.user.role == "1" }
+    { enabled: userData.data?.user.role == 1 }
   );
   // Define years from 2023-24 to 2029-30
   const years = [
     "2023-24", "2024-25", "2025-26", "2026-27",
     "2027-28", "2028-29", "2029-30"
   ];
+  const updateBudgetStatus = api.post.updateStatusBudgetDetails.useMutation()
   useEffect(() => {
     if (data && data.departments.length === 0) {
       void refetch(); // Trigger refetch if departments are empty
     }
   }, [data, refetch]);
-  
+  const handelStatusUpdate = (status:string)=>{
+    try{
+      if(budgetId)
+      {
+        updateBudgetStatus.mutate({
+          budgetId,
+          status
+        },{
+          // need to update the status from here
+          onSuccess: (data) => {
+            setStatus(status)
+            console.log("Budget created successfully:", data);
+          },
+          onError: (error) => {
+            console.error("Error creating budget:", error);
+          },
+        })
+      }
+
+    }catch(error){
+      console.error("Failed to save budget details:", error);
+      alert("Failed to save budget details. Please try again.");
+    }
+  }
   useEffect(()=>{
     if (userData.data?.user.departmentId && userData.data?.user.departmentName )
       handleSelect("department", { id: userData.data?.user.departmentId, departmentname: userData.data?.user.departmentName })
@@ -79,8 +103,9 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
                 <RiArrowDropDownLine size={30} />
               </button>
             </DropdownMenu.Trigger>
+            {/* drop down only when user role is 1 that means when the user is admin */}
             {
-              userData.data?.user.role == "1" && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+              userData.data?.user.role == 1 && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
                 {data?.departments
                   ?.sort((a, b) => a.departmentname.localeCompare(b.departmentname)) // Sorting alphabetically by department name
                   .map((dep) => (
@@ -137,20 +162,26 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         }
         {
           budgetId && <div className='flex justify-end items-center space-x-2'>
-            <Button
-              type="button"
-              className="!cursor-pointer !text-white !bg-primary px-2"
-              variant="soft"
-            >
-              Submit
-            </Button>
-            <Button
-              type="button"
-              className="!cursor-pointer !text-white !bg-primary px-2"
-              variant="soft"
-            >
-              Approve
-            </Button>
+            {
+              userData.data?.user.role != 1 && status == "draft" &&<Button
+                type="button"
+                className="!cursor-pointer !text-white !bg-primary px-2"
+                variant="soft"
+                onClick={() => handelStatusUpdate("submitted")}
+              >
+                Submit
+              </Button>
+            }
+            {
+              userData.data?.user.role == 1 && status == "submitted" && <Button
+                type="button"
+                className="!cursor-pointer !text-white !bg-primary px-2"
+                variant="soft"
+                onClick={() => handelStatusUpdate("approved")}
+              >
+                Approve
+              </Button>
+            }
           </div>
         }
         

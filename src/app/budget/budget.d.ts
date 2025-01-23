@@ -14,5 +14,6 @@ interface BudgetFilterFormProps {
   budgetId:number|null
   setBugetId:(val:number|null)=>void
   status:string|undefined
+  setStatus:(val:string)=>void
 }
 

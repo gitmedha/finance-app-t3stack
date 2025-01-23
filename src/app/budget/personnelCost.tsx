@@ -8,6 +8,7 @@ interface PersonnelCostProps {
   categoryId: number;
   deptId: string;
   budgetId: number;
+  status: string | undefined
 }
 
 interface LevelData {
@@ -70,7 +71,7 @@ const months = [
   "Mar",
 ];
 
-const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId }) => {
+const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status }) => {
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
@@ -82,11 +83,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     catId: categoryId,
     deptId: Number(deptId),
   }
-  ,
-  {
-      enabled: !!subCategories, 
-  }
-);
+    ,
+    {
+      enabled: !!subCategories,
+    }
+  );
 
   const { data: levelEmployeesCount } = api.get.getLevelStaffCount.useQuery(
     {
@@ -549,7 +550,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                         <input
                           type={idx % 4 === 0 ? "number" : "text"}
                           className="w-full rounded border p-1"
-                          disabled={idx % 4 !== 0}
+                          disabled={idx % 4 !== 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
                           value={tableData[sub.subCategoryId]?.[month] ?? ""}
                           id={sub.subCategoryId + month}
                           onChange={(e) =>
@@ -565,14 +566,17 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse">
           {
-            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 ? <Button
+            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
               onClick={() => handleUpdate()}
             >
               Edit
-            </Button> : <Button
+            </Button>
+          }
+          {
+            categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
@@ -581,6 +585,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               Save
             </Button>
           }
+          
         </div>
       </details>
     </div>

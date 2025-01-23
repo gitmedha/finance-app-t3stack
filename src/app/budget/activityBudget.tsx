@@ -12,6 +12,7 @@ interface ActivityBudgetProps {
   categoryId: number;
   budgetId: number;
   deptId: string;
+  status: string | undefined
 }
 interface totalschema {
   totalQ1: number
@@ -77,7 +78,7 @@ const months = [
   "Mar",
 ];
 
-const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId }) => {
+const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId,status }) => {
 
   const userData = useSession()
   const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
@@ -515,7 +516,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                   {months.map((month,key) => (
                     <td key={month} className="border p-2">
                       <input
-                        disabled={key == 2 || key ==8 || key== 14 || key==20 || filter?.map==0}
+                        disabled={key == 2 || key == 8 || key == 14 || key == 20 || filter?.map == 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
                         type={key%6 == 0 ?"number":"text"}
                         className="w-full rounded border p-1"
                         value={tableData[sub.subCategoryId]?.[month] ?? ""}
@@ -540,7 +541,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         {
           filter?.map != 0 && <div className="py-2 pr-4 flex flex-row-reverse ">
             {
-              categoriesBudgetDetails && categoriesBudgetDetails.length > 0 ? <Button
+              categoriesBudgetDetails && categoriesBudgetDetails.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&  <Button
                 type="button"
                 className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
                 variant="soft"
@@ -549,7 +550,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                 onClick={() => handleUpdate()}
               >
                 Edit
-              </Button> : <Button
+              </Button>}
+            {categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&<Button
                 type="button"
                 className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
                 variant="soft"

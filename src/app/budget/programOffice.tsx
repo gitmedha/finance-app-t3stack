@@ -10,6 +10,7 @@ interface ProgramOfficeProps {
   categoryId: number;
   budgetId: number;
   deptId: string;
+  status: string | undefined
 }
 
 interface LevelData {
@@ -30,7 +31,7 @@ const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
-const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId }) => {
+const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId, status }) => {
   const userData = useSession()
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -115,7 +116,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
-          Count:  Number(item.total),
+          Count: Number(item.total),
           Apr: Number(item.april) ?? "0",
           May: Number(item.may) ?? "0",
           Jun: Number(item.june) ?? "0",
@@ -269,9 +270,9 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
                 <th className="border p-2">PROGRAM OFFICE</th>
 
                 {months.map((month) => (
-                <th key={month} className="border p-2">{month}</th>
+                  <th key={month} className="border p-2">{month}</th>
                 ))}
-              
+
               </tr>
             </thead>
             <tbody>
@@ -288,6 +289,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
                         type="text"
                         className="w-full rounded border p-1"
                         value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                        disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
                         onChange={(e) =>
                           handleInputChange(sub.subCategoryId, month, e.target.value)
                         }
@@ -301,7 +303,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse ">
           {
-            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 ? <Button
+            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
@@ -310,7 +312,9 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
               onClick={() => handleUpdate()}
             >
               Edit
-            </Button> : <Button
+            </Button>}
+          {categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&
+            <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"

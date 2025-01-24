@@ -87,6 +87,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
+  },{
+    enabled:!!budgetId
   });
 
   useEffect(() => {
@@ -112,9 +114,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         };
       });
     }
-    if (categoriesBudgetDetails) {
+    if (categoriesBudgetDetails && categoriesBudgetDetails.result.length > 0 && budgetId == categoriesBudgetDetails.budgeId) {
       const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-      categoriesBudgetDetails.forEach((item) => {
+      categoriesBudgetDetails.result.forEach((item) => {
         initialData[item.subcategoryId] = {
           Count: Number(item.total),
           Apr: Number(item.april) ?? "0",
@@ -254,7 +256,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
   // if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div className="my-6 rounded-md bg-white shadow-lg">
+    <div className="my-6 rounded-md bg-white shadow-lg">{budgetId}
       <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow">
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary">
           <h1 className="uppercase">{section}</h1>
@@ -284,7 +286,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
                     <td key={month} className="border p-2">
                       <input
                         type="text"
-                        disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                        // disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
                         className="w-full rounded border p-1"
                         value={tableData[sub.subCategoryId]?.[month] ?? ""}
                         onChange={(e) =>
@@ -301,7 +303,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
 
         <div className="py-2 pr-4 flex flex-row-reverse">
           {
-            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+            categoriesBudgetDetails && categoriesBudgetDetails.result.length > 0 ? <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
@@ -311,19 +313,20 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             // Disable the button if input is empty
             >
               Edit
+            </Button> : <Button
+              type="button"
+              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+              variant="soft"
+              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+              disabled={isSaveDisabled()}
+              onClick={() => handleSave()}
+            // Disable the button if input is empty
+            >
+              Save
             </Button>}
-          {categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
-            type="button"
-            className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-            variant="soft"
-            style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-            disabled={isSaveDisabled()}
-            onClick={() => handleSave()}
-          // Disable the button if input is empty
-          >
-            Save
-          </Button>
-          }
+          {/* {categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&      && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&
+          
+          } */}
 
         </div>
       </details>

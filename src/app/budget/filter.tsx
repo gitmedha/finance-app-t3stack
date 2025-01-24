@@ -14,8 +14,8 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   );
   // Define years from 2023-24 to 2029-30
   const years = [
-    "2023-24", "2024-25", "2025-26", "2026-27",
-    "2027-28", "2028-29", "2029-30"
+    "2029-30","2023-24", "2024-25", "2025-26", "2026-27",
+    "2027-28", "2028-29"
   ];
   const updateBudgetStatus = api.post.updateStatusBudgetDetails.useMutation()
   useEffect(() => {
@@ -99,7 +99,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                <span>{filters.departmentname}</span>
+                <span>{filters.departmentname} {filters.department}</span>
                 <RiArrowDropDownLine size={30} />
               </button>
             </DropdownMenu.Trigger>

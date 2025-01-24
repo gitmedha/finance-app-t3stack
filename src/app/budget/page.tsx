@@ -33,6 +33,8 @@ const Budget: React.FC = () => {
   });
   const [budgetId,setBudgetId] = useState<number|null>(null)
   const handleSelect = (name: string, value: HandleSelectValue) => {
+    // setBudgetId(null)
+    console.log("I am getting hitted")
     if (name === 'department' && typeof value === 'object' && value !== null) {
       const departmentValue = value as { id: string; departmentname: string }; // Narrow type
       setFilters((prev) => ({
@@ -57,9 +59,9 @@ const Budget: React.FC = () => {
       : {
         deptId:1,
         financialYear:"1"
-      }, // Pass undefined if no filters are set to skip fetching
+      }, 
     {
-      enabled: shouldFetch, // Only fetch if the filters are valid
+      enabled: shouldFetch,
     }
   );
   useEffect(() => {
@@ -76,14 +78,18 @@ const Budget: React.FC = () => {
   return (
     <div className="mt-10 overflow-hidden m-2 p-2">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId} status={status} setStatus={setStatus}/>
+      {budgetId}
       {
-        budgetId && <div>
+        isLoading && <div>loading</div>
+      }
+      {
+        budgetId && !isLoading && <div>
           <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} />
-          <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} status={status} />
-          <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} status={status} />
-          <ProgramOffice section='PROGRAM OFFICE' categoryId={data?.categories[3] ? data?.categories[3].categoryId : 4} budgetId={budgetId} deptId={filters.department} status={status} />
-          <CapitalCost section='CAPITAL COST' categoryId={data?.categories[4] ? data?.categories[4].categoryId : 5} budgetId={budgetId} deptId={filters.department} status={status} />
-          <OverHeads section='OVERHEADS' categoryId={data?.categories[5] ? data?.categories[5].categoryId : 6} budgetId={budgetId} deptId={filters.department} status={status} />
+          {/* <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} status={status} /> */}
+          {/* <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} status={status} /> */}
+          {/* <ProgramOffice section='PROGRAM OFFICE' categoryId={data?.categories[3] ? data?.categories[3].categoryId : 4} budgetId={budgetId} deptId={filters.department} status={status} /> */}
+          {/* <CapitalCost section='CAPITAL COST' categoryId={data?.categories[4] ? data?.categories[4].categoryId : 5} budgetId={budgetId} deptId={filters.department} status={status} /> */}
+          {/* <OverHeads section='OVERHEADS' categoryId={data?.categories[5] ? data?.categories[5].categoryId : 6} budgetId={budgetId} deptId={filters.department} status={status} /> */}
         </div>
       }      
     </div>

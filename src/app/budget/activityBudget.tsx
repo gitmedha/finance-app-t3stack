@@ -50,7 +50,6 @@ const subProgramActivites:subProgramActivitesSchema[] = [
   {map:0,name:"All"}
 ]
 
-
 const months = [
   "Qty1",
   "Rate1",
@@ -81,12 +80,103 @@ const months = [
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId,status }) => {
 
   const userData = useSession()
-  const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
+  // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
-  const [tableData, setTableData] = useState<TableData>({});
   const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
+  const { data: programData, isLoading: programDataLodaing } = api.get.getProgramActivities.useQuery({
+    budgetId,
+    catId: categoryId,
+    deptId: Number(deptId),
+    activity: (filter?.map)?.toString()
+  })
+  useEffect(() => {
+    if (programData?.budgetId == budgetId) {
+      const initialData: TableData = {};
+      if (programData?.subCategories) {
+        console.log("After getting the subcategories")
+        programData.subCategories.forEach((sub) => {
+          initialData[sub.subCategoryId] = {
+            Count: "",
+            Qty1: 0,
+            Rate1: "0",
+            Amount1: "0",
+            Apr: "0",
+            May: "0",
+            Jun: "0",
+            Qty2: 0,
+            Rate2: "0",
+            Amount2: "0",
+            Jul: "0",
+            Aug: "0",
+            Sep: "0",
+            Qty3: 0,
+            Rate3: "0",
+            Amount3: "0",
+            Oct: "0",
+            Nov: "0",
+            Dec: "0",
+            Qty4: "0",
+            Rate4: "0",
+            Amount4: "0",
+            Jan: "0",
+            Feb: "0",
+            Mar: "0",
+            budgetDetailsId: 0
+          };
+        });
+        setTableData(initialData);
+      }
+      if ( programData.result.length > 0 && programData.subCategories.length >0) {
+          
+          console.log("After getting the categorydetails")
+          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+          programData.result.forEach((item) => {
+            console.log(Number(item.april), Number(item.may), Number(item.june))
+            initialData[item.subcategoryId] = {
+              Count: item.total ? Number(item.total) : 0,
+              Apr: item.april ? Number(item.april) : "0",
+              May: item.may ? Number(item.may) : "0",
+              Jun: item.june ? Number(item.june) : "0",
+              Jul: item.july ? Number(item.july) : "0",
+              Aug: item.august ? Number(item.august) : "0",
+              Sep: item.september ? Number(item.september) : "0",
+              Oct: item.october ? Number(item.october) : "0",
+              Nov: item.november ? Number(item.november) : "0",
+              Dec: item.december ? Number(item.december) : "0",
+              Jan: item.january ? Number(item.january) : "0",
+              Feb: item.february ? Number(item.february) : "0",
+              Mar: item.march ? Number(item.march) : "0",
+              Qty1: item.qty1 ? Number(Number(item.qty1)) : "0",
+              Rate1: item.rate1 ? Number(item.rate1) : "0",
+              Amount1: item.amount1 ? Number(item.amount1) : "0",
+              Qty2: item.qty2 ? Number(item.qty2) : "0",
+              Rate2: item.rate2 ? Number(item.rate2) : "0",
+              Amount2: item.amount2 ? Number(item.amount2) : "0",
+              Qty3: item.qty3 ? Number(Number(item.qty3)) : "0",
+              Rate3: item.rate3 ? Number(item.rate3) : "0",
+              Amount3: item.amount3 ? Number(item.amount3) : "0",
+              Qty4: item.qty4 ? Number(Number(item.qty4)) : "0",
+              Rate4: item.rate4 ? Number(item.rate4) : "0",
+              Amount4: item.amount4 ? Number(item.amount4) : "0",
+              budgetDetailsId: item.id ? Number(Number(item.id)) : 0 
+            };
+            totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+            totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+            totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+            totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+          });
+          setTableData(initialData);
+          setTotalQty(totalQtyAfterBudgetDetails)
+        }      
+
+    }
+
+    // this one if we get the subcategories and the category details
+
+  }, [programData])
+  const [tableData, setTableData] = useState<TableData>({});
   const handleSelect = (val: subProgramActivitesSchema) => {
     setFilter(val)
   }
@@ -105,91 +195,91 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       });
     });
   };
-  const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
-    budgetId,
-    catId: categoryId,
-    deptId: Number(deptId),
-    activity:(filter?.map)?.toString()
-  },{
-    enabled:!!filter
-  });
-  useEffect(() => {
-    const initialData: TableData = {};
-    if (data?.subCategories) {
-      data.subCategories.forEach((sub) => {
-        initialData[sub.subCategoryId] = {
-          Count:"",
-          Qty1:0,
-          Rate1:"0",
-          Amount1:"0",
-          Apr:"0",
-          May:"0",
-          Jun:"0",
-          Qty2:0,
-          Rate2:"0",
-          Amount2:"0",
-          Jul:"0",
-          Aug:"0",
-          Sep:"0",
-          Qty3:0,
-          Rate3:"0",
-          Amount3:"0",
-          Oct:"0",
-          Nov:"0",
-          Dec:"0",
-          Qty4:"0",
-          Rate4:"0",
-          Amount4:"0",
-          Jan:"0",
-          Feb:"0",
-          Mar:"0",
-          budgetDetailsId:0
-        };
-      });
-    }
-    if (categoriesBudgetDetails) {
-      const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-      categoriesBudgetDetails.forEach((item) => {
-        initialData[item.subcategoryId] = {
-          Count: item.total? Number(item.total) : 0,
-          Apr: item.april ? Number(item.april) : "0",
-          May: item.may ? Number(item.may) : "0",
-          Jun: item.june ? Number(item.june) : "0",
-          Jul: item.july ? Number(item.july) : "0",
-          Aug: item.august ? Number(item.august) : "0",
-          Sep: item.september ? Number(item.september) : "0",
-          Oct: item.october ? Number(item.october) : "0",
-          Nov: item.november ? Number(item.november) : "0",
-          Dec: item.december ? Number(item.december) : "0",
-          Jan: item.january ? Number(item.january) : "0",
-          Feb: item.february ? Number(item.february) : "0",
-          Mar: item.march ? Number(item.march) : "0",
-          Qty1: item.qty1 ? Number(Number(item.qty1)) : "0",
-          Rate1: item.rate1 ? Number(item.rate1) : "0",
-          Amount1: item.amount1 ? Number(item.amount1) : "0",
-          Qty2: item.qty2 ? Number(item.qty2) : "0",
-          Rate2: item.rate2 ? Number(item.rate2) : "0",
-          Amount2: item.amount2 ? Number(item.amount2) : "0",
-          Qty3: item.qty3 ? Number(Number(item.qty3)) : "0",
-          Rate3: item.rate3 ? Number(item.rate3) : "0",
-          Amount3: item.amount3 ? Number(item.amount3) : "0",
-          Qty4: item.qty4 ? Number( Number(item.qty4)) : "0",
-          Rate4: item.rate4 ? Number(item.rate4) : "0",
-          Amount4: item.amount4 ? Number(item.amount4) : "0",
-          budgetDetailsId: item.id ? Number(Number(item.id)) :0 
-        };
-        totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-        totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-        totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-        totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
-      });
-      setTableData(initialData);
-      setTotalQty(totalQtyAfterBudgetDetails)
-    }
-    else {
-      setTableData({});
-    }
-  }, [categoriesBudgetDetails]);
+  // const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  //   budgetId,
+  //   catId: categoryId,
+  //   deptId: Number(deptId),
+  //   activity:(filter?.map)?.toString()
+  // },{
+  //   enabled:!!filter
+  // });
+  // useEffect(() => {
+  //   const initialData: TableData = {};
+  //   if (data?.subCategories) {
+  //     data.subCategories.forEach((sub) => {
+  //       initialData[sub.subCategoryId] = {
+          // Count:"",
+          // Qty1:0,
+          // Rate1:"0",
+          // Amount1:"0",
+          // Apr:"0",
+          // May:"0",
+          // Jun:"0",
+          // Qty2:0,
+          // Rate2:"0",
+          // Amount2:"0",
+          // Jul:"0",
+          // Aug:"0",
+          // Sep:"0",
+          // Qty3:0,
+          // Rate3:"0",
+          // Amount3:"0",
+          // Oct:"0",
+          // Nov:"0",
+          // Dec:"0",
+          // Qty4:"0",
+          // Rate4:"0",
+          // Amount4:"0",
+          // Jan:"0",
+          // Feb:"0",
+          // Mar:"0",
+          // budgetDetailsId:0
+  //       };
+  //     });
+  //   }
+  //   if (categoriesBudgetDetails) {
+  //     const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+  //     categoriesBudgetDetails.forEach((item) => {
+  //       initialData[item.subcategoryId] = {
+          // Count: item.total? Number(item.total) : 0,
+          // Apr: item.april ? Number(item.april) : "0",
+          // May: item.may ? Number(item.may) : "0",
+          // Jun: item.june ? Number(item.june) : "0",
+          // Jul: item.july ? Number(item.july) : "0",
+          // Aug: item.august ? Number(item.august) : "0",
+          // Sep: item.september ? Number(item.september) : "0",
+          // Oct: item.october ? Number(item.october) : "0",
+          // Nov: item.november ? Number(item.november) : "0",
+          // Dec: item.december ? Number(item.december) : "0",
+          // Jan: item.january ? Number(item.january) : "0",
+          // Feb: item.february ? Number(item.february) : "0",
+          // Mar: item.march ? Number(item.march) : "0",
+          // Qty1: item.qty1 ? Number(Number(item.qty1)) : "0",
+          // Rate1: item.rate1 ? Number(item.rate1) : "0",
+          // Amount1: item.amount1 ? Number(item.amount1) : "0",
+          // Qty2: item.qty2 ? Number(item.qty2) : "0",
+          // Rate2: item.rate2 ? Number(item.rate2) : "0",
+          // Amount2: item.amount2 ? Number(item.amount2) : "0",
+          // Qty3: item.qty3 ? Number(Number(item.qty3)) : "0",
+          // Rate3: item.rate3 ? Number(item.rate3) : "0",
+          // Amount3: item.amount3 ? Number(item.amount3) : "0",
+          // Qty4: item.qty4 ? Number( Number(item.qty4)) : "0",
+          // Rate4: item.rate4 ? Number(item.rate4) : "0",
+          // Amount4: item.amount4 ? Number(item.amount4) : "0",
+          // budgetDetailsId: item.id ? Number(Number(item.id)) :0 
+        // };
+  //       totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+  //       totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+  //       totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+  //       totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+  //     });
+  //     setTableData(initialData);
+  //     setTotalQty(totalQtyAfterBudgetDetails)
+  //   }
+  //   else {
+  //     setTableData({});
+  //   }
+  // }, [categoriesBudgetDetails]);
  
   const handleInputChange = (
     subCategoryId: number,
@@ -506,7 +596,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
               </tr>
             </thead>
             <tbody>
-              {data?.subCategories.map((sub,key) => (
+              {programData?.subCategories.map((sub,key) => (
                 <tr
                   key={sub.subCategoryId}
                   className="text-sm transition hover:bg-gray-100"
@@ -516,7 +606,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                   {months.map((month,key) => (
                     <td key={month} className="border p-2">
                       <input
-                        disabled={key == 2 || key == 8 || key == 14 || key == 20 || filter?.map == 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                        // disabled={key == 2 || key == 8 || key == 14 || key == 20 || filter?.map == 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
                         type={key%6 == 0 ?"number":"text"}
                         className="w-full rounded border p-1"
                         value={tableData[sub.subCategoryId]?.[month] ?? ""}
@@ -541,7 +631,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         {
           filter?.map != 0 && <div className="py-2 pr-4 flex flex-row-reverse ">
             {
-              categoriesBudgetDetails && categoriesBudgetDetails.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&  <Button
+              programData?.result && programData?.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&  <Button
                 type="button"
                 className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
                 variant="soft"
@@ -551,7 +641,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
               >
                 Edit
               </Button>}
-            {categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&<Button
+            {programData?.result?.length == 0 && !programData.result && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&<Button
                 type="button"
                 className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
                 variant="soft"

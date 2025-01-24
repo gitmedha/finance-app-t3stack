@@ -36,7 +36,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
-  const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
+  // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
   const [tableData, setTableData] = useState<TableData>({});
   const updateTotalQtyVals = (which: string, difference: number) => {
     setTotalQty((prev) => {
@@ -84,62 +84,125 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       });
     });
   };
-  const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  // const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  //   budgetId,
+  //   catId: categoryId,
+  //   deptId: Number(deptId),
+  // });
+  const { data: programOfficeData, isLoading: programOfficeDataLodaing } = api.get.getProgramOfficeData.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
-  });
+  })
   useEffect(() => {
-    const initialData: TableData = {};
+    if (programOfficeData?.budgetId == budgetId) {
+      const initialData: TableData = {};
+      if (programOfficeData?.subCategories) {
+        console.log("After getting the subcategories")
+        programOfficeData.subCategories.forEach((sub) => {
+          initialData[sub.subCategoryId] = {
+            Count: "",
+            Apr: "0",
+            May: "0",
+            Jun: "0",
+            Jul: "0",
+            Aug: "0",
+            Sep: "0",
+            Oct: "0",
+            Nov: "0",
+            Dec: "0",
+            Jan: "0",
+            Feb: "0",
+            Mar: "0",
+            budgetDetailsId: 0,
+          };
+        });
+        setTableData(initialData);
+      }
+      if (programOfficeData.result.length > 0 && programOfficeData.subCategories.length > 0) {
 
-    if (data?.subCategories) {
-      data.subCategories.forEach((sub) => {
-        initialData[sub.subCategoryId] = {
-          Count: "",
-          Apr: "0",
-          May: "0",
-          Jun: "0",
-          Jul: "0",
-          Aug: "0",
-          Sep: "0",
-          Oct: "0",
-          Nov: "0",
-          Dec: "0",
-          Jan: "0",
-          Feb: "0",
-          Mar: "0",
-          budgetDetailsId: 0,
-        };
-      });
+        console.log("After getting the categorydetails")
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        programOfficeData.result.forEach((item) => {
+          console.log(Number(item.april), Number(item.may), Number(item.june))
+          initialData[item.subcategoryId] = {
+            Count: Number(item.total),
+            Apr: Number(item.april) ?? "0",
+            May: Number(item.may) ?? "0",
+            Jun: Number(item.june) ?? "0",
+            Jul: Number(item.july) ?? "0",
+            Aug: Number(item.august) ?? "0",
+            Sep: Number(item.september) ?? "0",
+            Oct: Number(item.october) ?? "0",
+            Nov: Number(item.november) ?? "0",
+            Dec: Number(item.december) ?? "0",
+            Jan: Number(item.january) ?? "0",
+            Feb: Number(item.february) ?? "0",
+            Mar: Number(item.march) ?? "0",
+            budgetDetailsId: Number(item.id),
+          };
+          totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+          totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+          totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+          totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+        });
+        setTableData(initialData);
+        setTotalQty(totalQtyAfterBudgetDetails)
+      }
+
     }
-    if (categoriesBudgetDetails) {
-      const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-      categoriesBudgetDetails.forEach((item) => {
-        initialData[item.subcategoryId] = {
-          Count: Number(item.total),
-          Apr: Number(item.april) ?? "0",
-          May: Number(item.may) ?? "0",
-          Jun: Number(item.june) ?? "0",
-          Jul: Number(item.july) ?? "0",
-          Aug: Number(item.august) ?? "0",
-          Sep: Number(item.september) ?? "0",
-          Oct: Number(item.october) ?? "0",
-          Nov: Number(item.november) ?? "0",
-          Dec: Number(item.december) ?? "0",
-          Jan: Number(item.january) ?? "0",
-          Feb: Number(item.february) ?? "0",
-          Mar: Number(item.march) ?? "0",
-          budgetDetailsId: Number(item.id),
-        };
-        totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-        totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-        totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-        totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
-      });
-      setTotalQty(totalQty)
-    }
-    setTableData(initialData);
-  }, [data, categoriesBudgetDetails]);
+  }, [programOfficeData])
+  // useEffect(() => {
+  //   const initialData: TableData = {};
+
+  //   if (data?.subCategories) {
+  //     data.subCategories.forEach((sub) => {
+  //       initialData[sub.subCategoryId] = {
+  //         Count: "",
+  //         Apr: "0",
+  //         May: "0",
+  //         Jun: "0",
+  //         Jul: "0",
+  //         Aug: "0",
+  //         Sep: "0",
+  //         Oct: "0",
+  //         Nov: "0",
+  //         Dec: "0",
+  //         Jan: "0",
+  //         Feb: "0",
+  //         Mar: "0",
+  //         budgetDetailsId: 0,
+  //       };
+  //     });
+  //   }
+  //   if (categoriesBudgetDetails) {
+  //     const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+  //     categoriesBudgetDetails.forEach((item) => {
+  //       initialData[item.subcategoryId] = {
+  //         Count: Number(item.total),
+  //         Apr: Number(item.april) ?? "0",
+  //         May: Number(item.may) ?? "0",
+  //         Jun: Number(item.june) ?? "0",
+  //         Jul: Number(item.july) ?? "0",
+  //         Aug: Number(item.august) ?? "0",
+  //         Sep: Number(item.september) ?? "0",
+  //         Oct: Number(item.october) ?? "0",
+  //         Nov: Number(item.november) ?? "0",
+  //         Dec: Number(item.december) ?? "0",
+  //         Jan: Number(item.january) ?? "0",
+  //         Feb: Number(item.february) ?? "0",
+  //         Mar: Number(item.march) ?? "0",
+  //         budgetDetailsId: Number(item.id),
+  //       };
+  //       totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+  //       totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+  //       totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+  //       totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+  //     });
+  //     setTotalQty(totalQty)
+  //   }
+  //   setTableData(initialData);
+  // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -276,7 +339,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
               </tr>
             </thead>
             <tbody>
-              {data?.subCategories.map((sub) => (
+              {programOfficeData?.subCategories.map((sub) => (
                 <tr
                   key={sub.subCategoryId}
                   className="text-sm transition hover:bg-gray-100"
@@ -303,7 +366,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse ">
           {
-            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+            programOfficeData?.result && programOfficeData.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
@@ -313,7 +376,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
             >
               Edit
             </Button>}
-          {categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&
+          {programOfficeData?.result?.length == 0 && !programOfficeData.result && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&
             <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"

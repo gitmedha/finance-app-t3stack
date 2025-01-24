@@ -36,7 +36,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
-  const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
+  // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
   const [tableData, setTableData] = useState<TableData>({});
 
   const updateTotalQtyVals = (which: string, difference: number) => {
@@ -85,63 +85,126 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       });
     });
   };
-  const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  // const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  //   budgetId,
+  //   catId: categoryId,
+  //   deptId: Number(deptId),
+  // });
+  const { data: overHeadData, isLoading:overHeadDataLodaing } = api.get.getOverHeadsData.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
-  });
+  })
   useEffect(() => {
-    const initialData: TableData = {};
+    if (overHeadData?.budgetId == budgetId) {
+      const initialData: TableData = {};
+      if (overHeadData?.subCategories) {
+        console.log("After getting the subcategories")
+        overHeadData.subCategories.forEach((sub) => {
+          initialData[sub.subCategoryId] = {
+            Count: "",
+            Apr: "0",
+            May: "0",
+            Jun: "0",
+            Jul: "0",
+            Aug: "0",
+            Sep: "0",
+            Oct: "0",
+            Nov: "0",
+            Dec: "0",
+            Jan: "0",
+            Feb: "0",
+            Mar: "0",
+            budgetDetailsId: 0,
+          };
+        });
+        setTableData(initialData);
+      }
+      if (overHeadData.result.length > 0 && overHeadData.subCategories.length > 0) {
 
-    if (data?.subCategories) {
-      data.subCategories.forEach((sub) => {
-        initialData[sub.subCategoryId] = {
-          Count: "",
-          Apr: "0",
-          May: "0",
-          Jun: "0",
-          Jul: "0",
-          Aug: "0",
-          Sep: "0",
-          Oct: "0",
-          Nov: "0",
-          Dec: "0",
-          Jan: "0",
-          Feb: "0",
-          Mar: "0",
-          budgetDetailsId: 0,
-        };
-      });
-    }
-    if (categoriesBudgetDetails) {
-      categoriesBudgetDetails.forEach((item) => {
+        console.log("After getting the categorydetails")
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-        initialData[item.subcategoryId] = {
-          Count: Number(item.total),
-          Apr: Number(item.april) ?? "0",
-          May: Number(item.may) ?? "0",
-          Jun: Number(item.june) ?? "0",
-          Jul: Number(item.july) ?? "0",
-          Aug: Number(item.august )?? "0",
-          Sep: Number(item.september) ?? "0",
-          Oct: Number(item.october) ?? "0",
-          Nov: Number(item.november) ?? "0",
-          Dec: Number(item.december) ?? "0",
-          Jan: Number(item.january) ?? "0",
-          Feb: Number(item.february) ?? "0",
-          Mar: Number(item.march) ?? "0",
-          budgetDetailsId: Number(item.id),
-        };
-        totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-        totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-        totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-        totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
-      });
-      setTotalQty(totalQty)
-    }
+        overHeadData.result.forEach((item) => {
+          console.log(Number(item.april), Number(item.may), Number(item.june))
+          initialData[item.subcategoryId] = {
+            Count: Number(item.total),
+            Apr: Number(item.april) ?? "0",
+            May: Number(item.may) ?? "0",
+            Jun: Number(item.june) ?? "0",
+            Jul: Number(item.july) ?? "0",
+            Aug: Number(item.august) ?? "0",
+            Sep: Number(item.september) ?? "0",
+            Oct: Number(item.october) ?? "0",
+            Nov: Number(item.november) ?? "0",
+            Dec: Number(item.december) ?? "0",
+            Jan: Number(item.january) ?? "0",
+            Feb: Number(item.february) ?? "0",
+            Mar: Number(item.march) ?? "0",
+            budgetDetailsId: Number(item.id),
+          };
+          totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+          totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+          totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+          totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+        });
+        setTableData(initialData);
+        setTotalQty(totalQtyAfterBudgetDetails)
+      }
 
-    setTableData(initialData);
-  }, [data, categoriesBudgetDetails]);
+    }
+  }, [overHeadData])
+  // useEffect(() => {
+  //   const initialData: TableData = {};
+
+  //   if (data?.subCategories) {
+  //     data.subCategories.forEach((sub) => {
+  //       initialData[sub.subCategoryId] = {
+  //         Count: "",
+  //         Apr: "0",
+  //         May: "0",
+  //         Jun: "0",
+  //         Jul: "0",
+  //         Aug: "0",
+  //         Sep: "0",
+  //         Oct: "0",
+  //         Nov: "0",
+  //         Dec: "0",
+  //         Jan: "0",
+  //         Feb: "0",
+  //         Mar: "0",
+  //         budgetDetailsId: 0,
+  //       };
+  //     });
+  //   }
+  //   if (categoriesBudgetDetails) {
+  //     categoriesBudgetDetails.forEach((item) => {
+  //       const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+  //       initialData[item.subcategoryId] = {
+  //         Count: Number(item.total),
+  //         Apr: Number(item.april) ?? "0",
+  //         May: Number(item.may) ?? "0",
+  //         Jun: Number(item.june) ?? "0",
+  //         Jul: Number(item.july) ?? "0",
+  //         Aug: Number(item.august )?? "0",
+  //         Sep: Number(item.september) ?? "0",
+  //         Oct: Number(item.october) ?? "0",
+  //         Nov: Number(item.november) ?? "0",
+  //         Dec: Number(item.december) ?? "0",
+  //         Jan: Number(item.january) ?? "0",
+  //         Feb: Number(item.february) ?? "0",
+  //         Mar: Number(item.march) ?? "0",
+  //         budgetDetailsId: Number(item.id),
+  //       };
+  //       totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+  //       totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+  //       totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+  //       totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+  //     });
+  //     setTotalQty(totalQty)
+  //   }
+
+  //   setTableData(initialData);
+  // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
     // If validation passes, proceed with saving the budget details
@@ -276,7 +339,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
               </tr>
             </thead>
             <tbody>
-              {data?.subCategories.map((sub) => (
+              {overHeadData?.subCategories.map((sub) => (
                 <tr
                   key={sub.subCategoryId} 
                   className="text-sm transition hover:bg-gray-100"
@@ -303,7 +366,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse ">
           {
-            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+            overHeadData?.result && overHeadData.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
@@ -313,7 +376,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
             >
               Edit
             </Button> }
-          {categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+          {overHeadData?.result?.length == 0 && !overHeadData && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"

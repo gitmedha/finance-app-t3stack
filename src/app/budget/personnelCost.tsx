@@ -452,16 +452,16 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       if (!subCategoryData || !avgQty[subCategoryId]) return updatedData;
 
       if (month == "Apr" || month == "May" || month == "Jun") {
-        const diff = Number(subCategoryData[month]) - Number(value)
+        const diff = Number(value) - Number(subCategoryData[month]) 
         updateTotalQtyVals("totalQ1", diff)
       }
       if (month == "Jul" || month == "Aug" || month == "Sep") {
-        const diff = Number(subCategoryData[month]) - Number(value)
+        const diff = Number(value) - Number(subCategoryData[month]) 
         console.log(diff)
         updateTotalQtyVals("totalQ2", diff)
       }
       if (month == "Oct" || month == "Nov" || month == "Dec") {
-        const diff = Number(subCategoryData[month]) - Number(value)
+        const diff = Number(value) - Number(subCategoryData[month]) 
         updateTotalQtyVals("totalQ3", diff)
       }
       if (month == "Jan" || month == "Feb" || month == "Mar") {
@@ -472,7 +472,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         const qty = parseInt(value, 10) || 0;
 
         if (month === "Qty1") {
-          const aprDiff = qty * avgQty[subCategoryId].Apr - Number(subCategoryData.Apr)
+          const aprDiff = qty * avgQty[subCategoryId].Apr-Number(subCategoryData.Apr) 
           const mayDiff = qty * avgQty[subCategoryId].May - Number(subCategoryData.May)
           const jubDiff = qty * avgQty[subCategoryId].Jun - Number(subCategoryData.Jun)
           updateTotalQtyVals("totalQ1", aprDiff)
@@ -731,7 +731,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   };
   return (
   
-    <div className="my-6 rounded-md bg-white shadow-lg">{personnelCostData?.budgetId}
+    <div className="my-6 rounded-md bg-white shadow-lg">
     {/* {categoriesBudgetDetails && categoriesBudgetDetails.result.length > 0 && "data from the category details"} */}
       <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500">
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
@@ -783,14 +783,17 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse">
           {
-            personnelCostData?.result && personnelCostData.result.length > 0 ? <Button
+            personnelCostData?.result && personnelCostData.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
               onClick={() => handleUpdate()}
             >
               Edit
-            </Button>:<Button
+            </Button>
+          }
+          {
+            personnelCostData?.result.length == 0 && !personnelCostData && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&      <Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
@@ -799,9 +802,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             Save
           </Button>
           }
-          {/* {
-          personnelCostData?.result.length == 0 && !personnelCostData && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&      && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&
-          } */}
 
         </div>
       </details>

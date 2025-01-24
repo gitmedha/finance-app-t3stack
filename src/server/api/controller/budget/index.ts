@@ -482,7 +482,490 @@ export const getPersonalCatDetials = protectedProcedure
             throw new Error("Failed to get staff level count. Please try again.");
         }
     });
+export const getProgramActivities = protectedProcedure
+    .input(
+        z.object({
+            deptId: z.number(),
+            budgetId: z.number(),
+            catId: z.number(),
+            activity: z.string().optional(),
+        })
+    )
+    .query(async ({ ctx, input }) => {
+        try {
+            // get sub categories
+            const subCategories = await ctx.db
+                .select({
+                    subCategoryId: categoryHierarchyInFinanceProject.catId,
+                    subCategoryName: categoryMasterInFinanceProject.categoryname,
+                })
+                .from(categoryHierarchyInFinanceProject)
+                .innerJoin(
+                    categoryMasterInFinanceProject,
+                    eq(categoryHierarchyInFinanceProject.catId, categoryMasterInFinanceProject.id)
+                )
+                .where(eq(categoryHierarchyInFinanceProject.parentId, input.catId));
+            if (!subCategories)
+                throw new Error("Failed to get the subcategories")
+            // category budgetDetails call
+            const baseConditions = [
+                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
+                eq(budgetDetailsInFinanceProject.catid, input.catId),
+            ];
 
+            // Add activity condition if it is not null or undefined
+            if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
+            }
+            let result
+            // Execute the query with all conditions
+            if (input.activity == "0") {
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
+            else {
+                result = await ctx.db
+                    .select()
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions));
+            }
+            
+            return {
+                subCategories,budgetId: input.budgetId, result
+            };
+
+        } catch (error) {
+            console.error("Error in getting staff level count:", error);
+            throw new Error("Failed to get staff level count. Please try again.");
+        }
+    });
+export const getTravelCatDetials = protectedProcedure
+    .input(
+        z.object({
+            deptId: z.number(),
+            budgetId: z.number(),
+            catId: z.number(),
+            activity: z.string().optional(),
+            searchSubCatId:z.number()
+        })
+    )
+    .query(async ({ ctx, input }) => {
+        try {
+            // get sub categories
+            const subCategories = await ctx.db
+                .select({
+                    subCategoryId: categoryHierarchyInFinanceProject.catId,
+                    subCategoryName: categoryMasterInFinanceProject.categoryname,
+                })
+                .from(categoryHierarchyInFinanceProject)
+                .innerJoin(
+                    categoryMasterInFinanceProject,
+                    eq(categoryHierarchyInFinanceProject.catId, categoryMasterInFinanceProject.id)
+                )
+                .where(eq(categoryHierarchyInFinanceProject.parentId, input.searchSubCatId));
+            if (!subCategories)
+                throw new Error("Failed to get the subcategories")
+            // category budgetDetails call
+            const baseConditions = [
+                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
+                eq(budgetDetailsInFinanceProject.catid, input.catId),
+            ];
+
+            // Add activity condition if it is not null or undefined
+            if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
+            }
+            let result
+            // Execute the query with all conditions
+            if (input.activity == "0") {
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
+            else {
+                result = await ctx.db
+                    .select()
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions));
+            }
+            // make a call for staff count
+            const levelStats = await ctx.db
+                .select({
+                    level: staffMasterInFinanceProject.level,
+                    employeeCount: sql<number>`COUNT(${staffMasterInFinanceProject.id})`.as("employee_count"),
+                })
+                .from(staffMasterInFinanceProject)
+                .innerJoin(
+                    salaryDetailsInFinanceProject,
+                    eq(salaryDetailsInFinanceProject.empId, staffMasterInFinanceProject.id)
+                )
+                .where(
+                    and(
+                        eq(staffMasterInFinanceProject.department, input.deptId),
+                        isNotNull(salaryDetailsInFinanceProject.salary)
+                    )
+                )
+                .groupBy(staffMasterInFinanceProject.level);
+
+            return {
+                subCategories, levelStats, budgetId: input.budgetId, result
+            };
+
+        } catch (error) {
+            console.error("Error in getting staff level count:", error);
+            throw new Error("Failed to get staff level count. Please try again.");
+        }
+    });
+export const getProgramOfficeData = protectedProcedure
+    .input(
+        z.object({
+            deptId: z.number(),
+            budgetId: z.number(),
+            catId: z.number(),
+            activity: z.string().optional(),
+        })
+    )
+    .query(async ({ ctx, input }) => {
+        try {
+            // get sub categories
+            const subCategories = await ctx.db
+                .select({
+                    subCategoryId: categoryHierarchyInFinanceProject.catId,
+                    subCategoryName: categoryMasterInFinanceProject.categoryname,
+                })
+                .from(categoryHierarchyInFinanceProject)
+                .innerJoin(
+                    categoryMasterInFinanceProject,
+                    eq(categoryHierarchyInFinanceProject.catId, categoryMasterInFinanceProject.id)
+                )
+                .where(eq(categoryHierarchyInFinanceProject.parentId, input.catId));
+            if (!subCategories)
+                throw new Error("Failed to get the subcategories")
+            // category budgetDetails call
+            const baseConditions = [
+                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
+                eq(budgetDetailsInFinanceProject.catid, input.catId),
+            ];
+
+            // Add activity condition if it is not null or undefined
+            if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
+            }
+            let result
+            // Execute the query with all conditions
+            if (input.activity == "0") {
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
+            else {
+                result = await ctx.db
+                    .select()
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions));
+            }
+
+            return {
+                subCategories, budgetId: input.budgetId, result
+            };
+
+        } catch (error) {
+            console.error("Error in getting staff level count:", error);
+            throw new Error("Failed to get staff level count. Please try again.");
+        }
+    });
+export const getCapitalCostData = protectedProcedure
+    .input(
+        z.object({
+            deptId: z.number(),
+            budgetId: z.number(),
+            catId: z.number(),
+            activity: z.string().optional(),
+        })
+    )
+    .query(async ({ ctx, input }) => {
+        try {
+            // get sub categories
+            const subCategories = await ctx.db
+                .select({
+                    subCategoryId: categoryHierarchyInFinanceProject.catId,
+                    subCategoryName: categoryMasterInFinanceProject.categoryname,
+                })
+                .from(categoryHierarchyInFinanceProject)
+                .innerJoin(
+                    categoryMasterInFinanceProject,
+                    eq(categoryHierarchyInFinanceProject.catId, categoryMasterInFinanceProject.id)
+                )
+                .where(eq(categoryHierarchyInFinanceProject.parentId, input.catId));
+            if (!subCategories)
+                throw new Error("Failed to get the subcategories")
+            // category budgetDetails call
+            const baseConditions = [
+                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
+                eq(budgetDetailsInFinanceProject.catid, input.catId),
+            ];
+
+            // Add activity condition if it is not null or undefined
+            if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
+            }
+            let result
+            // Execute the query with all conditions
+            if (input.activity == "0") {
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
+            else {
+                result = await ctx.db
+                    .select()
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions));
+            }
+
+            return {
+                subCategories, budgetId: input.budgetId, result
+            };
+
+        } catch (error) {
+            console.error("Error in getting staff level count:", error);
+            throw new Error("Failed to get staff level count. Please try again.");
+        }
+    });
+export const getOverHeadsData = protectedProcedure
+    .input(
+        z.object({
+            deptId: z.number(),
+            budgetId: z.number(),
+            catId: z.number(),
+            activity: z.string().optional(),
+        })
+    )
+    .query(async ({ ctx, input }) => {
+        try {
+            // get sub categories
+            const subCategories = await ctx.db
+                .select({
+                    subCategoryId: categoryHierarchyInFinanceProject.catId,
+                    subCategoryName: categoryMasterInFinanceProject.categoryname,
+                })
+                .from(categoryHierarchyInFinanceProject)
+                .innerJoin(
+                    categoryMasterInFinanceProject,
+                    eq(categoryHierarchyInFinanceProject.catId, categoryMasterInFinanceProject.id)
+                )
+                .where(eq(categoryHierarchyInFinanceProject.parentId, input.catId));
+            if (!subCategories)
+                throw new Error("Failed to get the subcategories")
+            // category budgetDetails call
+            const baseConditions = [
+                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
+                eq(budgetDetailsInFinanceProject.catid, input.catId),
+            ];
+
+            // Add activity condition if it is not null or undefined
+            if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
+            }
+            let result
+            // Execute the query with all conditions
+            if (input.activity == "0") {
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
+            else {
+                result = await ctx.db
+                    .select()
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...baseConditions));
+            }
+
+            return {
+                subCategories, budgetId: input.budgetId, result
+            };
+
+        } catch (error) {
+            console.error("Error in getting staff level count:", error);
+            throw new Error("Failed to get staff level count. Please try again.");
+        }
+    });
 export const updateBudgetDetails = protectedProcedure
     .input(
         z.object({
@@ -627,7 +1110,6 @@ export const updateStatusBudgetDetails = protectedProcedure
         else
             return { message: "status update was not successfull" }
     })
-
 
 
 

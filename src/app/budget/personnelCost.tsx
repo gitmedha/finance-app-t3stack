@@ -8,7 +8,6 @@ interface PersonnelCostProps {
   categoryId: number;
   deptId: string;
   budgetId: number;
-  status: string | undefined
 }
 
 interface LevelData {
@@ -71,12 +70,7 @@ const months = [
   "Mar",
 ];
 
-const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status }) => {
-  const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
-  })
-  const [tableData, setTableData] = useState<TableData>({});
-  const userData = useSession()
+const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId }) => {
   const { data: subCategories } = api.get.getSubCats.useQuery({ categoryId });
   const { data: categoriesBudgetDetails, isLoading: categoryDetailsLoading, error } = api.get.getCatsBudgetDetails.useQuery({
     budgetId,
@@ -96,13 +90,20 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     {
       enabled:
         !categoryDetailsLoading &&
-        (!!error || !categoriesBudgetDetails || categoriesBudgetDetails.length === 0),
+        (!!error || !categoriesBudgetDetails || categoriesBudgetDetails.length === 0 ),
     }
   );
+  const [totalQty, setTotalQty] = useState<totalschema>({
+    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
+  })
+  const [tableData, setTableData] = useState<TableData>({});
+  const userData = useSession()
+  
   const [avgQty, setAvgQty] = useState<avgQtySchema>({})
 
   useEffect(() => {
     if (subCategories && levelEmployeesCount) {
+      console.log("after the levelemployee count")
       const initialTableData: TableData = {};
       const intialAvgQty: avgQtySchema = {}
       const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
@@ -311,9 +312,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     });
   };
   useEffect(() => {
+
     const initialData: TableData = {};
     const intialAvgQty: avgQtySchema = {}
     if (subCategories?.subCategories) {
+      console.log("after the subcategories")
       subCategories.subCategories.forEach((sub) => {
         initialData[sub.subCategoryId] = {
           Count: "",
@@ -352,7 +355,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       });
 
     }
-    if (categoriesBudgetDetails) {
+    if (categoriesBudgetDetails && categoriesBudgetDetails.length >0) {
+      console.log("after the categoriesbudgetdetails")
       const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
       categoriesBudgetDetails.forEach((item) => {
         initialData[item.subcategoryId] = {
@@ -550,7 +554,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                         <input
                           type={idx % 4 === 0 ? "number" : "text"}
                           className="w-full rounded border p-1"
-                          disabled={idx % 4 !== 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                          disabled={idx % 4 !== 0}
                           value={tableData[sub.subCategoryId]?.[month] ?? ""}
                           id={sub.subCategoryId + month}
                           onChange={(e) =>
@@ -566,17 +570,14 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse">
           {
-            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 ? <Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
               onClick={() => handleUpdate()}
             >
               Edit
-            </Button>
-          }
-          {
-            categoriesBudgetDetails?.length == 0 && !categoriesBudgetDetails && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+            </Button> : <Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
@@ -585,7 +586,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               Save
             </Button>
           }
-          
         </div>
       </details>
     </div>

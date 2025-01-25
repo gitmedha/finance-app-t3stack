@@ -61,6 +61,8 @@ const months = [
 ];
 
 const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId,searchSubCatId,status }) => {
+  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
+  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const userData = useSession()
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -70,6 +72,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
 
   const [filter, setFilter] = useState(subTravels.sort((a, b) => a.name.localeCompare(b.name))[0])
   const handleSelect = (val: subTravelSchema) => {
+    setErrorMsg(null)
+    setSaveBtnState("loading")
     setFilter(val)
   }
   const updateTotalQtyVals = (which: string, difference: number) => {
@@ -143,6 +147,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         });
         if (travelData.result && travelData.result.length > 0) {
           // console.log("After getting the categorydetails")
+          setSaveBtnState("edit")
           const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           travelData.result.forEach((item) => {
             initialData[item.subcategoryId] = {
@@ -175,36 +180,65 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           setTotalQty(totalQtyAfterBudgetDetails)
         }
         else if (travelData.levelStats) {
+          setSaveBtnState("save")
           console.log("After getting the level count")
           travelData.subCategories.forEach((sub, index) => {
             const level = travelData.levelStats?.find(
               (level) => level.level === sub.subCategoryId
             );
-            const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-            initialData[sub.subCategoryId] = {
-              Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
-              Qty1: level?.employeeCount ? Number(level?.employeeCount) : 0,
-              Qty2: level?.employeeCount ? Number(level?.employeeCount) : 0,
-              Qty3: level?.employeeCount ? Number(level?.employeeCount) : 0,
-              Qty4: level?.employeeCount ? Number(level?.employeeCount) : 0,
-              Apr: "0",
-              May: "0",
-              Jun: "0",
-              Jul: "0",
-              Aug: "0",
-              Sep: "0",
-              Oct: "0",
-              Nov: "0",
-              Dec: "0",
-              Jan: "0",
-              Feb: "0",
-              Mar: "0",
-              budgetDetailsId: 0,
-            };
+            if(filter?.map == 0)
+            {
+              initialData[sub.subCategoryId] = {
+                Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                Qty1: level?.employeeCount ? Number(level?.employeeCount)*4 : 0,
+                Qty2: level?.employeeCount ? Number(level?.employeeCount)*4 : 0,
+                Qty3: level?.employeeCount ? Number(level?.employeeCount) *4: 0,
+                Qty4: level?.employeeCount ? Number(level?.employeeCount)*4 : 0,
+                Apr: "0",
+                May: "0",
+                Jun: "0",
+                Jul: "0",
+                Aug: "0",
+                Sep: "0",
+                Oct: "0",
+                Nov: "0",
+                Dec: "0",
+                Jan: "0",
+                Feb: "0",
+                Mar: "0",
+                budgetDetailsId: 0,
+              };
+            }
+            else{
+              initialData[sub.subCategoryId] = {
+                Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                Qty1: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                Qty2: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                Qty3: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                Qty4: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                Apr: "0",
+                May: "0",
+                Jun: "0",
+                Jul: "0",
+                Aug: "0",
+                Sep: "0",
+                Oct: "0",
+                Nov: "0",
+                Dec: "0",
+                Jan: "0",
+                Feb: "0",
+                Mar: "0",
+                budgetDetailsId: 0,
+              };
+            }
+            
           });
           setTableData(initialData);
         }
-
+        else
+        {
+          setErrorMsg("There is error in finding the both budgetDetails and staff count details")
+        }
       }
 
     }
@@ -307,6 +341,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
     month: string,
     value: string,
   ) => {
+    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -379,9 +414,24 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         },
         {
           onSuccess: (data) => {
+            setSaveBtnState("edit")
+            setTableData((prev) => {
+              const updatedData = { ...prev }
+              data.data.map((item) => {
+                const subCategoryData = updatedData[item.subcategoryId]
+                if (subCategoryData) {
+                  updatedData[item.subcategoryId] = {
+                    ...subCategoryData,
+                    budgetDetailsId: item.budgetDetailsId,
+                  };
+                }
+              })
+              return updatedData
+            })
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
+            setErrorMsg(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
@@ -437,13 +487,18 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
-            console.error("Error updating budget:", error);
+            throw new Error(JSON.stringify(error))
+            
           },
         }
       );
     } catch (error) {
-      console.error("Failed to update budget details:", error);
+      setErrorMsg(JSON.stringify(error))
+      console.error("Error updating budget:", error);
       alert("Failed to update budget details. Please try again.");
+    }
+    finally {
+      setSaveBtnState("edit")
     }
   };
 
@@ -454,13 +509,15 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
       >
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
           <h1 className=" uppercase ">{section}</h1>
-          <div className="flex items-center space-x-2">
-            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
-            {/* Rotate arrow when details are open */}
-            <span className="text-lg font-bold transition-transform group-open:rotate-90">
-              →
-            </span>
-          </div>
+          {
+            travelDataLodaing ? <div className="flex items-center space-x-2">
+              <p className="text-sm">Loading.....</p>
+            </div> :
+              <div className="flex items-center space-x-2">
+                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+                <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+              </div>
+          }
         </summary>
 
         <div className='w-72 mt-3 z-10'>
@@ -550,7 +607,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
                
               </tr>
             </thead>
-            <tbody>
+            {!travelDataLodaing && <tbody>
               {travelData?.subCategories.map((sub) => (
                 <tr
                   key={sub.subCategoryId}
@@ -561,7 +618,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
                     <td key={month} className="border p-2">
                       <input
                         disabled={filter?.map == 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                        type={key % 4 == 0 ? "number" : "text" }
+                        type={key % 4 == 0 ? "number" : "text"}
                         className="w-full rounded border p-1"
                         value={tableData[sub.subCategoryId]?.[month] ?? ""}
                         onChange={(e) =>
@@ -576,13 +633,24 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
                   ))}
                 </tr>
               ))}
-            </tbody>
+            </tbody> }
           </table>
+          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         {
           filter?.map != 0 && <div className="py-2 pr-4 flex flex-row-reverse ">
             {
-              travelData?.result && travelData.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&  <Button
+              saveBtnState == "loading" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
+                type="button"
+                className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+                variant="soft"
+              // Disable the button if input is empty
+              >
+                Loading...
+              </Button>
+            }
+            {
+              saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) &&  <Button
                 type="button"
                 className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
                 variant="soft"
@@ -592,7 +660,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
               >
                 Edit
               </Button>}
-            {travelData?.result?.length == 0 && !travelData.result && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&
+            {saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) &&
                <Button
                 type="button"
                 className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"

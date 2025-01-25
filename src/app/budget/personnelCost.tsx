@@ -246,7 +246,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         //   setTableData({});
         // }
         else if (personnelCostData.levelStats) {
-          console.log("After getting the level count")
           const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           personnelCostData.subCategories.forEach((sub, index) => {

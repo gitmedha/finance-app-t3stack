@@ -33,6 +33,8 @@ const months = [
 
 const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId, status }) => {
   const userData = useSession()
+  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
+  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
@@ -51,6 +53,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
     month: string,
     value: string,
   ) => {
+    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -120,7 +123,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         setTableData(initialData);
       }
       if (programOfficeData.result.length > 0 && programOfficeData.subCategories.length > 0) {
-
+        setSaveBtnState("edit")
         console.log("After getting the categorydetails")
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
         programOfficeData.result.forEach((item) => {
@@ -149,7 +152,9 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         setTableData(initialData);
         setTotalQty(totalQtyAfterBudgetDetails)
       }
-
+      else {
+        setSaveBtnState("save")
+      }
     }
   }, [programOfficeData])
   // useEffect(() => {
@@ -205,6 +210,8 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
   // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -244,9 +251,24 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         },
         {
           onSuccess: (data) => {
+            setSaveBtnState("edit")
+            setTableData((prev) => {
+              const updatedData = { ...prev }
+              data.data.map((item) => {
+                const subCategoryData = updatedData[item.subcategoryId]
+                if (subCategoryData) {
+                  updatedData[item.subcategoryId] = {
+                    ...subCategoryData,
+                    budgetDetailsId: item.budgetDetailsId,
+                  };
+                }
+              })
+              return updatedData
+            })
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
+            setErrorMsg(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
@@ -258,6 +280,8 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
   };
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       subcategoryId: parseInt(subCategoryId, 10),
@@ -284,7 +308,6 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
     }));
-    console.log(tableData)
     try {
       updateBudgetDetails.mutate(
         {
@@ -298,13 +321,18 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
+            setErrorMsg(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
       );
     } catch (error) {
+      
       console.error("Failed to update budget details:", error);
       alert("Failed to update budget details. Please try again.");
+    }
+    finally {
+      setSaveBtnState("edit")
     }
   };
 
@@ -315,12 +343,15 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       >
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
           <h1 className=" uppercase ">{section}</h1>
-          <div className="flex items-center space-x-2">
-            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
-            <span className="text-lg font-bold transition-transform group-open:rotate-90">
-              →
-            </span>
-          </div>
+          {
+            programOfficeDataLodaing ? <div className="flex items-center space-x-2">
+              <p className="text-sm">Loading.....</p>
+            </div> :
+              <div className="flex items-center space-x-2">
+                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+                <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+              </div>
+          }
         </summary>
 
         <hr className="my-2 scale-x-150" />
@@ -338,35 +369,49 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
 
               </tr>
             </thead>
-            <tbody>
-              {programOfficeData?.subCategories.map((sub) => (
-                <tr
-                  key={sub.subCategoryId}
-                  className="text-sm transition hover:bg-gray-100"
-                >
-                  {/* Level Name */}
-                  <td className="border p-2 font-medium">{sub.subCategoryName}</td>
-                  {months.map((month) => (
-                    <td key={month} className="border p-2">
-                      <input
-                        type="text"
-                        className="w-full rounded border p-1"
-                        value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                        disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                        onChange={(e) =>
-                          handleInputChange(sub.subCategoryId, month, e.target.value)
-                        }
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
+            {
+              !programOfficeDataLodaing && <tbody>
+                {programOfficeData?.subCategories.map((sub) => (
+                  <tr
+                    key={sub.subCategoryId}
+                    className="text-sm transition hover:bg-gray-100"
+                  >
+                    {/* Level Name */}
+                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    {months.map((month) => (
+                      <td key={month} className="border p-2">
+                        <input
+                          type="text"
+                          className="w-full rounded border p-1"
+                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                          disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                          onChange={(e) =>
+                            handleInputChange(sub.subCategoryId, month, e.target.value)
+                          }
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            }
+            
           </table>
+          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse ">
           {
-            programOfficeData?.result && programOfficeData.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+            saveBtnState == "loading" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
+              type="button"
+              className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+              variant="soft"
+            // Disable the button if input is empty
+            >
+              Loading...
+            </Button>
+          }
+          {
+            saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
@@ -376,7 +421,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
             >
               Edit
             </Button>}
-          {programOfficeData?.result?.length == 0 && !programOfficeData.result && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&
+          {saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) &&
             <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"

@@ -32,6 +32,8 @@ const months = [
 ];
 
 const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, deptId ,status}) => {
+  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
+  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const userData = useSession()
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -52,6 +54,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
     month: string,
     value: string,
   ) => {
+    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -121,7 +124,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         setTableData(initialData);
       }
       if (overHeadData.result.length > 0 && overHeadData.subCategories.length > 0) {
-
+        setSaveBtnState("edit")
         console.log("After getting the categorydetails")
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
         overHeadData.result.forEach((item) => {
@@ -150,7 +153,9 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         setTableData(initialData);
         setTotalQty(totalQtyAfterBudgetDetails)
       }
-
+      else {
+        setSaveBtnState("save")
+      }
     }
   }, [overHeadData])
   // useEffect(() => {
@@ -207,7 +212,8 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
-    // If validation passes, proceed with saving the budget details
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -247,6 +253,20 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         },
         {
           onSuccess: (data) => {
+            setSaveBtnState("edit")
+            setTableData((prev) => {
+              const updatedData = { ...prev }
+              data.data.map((item) => {
+                const subCategoryData = updatedData[item.subcategoryId]
+                if (subCategoryData) {
+                  updatedData[item.subcategoryId] = {
+                    ...subCategoryData,
+                    budgetDetailsId: item.budgetDetailsId,
+                  };
+                }
+              })
+              return updatedData
+            })
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
@@ -255,12 +275,15 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         }
       );
     } catch (error) {
+      setErrorMsg(JSON.stringify(error))
       console.error("Failed to save budget details:", error);
       alert("Failed to save budget details. Please try again.");
     }
   };
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       subcategoryId: parseInt(subCategoryId, 10),
@@ -309,6 +332,9 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       console.error("Failed to update budget details:", error);
       alert("Failed to update budget details. Please try again.");
     }
+    finally {
+      setSaveBtnState("edit")
+    }
   };
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
@@ -317,13 +343,15 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       >
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
           <h1 className=" uppercase ">{section}</h1>
-          <div className="flex items-center space-x-2">
-            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
-            {/* Rotate arrow when details are open */}
-            <span className="text-lg font-bold transition-transform group-open:rotate-90">
-              →
-            </span>
-          </div>
+          {
+            overHeadDataLodaing ? <div className="flex items-center space-x-2">
+              <p className="text-sm">Loading.....</p>
+            </div> :
+              <div className="flex items-center space-x-2">
+                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+                <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+              </div>
+          }
         </summary>
 
         <hr className="my-2 scale-x-150" />
@@ -338,35 +366,49 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {overHeadData?.subCategories.map((sub) => (
-                <tr
-                  key={sub.subCategoryId} 
-                  className="text-sm transition hover:bg-gray-100"
-                >
-                  {/* Level Name */}
-                  <td className="border p-2 font-medium">{sub.subCategoryName}</td>
-                  {months.map((month) => (
-                    <td key={month} className="border p-2">
-                      <input
-                        type="text"
-                        disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                        className="w-full rounded border p-1"
-                        value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(sub.subCategoryId, month, e.target.value)
-                        }
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
+            {
+              !overHeadDataLodaing && <tbody>
+                {overHeadData?.subCategories.map((sub) => (
+                  <tr
+                    key={sub.subCategoryId}
+                    className="text-sm transition hover:bg-gray-100"
+                  >
+                    {/* Level Name */}
+                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    {months.map((month) => (
+                      <td key={month} className="border p-2">
+                        <input
+                          type="text"
+                          disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                          className="w-full rounded border p-1"
+                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                          onChange={(e) =>
+                            handleInputChange(sub.subCategoryId, month, e.target.value)
+                          }
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            }
+            
           </table>
+          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse ">
           {
-            overHeadData?.result && overHeadData.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+            saveBtnState == "loading" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
+              type="button"
+              className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+              variant="soft"
+            // Disable the button if input is empty
+            >
+              Loading...
+            </Button>
+          }
+          {
+            saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
@@ -376,7 +418,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
             >
               Edit
             </Button> }
-          {overHeadData?.result?.length == 0 && !overHeadData && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+          {saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"

@@ -72,6 +72,9 @@ const months = [
 ];
 
 const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status }) => {
+  const [sMsg, setSmsg] = useState<string | null>(null)
+  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
+  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
@@ -92,7 +95,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
-  })
+  }, {
+    refetchOnMount: false,
+    refetchOnWindowFocus:false,
+    staleTime: 0, 
+  },)
   // const { data: levelEmployeesCount } = api.get.getLevelStaffCount.useQuery(
   //   {
   //     deptId: Number(deptId),
@@ -110,7 +117,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       const initialData: TableData = {};
       const intialAvgQty: avgQtySchema = {}
       if (personnelCostData?.subCategories) {
-        // console.log("After getting the subcategories")
+        console.log("After getting the subcategories")
         personnelCostData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
             Count: "",
@@ -148,6 +155,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           }
         });
         if (personnelCostData.result && personnelCostData.result.length > 0) {
+          setSaveBtnState("edit")
           // console.log("After getting the categorydetails")
           const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           personnelCostData.result.forEach((item) => {
@@ -226,6 +234,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               }
             }
             if ((item.qty4 == 0 || !item.qty4) && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
+              console.log(userData.data.user.role,status)
               const janIn = document.getElementById(item.subcategoryId + "Jan") as HTMLInputElement;
               const febIn = document.getElementById(item.subcategoryId + "Feb") as HTMLInputElement;
               const marIn = document.getElementById(item.subcategoryId + "Mar") as HTMLInputElement;
@@ -242,10 +251,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           setTableData(initialData);
           setTotalQty(totalQtyAfterBudgetDetails)
         }
-        // else {
-        //   setTableData({});
-        // }
         else if (personnelCostData.levelStats) {
+          setSaveBtnState("save")
           const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           personnelCostData.subCategories.forEach((sub, index) => {
@@ -297,20 +304,44 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             totalQtyAfterStaffCount.totalQ2 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ3 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ4 += salarySum + epfSum + bonusSum + salarySum + epfSum + gratuitySum + salarySum + epfSum
+            // if ((employeeCount == 0 || employeeCount) && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
+            //   const aprIn = document.getElementById(sub.subCategoryId + "Apr") as HTMLInputElement;
+            //   const mayIn = document.getElementById(sub.subCategoryId + "May") as HTMLInputElement;
+            //   const junIn = document.getElementById(sub.subCategoryId + "Jun") as HTMLInputElement;
+            //   const julIn = document.getElementById(sub.subCategoryId + "Jul") as HTMLInputElement;
+            //   const augIn = document.getElementById(sub.subCategoryId + "Aug") as HTMLInputElement;
+            //   const sepIn = document.getElementById(sub.subCategoryId + "Sep") as HTMLInputElement;
+            //   const octIn = document.getElementById(sub.subCategoryId + "Oct") as HTMLInputElement;
+            //   const novIn = document.getElementById(sub.subCategoryId + "Nov") as HTMLInputElement;
+            //   const decIn = document.getElementById(sub.subCategoryId + "Dec") as HTMLInputElement;
+            //   const janIn = document.getElementById(sub.subCategoryId + "Jan") as HTMLInputElement;
+            //   const febIn = document.getElementById(sub.subCategoryId + "Feb") as HTMLInputElement;
+            //   const marIn = document.getElementById(sub.subCategoryId + "Mar") as HTMLInputElement;
+            //   if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn) {
+            //     console.log(employeeCount)
+            //     aprIn.disabled = false;
+            //     mayIn.disabled = false;
+            //     junIn.disabled = false;
+            //     octIn.disabled = false;
+            //     novIn.disabled = false;
+            //     decIn.disabled = false;
+            //     julIn.disabled = false;
+            //     augIn.disabled = false;
+            //     sepIn.disabled = false;
+            //     janIn.disabled = false;
+            //     febIn.disabled = false;
+            //     marIn.disabled = false;
+            //   } else {
+            //     console.error(`Input element with ID  not found.`);
+            //   }
+            // }
           });
           setAvgQty(intialAvgQty)
           setTableData(initialData);
           setTotalQty(totalQtyAfterStaffCount)
         }
-
-      }
-      
-      // if we get the subcategories and the staff count
-      
-    }
-
-    // this one if we get the subcategories and the category details
-    
+      }      
+    }    
   },[personnelCostData])
   // useEffect(() => {
   //   if (subCategories && levelEmployeesCount) {
@@ -376,7 +407,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
 
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
-    // If validation passes, proceed with saving the budget details
+    setSmsg(null)
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -419,9 +452,26 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Saved")
+            setSaveBtnState("edit")
+            setTableData((prev) => {
+              const updatedData = { ...prev }
+              data.data.map((item) => {
+                const subCategoryData = updatedData[item.subcategoryId]
+                if (subCategoryData) {
+                  updatedData[item.subcategoryId] = {
+                    ...subCategoryData,
+                    budgetDetailsId: item.budgetDetailsId,
+                  };
+                }
+              })
+              return updatedData
+            })
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
+            setSaveBtnState("save")
+            setErrorMsg(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
@@ -445,6 +495,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     month: string,
     value: string
   ) => {
+    setSmsg(null)
+    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -667,6 +719,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
 
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
+    setSmsg(null)
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       catid: categoryId,
@@ -716,9 +771,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Edited")
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
+            setErrorMsg(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
@@ -726,19 +783,26 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     } catch (error) {
       console.error("Failed to update budget details:", error);
       alert("Failed to update budget details. Please try again.");
+    } finally {
+      setSaveBtnState("edit")
     }
   };
   return (
   
-    <div className="my-6 rounded-md bg-white shadow-lg">
+    <div className="my-6 rounded-md bg-white shadow-lg">{status}{userData.data?.user.role}
     {/* {categoriesBudgetDetails && categoriesBudgetDetails.result.length > 0 && "data from the category details"} */}
       <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500">
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
           <h1 className="uppercase">{section}</h1>
-          <div className="flex items-center space-x-2">
-            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
-            <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
-          </div>
+          {
+            personnelCostDataLodaing ? <div className="flex items-center space-x-2">
+              <p className="text-sm">Loading.....</p>
+            </div> :
+              <div className="flex items-center space-x-2">
+                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+                <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+              </div>
+          }
         </summary>
 
         <hr className="my-2 scale-x-150" />
@@ -779,10 +843,23 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                 ))}
             </tbody>
           </table>
+          {
+            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
+          }
+          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse">
           {
-            personnelCostData?.result && personnelCostData.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") && <Button
+            saveBtnState == "loading" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
+              type="button"
+              className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+              variant="soft"
+            >
+              Loading...
+            </Button>
+          }
+          {
+            saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
@@ -792,7 +869,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             </Button>
           }
           {
-            personnelCostData?.result.length == 0 && !personnelCostData && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&      <Button
+            saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) &&      <Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"

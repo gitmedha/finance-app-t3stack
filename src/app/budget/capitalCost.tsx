@@ -30,6 +30,7 @@ const months = [
 
 const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status }) => {
   // state to disable and enable the save and edit button
+  const [sMsg,setSmsg] = useState<string|null>(null)
   const [saveBtnState,setSaveBtnState] = useState<"loading"|"edit"|"save">("loading")
   const [erroMsg,setErrorMsg] = useState<string|null>(null)
   const userData = useSession()
@@ -51,6 +52,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     month: string,
     value: string,
   ) => {
+    setSmsg(null)
     setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
@@ -103,6 +105,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     if (capitalCostData?.budgetId == budgetId) {
       const initialData: TableData = {};
       if (capitalCostData?.subCategories) {
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
         console.log("After getting the subcategories")
         capitalCostData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
@@ -122,6 +125,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             budgetDetailsId: 0,
           };
         });
+        setTotalQty(totalQtyAfterBudgetDetails)
         setTableData(initialData);
       }
       if (capitalCostData.result.length > 0 && capitalCostData.subCategories.length > 0) {
@@ -215,6 +219,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
 
   const handleSave = async () => {
+    setSmsg(null)
     setSaveBtnState("loading")
     setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -257,6 +262,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         {
           onSuccess: (data) => {
             setSaveBtnState("edit")
+            setSmsg("Successfully Saved")
             setTableData((prev) => {
               const updatedData = {...prev}
               data.data.map((item)=>{
@@ -288,6 +294,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
 
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
+    setSmsg(null)
     setSaveBtnState("loading")
     setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -326,6 +333,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Edited")
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
@@ -399,6 +407,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             }
             
           </table>
+          {
+            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
+          }
           {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
 

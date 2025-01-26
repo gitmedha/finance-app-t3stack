@@ -33,6 +33,7 @@ const months = [
 
 const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId, status }) => {
   const userData = useSession()
+  const [sMsg, setSmsg] = useState<string | null>(null)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const [totalQty, setTotalQty] = useState<totalschema>({
@@ -53,6 +54,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
     month: string,
     value: string,
   ) => {
+    setSmsg(null)
     setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
@@ -101,6 +103,8 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
     if (programOfficeData?.budgetId == budgetId) {
       const initialData: TableData = {};
       if (programOfficeData?.subCategories) {
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        setTotalQty(totalQtyAfterBudgetDetails)
         console.log("After getting the subcategories")
         programOfficeData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
@@ -210,6 +214,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
   // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
+    setSmsg(null)
     setSaveBtnState("loading")
     setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -252,6 +257,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         {
           onSuccess: (data) => {
             setSaveBtnState("edit")
+            setSmsg("Successfully Saved")
             setTableData((prev) => {
               const updatedData = { ...prev }
               data.data.map((item) => {
@@ -268,6 +274,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
+            setSaveBtnState("save")
             setErrorMsg(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
@@ -278,9 +285,10 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       alert("Failed to save budget details. Please try again.");
     }
   };
+    setSaveBtnState("loading")
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
-    setSaveBtnState("loading")
+    setSmsg(null)
     setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
@@ -318,6 +326,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Editted")
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
@@ -397,6 +406,9 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
             }
             
           </table>
+          {
+            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
+          }
           {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse ">

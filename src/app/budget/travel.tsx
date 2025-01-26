@@ -61,6 +61,7 @@ const months = [
 ];
 
 const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId,searchSubCatId,status }) => {
+  const [sMsg, setSmsg] = useState<string | null>(null)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const userData = useSession()
@@ -180,8 +181,9 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           setTotalQty(totalQtyAfterBudgetDetails)
         }
         else if (travelData.levelStats) {
+          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+          setTotalQty(totalQtyAfterBudgetDetails)
           setSaveBtnState("save")
-          console.log("After getting the level count")
           travelData.subCategories.forEach((sub, index) => {
             const level = travelData.levelStats?.find(
               (level) => level.level === sub.subCategoryId
@@ -341,6 +343,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
     month: string,
     value: string,
   ) => {
+    setSmsg(null)
     setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
@@ -371,6 +374,9 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
 
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
+    setSmsg(null)
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -414,6 +420,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Saved")
             setSaveBtnState("edit")
             setTableData((prev) => {
               const updatedData = { ...prev }
@@ -431,6 +438,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
+            setSaveBtnState("save")
             setErrorMsg(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
@@ -443,6 +451,9 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
   };
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
+    setSmsg(null)
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       catid: categoryId,
@@ -484,6 +495,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Editted")
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
@@ -634,7 +646,10 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
                 </tr>
               ))}
             </tbody> }
-          </table>
+          </table> 
+          {
+            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
+          }
           {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         {

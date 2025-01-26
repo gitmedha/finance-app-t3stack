@@ -35,6 +35,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const userData = useSession()
+  const [sMsg, setSmsg] = useState<string | null>(null)
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
@@ -54,6 +55,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
     month: string,
     value: string,
   ) => {
+    setSmsg(null)
     setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
@@ -102,6 +104,8 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
     if (overHeadData?.budgetId == budgetId) {
       const initialData: TableData = {};
       if (overHeadData?.subCategories) {
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        setTotalQty(totalQtyAfterBudgetDetails)
         console.log("After getting the subcategories")
         overHeadData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
@@ -212,6 +216,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
+    setSmsg(null)
     setSaveBtnState("loading")
     setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -253,6 +258,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Saved")
             setSaveBtnState("edit")
             setTableData((prev) => {
               const updatedData = { ...prev }
@@ -282,6 +288,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   };
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
+    setSmsg(null)
     setSaveBtnState("loading")
     setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -310,7 +317,6 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
     }));
-    console.log(tableData)
     try {
       updateBudgetDetails.mutate(
         {
@@ -321,6 +327,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Editted")
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
@@ -394,6 +401,9 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
             }
             
           </table>
+          {
+            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
+          }
           {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         <div className="py-2 pr-4 flex flex-row-reverse ">

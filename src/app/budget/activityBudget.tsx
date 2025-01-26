@@ -78,7 +78,9 @@ const months = [
 ];
 
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId,status }) => {
-
+  const [sMsg, setSmsg] = useState<string | null>(null)
+  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
+  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const userData = useSession()
   // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
   const [totalQty, setTotalQty] = useState<totalschema>({
@@ -95,6 +97,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     if (programData?.budgetId == budgetId) {
       const initialData: TableData = {};
       if (programData?.subCategories) {
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        setTotalQty(totalQtyAfterBudgetDetails)
         console.log("After getting the subcategories")
         programData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
@@ -129,8 +133,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         setTableData(initialData);
       }
       if ( programData.result.length > 0 && programData.subCategories.length >0) {
-          
-          console.log("After getting the categorydetails")
+        setSaveBtnState("edit")
           const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           programData.result.forEach((item) => {
             console.log(Number(item.april), Number(item.may), Number(item.june))
@@ -169,12 +172,12 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           });
           setTableData(initialData);
           setTotalQty(totalQtyAfterBudgetDetails)
-        }      
+        }   
+      else {
+        setSaveBtnState("save")
+      } 
 
     }
-
-    // this one if we get the subcategories and the category details
-
   }, [programData])
   const [tableData, setTableData] = useState<TableData>({});
   const handleSelect = (val: subProgramActivitesSchema) => {
@@ -286,6 +289,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     month: string,
     value: string
   ) => {
+    setSmsg(null)
+    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -342,6 +347,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
 
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
+    setSaveBtnState("loading")
+    setSmsg(null)
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId, 
       catid: categoryId,
@@ -394,9 +402,26 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Saved")
+            setSaveBtnState("edit")
+            setTableData((prev) => {
+              const updatedData = { ...prev }
+              data.data.map((item) => {
+                const subCategoryData = updatedData[item.subcategoryId]
+                if (subCategoryData) {
+                  updatedData[item.subcategoryId] = {
+                    ...subCategoryData,
+                    budgetDetailsId: item.budgetDetailsId,
+                  };
+                }
+              })
+              return updatedData
+            })
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
+            setSaveBtnState("save")
+            setErrorMsg(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
@@ -408,6 +433,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
   };
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
+    setSmsg(null)
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       catid: categoryId,
@@ -458,9 +486,11 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Edited")
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
+            setErrorMsg(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
@@ -468,6 +498,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     } catch (error) {
       console.error("Failed to update budget details:", error);
       alert("Failed to update budget details. Please try again.");
+    } finally {
+      setSaveBtnState("edit")
     }
   };
   return (
@@ -477,12 +509,15 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       >
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
           <h1 className=" uppercase ">{section}</h1>
-          <div className="flex items-center space-x-2">
-            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
-            <span className="text-lg font-bold transition-transform group-open:rotate-90">
-              →
-            </span>
-          </div>
+          {
+            programDataLodaing ? <div className="flex items-center space-x-2">
+              <p className="text-sm">Loading.....</p>
+            </div> :
+              <div className="flex items-center space-x-2">
+                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+                <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+              </div>
+          }
         </summary>
 
         <div className='w-72 mt-3 z-10'>
@@ -595,43 +630,60 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {programData?.subCategories.map((sub,key) => (
-                <tr
-                  key={sub.subCategoryId}
-                  className="text-sm transition hover:bg-gray-100"
-                >
+            {
+              !programDataLodaing && <tbody>
+                {programData?.subCategories.map((sub, key) => (
+                  <tr
+                    key={sub.subCategoryId}
+                    className="text-sm transition hover:bg-gray-100"
+                  >
 
-                  <td className="border p-2 font-medium">{sub.subCategoryName}</td>
-                  {months.map((month,key) => (
-                    <td key={month} className="border p-2">
-                      <input
-                        // disabled={key == 2 || key == 8 || key == 14 || key == 20 || filter?.map == 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                        type={key%6 == 0 ?"number":"text"}
-                        className="w-full rounded border p-1"
-                        value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            sub.subCategoryId,
-                            month,
-                            e.target.value,
-                          )
-                        }
-                      />
+                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    {months.map((month, key) => (
+                      <td key={month} className="border p-2">
+                        <input
+                          disabled={key == 2 || key == 8 || key == 14 || key == 20 || filter?.map == 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                          type={key % 6 == 0 ? "number" : "text"}
+                          className="w-full rounded border p-1"
+                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                          onChange={(e) =>
+                            handleInputChange(
+                              sub.subCategoryId,
+                              month,
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                    ))}
+                    <td className="border p-2">
+                      <BiComment className="text-xl" />
                     </td>
-                  ))}
-                  <td className="border p-2">
-                    <BiComment className="text-xl" />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+                  </tr>
+                ))}
+              </tbody>
+            }
+            
           </table>
+          {
+            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
+          }
+          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         {
           filter?.map != 0 && <div className="py-2 pr-4 flex flex-row-reverse ">
             {
-              programData?.result && programData?.result.length > 0 && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&  <Button
+              saveBtnState == "loading" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
+                type="button"
+                className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+                variant="soft"
+              // Disable the button if input is empty
+              >
+                Loading...
+              </Button>
+            }
+            {
+              saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) &&  <Button
                 type="button"
                 className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
                 variant="soft"
@@ -641,7 +693,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
               >
                 Edit
               </Button>}
-            {programData?.result?.length == 0 && !programData.result && (userData.data?.user.role == 1 && status != "draft") && (userData.data?.user.role != 1 && status == "draft") &&<Button
+            {saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) &&<Button
                 type="button"
                 className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
                 variant="soft"

@@ -1097,13 +1097,14 @@ export const updateBudgetDetails = protectedProcedure
 export const updateStatusBudgetDetails = protectedProcedure
     .input(z.object({
         budgetId: z.number(),
-        status: z.string()
+        status: z.string(),
+        userId:z.number()
     }))
     .mutation(async ({ ctx, input }) => {
-        const { status, budgetId } = input
+        const { status, budgetId ,userId} = input
         const updatedStatus = await ctx.db
             .update(budgetMasterInFinanceProject)
-            .set({ status })
+            .set({ status, approvedBy:userId })
             .where(eq(budgetMasterInFinanceProject.id, budgetId))
         if (updatedStatus)
             return { message: "status update successfull" }

@@ -25,12 +25,13 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   //     void refetch(); // Trigger refetch if departments are empty
   //   }
   // }, [data]);
-  const handelStatusUpdate = (status: string) => {
+  const handelStatusUpdate = (status: string,userId:number) => {
     try {
       if (budgetId) {
         updateBudgetStatus.mutate({
           budgetId,
-          status
+          status,
+          userId
         }, {
           // need to update the status from here
           onSuccess: (data) => {
@@ -228,13 +229,13 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
               userData.data?.user.role == 2 ?  <Button
                 type="submit"
                 className="!cursor-pointer !bg-primary text-white"
-                onClick={() => handelStatusUpdate("submitted")}
+                onClick={() => handelStatusUpdate("submitted",userData.data?.user.id ?? 1)}
               >
                 Submit
               </Button> : <Button
                 type="submit"
                 className="!cursor-pointer !bg-primary text-white"
-                  onClick={() => handelStatusUpdate("approved")}
+                  onClick={() => handelStatusUpdate("approved", userData.data?.user.id ?? 1)}
               >
                 Approve
               </Button>

@@ -76,7 +76,7 @@ const Budget: React.FC = () => {
   return (
     <div className="mt-10 overflow-hidden m-2 p-2">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId} status={status} setStatus={setStatus}/>
-      {budgetId}
+
       {
         isLoading && <div>loading</div>
       }

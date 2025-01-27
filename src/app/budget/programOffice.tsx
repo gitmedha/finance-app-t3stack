@@ -285,10 +285,11 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       alert("Failed to save budget details. Please try again.");
     }
   };
-    setSaveBtnState("loading")
+    
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
     setSmsg(null)
+    setSaveBtnState("loading")
     setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,

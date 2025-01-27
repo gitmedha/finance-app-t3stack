@@ -12,12 +12,15 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   // Fetch data for departments
   const { data} = api.get.getDepartments.useQuery(
     { page: 1, limit: 100, type: 'Department' },
-    // { enabled: userData.data?.user.role == 1 }
+    {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      staleTime: 0, }
   );
   // Define years from 2023-24 to 2029-30
   const years = [
-    "2029-30", "2023-24", "2024-25", "2025-26", "2026-27",
-    "2027-28", "2028-29"
+     "2023-24", "2024-25", "2025-26", "2026-27",
+    "2027-28", "2028-29", "2029-30",
   ];
   const updateBudgetStatus = api.post.updateStatusBudgetDetails.useMutation()
   // useEffect(() => {
@@ -64,7 +67,6 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         handleSelect("department", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].departmentname })
         handleSelect("year", years[0])
       }
-
     }
   }, [data]);
 
@@ -101,7 +103,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                  <span>{filters.departmentname} {filters.department}</span>
+                  <span>{filters.departmentname}</span>
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>

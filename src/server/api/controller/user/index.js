@@ -19,6 +19,7 @@ export const login = publicProcedure
             where: (fields, operators) =>
                 operators.eq(fields.email, input.email),
         });
+
         if (!user) {
             return { message: "Invalid email", user, success: false };
         }

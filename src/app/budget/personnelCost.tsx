@@ -99,7 +99,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     refetchOnMount: false,
     refetchOnWindowFocus:false,
     staleTime: 0, 
-    enabled:!!budgetId
   },)
   // const { data: levelEmployeesCount } = api.get.getLevelStaffCount.useQuery(
   //   {
@@ -167,6 +166,34 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           console.log("Am i hitting this or not ")
           const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           personnelCostData.result.forEach((item) => {
+            const aprIn = document.getElementById(item.subcategoryId + "Apr") as HTMLInputElement;
+            const mayIn = document.getElementById(item.subcategoryId + "May") as HTMLInputElement;
+            const junIn = document.getElementById(item.subcategoryId + "Jun") as HTMLInputElement;
+            const julIn = document.getElementById(item.subcategoryId + "Jul") as HTMLInputElement;
+            const augIn = document.getElementById(item.subcategoryId + "Aug") as HTMLInputElement;
+            const sepIn = document.getElementById(item.subcategoryId + "Sep") as HTMLInputElement;
+            const octIn = document.getElementById(item.subcategoryId + "Oct") as HTMLInputElement;
+            const novIn = document.getElementById(item.subcategoryId + "Nov") as HTMLInputElement;
+            const decIn = document.getElementById(item.subcategoryId + "Dec") as HTMLInputElement;
+            const janIn = document.getElementById(item.subcategoryId + "Jan") as HTMLInputElement;
+            const febIn = document.getElementById(item.subcategoryId + "Feb") as HTMLInputElement;
+            const marIn = document.getElementById(item.subcategoryId + "Mar") as HTMLInputElement;
+              if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn) {
+                aprIn.disabled = true;
+                mayIn.disabled = true;
+                junIn.disabled = true;
+                octIn.disabled = true;
+                novIn.disabled = true;
+                decIn.disabled = true;
+                julIn.disabled = true;
+                augIn.disabled = true;
+                sepIn.disabled = true;
+                janIn.disabled = true;
+                febIn.disabled = true;
+                marIn.disabled = true;
+              } else {
+                console.error(`Input element with ID  not found.`);
+              }
             initialData[item.subcategoryId] = {
               Count: Number(item.total),
               Apr: item.april ? Number(item.april) : "0",
@@ -201,6 +228,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               Feb: Number(item.february) / (item.qty4 ? Number(item.qty4) : 1),
               Mar: Number(item.march) / (item.qty4 ? Number(item.qty4) : 1),
             }
+            console.log(Number(item.october) / (item.qty3 ? Number(item.qty3) : 1))
             totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
             totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
             totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
@@ -265,6 +293,34 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             const levelData = personnelCostData.levelStats?.find(
               (level) => level.level === sub.subCategoryId
             );
+            const aprIn = document.getElementById(sub.subCategoryId + "Apr") as HTMLInputElement;
+            const mayIn = document.getElementById(sub.subCategoryId + "May") as HTMLInputElement;
+            const junIn = document.getElementById(sub.subCategoryId + "Jun") as HTMLInputElement;
+            const julIn = document.getElementById(sub.subCategoryId + "Jul") as HTMLInputElement;
+            const augIn = document.getElementById(sub.subCategoryId + "Aug") as HTMLInputElement;
+            const sepIn = document.getElementById(sub.subCategoryId + "Sep") as HTMLInputElement;
+            const octIn = document.getElementById(sub.subCategoryId + "Oct") as HTMLInputElement;
+            const novIn = document.getElementById(sub.subCategoryId + "Nov") as HTMLInputElement;
+            const decIn = document.getElementById(sub.subCategoryId + "Dec") as HTMLInputElement;
+            const janIn = document.getElementById(sub.subCategoryId + "Jan") as HTMLInputElement;
+            const febIn = document.getElementById(sub.subCategoryId + "Feb") as HTMLInputElement;
+            const marIn = document.getElementById(sub.subCategoryId + "Mar") as HTMLInputElement;
+            if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn) {
+              aprIn.disabled = true;
+              mayIn.disabled = true;
+              junIn.disabled = true;
+              octIn.disabled = true;
+              novIn.disabled = true;
+              decIn.disabled = true;
+              julIn.disabled = true;
+              augIn.disabled = true;
+              sepIn.disabled = true;
+              janIn.disabled = true;
+              febIn.disabled = true;
+              marIn.disabled = true;
+            } else {
+              console.error(`Input element with ID  not found.`);
+            }
             const employeeCount = levelData ? levelData.employeeCount : 0;
             const salarySum = levelData?.salarySum ? Number(levelData?.salarySum) : 0;
             const epfSum = levelData?.epfSum ? Number(levelData?.epfSum) : 0;
@@ -558,9 +614,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           updateTotalQtyVals("totalQ3", julDiff)
           updateTotalQtyVals("totalQ3", augDiff)
           updateTotalQtyVals("totalQ3", sepDiff)
-          subCategoryData.Oct = qty * avgQty[subCategoryId].Jan;
-          subCategoryData.Nov = qty * avgQty[subCategoryId].Jan;
-          subCategoryData.Dec = qty * avgQty[subCategoryId].Jan;
+          subCategoryData.Oct = qty * avgQty[subCategoryId].Oct;
+          subCategoryData.Nov = qty * avgQty[subCategoryId].Nov;
+          subCategoryData.Dec = qty * avgQty[subCategoryId].Dec;
         }
         if (month === "Qty4") {
           const julDiff = qty * avgQty[subCategoryId].Jan - Number(subCategoryData.Jan)
@@ -868,7 +924,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           {
             saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
               type="button"
-              className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
+              className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
               style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
               disabled={isSaveDisabled()}
@@ -880,7 +936,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           {
             saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) &&      <Button
               type="button"
-              className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
+              className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
               style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
               disabled={isSaveDisabled()}

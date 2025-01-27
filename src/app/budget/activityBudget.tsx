@@ -553,7 +553,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
               <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
                 <th className="border p-2">Particulars</th>
                 <th scope="col" className="border p-2">
-                  Qty
+                  Qty&nbsp;&nbsp;
                 </th>
                 <th scope="col" className="border p-2">
                   Rate
@@ -572,7 +572,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                 </th>
 
                 <th scope="col" className="border p-2">
-                  Qty
+                  Qty&nbsp;&nbsp;
                 </th>
                 <th scope="col" className="border p-2">
                   Rate
@@ -591,7 +591,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                 </th>
 
                 <th scope="col" className="border p-2">
-                  Qty
+                  Qty&nbsp;&nbsp;
                 </th>
                 <th scope="col" className="border p-2">
                   Rate
@@ -609,7 +609,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                   Dec
                 </th>
                 <th scope="col" className="border p-2">
-                  Qty
+                  Qty&nbsp;&nbsp;
                 </th>
                 <th scope="col" className="border p-2">
                   Rate

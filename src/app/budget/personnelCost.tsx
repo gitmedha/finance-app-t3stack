@@ -481,18 +481,18 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       currency: "USD",
       notes: "",
       description: "",
-      april: (data.Apr ?? "").toString(),
-      may: (data.May ?? "").toString(),
-      june: (data.Jun ?? "").toString(),
-      july: (data.Jul ?? "").toString(),
-      august: (data.Aug ?? "").toString(),
-      september: (data.Sep ?? "").toString(),
-      october: (data.Oct ?? "").toString(),
-      november: (data.Nov ?? "").toString(),
-      december: (data.Dec ?? "").toString(),
-      january: (data.Jan ?? "").toString(),
-      february: (data.Feb ?? "").toString(),
-      march: (data.Mar ?? "").toString(),
+      april: (data.Apr ?? "0").toString(),
+      may: (data.May ?? "0").toString(),
+      june: (data.Jun ?? "0").toString(),
+      july: (data.Jul ?? "0").toString(),
+      august: (data.Aug ?? "0").toString(),
+      september: (data.Sep ?? "0").toString(),
+      october: (data.Oct ?? "0").toString(),
+      november: (data.Nov ?? "0").toString(),
+      december: (data.Dec ?? "0").toString(),
+      january: (data.Jan ?? "0").toString(),
+      february: (data.Feb ?? "0").toString(),
+      march: (data.Mar ?? "0").toString(),
       activity: undefined,
       deptId: 9,
       clusterId: undefined,
@@ -796,29 +796,29 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       currency: "USD",
       notes: "",
       description: "",
-      april: (data.Apr ?? "").toString(),
-      may: (data.May ?? "").toString(),
-      june: (data.Jun ?? "").toString(),
-      july: (data.Jul ?? "").toString(),
-      august: (data.Aug ?? "").toString(),
-      september: (data.Sep ?? "").toString(),
-      october: (data.Oct ?? "").toString(),
-      november: (data.Nov ?? "").toString(),
-      december: (data.Dec ?? "").toString(),
-      january: (data.Jan ?? "").toString(),
-      february: (data.Feb ?? "").toString(),
-      march: (data.Mar ?? "").toString(),
+      april: (data.Apr ?? "0").toString(),
+      may: (data.May ?? "0").toString(),
+      june: (data.Jun ?? "0").toString(),
+      july: (data.Jul ?? "0").toString(),
+      august: (data.Aug ?? "0").toString(),
+      september: (data.Sep ?? "0").toString(),
+      october: (data.Oct ?? "0").toString(),
+      november: (data.Nov ?? "0").toString(),
+      december: (data.Dec ?? "0").toString(),
+      january: (data.Jan ?? "0").toString(),
+      february: (data.Feb ?? "0").toString(),
+      march: (data.Mar ?? "0").toString(),
       clusterId: undefined,
       updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
-      rate1: (data.rate1 ?? "").toString(),
-      rate2: (data.rate2 ?? "").toString(),
-      rate3: (data.rate3 ?? "").toString(),
-      rate4: (data.rate4 ?? "").toString(),
-      amount1: ((data.amount1 ?? "").toString()),
-      amount2: ((data.amount2 ?? "").toString()),
-      amount3: ((data.amount3 ?? "").toString()),
-      amount4: ((data.amount4 ?? "").toString()),
+      rate1: (data.rate1 ?? "0").toString(),
+      rate2: (data.rate2 ?? "0").toString(),
+      rate3: (data.rate3 ?? "0").toString(),
+      rate4: (data.rate4 ?? "0").toString(),
+      amount1: ((data.amount1 ?? "0").toString()),
+      amount2: ((data.amount2 ?? "0").toString()),
+      amount3: ((data.amount3 ?? "0").toString()),
+      amount4: ((data.amount4 ?? "0").toString()),
       qty1: Number(data.Qty1),
       qty2: Number(data.Qty2),
       qty3: Number(data.Qty3),
@@ -924,7 +924,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           {
             saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
               type="button"
-              className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
               style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
               disabled={isSaveDisabled()}
@@ -936,7 +936,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           {
             saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) &&      <Button
               type="button"
-              className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
               style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
               disabled={isSaveDisabled()}

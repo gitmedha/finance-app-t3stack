@@ -54,18 +54,25 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     }
   }
   useEffect(() => {
+    console.log(userData.data)
     if (userData.data?.user.departmentId && userData.data?.user.departmentName)
       handleSelect("department", { id: userData.data?.user.departmentId, departmentname: userData.data?.user.departmentName })
   }, [userData])
-
+  useEffect(()=>{
+    if (years[0]){
+      handleSelect("year", years[0])
+    }
+  },[])
   useEffect(() => {
-    if (data?.departments?.length) {
-      const sortedDepartments = [...data.departments].sort((a, b) =>
-        a.departmentname.localeCompare(b.departmentname)
-      );
-      if (sortedDepartments[0] && years[0]) {
-        handleSelect("department", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].departmentname })
-        handleSelect("year", years[0])
+    if (!userData.data?.user.departmentId && !userData.data?.user.departmentName)
+    {
+      if (data?.departments?.length) {
+        const sortedDepartments = [...data.departments].sort((a, b) =>
+          a.departmentname.localeCompare(b.departmentname)
+        );
+        if (sortedDepartments[0]) {
+          handleSelect("department", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].departmentname })
+        }
       }
     }
   }, [data]);
@@ -103,7 +110,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                  <span>{filters.departmentname}</span>
+                  <span>{filters.departmentname}{filters.department}</span>
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>

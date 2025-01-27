@@ -289,6 +289,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     month: string,
     value: string
   ) => {
+    console.log(tableData)
     setSmsg(null)
     setErrorMsg(null)
     setTableData((prev) => {
@@ -378,10 +379,10 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       clusterId: undefined,
       createdBy: userData.data?.user.id ?? 1,
       createdAt: new Date().toISOString(),
-      rate1:(data.rate1 ?? "").toString(),
-      rate2: (data.rate2 ?? "").toString(),
-      rate3: (data.rate3 ?? "").toString(),
-      rate4: (data.rate4 ?? "").toString(),
+      rate1:(data.Rate1 ?? "").toString(),
+      rate2: (data.Rate2 ?? "").toString(),
+      rate3: (data.Rate3 ?? "").toString(),
+      rate4: (data.Rate4 ?? "").toString(),
       amount1: ((data.amount1 ?? "").toString()),
       amount2: ((data.amount2 ?? "").toString()),
       amount3: ((data.amount3 ?? "").toString()),
@@ -463,14 +464,14 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       clusterId: undefined,
       updatedBy: userData.data?.user.id??1,
       updatedAt: new Date().toISOString(),
-      rate1: (data.rate1 ?? "").toString(),
-      rate2: (data.rate2 ?? "").toString(),
-      rate3: (data.rate3 ?? "").toString(),
-      rate4: (data.rate4 ?? "").toString(),
-      amount1: ((data.amount1 ?? "").toString()),
-      amount2: ((data.amount2 ?? "").toString()),
-      amount3: ((data.amount3 ?? "").toString()),
-      amount4: ((data.amount4 ?? "").toString()),
+      rate1: (data.Rate1 ?? "").toString(),
+      rate2: (data.Rate2 ?? "").toString(),
+      rate3: (data.Rate3 ?? "").toString(),
+      rate4: (data.Rate4 ?? "").toString(),
+      amount1: ((data.Amount1 ?? "").toString()),
+      amount2: ((data.Amount2 ?? "").toString()),
+      amount3: ((data.Amount3 ?? "").toString()),
+      amount4: ((data.Amount4 ?? "").toString()),
       qty1: Number(data.Qty1),
       qty2: Number(data.Qty2),
       qty3: Number(data.Qty3),

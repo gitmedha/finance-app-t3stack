@@ -99,6 +99,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     refetchOnMount: false,
     refetchOnWindowFocus:false,
     staleTime: 0, 
+    enabled:!!budgetId
   },)
   // const { data: levelEmployeesCount } = api.get.getLevelStaffCount.useQuery(
   //   {
@@ -110,33 +111,38 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   //   }
   // );
   const [avgQty, setAvgQty] = useState<avgQtySchema>({})
-
+  const isSaveDisabled = () => {
+    return Object.values(tableData).some((subData) => {
+      return months.some((month) => {
+        return !subData[month]?.toString().trim();
+      });
+    });
+  };
   useEffect(()=>{
     if (personnelCostData?.budgetId == budgetId )
     {
       const initialData: TableData = {};
       const intialAvgQty: avgQtySchema = {}
       if (personnelCostData?.subCategories) {
-        console.log("After getting the subcategories")
         personnelCostData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
-            Count: "",
+            Count: "0",
             Qty1: 0,
-            Apr: "",
-            May: "",
-            Jun: "",
+            Apr: "0",
+            May: "0",
+            Jun: "0",
             Qty2: 0,
-            Jul: "",
-            Aug: "",
-            Sep: "",
+            Jul: "0",
+            Aug: "0",
+            Sep: "0",
             Qty3: 0,
-            Oct: "",
-            Nov: "",
-            Dec: "",
-            Qty4: "",
-            Jan: "",
-            Feb: "",
-            Mar: "",
+            Oct: "0",
+            Nov: "0",
+            Dec: "0",
+            Qty4: 0,
+            Jan: "0",
+            Feb: "0",
+            Mar: "0",
             budgetDetailsId: 0
           };
           intialAvgQty[sub.subCategoryId] = {
@@ -153,10 +159,12 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             Feb: 0,
             Mar: 0,
           }
+          setAvgQty(intialAvgQty)
+          setTableData(initialData);
         });
         if (personnelCostData.result && personnelCostData.result.length > 0) {
           setSaveBtnState("edit")
-          // console.log("After getting the categorydetails")
+          console.log("Am i hitting this or not ")
           const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           personnelCostData.result.forEach((item) => {
             initialData[item.subcategoryId] = {
@@ -234,7 +242,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               }
             }
             if ((item.qty4 == 0 || !item.qty4) && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
-              console.log(userData.data.user.role,status)
               const janIn = document.getElementById(item.subcategoryId + "Jan") as HTMLInputElement;
               const febIn = document.getElementById(item.subcategoryId + "Feb") as HTMLInputElement;
               const marIn = document.getElementById(item.subcategoryId + "Mar") as HTMLInputElement;
@@ -254,7 +261,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         else if (personnelCostData.levelStats) {
           setSaveBtnState("save")
           const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           personnelCostData.subCategories.forEach((sub, index) => {
             const levelData = personnelCostData.levelStats?.find(
               (level) => level.level === sub.subCategoryId
@@ -287,54 +293,53 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               budgetDetailsId: 0, // Default or placeholder value
             };
             intialAvgQty[sub.subCategoryId] = {
-              Apr: (salarySum + epfSum + insuranceSum) / employeeCount,
-              May: (salarySum + epfSum + pwgPldSum) / employeeCount,
-              Jun: (salarySum + epfSum) / employeeCount,
-              Jul: (salarySum + epfSum) / employeeCount,
-              Aug: (salarySum + epfSum + pwgPldSum) / employeeCount,
-              Sep: (salarySum + epfSum) / employeeCount,
-              Oct: (salarySum + epfSum) / employeeCount,
-              Nov: (salarySum + epfSum + pwgPldSum) / employeeCount,
-              Dec: (salarySum + epfSum) / employeeCount,
-              Jan: (salarySum + epfSum + bonusSum) / employeeCount,
-              Feb: (salarySum + epfSum + gratuitySum) / employeeCount,
-              Mar: (salarySum + epfSum) / employeeCount,
+              Apr: employeeCount!=0 ? (salarySum + epfSum + insuranceSum) / employeeCount : 0,
+              May: employeeCount != 0 ?(salarySum + epfSum + pwgPldSum) / employeeCount:0,
+              Jun: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
+              Jul: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
+              Aug: employeeCount != 0 ?(salarySum + epfSum + pwgPldSum) / employeeCount:0,
+              Sep: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
+              Oct: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
+              Nov: employeeCount != 0 ?(salarySum + epfSum + pwgPldSum) / employeeCount:0,
+              Dec: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
+              Jan: employeeCount != 0 ?(salarySum + epfSum + bonusSum) / employeeCount:0,
+              Feb: employeeCount != 0 ?(salarySum + epfSum + gratuitySum) / employeeCount:0,
+              Mar: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
             }
             totalQtyAfterStaffCount.totalQ1 += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ2 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ3 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ4 += salarySum + epfSum + bonusSum + salarySum + epfSum + gratuitySum + salarySum + epfSum
-            // if ((employeeCount == 0 || employeeCount) && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
-            //   const aprIn = document.getElementById(sub.subCategoryId + "Apr") as HTMLInputElement;
-            //   const mayIn = document.getElementById(sub.subCategoryId + "May") as HTMLInputElement;
-            //   const junIn = document.getElementById(sub.subCategoryId + "Jun") as HTMLInputElement;
-            //   const julIn = document.getElementById(sub.subCategoryId + "Jul") as HTMLInputElement;
-            //   const augIn = document.getElementById(sub.subCategoryId + "Aug") as HTMLInputElement;
-            //   const sepIn = document.getElementById(sub.subCategoryId + "Sep") as HTMLInputElement;
-            //   const octIn = document.getElementById(sub.subCategoryId + "Oct") as HTMLInputElement;
-            //   const novIn = document.getElementById(sub.subCategoryId + "Nov") as HTMLInputElement;
-            //   const decIn = document.getElementById(sub.subCategoryId + "Dec") as HTMLInputElement;
-            //   const janIn = document.getElementById(sub.subCategoryId + "Jan") as HTMLInputElement;
-            //   const febIn = document.getElementById(sub.subCategoryId + "Feb") as HTMLInputElement;
-            //   const marIn = document.getElementById(sub.subCategoryId + "Mar") as HTMLInputElement;
-            //   if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn) {
-            //     console.log(employeeCount)
-            //     aprIn.disabled = false;
-            //     mayIn.disabled = false;
-            //     junIn.disabled = false;
-            //     octIn.disabled = false;
-            //     novIn.disabled = false;
-            //     decIn.disabled = false;
-            //     julIn.disabled = false;
-            //     augIn.disabled = false;
-            //     sepIn.disabled = false;
-            //     janIn.disabled = false;
-            //     febIn.disabled = false;
-            //     marIn.disabled = false;
-            //   } else {
-            //     console.error(`Input element with ID  not found.`);
-            //   }
-            // }
+            if ((employeeCount == 0 || !employeeCount) && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
+              const aprIn = document.getElementById(sub.subCategoryId + "Apr") as HTMLInputElement;
+              const mayIn = document.getElementById(sub.subCategoryId + "May") as HTMLInputElement;
+              const junIn = document.getElementById(sub.subCategoryId + "Jun") as HTMLInputElement;
+              const julIn = document.getElementById(sub.subCategoryId + "Jul") as HTMLInputElement;
+              const augIn = document.getElementById(sub.subCategoryId + "Aug") as HTMLInputElement;
+              const sepIn = document.getElementById(sub.subCategoryId + "Sep") as HTMLInputElement;
+              const octIn = document.getElementById(sub.subCategoryId + "Oct") as HTMLInputElement;
+              const novIn = document.getElementById(sub.subCategoryId + "Nov") as HTMLInputElement;
+              const decIn = document.getElementById(sub.subCategoryId + "Dec") as HTMLInputElement;
+              const janIn = document.getElementById(sub.subCategoryId + "Jan") as HTMLInputElement;
+              const febIn = document.getElementById(sub.subCategoryId + "Feb") as HTMLInputElement;
+              const marIn = document.getElementById(sub.subCategoryId + "Mar") as HTMLInputElement;
+              if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn) {
+                aprIn.disabled = false;
+                mayIn.disabled = false;
+                junIn.disabled = false;
+                octIn.disabled = false;
+                novIn.disabled = false;
+                decIn.disabled = false;
+                julIn.disabled = false;
+                augIn.disabled = false;
+                sepIn.disabled = false;
+                janIn.disabled = false;
+                febIn.disabled = false;
+                marIn.disabled = false;
+              } else {
+                console.error(`Input element with ID  not found.`);
+              }
+            }
           });
           setAvgQty(intialAvgQty)
           setTableData(initialData);
@@ -503,6 +508,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       if (!subCategoryData || !avgQty[subCategoryId]) return updatedData;
 
       if (month == "Apr" || month == "May" || month == "Jun") {
+        console.log(Number(value))
+        console.log(Number(subCategoryData[month]))
         const diff = Number(value) - Number(subCategoryData[month]) 
         updateTotalQtyVals("totalQ1", diff)
       }
@@ -863,6 +870,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
+              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+              disabled={isSaveDisabled()}
               onClick={() => handleUpdate()}
             >
               Edit
@@ -873,6 +882,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black"
               variant="soft"
+              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+              disabled={isSaveDisabled()}
               onClick={() => handleSave()}
             >
             Save

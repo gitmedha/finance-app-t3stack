@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import { api } from "~/trpc/react";
 
 // Define types for maricsList items
@@ -10,7 +10,7 @@ interface MetricItem {
 }
 
 const maricsList: MetricItem[] = [
-    { count: "2023-24", title: 'Financial Year', name: 'noofweektimesheetpendingapproval' },
+    { count: "", title: 'Financial Year', name: 'noofweektimesheetpendingapproval' },
     { count: 33, title: 'Annual Budget', name: 'totalnoofskills'},
     { count: 4, title: 'Annual Actual', name: 'totalprojectsworked'},
     { count: 40, title: 'Annual Balance', name: 'noofweektimesheetpendingsubmission'},
@@ -36,20 +36,24 @@ const PendingCard: FC<PendingCardProps> = ({ count, title }) => {
 };
 
 
-const AnnualBudget = () => {
+const AnnualBudget = ({ financialYear }: { financialYear :string}) => {
     // call to get total sum 
-    const { data: totalBudgetSum, isLoading: totalBudgetSumLoading } = api.get.getTotalBudgetSum.useQuery({ financialYear:"2023-24"})
+    const { data: totalBudgetSum, isLoading: totalBudgetSumLoading } = api.get.getTotalBudgetSum.useQuery(
+        { financialYear:financialYear}
+    )
     return (
-        <div className="grid grid-cols-5 gap-4">
-            {maricsList.map((item) => (
-                <PendingCard
-                    key={item.title}
-                    // we should not make the totalBudgetSum as number
-                    count={item.title == "Annual Budget" ? totalBudgetSum ? Number(totalBudgetSum) : 0: item.count}
-                    title={item.title}
-                />
-            ))}
-        </div>
+                 <div className="grid grid-cols-5 gap-4">
+
+                    {maricsList.map((item) => (
+                        <PendingCard
+                            key={item.title}
+                            // we should not make the totalBudgetSum as number
+                            count={item.title == "Annual Budget" ? totalBudgetSum ? Number(totalBudgetSum) : 0 : item.title == "Financial Year" ? financialYear : item.count}
+                            title={item.title}
+                        />
+                    ))}
+                </div>
+        
     );
 };
 

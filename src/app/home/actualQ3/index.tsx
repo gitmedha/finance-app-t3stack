@@ -55,10 +55,10 @@ const data = [
         budget: ""
     }
 ]
-const ActualQ3 = () => {
+const ActualQ3 = ({ financialYear }: { financialYear: string }) => {
     const [tableData, setTableData] = useState<tableDataSchema>({})
     const { data: cat, isLoading: catsLoading } = api.get.getCats.useQuery()
-    const { data: q1data, isLoading: q1DataLoading } = api.get.getQuarterBudgetSum.useQuery({ financialYear: "2023-24", quarter: "q3" }, { enabled: !!cat && !catsLoading })
+    const { data: q1data, isLoading: q1DataLoading } = api.get.getQuarterBudgetSum.useQuery({ financialYear: financialYear, quarter: "q3" }, { enabled: !!cat && !catsLoading })
 
     useEffect(() => {
         if (cat?.categories && cat.categories.length > 0) {

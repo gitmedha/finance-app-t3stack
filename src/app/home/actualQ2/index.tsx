@@ -11,10 +11,10 @@ interface BudgetData {
 
 type tableDataSchema = Record<string, BudgetData>
 
-const ActualQ2 = () => {
+const ActualQ2 = ({ financialYear }: { financialYear: string }) => {
     const [tableData, setTableData] = useState<tableDataSchema>({})
     const { data: cat, isLoading: catsLoading } = api.get.getCats.useQuery()
-    const { data: q1data, isLoading: q1DataLoading } = api.get.getQuarterBudgetSum.useQuery({ financialYear: "2023-24", quarter: "q2" }, { enabled: !!cat && !catsLoading })
+    const { data: q1data, isLoading: q1DataLoading } = api.get.getQuarterBudgetSum.useQuery({ financialYear: financialYear, quarter: "q2" }, { enabled: !!cat && !catsLoading })
     useEffect(() => {
         if (cat?.categories && cat.categories.length > 0) {
             const formattedData = cat.categories.reduce((acc, category) => {

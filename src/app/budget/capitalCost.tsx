@@ -8,10 +8,11 @@ interface CapitalCostProps {
   categoryId: number;
   budgetId: number;
   deptId: string;
+  status: string | undefined
 }
 
 interface LevelData {
-  budgetDetailsId:number
+  budgetDetailsId: number
   Count: string | number;
   [month: string]: string | number;
 }
@@ -27,12 +28,16 @@ const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
-const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId }) => {
+const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status }) => {
+  // state to disable and enable the save and edit button
+  const [sMsg,setSmsg] = useState<string|null>(null)
+  const [saveBtnState,setSaveBtnState] = useState<"loading"|"edit"|"save">("loading")
+  const [erroMsg,setErrorMsg] = useState<string|null>(null)
   const userData = useSession()
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
-  const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
+  // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
   const [tableData, setTableData] = useState<TableData>({});
   const updateTotalQtyVals = (which: string, difference: number) => {
     setTotalQty((prev) => {
@@ -47,6 +52,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     month: string,
     value: string,
   ) => {
+    setSmsg(null)
+    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -77,74 +84,144 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) => {
       return months.some((month) => {
-        return !subData[month]?.toString().trim(); 
+        return !subData[month]?.toString().trim();
       });
     });
   };
 
-  const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  // const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  //   budgetId,
+  //   catId: categoryId,
+  //   deptId: Number(deptId),
+  // },{
+  //   enabled:!!budgetId
+  // });
+  const { data: capitalCostData, isLoading: capitalCostDataLodaing } = api.get.getCapitalCostData.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
-  });
-
+  })
   useEffect(() => {
-    const initialData: TableData = {};
+    if (capitalCostData?.budgetId == budgetId) {
+      const initialData: TableData = {};
+      if (capitalCostData?.subCategories) {
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        console.log("After getting the subcategories")
+        capitalCostData.subCategories.forEach((sub) => {
+          initialData[sub.subCategoryId] = {
+            Count: "",
+            Apr: "0",
+            May: "0",
+            Jun: "0",
+            Jul: "0",
+            Aug: "0",
+            Sep: "0",
+            Oct: "0",
+            Nov: "0",
+            Dec: "0",
+            Jan: "0",
+            Feb: "0",
+            Mar: "0",
+            budgetDetailsId: 0,
+          };
+        });
+        setTotalQty(totalQtyAfterBudgetDetails)
+        setTableData(initialData);
+      }
+      if (capitalCostData.result.length > 0 && capitalCostData.subCategories.length > 0) {
+        setSaveBtnState("edit")
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        capitalCostData.result.forEach((item) => {
+          console.log(Number(item.april), Number(item.may), Number(item.june))
+          initialData[item.subcategoryId] = {
+            Count: Number(item.total),
+            Apr: Number(item.april) ?? "0",
+            May: Number(item.may) ?? "0",
+            Jun: Number(item.june) ?? "0",
+            Jul: Number(item.july) ?? "0",
+            Aug: Number(item.august) ?? "0",
+            Sep: Number(item.september) ?? "0",
+            Oct: Number(item.october) ?? "0",
+            Nov: Number(item.november) ?? "0",
+            Dec: Number(item.december) ?? "0",
+            Jan: Number(item.january) ?? "0",
+            Feb: Number(item.february) ?? "0",
+            Mar: Number(item.march) ?? "0",
+            budgetDetailsId: Number(item.id),
+          };
+          totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+          totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+          totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+          totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+        });
+        setTableData(initialData);
+        setTotalQty(totalQtyAfterBudgetDetails)
+      }
+      else{
+        setSaveBtnState("save")
+      }
 
-    if (data?.subCategories) {
-      data.subCategories.forEach((sub) => {
-        initialData[sub.subCategoryId] = {
-          Count: "",
-          Apr: "0",
-          May: "0",
-          Jun: "0",
-          Jul: "0",
-          Aug: "0",
-          Sep: "0",
-          Oct: "0",
-          Nov: "0",
-          Dec: "0",
-          Jan: "0",
-          Feb: "0",
-          Mar: "0",
-          budgetDetailsId: 0,
-        };
-      });
     }
-    if (categoriesBudgetDetails) {
-      const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-      categoriesBudgetDetails.forEach((item) => {
-        initialData[item.subcategoryId] = {
-          Count: Number(item.total),
-          Apr: Number(item.april) ?? "0",
-          May: Number(item.may) ?? "0",
-          Jun: Number(item.june) ?? "0",
-          Jul: Number(item.july) ?? "0",
-          Aug: Number(item.august) ?? "0",
-          Sep: Number(item.september) ?? "0",
-          Oct: Number(item.october )?? "0",
-          Nov: Number(item.november) ?? "0",
-          Dec: Number(item.december) ?? "0",
-          Jan: Number(item.january) ?? "0",
-          Feb: Number(item.february) ?? "0",
-          Mar: Number(item.march )?? "0",
-          budgetDetailsId: Number(item.id),
-        };
-        totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-        totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-        totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-        totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
-      });
-      setTotalQty(totalQty)
-    }
-    setTableData(initialData);
-  }, [data, categoriesBudgetDetails]);
+  }, [capitalCostData])
+  // useEffect(() => {
+  //   const initialData: TableData = {};
+
+  //   if (data?.subCategories) {
+  //     data.subCategories.forEach((sub) => {
+  //       initialData[sub.subCategoryId] = {
+  //         Count: "",
+  //         Apr: "0",
+  //         May: "0",
+  //         Jun: "0",
+  //         Jul: "0",
+  //         Aug: "0",
+  //         Sep: "0",
+  //         Oct: "0",
+  //         Nov: "0",
+  //         Dec: "0",
+  //         Jan: "0",
+  //         Feb: "0",
+  //         Mar: "0",
+  //         budgetDetailsId: 0,
+  //       };
+  //     });
+  //   }
+  //   if (categoriesBudgetDetails && categoriesBudgetDetails.result.length > 0 && budgetId == categoriesBudgetDetails.budgeId) {
+  //     const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+  //     categoriesBudgetDetails.result.forEach((item) => {
+  //       initialData[item.subcategoryId] = {
+  //         Count: Number(item.total),
+  //         Apr: Number(item.april) ?? "0",
+  //         May: Number(item.may) ?? "0",
+  //         Jun: Number(item.june) ?? "0",
+  //         Jul: Number(item.july) ?? "0",
+  //         Aug: Number(item.august) ?? "0",
+  //         Sep: Number(item.september) ?? "0",
+  //         Oct: Number(item.october) ?? "0",
+  //         Nov: Number(item.november) ?? "0",
+  //         Dec: Number(item.december) ?? "0",
+  //         Jan: Number(item.january) ?? "0",
+  //         Feb: Number(item.february) ?? "0",
+  //         Mar: Number(item.march) ?? "0",
+  //         budgetDetailsId: Number(item.id),
+  //       };
+  //       totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
+  //       totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
+  //       totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
+  //       totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+  //     });
+  //     setTotalQty(totalQty)
+  //   }
+  //   setTableData(initialData);
+  // }, [data, categoriesBudgetDetails]);
 
 
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
 
   const handleSave = async () => {
-    // If validation passes, proceed with saving the budget details
+    setSmsg(null)
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -177,21 +254,39 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     try {
       createBudgetDetails.mutate(
         {
-          deptId: parseInt(deptId,10),
+          deptId: parseInt(deptId, 10),
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
         },
         {
           onSuccess: (data) => {
+            setSaveBtnState("edit")
+            setSmsg("Successfully Saved")
+            setTableData((prev) => {
+              const updatedData = {...prev}
+              data.data.map((item)=>{
+                const subCategoryData = updatedData[item.subcategoryId]
+                if(subCategoryData)
+                {
+                  updatedData[item.subcategoryId] = {
+                    ...subCategoryData, 
+                    budgetDetailsId: item.budgetDetailsId,
+                  };
+                }
+              })
+              return updatedData
+            })
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
+            setErrorMsg(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
       );
     } catch (error) {
+      setErrorMsg(JSON.stringify(error))
       console.error("Failed to save budget details:", error);
       alert("Failed to save budget details. Please try again.");
     }
@@ -199,8 +294,11 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
 
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
+    setSmsg(null)
+    setSaveBtnState("loading")
+    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
-      budgetDetailsId: data.budgetDetailsId, 
+      budgetDetailsId: data.budgetDetailsId,
       subcategoryId: parseInt(subCategoryId, 10),
       unit: 1,
       rate: "1",
@@ -222,10 +320,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       march: (data.Mar ?? "").toString(),
       activity: "",
       clusterId: undefined,
-      updatedBy: userData.data?.user.id??1,
+      updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
     }));
-    console.log(tableData)
     try {
       updateBudgetDetails.mutate(
         {
@@ -236,9 +333,11 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         },
         {
           onSuccess: (data) => {
+            setSmsg("Successfully Edited")
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
+            setErrorMsg(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
@@ -246,6 +345,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     } catch (error) {
       console.error("Failed to update budget details:", error);
       alert("Failed to update budget details. Please try again.");
+    }
+    finally{
+      setSaveBtnState("edit")
     }
   };
 
@@ -257,10 +359,16 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow">
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary">
           <h1 className="uppercase">{section}</h1>
-          <div className="flex items-center space-x-2">
-            <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
-            <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
-          </div>
+          {
+            capitalCostDataLodaing ? <div className="flex items-center space-x-2">
+              <p className="text-sm">Loading.....</p>
+            </div> : 
+            <div className="flex items-center space-x-2">
+              <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+              <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+            </div>
+          }
+          
         </summary>
 
         <hr className="my-2 scale-x-150" />
@@ -275,31 +383,49 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {data?.subCategories.map((sub) => (
-                <tr key={sub.subCategoryId} className="text-sm transition hover:bg-gray-100">
-                  <td className="border p-2 font-medium">{sub.subCategoryName}</td>
-                  {months.map((month) => (
-                    <td key={month} className="border p-2">
-                      <input
-                        type="text"
-                        className="w-full rounded border p-1"
-                        value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(sub.subCategoryId, month, e.target.value)
-                        }
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
+            {
+              !capitalCostDataLodaing && <tbody>
+                {capitalCostData?.subCategories.map((sub) => (
+                  <tr key={sub.subCategoryId} className="text-sm transition hover:bg-gray-100">
+                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    {months.map((month) => (
+                      <td key={month} className="border p-2">
+                        <input
+                          type="text"
+                          disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                          className="w-full rounded border p-1"
+                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                          onChange={(e) =>
+                            handleInputChange(sub.subCategoryId, month, e.target.value)
+                          }
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            }
+            
           </table>
+          {
+            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
+          }
+          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
 
         <div className="py-2 pr-4 flex flex-row-reverse">
           {
-            categoriesBudgetDetails && categoriesBudgetDetails.length > 0 ? <Button
+            saveBtnState == "loading" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
+              type="button"
+              className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+              variant="soft"
+            // Disable the button if input is empty
+            >
+              Loading...
+            </Button>
+          }
+          {
+            saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
               type="button"
               className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
@@ -308,20 +434,23 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
               onClick={() => handleUpdate()}
             // Disable the button if input is empty
             >
-              Edit
-            </Button> : <Button
-              type="button"
-              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-              variant="soft"
-              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-              disabled={isSaveDisabled()}
-              onClick={() => handleSave()}
-            // Disable the button if input is empty
-            >
-              Save
-            </Button>
-          }
+              Edit  
+            </Button>} 
+            
+          {saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
+            type="button"
+            className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+            variant="soft"
+            style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+            disabled={isSaveDisabled()}
+            onClick={() => handleSave()}
+          // Disable the button if input is empty
+          >
+            Save
+          </Button>
           
+          }
+
         </div>
       </details>
     </div>

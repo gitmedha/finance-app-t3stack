@@ -13,5 +13,7 @@ interface BudgetFilterFormProps {
   handleSelect: (name: string, value: number | string | { id: number; departmentname: string }) => void;
   budgetId:number|null
   setBugetId:(val:number|null)=>void
+  status:string|undefined
+  setStatus:(val:string)=>void
 }
 

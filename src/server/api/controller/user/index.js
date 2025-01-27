@@ -5,7 +5,6 @@ import {
     publicProcedure,
 } from "~/server/api/trpc";
 
-
 export const login = publicProcedure
     .input(
         z.object({
@@ -15,13 +14,14 @@ export const login = publicProcedure
     )
     .mutation(async ({ input, ctx }) => {
         // Find user in the database by username
-        const user = await ctx.db.query.userMasterInFinanceProject.findFirst({
+        console.log(input)
+        let user = await ctx.db.query.userMasterInFinanceProject.findFirst({
             where: (fields, operators) =>
                 operators.eq(fields.email, input.email),
         });
-        // console.log(user)
+
         if (!user) {
-            return { message: "Invalid username ", user, success: false };
+            return { message: "Invalid email", user, success: false };
         }
         // Compare the hashed password with the input password
         const isPasswordValid = await bcrypt.compare(input.password, user.password);

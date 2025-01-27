@@ -1,25 +1,25 @@
-import { type FC } from "react";
+import { useEffect, useState, type FC } from "react";
+import { api } from "~/trpc/react";
 
 // Define types for maricsList items
 interface MetricItem {
-    count: number;
+    count: number|string;
     title: string;
     name: string;
     viewLink?: string;
 }
 
 const maricsList: MetricItem[] = [
+    { count: "", title: 'Financial Year', name: 'noofweektimesheetpendingapproval' },
     { count: 33, title: 'Annual Budget', name: 'totalnoofskills'},
     { count: 4, title: 'Annual Actual', name: 'totalprojectsworked'},
     { count: 40, title: 'Annual Balance', name: 'noofweektimesheetpendingsubmission'},
     { count: 1, title: 'Annual Utilized %', name: 'noofweektimesheetpendingapproval'},
-    { count: 3, title: 'Annual Utilized', name: 'noofweektimesheetpendingapproval'},
-
 ];
 
 // Define types for PendingCard props
 interface PendingCardProps {
-    count: number;
+    count: number|string;
     title: string;
 }
 
@@ -36,17 +36,24 @@ const PendingCard: FC<PendingCardProps> = ({ count, title }) => {
 };
 
 
-const AnnualBudget = () => {
+const AnnualBudget = ({ financialYear }: { financialYear :string}) => {
+    // call to get total sum 
+    const { data: totalBudgetSum, isLoading: totalBudgetSumLoading } = api.get.getTotalBudgetSum.useQuery(
+        { financialYear:financialYear}
+    )
     return (
-        <div className="grid grid-cols-5 gap-4">
-            {maricsList.map((item) => (
-                <PendingCard
-                    key={item.title}
-                    count={item?.count}
-                    title={item.title}
-                />
-            ))}
-        </div>
+                 <div className="grid grid-cols-5 gap-4">
+
+                    {maricsList.map((item) => (
+                        <PendingCard
+                            key={item.title}
+                            // we should not make the totalBudgetSum as number
+                            count={item.title == "Annual Budget" ? totalBudgetSum ? Number(totalBudgetSum) : 0 : item.title == "Financial Year" ? financialYear : item.count}
+                            title={item.title}
+                        />
+                    ))}
+                </div>
+        
     );
 };
 

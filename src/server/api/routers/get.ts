@@ -4,7 +4,8 @@ import { getDonors } from "../controller/donor";
 import { getCostCenters, getAllCostCenters } from "../controller/costCenters";
 import { getDepartments, getAllDepartments } from "../controller/department";
 import { getAllLocations, getAllStates } from "../controller/geography";
-import { getBudgetMaster, getCats, getCatsBudgetDetails, getLevelStaffCount, getSubCats } from "../controller/budget";
+import { getBudgetMaster, getCapitalCostData, getCats, getCatsBudgetDetails, getLevelStaffCount, getOverHeadsData, getPersonalCatDetials, getProgramActivities, getProgramOfficeData, getSubCats, getTravelCatDetials } from "../controller/budget";
+import { getQuarterBudgetSum, getTotalBudgetSum } from "../controller/home";
 
 export const getRouter = createTRPCRouter({
   getStaffs,
@@ -22,6 +23,14 @@ export const getRouter = createTRPCRouter({
   getCatsBudgetDetails,
   getLevelStaffCount,
   getLevels,
+  getTotalBudgetSum,
+  getQuarterBudgetSum,
+  getPersonalCatDetials,
+  getProgramActivities,
+  getTravelCatDetials,
+  getProgramOfficeData,
+  getCapitalCostData,
+  getOverHeadsData,
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";
   }),

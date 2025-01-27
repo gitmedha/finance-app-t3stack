@@ -58,10 +58,10 @@ export const getStaffs = protectedProcedure
         updatedBy: staffMaster.updatedBy,
         department: staffMaster.department,
         departmentname: departmentMaster.departmentname,
-        state: stateMaster.name,
-        stateId: stateMaster.id,
-        location: locationMaster.cityName,
-        locationId: locationMaster.id,
+        state: staffMaster.stateId,
+        stateId: staffMaster.stateId,
+        location: staffMaster.locationId,
+        locationId: staffMaster.locationId,
         designation: staffMaster.designation,
         salaryDetailsId: salaryMaster.id,
         salary: salaryMaster.salary,
@@ -70,7 +70,6 @@ export const getStaffs = protectedProcedure
         gratuity: salaryMaster.gratuity,
         epf: salaryMaster.epf,
         pgwPld: salaryMaster.pgwPld,
-        // count: count()
       })
       .from(staffMaster)
       .leftJoin(
@@ -78,20 +77,6 @@ export const getStaffs = protectedProcedure
         and(
           eq(departmentMaster.isactive, true),
           eq(departmentMaster.id, staffMaster.department),
-        ),
-      )
-      .leftJoin(
-        stateMaster,
-        and(
-          // eq(stateMaster.is, true),
-          eq(stateMaster.id, staffMaster.stateId),
-        ),
-      )
-      .leftJoin(
-        locationMaster,
-        and(
-          // eq(stateMaster.is, true),
-          eq(locationMaster.id, staffMaster.locationId),
         ),
       )
       .leftJoin(salaryMaster, and(eq(salaryMaster.empId, staffMaster.id)))

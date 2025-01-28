@@ -206,18 +206,18 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
       </div>
       <div className='text-right p-2 text-green-900 font-black'>
           {
-            status == "submitted" && <p>Status is Submitted</p>
+          status == "submitted" && <p>{status.toUpperCase()}</p>
           }
         {
-          status == "draft" && userData.data?.user.role == 1 && <p className='text-red-900'>Still Not Submitted</p>
+          status == "draft" && userData.data?.user.role == 1 && <p className='text-red-900'>{status.toUpperCase()}</p>
         }
         {
-          status == "approved" && <p>Staus is Approved</p>
+          status == "approved" && <p>{status.toUpperCase()}</p>
         }
       </div>
 
       <Modal
-        title={`Status ${userData.data?.user.role == 2 ? "Submit" : "Approve"} conformation`}
+        title={`Status ${userData.data?.user.role == 2 ? "Submit" : "Approve"} confirmation`}
         className=""
         description=""
         isOpen={isModalOpen}

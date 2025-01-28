@@ -359,7 +359,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       unit: 1, 
       rate: "1", 
       total: "1", 
-      currency: "USD", 
+      currency: "INR", 
       notes: "",
       description: "",
       april: (data.Apr ?? "").toString(),
@@ -445,7 +445,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       unit: 1,
       rate: "1",
       total: "1",
-      currency: "USD",
+      currency: "INR",
       notes: "",
       description: "",
       april: (data.Apr ?? "").toString(),
@@ -626,9 +626,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                 <th scope="col" className="border p-2">
                   Mar
                 </th>
-                <th scope="col" className="border p-2">
+                {/* <th scope="col" className="border p-2">
                   Notes
-                </th>
+                </th> */}
               </tr>
             </thead>
             {
@@ -657,9 +657,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                         />
                       </td>
                     ))}
-                    <td className="border p-2">
+                    {/* <td className="border p-2">
                       <BiComment className="text-xl" />
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>

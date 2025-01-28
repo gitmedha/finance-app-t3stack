@@ -49,7 +49,6 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const { mutate: addStaff } = api.post.addStaff.useMutation({
     async onSuccess(data) {
-      setIsModalOpen(false) 
       await apiContext.get.getStaffs.invalidate();
       if (data.staff) {
         setActiveStaffId(data.staff?.id);

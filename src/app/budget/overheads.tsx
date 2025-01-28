@@ -35,13 +35,14 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const userData = useSession()
+  const [inputStates, setInputStates] = useState<boolean>(true)
   const [sMsg, setSmsg] = useState<string | null>(null)
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
   // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId });
   const [tableData, setTableData] = useState<TableData>({});
-
+  
   const updateTotalQtyVals = (which: string, difference: number) => {
     setTotalQty((prev) => {
       const updatedTotal = { ...prev };
@@ -90,6 +91,43 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       });
     });
   };
+  const handelnputDisable = (disable: boolean) => {
+    const subcategoryIds = []
+    setInputStates(disable)
+    for (const [subcategoryId, subcategoryData] of Object.entries(tableData)) {
+      subcategoryIds.push(subcategoryId)
+    }
+    subcategoryIds.forEach((id) => {
+      const aprIn = document.getElementById(id + "Apr") as HTMLInputElement;
+      const mayIn = document.getElementById(id + "May") as HTMLInputElement;
+      const junIn = document.getElementById(id + "Jun") as HTMLInputElement;
+      const julIn = document.getElementById(id + "Jul") as HTMLInputElement;
+      const augIn = document.getElementById(id + "Aug") as HTMLInputElement;
+      const sepIn = document.getElementById(id + "Sep") as HTMLInputElement;
+      const octIn = document.getElementById(id + "Oct") as HTMLInputElement;
+      const novIn = document.getElementById(id + "Nov") as HTMLInputElement;
+      const decIn = document.getElementById(id + "Dec") as HTMLInputElement;
+      const janIn = document.getElementById(id + "Jan") as HTMLInputElement;
+      const febIn = document.getElementById(id + "Feb") as HTMLInputElement;
+      const marIn = document.getElementById(id + "Mar") as HTMLInputElement;
+      if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn) {
+        aprIn.disabled = disable;
+        mayIn.disabled = disable;
+        junIn.disabled = disable;
+        octIn.disabled = disable;
+        novIn.disabled = disable;
+        decIn.disabled = disable;
+        julIn.disabled = disable;
+        augIn.disabled = disable;
+        sepIn.disabled = disable;
+        janIn.disabled = disable;
+        febIn.disabled = disable;
+        marIn.disabled = disable;
+      } else {
+        console.error(`Input element with ID  not found.`);
+      }
+    })
+  }
   // const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
   //   budgetId,
   //   catId: categoryId,
@@ -260,6 +298,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
           onSuccess: (data) => {
             setSmsg("Successfully Saved")
             setSaveBtnState("edit")
+            handelnputDisable(true)
             setTableData((prev) => {
               const updatedData = { ...prev }
               data.data.map((item) => {
@@ -328,6 +367,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         {
           onSuccess: (data) => {
             setSmsg("Successfully Editted")
+            handelnputDisable(true)
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
@@ -386,7 +426,8 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
                       <td key={month} className="border p-2">
                         <input
                           type="text"
-                          disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                          id={sub.subCategoryId + month}
+                          disabled={true}
                           className="w-full rounded border p-1"
                           value={tableData[sub.subCategoryId]?.[month] ?? ""}
                           onChange={(e) =>
@@ -406,40 +447,67 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
           }
           {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
-        <div className="py-2 pr-4 flex flex-row-reverse ">
-          {
-            saveBtnState == "loading" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
+        {
+          ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
+            {
+              !inputStates && <div>
+                {
+                  saveBtnState == "loading" && <Button
+                    type="button"
+                    className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+                    variant="soft"
+                  >
+                    Loading...
+                  </Button>
+                }
+                {
+                  saveBtnState == "edit" && <Button
+                    type="button"
+                    className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+                    variant="soft"
+                    style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+                    disabled={isSaveDisabled()}
+                    onClick={() => handleUpdate()}
+                  >
+                    Edit
+                  </Button>}
+                {saveBtnState == "save" && <Button
+                  type="button"
+                  className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+                  variant="soft"
+                  style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+                  disabled={isSaveDisabled()}
+                  onClick={() => handleSave()}
+                >
+                  Save
+                </Button>
+                }
+              </div>
+            }
+            {inputStates ? <Button
               type="button"
-              className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+              className="cursor-pointer !text-primary  px-2 !w-20 !text-lg  border-primary border-2 !disabled:cursor-not-allowed"
               variant="soft"
-            // Disable the button if input is empty
-            >
-              Loading...
-            </Button>
-          }
-          {
-            saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
-              type="button"
-              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-              variant="soft"
-              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-              disabled={isSaveDisabled()}
-              onClick={() => handleUpdate()}
+              style={{ cursor: "pointer" }}
+              // disabled={isSaveDisabled()}
+              onClick={() => handelnputDisable(false)}
             >
               Edit
-            </Button> }
-          {saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
-              type="button"
-              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-              variant="soft"
-              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-              disabled={isSaveDisabled()}
-              onClick={() => handleSave()}
-            >
-              Save
-            </Button>
-          }
-        </div>
+            </Button> :
+              <Button
+                type="button"
+                className="cursor-pointer !text-primary  px-2 !w-20 !text-lg border border-primary !disabled:cursor-not-allowed"
+                variant="soft"
+                style={{ cursor: "pointer" }}
+                // disabled={isSaveDisabled()}
+                onClick={() => handelnputDisable(true)}
+              >
+                Cancel
+              </Button>
+            }
+          </div>
+        }
+        
       </details>
     </div>
   );

@@ -90,7 +90,7 @@ const ActualQ3 = ({ financialYear }: { financialYear: string }) => {
                             actQ1: valBeforeUpdate?.actQ1 ?? "NA",
                             q1bal: valBeforeUpdate?.q1bal ?? "NA",
                             util: valBeforeUpdate?.util ?? "NA",
-                            budget: Number(val.qSum).toString()
+                            budget: Math.round(Number(val.qSum)).toString()
                         }
                     }
                 });

@@ -10,7 +10,7 @@ export type {
 };
 
 interface StaffItem {
-  push(staff: {
+  push(staff: { 
     id: number;
     name: string;
     empNo: string;
@@ -29,6 +29,7 @@ interface StaffItem {
     location: string | null;
     locationId: string | null;
     designation: string | null;
+    level:number|null
   }): unknown;
   id: number;
   name: string;
@@ -52,6 +53,7 @@ interface StaffItem {
   departmentData?: ISelectItem;
   statesData?: ISelectItem;
   locationData?: ISelectItem;
+  levelData?:ISelectItem
   salary: string;
   insurance: string | null;
   bonus: string | null;

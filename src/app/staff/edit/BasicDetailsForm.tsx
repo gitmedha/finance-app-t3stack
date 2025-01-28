@@ -67,6 +67,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         locationId: data.locationData?.label.toString(),
         updatedBy: userData.data?.user.id ?? 1,
         isactive: true,
+        level:data.levelData?.value,
         updatedAt: new Date().toISOString().split("T")[0] ?? "",
       };
 
@@ -231,7 +232,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       </div>
       
       {/* Level Dropdown */}
-      {/* <div className="w-1/2">
+      <div className="w-1/2">
         <label className="text-sm">
           Level <span className="text-red-400">*</span>
         </label>
@@ -241,6 +242,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           render={({ field }) => (
             <Select
               onChange={field.onChange}
+              defaultValue={item.levelData}
               options={levelsData}
               placeholder="Select Level"
               isClearable
@@ -253,7 +255,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             {errors.levelData.message}
           </span>
         )}
-      </div> */}
+      </div>
 
       <Flex gap="3" mt="4" justify="end">
         <Button

@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from "~/trpc/react";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast,Bounce } from 'react-toastify';
 
 interface TravelBudgetProps {
   section: string;
@@ -505,6 +505,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         draggable: true,
         progress: undefined,
         theme: "light",
+        transition: Bounce,
       });
     }
   };
@@ -582,6 +583,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         draggable: true,
         progress: undefined,
         theme: "light",
+        transition: Bounce,
       });
     }
     finally {
@@ -591,7 +593,19 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
-      <ToastContainer />
+      {/* <ToastContainer
+        position="bottom-center"
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      /> */}
       <details
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
       >

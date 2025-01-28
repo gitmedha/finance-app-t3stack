@@ -334,9 +334,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: false,
-        pauseOnHover: true,
+        // pauseOnHover: true,
         draggable: true,
-        progress: undefined,
+        // progress: undefined,
         theme: "light",
       });
       console.error("Failed to save budget details:", error);
@@ -388,9 +388,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
               autoClose: 1000,
               hideProgressBar: false,
               closeOnClick: false,
-              pauseOnHover: true,
+              // pauseOnHover: true,
               draggable: true,
-              progress: undefined,
+              // progress: undefined,
               theme: "light",
             });
             console.log("Budget updated successfully:", data);
@@ -424,7 +424,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
-      <ToastContainer/>
       <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow">
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary">
           <h1 className="uppercase">{section}</h1>

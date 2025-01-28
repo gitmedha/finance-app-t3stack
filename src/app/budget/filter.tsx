@@ -110,7 +110,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                  <span>{filters.departmentname}{filters.department}</span>
+                  <span>{filters.departmentname}</span>
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
@@ -162,7 +162,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         </div>
         <div className='flex justify-end items-center space-x-2'>
           {
-            !budgetId && <Button
+            !budgetId && userData.data?.user.role == 2 &&<Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2"
               variant="soft"
@@ -206,18 +206,18 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
       </div>
       <div className='text-right p-2 text-green-900 font-black'>
           {
-            status == "submitted" && <p>Status is Submitted</p>
+          status == "submitted" && <p>{status.toUpperCase()}</p>
           }
         {
-          status == "draft" && userData.data?.user.role == 1 && <p className='text-red-900'>Still Not Submitted</p>
+          status == "draft" && userData.data?.user.role == 1 && <p className='text-red-900'>{status.toUpperCase()}</p>
         }
         {
-          status == "approved" && <p>Staus is Approved</p>
+          status == "approved" && <p>{status.toUpperCase()}</p>
         }
       </div>
 
       <Modal
-        title={`Status ${userData.data?.user.role == 2 ? "Submit" : "Approve"} conformation`}
+        title={`Status ${userData.data?.user.role == 2 ? "Submit" : "Approve"} confirmation`}
         className=""
         description=""
         isOpen={isModalOpen}

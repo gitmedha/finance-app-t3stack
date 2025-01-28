@@ -2,7 +2,7 @@ import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
-
+import { ToastContainer, toast } from 'react-toastify';
 interface CapitalCostProps {
   section: string;
   categoryId: number;
@@ -30,9 +30,8 @@ const months = [
 
 const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status }) => {
   // state to disable and enable the save and edit button
-  const [sMsg,setSmsg] = useState<string|null>(null)
+  const[inputStates,setInputStates] = useState<boolean>(true)
   const [saveBtnState,setSaveBtnState] = useState<"loading"|"edit"|"save">("loading")
-  const [erroMsg,setErrorMsg] = useState<string|null>(null)
   const userData = useSession()
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -52,8 +51,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     month: string,
     value: string,
   ) => {
-    setSmsg(null)
-    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -80,7 +77,44 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       return updatedData
     });
   };
-
+  const handelnputDisable = (disable:boolean)=>{
+    const subcategoryIds = []
+    setInputStates(disable)
+    for(const [subcategoryId,subcategoryData] of Object.entries(tableData))
+    {
+      subcategoryIds.push(subcategoryId)
+    }
+    subcategoryIds.forEach((id)=>{
+      const aprIn = document.getElementById(id + "Apr") as HTMLInputElement;
+      const mayIn = document.getElementById(id + "May") as HTMLInputElement;
+      const junIn = document.getElementById(id+ "Jun") as HTMLInputElement;
+      const julIn = document.getElementById(id+ "Jul") as HTMLInputElement;
+      const augIn = document.getElementById(id+ "Aug") as HTMLInputElement;
+      const sepIn = document.getElementById(id+ "Sep") as HTMLInputElement;
+      const octIn = document.getElementById(id+ "Oct") as HTMLInputElement;
+      const novIn = document.getElementById(id+ "Nov") as HTMLInputElement;
+      const decIn = document.getElementById(id+ "Dec") as HTMLInputElement;
+      const janIn = document.getElementById(id+ "Jan") as HTMLInputElement;
+      const febIn = document.getElementById(id+ "Feb") as HTMLInputElement;
+      const marIn = document.getElementById(id+ "Mar") as HTMLInputElement;
+      if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn) {
+        aprIn.disabled = disable;
+        mayIn.disabled = disable;
+        junIn.disabled = disable;
+        octIn.disabled = disable;
+        novIn.disabled = disable;
+        decIn.disabled = disable;
+        julIn.disabled = disable;
+        augIn.disabled = disable;
+        sepIn.disabled = disable;
+        janIn.disabled = disable;
+        febIn.disabled = disable;
+        marIn.disabled = disable;
+      } else {
+        console.error(`Input element with ID  not found.`);
+      }
+    })
+  }
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) => {
       return months.some((month) => {
@@ -219,9 +253,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
 
   const handleSave = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -229,7 +261,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       unit: 1,
       rate: "1",
       total: "1",
-      currency: "USD",
+      currency: "INR",
       notes: "",
       description: "",
       april: (data.Apr ?? "").toString(),
@@ -262,7 +294,17 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         {
           onSuccess: (data) => {
             setSaveBtnState("edit")
-            setSmsg("Successfully Saved")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+            handelnputDisable(true)
             setTableData((prev) => {
               const updatedData = {...prev}
               data.data.map((item)=>{
@@ -280,30 +322,37 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
-            setErrorMsg(JSON.stringify(error))
+            setSaveBtnState("save")
+            throw new Error(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
       );
     } catch (error) {
-      setErrorMsg(JSON.stringify(error))
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        // pauseOnHover: true,
+        draggable: true,
+        // progress: undefined,
+        theme: "light",
+      });
       console.error("Failed to save budget details:", error);
-      alert("Failed to save budget details. Please try again.");
     }
   };
 
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       subcategoryId: parseInt(subCategoryId, 10),
       unit: 1,
       rate: "1",
       total: "1",
-      currency: "USD",
+      currency: "INR",
       notes: "",
       description: "",
       april: (data.Apr ?? "").toString(),
@@ -333,18 +382,37 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Edited")
+            handelnputDisable(true)
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              // pauseOnHover: true,
+              draggable: true,
+              // progress: undefined,
+              theme: "light",
+            });
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
-            setErrorMsg(JSON.stringify(error))
+            throw new Error(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
       );
     } catch (error) {
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       console.error("Failed to update budget details:", error);
-      alert("Failed to update budget details. Please try again.");
     }
     finally{
       setSaveBtnState("edit")
@@ -392,7 +460,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
                       <td key={month} className="border p-2">
                         <input
                           type="text"
-                          disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                          id={sub.subCategoryId + month}
+                          disabled={true}
+                          // disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
                           className="w-full rounded border p-1"
                           value={tableData[sub.subCategoryId]?.[month] ?? ""}
                           onChange={(e) =>
@@ -407,51 +477,70 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             }
             
           </table>
-          {
-            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
-          }
-          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
-
-        <div className="py-2 pr-4 flex flex-row-reverse">
           {
-            saveBtnState == "loading" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
-              type="button"
-              className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
-              variant="soft"
-            // Disable the button if input is empty
-            >
-              Loading...
-            </Button>
-          }
-          {
-            saveBtnState == "edit" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
-              type="button"
-              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-              variant="soft"
-              style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-              disabled={isSaveDisabled()}
-              onClick={() => handleUpdate()}
-            // Disable the button if input is empty
-            >
-              Edit  
-            </Button>} 
-            
-          {saveBtnState == "save" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <Button
-            type="button"
-            className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-            variant="soft"
-            style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-            disabled={isSaveDisabled()}
-            onClick={() => handleSave()}
-          // Disable the button if input is empty
-          >
-            Save
-          </Button>
-          
-          }
+          ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
+            {
+              !inputStates && <div> {
+                saveBtnState == "loading"  && <Button
+                  type="button"
+                  className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+                  variant="soft"
+                >
+                  Loading...
+                </Button>
+              }
+                {
+                  saveBtnState == "edit"  && <Button
+                    type="button"
+                    className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+                    variant="soft"
+                    style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+                    disabled={isSaveDisabled()}
+                    onClick={() => handleUpdate()}
+                  >
+                    Save
+                  </Button>}
 
-        </div>
+                {saveBtnState == "save"  && <Button
+                  type="button"
+                  className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+                  variant="soft"
+                  style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
+                  disabled={isSaveDisabled()}
+                  onClick={() => handleSave()}
+                >
+                  Save
+                </Button>
+
+                }
+              </div>
+            }
+            {inputStates ? <Button
+              type="button"
+              className="cursor-pointer !text-primary  px-2 !w-20 !text-lg  border-primary border-2 !disabled:cursor-not-allowed"
+              variant="soft"
+              style={{ cursor: "pointer" }}
+              // disabled={isSaveDisabled()}
+              onClick={() => handelnputDisable(false)}
+            >
+              Edit
+            </Button> :
+              <Button
+                type="button"
+                className="cursor-pointer !text-primary  px-2 !w-20 !text-lg border border-primary !disabled:cursor-not-allowed"
+                variant="soft"
+                style={{ cursor: "pointer" }}
+                // disabled={isSaveDisabled()}
+                onClick={() => handelnputDisable(true)}
+              >
+                Cancel
+              </Button>
+            }
+
+          </div>
+          }
+        
       </details>
     </div>
   );

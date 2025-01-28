@@ -48,6 +48,7 @@ export const getStaffs = protectedProcedure
         empNo: staffMaster.empNo,
         email:staffMaster.email,
         level:staffMaster.level,
+        levelName:categoryMasterInFinanceProject.categoryname,
         isactive: staffMaster.isactive,
         notes: staffMaster.notes,
         nature_of_employment: staffMaster.natureOfEmployment,
@@ -78,6 +79,12 @@ export const getStaffs = protectedProcedure
           eq(departmentMaster.isactive, true),
           eq(departmentMaster.id, staffMaster.department),
         ),
+      )
+      .leftJoin(
+        categoryMasterInFinanceProject,
+        and(
+          eq(categoryMasterInFinanceProject.id,staffMaster.level)
+        )
       )
       .leftJoin(salaryMaster, and(eq(salaryMaster.empId, staffMaster.id)))
       .where(
@@ -124,12 +131,17 @@ export const getStaffs = protectedProcedure
         value: staff.department,
         label: staff.departmentname,
       };
+      const levelData = {
+        value:staff.level,
+        label:staff.levelName
+      }
 
       updatedStaffs.push({
         ...staff,
         statesData,
         locationData,
         departmentData,
+        levelData
       });
     }
 
@@ -202,6 +214,7 @@ export const editStaff = protectedProcedure
       natureOfEmployment: z.string().optional(),
       notes: z.string().optional().nullable(),
       description: z.string().optional().nullable(),
+      level:z.number().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
     }),

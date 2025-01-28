@@ -67,6 +67,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         locationId: data.locationData?.label.toString(),
         updatedBy: userData.data?.user.id ?? 1,
         isactive: true,
+        level: data.levelData?.value,
         updatedAt: new Date().toISOString().split("T")[0] ?? "",
       };
 
@@ -204,56 +205,58 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           />
         </div>
       </div>
-      
-      
 
-      <div>
-        <label className="text-sm">Department</label>
-        <Controller
-          name="departmentData"
-          control={control}
-          render={({ field }) => (
-            <Select
-              onChange={field.onChange}
-              defaultValue={item.departmentData}
-              options={departmentData}
-              placeholder="Select a Department"
-              isClearable
-              aria-invalid={!!errors.department}
-            />
+
+      <div className="flex gap-2">
+        <div className="w-1/2">
+          <label className="text-sm">Department</label>
+          <Controller
+            name="departmentData"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                defaultValue={item.departmentData}
+                options={departmentData}
+                placeholder="Select a Department"
+                isClearable
+                aria-invalid={!!errors.department}
+              />
+            )}
+          />
+          {errors.department && (
+            <span className="text-xs text-red-500">
+              {errors.department.message}
+            </span>
           )}
-        />
-        {errors.department && (
-          <span className="text-xs text-red-500">
-            {errors.department.message}
-          </span>
-        )}
+        </div>
+
+        {/* Level Dropdown */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            Level <span className="text-red-400">*</span>
+          </label>
+          <Controller
+            name="levelData"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                defaultValue={item.levelData}
+                options={levelsData}
+                placeholder="Select Level"
+                isClearable
+                aria-invalid={!!errors.levelData}
+              />
+            )}
+          />
+          {errors.levelData && (
+            <span className="text-xs text-red-500">
+              {errors.levelData.message}
+            </span>
+          )}
+        </div>
       </div>
-      
-      {/* Level Dropdown */}
-      {/* <div className="w-1/2">
-        <label className="text-sm">
-          Level <span className="text-red-400">*</span>
-        </label>
-        <Controller
-          name="levelData"
-          control={control}
-          render={({ field }) => (
-            <Select
-              onChange={field.onChange}
-              options={levelsData}
-              placeholder="Select Level"
-              isClearable
-              aria-invalid={!!errors.levelData}
-            />
-          )}
-        />
-        {errors.levelData && (
-          <span className="text-xs text-red-500">
-            {errors.levelData.message}
-          </span>
-        )}
-      </div> */}
 
       <Flex gap="3" mt="4" justify="end">
         <Button

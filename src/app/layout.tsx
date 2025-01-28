@@ -9,6 +9,7 @@ import { Theme } from "@radix-ui/themes";
 import AppBar from "./_components/appBar";
 import { ContextProvider } from "~/context"; // Correct path to AuthContext
 import { useSession } from "next-auth/react";
+import { ToastContainer} from 'react-toastify';
 
 export default function RootLayout({
   children,
@@ -22,6 +23,7 @@ export default function RootLayout({
             <Theme className="!bg-[#f3f4f65e]">
               <ContextProvider>
                 <AppContent>{children}</AppContent>
+                <ToastContainer />
               </ContextProvider>
             </Theme>
           </TRPCReactProvider>

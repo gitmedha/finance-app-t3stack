@@ -3,9 +3,10 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Button } from '@radix-ui/themes';
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from "react";
-import { BiComment } from "react-icons/bi";
+// import { BiComment } from "react-icons/bi";
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { api } from '~/trpc/react';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface ActivityBudgetProps {
   section: string;
@@ -78,7 +79,6 @@ const months = [
 ];
 
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId,status }) => {
-  const [sMsg, setSmsg] = useState<string | null>(null)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [inputStates, setInputStates] = useState<boolean>(true)
   const handelnputDisable = (disable: boolean) => {
@@ -134,7 +134,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       }
     })
   }
-  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const userData = useSession()
   // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
   const [totalQty, setTotalQty] = useState<totalschema>({
@@ -346,9 +345,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     month: string,
     value: string
   ) => {
-    console.log(tableData)
-    setSmsg(null)
-    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -406,8 +402,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
     setSaveBtnState("loading")
-    setSmsg(null)
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId, 
       catid: categoryId,
@@ -460,7 +454,16 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Saved")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             handelnputDisable(true)
             setSaveBtnState("edit")
             setTableData((prev) => {
@@ -480,21 +483,28 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           },
           onError: (error) => {
             setSaveBtnState("save")
-            setErrorMsg(JSON.stringify(error))
+            throw new Error(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
       );
     } catch (error) {
       console.error("Failed to save budget details:", error);
-      alert("Failed to save budget details. Please try again.");
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       catid: categoryId,
@@ -545,25 +555,44 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Edited")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             handelnputDisable(true)
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
-            setErrorMsg(JSON.stringify(error))
+            throw new Error(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
       );
     } catch (error) {
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       console.error("Failed to update budget details:", error);
-      alert("Failed to update budget details. Please try again.");
     } finally {
       setSaveBtnState("edit")
     }
   };
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
+      <ToastContainer/>
       <details
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
       >
@@ -727,10 +756,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
             }
             
           </table>
-          {
-            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
-          }
-          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         {
           filter?.map != 0 && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">

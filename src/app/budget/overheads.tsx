@@ -4,6 +4,7 @@ import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
+import { ToastContainer, toast } from 'react-toastify';
 
 interface OverHeadsProps {
   section: string;
@@ -33,10 +34,10 @@ const months = [
 
 const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, deptId ,status}) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
-  const [erroMsg, setErrorMsg] = useState<string | null>(null)
+  
   const userData = useSession()
   const [inputStates, setInputStates] = useState<boolean>(true)
-  const [sMsg, setSmsg] = useState<string | null>(null)
+
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
@@ -56,8 +57,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
     month: string,
     value: string,
   ) => {
-    setSmsg(null)
-    setErrorMsg(null)
+
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -254,9 +254,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -296,7 +294,16 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Saved")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             setSaveBtnState("edit")
             handelnputDisable(true)
             setTableData((prev) => {
@@ -315,21 +322,28 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
+            throw new Error(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
       );
     } catch (error) {
-      setErrorMsg(JSON.stringify(error))
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       console.error("Failed to save budget details:", error);
-      alert("Failed to save budget details. Please try again.");
     }
   };
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       subcategoryId: parseInt(subCategoryId, 10),
@@ -366,18 +380,37 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Editted")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             handelnputDisable(true)
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
+            throw new Error(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
       );
     } catch (error) {
       console.error("Failed to update budget details:", error);
-      alert("Failed to update budget details. Please try again.");
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
     finally {
       setSaveBtnState("edit")
@@ -385,6 +418,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
   };
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
+      <ToastContainer />
       <details
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
       >
@@ -442,10 +476,6 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
             }
             
           </table>
-          {
-            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
-          }
-          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
         {
           ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">

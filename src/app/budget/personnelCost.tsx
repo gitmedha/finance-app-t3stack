@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@radix-ui/themes";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
-
+import { ToastContainer, toast } from 'react-toastify';
 interface PersonnelCostProps {
   section: string;
   categoryId: number;
@@ -41,7 +41,7 @@ interface totalschema {
   totalQ4: number
 }
 type avgQtySchema = Record<string, qtySchema>
-// const salaryMap = [
+
 //   { name: "Assistant", salary: 10000,id:7 ,level:1},
 //   { name: "Associate", salary: 20000, id: 8, level: 2 },
 //   { name: "Manager", salary: 30000, id: 9, level: 3 },
@@ -72,9 +72,7 @@ const months = [
 ];
 
 const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status }) => {
-  const [sMsg, setSmsg] = useState<string | null>(null)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
-  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
@@ -420,9 +418,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
 
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -465,6 +461,16 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         },
         {
           onSuccess: (data) => {
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             handelnputDisable(true)
             setSaveBtnState("edit")
             setTableData((prev) => {
@@ -484,14 +490,23 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           },
           onError: (error) => {
             setSaveBtnState("save")
-            setErrorMsg(JSON.stringify(error))
+            throw new Error(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
       );
     } catch (error) {
       console.error("Failed to save budget details:", error);
-      alert("Failed to save budget details. Please try again.");
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
   const updateTotalQtyVals = (which: string, difference: number) => {
@@ -508,8 +523,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     month: string,
     value: string
   ) => {
-    setSmsg(null)
-    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -589,154 +602,10 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       return updatedData;
     });
   };
-  // useEffect(() => {
-  //   const initialData: TableData = {};
-  //   const intialAvgQty: avgQtySchema = {}
-  //   if (subCategories?.subCategories) {
-  //     console.log("After getting the subcategories")
-  //     subCategories.subCategories.forEach((sub) => {
-  //       initialData[sub.subCategoryId] = {
-  //         Count: "",
-  //         Qty1: 0,
-  //         Apr: "",
-  //         May: "",
-  //         Jun: "",
-  //         Qty2: 0,
-  //         Jul: "",
-  //         Aug: "",
-  //         Sep: "",
-  //         Qty3: 0,
-  //         Oct: "",
-  //         Nov: "",
-  //         Dec: "",
-  //         Qty4: "",
-  //         Jan: "",
-  //         Feb: "",
-  //         Mar: "",
-  //         budgetDetailsId: 0
-  //       };
-  //       intialAvgQty[sub.subCategoryId] = {
-  //         Apr: 0,
-  //         May: 0,
-  //         Jun: 0,
-  //         Jul: 0,
-  //         Aug: 0,
-  //         Sep: 0,
-  //         Oct: 0,
-  //         Nov: 0,
-  //         Dec: 0,
-  //         Jan: 0,
-  //         Feb: 0,
-  //         Mar: 0,
-  //       }
-  //     });
-
-  //   }
-  //   if (categoriesBudgetDetails && categoriesBudgetDetails.result.length>0) {
-  //     console.log("After getting the categorydetails")
-  //     const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-  //     categoriesBudgetDetails.result.forEach((item) => {
-  //       initialData[item.subcategoryId] = {
-  //         Count: Number(item.total),
-  //         Apr: item.april ? Number(item.april) : "0",
-  //         May: item.may ? Number(item.may) : "0",
-  //         Jun: item.june ? Number(item.june) : "0",
-  //         Jul: item.july ? Number(item.july) : "0",
-  //         Aug: item.august ? Number(item.august) : "0",
-  //         Sep: item.september ? Number(item.september) : "0",
-  //         Oct: item.october ? Number(item.october) : "0",
-  //         Nov: item.november ? Number(item.november) : "0",
-  //         Dec: item.december ? Number(item.december) : "0",
-  //         Jan: item.january ? Number(item.january) : "0",
-  //         Feb: item.february ? Number(item.february) : "0",
-  //         Mar: item.march ? Number(item.march) : "0",
-  //         Qty1: item.qty1 ? Number(item.qty1) : 0,
-  //         Qty2: item.qty2 ? Number(item.qty2) : 0,
-  //         Qty3: item.qty3 ? Number(item.qty3) : 0,
-  //         Qty4: item.qty4 ? Number(item.qty4) : 0,
-  //         budgetDetailsId: Number(item.id)
-  //       };
-  //       intialAvgQty[item.subcategoryId] = {
-  //         Apr: Number(item.april) / (item.qty1 ? Number(item.qty1) : 1),
-  //         May: Number(item.may) / (item.qty1 ? Number(item.qty1) : 1),
-  //         Jun: Number(item.june) / (item.qty1 ? Number(item.qty1) : 1),
-  //         Jul: Number(item.july) / (item.qty2 ? Number(item.qty2) : 1),
-  //         Aug: Number(item.august) / (item.qty2 ? Number(item.qty2) : 1),
-  //         Sep: Number(item.september) / (item.qty2 ? Number(item.qty2) : 1),
-  //         Oct: Number(item.october) / (item.qty3 ? Number(item.qty3) : 1),
-  //         Nov: Number(item.november) / (item.qty3 ? Number(item.qty3) : 1),
-  //         Dec: Number(item.december) / (item.qty3 ? Number(item.qty3) : 1),
-  //         Jan: Number(item.january) / (item.qty4 ? Number(item.qty4) : 1),
-  //         Feb: Number(item.february) / (item.qty4 ? Number(item.qty4) : 1),
-  //         Mar: Number(item.march) / (item.qty4 ? Number(item.qty4) : 1),
-  //       }
-  //       totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-  //       totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-  //       totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-  //       totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
-  //       if (item.qty1 == 0 || !item.qty1 && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
-  //         const aprIn = document.getElementById(item.subcategoryId + "Apr") as HTMLInputElement;
-  //         const mayIn = document.getElementById(item.subcategoryId + "May") as HTMLInputElement;
-  //         const junIn = document.getElementById(item.subcategoryId + "Jun") as HTMLInputElement;
-  //         if (aprIn && mayIn && junIn) {
-  //           aprIn.disabled = false;
-  //           mayIn.disabled = false;
-  //           junIn.disabled = false;
-  //         } else {
-  //           console.error(`Input element with ID  not found.`);
-  //         }
-  //       }
-  //       if (item.qty2 == 0 || !item.qty2 && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
-  //         const julIn = document.getElementById(item.subcategoryId + "Jul") as HTMLInputElement;
-  //         const augIn = document.getElementById(item.subcategoryId + "Aug") as HTMLInputElement;
-  //         const sepIn = document.getElementById(item.subcategoryId + "Sep") as HTMLInputElement;
-  //         if (julIn && augIn && sepIn) {
-  //           julIn.disabled = false;
-  //           augIn.disabled = false;
-  //           sepIn.disabled = false;
-  //         } else {
-  //           console.error(`Input element with ID  not found.`);
-  //         }
-  //       }
-  //       if (item.qty3 == 0 || !item.qty3 && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
-  //         const octIn = document.getElementById(item.subcategoryId + "Oct") as HTMLInputElement;
-  //         const novIn = document.getElementById(item.subcategoryId + "Nov") as HTMLInputElement;
-  //         const decIn = document.getElementById(item.subcategoryId + "Dec") as HTMLInputElement;
-  //         if (octIn && novIn && decIn) {
-  //           octIn.disabled = false;
-  //           novIn.disabled = false;
-  //           decIn.disabled = false;
-  //         } else {
-  //           console.error(`Input element with ID  not found.`);
-  //         }
-  //       }
-  //       if (item.qty4 == 0 || !item.qty4 && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role == 2 && status == "draft"))) {
-  //         const janIn = document.getElementById(item.subcategoryId + "Jan") as HTMLInputElement;
-  //         const febIn = document.getElementById(item.subcategoryId + "Feb") as HTMLInputElement;
-  //         const marIn = document.getElementById(item.subcategoryId + "Mar") as HTMLInputElement;
-  //         if (janIn && febIn && marIn) {
-  //           janIn.disabled = false;
-  //           febIn.disabled = false;
-  //           marIn.disabled = false;
-  //         } else {
-  //           console.error(`Input element with ID  not found.`);
-  //         }
-  //       }
-  //     });
-  //     setAvgQty(intialAvgQty)
-  //     setTableData(initialData);
-  //     setTotalQty(totalQtyAfterBudgetDetails)
-  //   }
-  //   else {
-  //     setTableData({});
-  //   }
-  // }, [categoriesBudgetDetails]);
-
+  
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       catid: categoryId,
@@ -786,19 +655,37 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Edited")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             handelnputDisable(true)
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
-            setErrorMsg(JSON.stringify(error))
+            throw new Error(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
       );
     } catch (error) {
       console.error("Failed to update budget details:", error);
-      alert("Failed to update budget details. Please try again.");
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } finally {
       setSaveBtnState("edit")
     }
@@ -806,6 +693,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   return (
   
     <div className="my-6 rounded-md bg-white shadow-lg">
+      <ToastContainer/>
     {/* {categoriesBudgetDetails && categoriesBudgetDetails.result.length > 0 && "data from the category details"} */}
       <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500">
         <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">

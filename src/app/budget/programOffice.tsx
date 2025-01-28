@@ -4,7 +4,7 @@ import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
-
+import { ToastContainer, toast } from 'react-toastify';
 interface ProgramOfficeProps {
   section: string;
   categoryId: number;
@@ -33,9 +33,7 @@ const months = [
 
 const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId, status }) => {
   const userData = useSession()
-  const [sMsg, setSmsg] = useState<string | null>(null)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
-  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
@@ -92,8 +90,6 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
     month: string,
     value: string,
   ) => {
-    setSmsg(null)
-    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -252,9 +248,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
   // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -295,7 +289,16 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         {
           onSuccess: (data) => {
             setSaveBtnState("edit")
-            setSmsg("Successfully Saved")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             handelnputDisable(true)
             setTableData((prev) => {
               const updatedData = { ...prev }
@@ -314,22 +317,29 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
           },
           onError: (error) => {
             setSaveBtnState("save")
-            setErrorMsg(JSON.stringify(error))
+            throw new Error(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
       );
     } catch (error) {
       console.error("Failed to save budget details:", error);
-      alert("Failed to save budget details. Please try again.");
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
     
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       subcategoryId: parseInt(subCategoryId, 10),
@@ -366,12 +376,21 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Editted")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             handelnputDisable(true)
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
-            setErrorMsg(JSON.stringify(error))
+            throw new Error(JSON.stringify(error))
             console.error("Error updating budget:", error);
           },
         }
@@ -379,7 +398,16 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
     } catch (error) {
       
       console.error("Failed to update budget details:", error);
-      alert("Failed to update budget details. Please try again.");
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
     finally {
       setSaveBtnState("edit")
@@ -388,6 +416,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
+      <ToastContainer />
       <details
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
       >
@@ -449,10 +478,6 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
             }
             
           </table>
-          {
-            sMsg && <p className="text-green-600 text-sm">{sMsg}</p>
-          }
-          {erroMsg && <p className="text-red-600 text-sm">{erroMsg}</p>}
         </div>
 
         {

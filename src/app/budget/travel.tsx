@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from "~/trpc/react";
+import { ToastContainer, toast } from 'react-toastify';
 
 interface TravelBudgetProps {
   section: string;
@@ -61,10 +62,9 @@ const months = [
 ];
 
 const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId,searchSubCatId,status }) => {
-  const [sMsg, setSmsg] = useState<string | null>(null)
+
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
-  const [erroMsg, setErrorMsg] = useState<string | null>(null)
   const userData = useSession()
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -74,7 +74,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
 
   const [filter, setFilter] = useState(subTravels.sort((a, b) => a.name.localeCompare(b.name))[0])
   const handleSelect = (val: subTravelSchema) => {
-    setErrorMsg(null)
     setSaveBtnState("loading")
     setFilter(val)
   }
@@ -283,10 +282,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           });
           setTableData(initialData);
         }
-        else
-        {
-          setErrorMsg("There is error in finding the both budgetDetails and staff count details")
-        }
       }
 
     }
@@ -392,8 +387,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
     month: string,
     value: string,
   ) => {
-    setSmsg(null)
-    setErrorMsg(null)
     setTableData((prev) => {
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
@@ -423,9 +416,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
 
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetid: budgetId,
       catid: categoryId,
@@ -469,7 +460,16 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Saved")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             setSaveBtnState("edit")
             handelnputDisable(true)
             setTableData((prev) => {
@@ -489,21 +489,28 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           },
           onError: (error) => {
             setSaveBtnState("save")
-            setErrorMsg(JSON.stringify(error))
+            throw new Error(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         }
       );
     } catch (error) {
       console.error("Failed to save budget details:", error);
-      alert("Failed to save budget details. Please try again.");
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   const handleUpdate = async () => {
-    setSmsg(null)
     setSaveBtnState("loading")
-    setErrorMsg(null)
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
       budgetDetailsId: data.budgetDetailsId,
       catid: categoryId,
@@ -545,7 +552,16 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         },
         {
           onSuccess: (data) => {
-            setSmsg("Successfully Editted")
+            toast.success('Successfully Saved', {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
             handelnputDisable(true)
             console.log("Budget updated successfully:", data);
           },
@@ -556,9 +572,17 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         }
       );
     } catch (error) {
-      setErrorMsg(JSON.stringify(error))
       console.error("Error updating budget:", error);
-      alert("Failed to update budget details. Please try again.");
+      toast.warn('Error While saving ', {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
     finally {
       setSaveBtnState("edit")
@@ -567,6 +591,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
+      <ToastContainer />
       <details
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
       >

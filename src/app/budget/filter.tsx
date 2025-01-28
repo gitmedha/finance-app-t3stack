@@ -162,7 +162,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         </div>
         <div className='flex justify-end items-center space-x-2'>
           {
-            !budgetId && <Button
+            !budgetId && userData.data?.user.role == 2 &&<Button
               type="button"
               className="!cursor-pointer !text-white !bg-primary px-2"
               variant="soft"

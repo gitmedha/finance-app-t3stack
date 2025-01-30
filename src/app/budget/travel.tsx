@@ -139,7 +139,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
       });
     });
   };
-  // const { data: categoriesBudgetDetails, isLoading: categoryDetailsLoading, error } = api.get.getCatsBudgetDetails.useQuery({
+  
   //   budgetId,
   //   catId: categoryId,
   //   deptId: Number(deptId),
@@ -164,6 +164,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
     deptId: Number(deptId),
     activity: (filter?.map)?.toString(),
     searchSubCatId:searchSubCatId
+  },{
+    staleTime:0
   })
   useEffect(() => {
     if (travelData?.budgetId == budgetId) {
@@ -648,10 +650,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         </div>
 
         <hr className="my-2 scale-x-150" />
-        {
-          
-        }
-
+        
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
           <table className="w-full table-auto border-collapse">

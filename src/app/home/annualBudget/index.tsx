@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import { useEffect, useState, type FC } from "react";
 import { api } from "~/trpc/react";
 
@@ -39,9 +40,10 @@ const PendingCard: FC<PendingCardProps> = ({ count, title,addOn }) => {
 
 
 const AnnualBudget = ({ financialYear }: { financialYear :string}) => {
+    const userData = useSession()
     // call to get total sum 
     const { data: totalBudgetSum, isLoading: totalBudgetSumLoading } = api.get.getTotalBudgetSum.useQuery(
-        { financialYear:financialYear}
+        { financialYear:financialYear,departmentId:userData.data?.user.departmentId}
     )
     return (
                  <div className="grid grid-cols-5 gap-4">

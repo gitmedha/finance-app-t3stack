@@ -83,6 +83,12 @@ const months = [
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [inputStates, setInputStates] = useState<boolean>(true)
+  const userData = useSession()
+  // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
+  const [totalQty, setTotalQty] = useState<totalschema>({
+    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
+  })
+  const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = []
     setInputStates(disable)
@@ -131,23 +137,20 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         qty2In.disabled = disable;
         qty3In.disabled = disable;
         qty4In.disabled = disable;
-      } else {
-        console.error(`Input element with ID  not found.`);
-        console.log(aprIn, rate1In, rate2In, rate3In, qty1In, qty2In)
-      }
+      } 
+      // else {
+      //   console.error(`Input element with ID  not found.`);
+      //   console.log(aprIn, rate1In, rate2In, rate3In, qty1In, qty2In)
+      // }
     })
   }
-  const userData = useSession()
-  // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
-  const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
-  })
-  const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
   const { data: programData, isLoading: programDataLodaing } = api.get.getProgramActivities.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
     activity: (filter?.map)?.toString()
+  },{
+    staleTime:0
   })
   useEffect(() => {
     if (programData?.budgetId == budgetId) {
@@ -155,7 +158,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       if (programData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
         setTotalQty(totalQtyAfterBudgetDetails)
-        console.log("After getting the subcategories")
         programData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
             Count: "",

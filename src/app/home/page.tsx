@@ -21,7 +21,6 @@ export default function Home() {
         }
     }, [])
     return (
-        //todo need to calculate the financial year from here and send it to the components
         <div className="mt-4 h-[100vh] gap-4 p-2">
             {
                 financialYear && <AppMatrics financialYear={financialYear} />

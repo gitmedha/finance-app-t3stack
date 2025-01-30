@@ -9,6 +9,8 @@ interface CapitalCostProps {
   budgetId: number;
   deptId: string;
   status: string | undefined
+  sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
+  setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS")=>void
 }
 
 interface LevelData {
@@ -28,7 +30,7 @@ const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
-const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status }) => {
+const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status,sectionOpen,setSectionOpen }) => {
   // state to disable and enable the save and edit button
   const[inputStates,setInputStates] = useState<boolean>(true)
   const [saveBtnState,setSaveBtnState] = useState<"loading"|"edit"|"save">("loading")
@@ -423,16 +425,26 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
   // if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div className="my-6 rounded-md bg-white shadow-lg">
-      <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow">
-        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary">
+    <div className="my-6 rounded-md bg-white shadow-lg" >
+      <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow" open={sectionOpen == "CAPITAL COST"} 
+        onClick={(e) =>{e.preventDefault() 
+        }}>
+        
+        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary"
+          onClick={(e) => {
+            e.preventDefault()
+            if (sectionOpen == "CAPITAL COST")
+              setSectionOpen(null)
+            else
+              setSectionOpen("CAPITAL COST")
+          }} >
           <h1 className="uppercase">{section}</h1>
           {
             capitalCostDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> : 
             <div className="flex items-center space-x-2">
-              <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+              <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
               <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
             </div>
           }
@@ -440,7 +452,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         </summary>
 
         <hr className="my-2 scale-x-150" />
-
+          {
+            
+          }
         <div className="bg-gray-50 overflow-scroll">
           <table className="w-full table-auto border-collapse">
             <thead>

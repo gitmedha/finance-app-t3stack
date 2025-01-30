@@ -11,6 +11,8 @@ interface ProgramOfficeProps {
   budgetId: number;
   deptId: string;
   status: string | undefined
+  sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
+  setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
 }
 
 interface LevelData {
@@ -31,7 +33,7 @@ const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
-const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId, status }) => {
+const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen }) => {
   const userData = useSession()
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
@@ -419,15 +421,26 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       {/* <ToastContainer /> */}
       <details
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
+        open={sectionOpen == "PROGRAM OFFICE"}
+        onClick={(e) => {
+          e.preventDefault()
+        }}
       >
-        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
+        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none" 
+          onClick={(e) => {
+            e.preventDefault()
+            if (sectionOpen == "PROGRAM OFFICE")
+              setSectionOpen(null)
+            else
+              setSectionOpen("PROGRAM OFFICE")
+          }}>
           <h1 className=" uppercase ">{section}</h1>
           {
             programOfficeDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }

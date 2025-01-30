@@ -6,6 +6,7 @@ import { Button, Flex } from '@radix-ui/themes';
 import { api } from "~/trpc/react";
 import { useSession } from 'next-auth/react';
 import Modal from '../_components/Modal';
+import { toast } from 'react-toastify';
 const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSelect, budgetId, setBugetId, status, setStatus }) => {
   const userData = useSession()
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,9 +41,20 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           onSuccess: (data) => {
             setIsModalOpen(false)
             setStatus(status)
-            console.log("Budget created successfully:", data);
+            toast.success(`Successfully budget ${status}`, {
+              position: "bottom-center",
+              autoClose: 1000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+            console.log("Budget status updated successfully:", data);
           },
           onError: (error) => {
+            throw new Error(JSON.stringify(error))
             console.error("Error creating budget:", error);
           },
         })
@@ -50,7 +62,16 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
 
     } catch (error) {
       console.error("Failed to save budget details:", error);
-      alert("Failed to save budget details. Please try again.");
+      toast.warn(`Error while ${status == "submitted" ? "submitting" : "approving"} the budget `, {
+        position: "bottom-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   }
   useEffect(() => {
@@ -180,7 +201,6 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
                   variant="soft"
                   onClick={() =>
                     setIsModalOpen(true) 
-                    // handelStatusUpdate("submitted")
                   }
                 >
                   Submit
@@ -193,7 +213,6 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
                   variant="soft"
                   onClick={() => 
                     setIsModalOpen(true) 
-                    // handelStatusUpdate("approved")
                   }
                 >
                   Approve

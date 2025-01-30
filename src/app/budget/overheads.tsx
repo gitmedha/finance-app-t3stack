@@ -12,6 +12,8 @@ interface OverHeadsProps {
   budgetId: number;
   deptId: string;
   status: string | undefined
+  sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
+  setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
 }
 
 interface LevelData {
@@ -32,7 +34,7 @@ const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
-const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, deptId ,status}) => {
+const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, deptId ,status,sectionOpen,setSectionOpen}) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   
   const userData = useSession()
@@ -200,58 +202,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       }
     }
   }, [overHeadData])
-  // useEffect(() => {
-  //   const initialData: TableData = {};
 
-  //   if (data?.subCategories) {
-  //     data.subCategories.forEach((sub) => {
-  //       initialData[sub.subCategoryId] = {
-  //         Count: "",
-  //         Apr: "0",
-  //         May: "0",
-  //         Jun: "0",
-  //         Jul: "0",
-  //         Aug: "0",
-  //         Sep: "0",
-  //         Oct: "0",
-  //         Nov: "0",
-  //         Dec: "0",
-  //         Jan: "0",
-  //         Feb: "0",
-  //         Mar: "0",
-  //         budgetDetailsId: 0,
-  //       };
-  //     });
-  //   }
-  //   if (categoriesBudgetDetails) {
-  //     categoriesBudgetDetails.forEach((item) => {
-  //       const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-  //       initialData[item.subcategoryId] = {
-  //         Count: Number(item.total),
-  //         Apr: Number(item.april) ?? "0",
-  //         May: Number(item.may) ?? "0",
-  //         Jun: Number(item.june) ?? "0",
-  //         Jul: Number(item.july) ?? "0",
-  //         Aug: Number(item.august )?? "0",
-  //         Sep: Number(item.september) ?? "0",
-  //         Oct: Number(item.october) ?? "0",
-  //         Nov: Number(item.november) ?? "0",
-  //         Dec: Number(item.december) ?? "0",
-  //         Jan: Number(item.january) ?? "0",
-  //         Feb: Number(item.february) ?? "0",
-  //         Mar: Number(item.march) ?? "0",
-  //         budgetDetailsId: Number(item.id),
-  //       };
-  //       totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-  //       totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-  //       totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-  //       totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
-  //     });
-  //     setTotalQty(totalQty)
-  //   }
-
-  //   setTableData(initialData);
-  // }, [data, categoriesBudgetDetails]);
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
     setSaveBtnState("loading")
@@ -421,15 +372,26 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       {/* <ToastContainer /> */}
       <details
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
+        open={sectionOpen == "OVERHEADS"}
+        onClick={(e) => {
+          e.preventDefault()
+        }}
       >
-        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
+        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
+          onClick={(e) => {
+            e.preventDefault()
+            if (sectionOpen == "OVERHEADS")
+              setSectionOpen(null)
+            else
+              setSectionOpen("OVERHEADS")
+          }}>
           <h1 className=" uppercase ">{section}</h1>
           {
             overHeadDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }

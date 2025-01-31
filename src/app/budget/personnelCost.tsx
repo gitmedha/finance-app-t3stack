@@ -9,6 +9,9 @@ interface PersonnelCostProps {
   deptId: string;
   budgetId: number;
   status: string | undefined
+  sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
+  setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
+  travelCatId:number
 }
 
 interface LevelData {
@@ -42,15 +45,6 @@ interface totalschema {
 }
 type avgQtySchema = Record<string, qtySchema>
 
-//   { name: "Assistant", salary: 10000,id:7 ,level:1},
-//   { name: "Associate", salary: 20000, id: 8, level: 2 },
-//   { name: "Manager", salary: 30000, id: 9, level: 3 },
-//   { name: "Senior Manager", salary: 40000, id: 10, level: 4 },
-//   { name: "AVP", salary: 50000, id: 11, level: 5 },
-//   { name: "VP", salary: 55000, id: 12, level: 6 },
-//   { name: "SVP", salary: 30000, id: 13, level: 7 },
-//   { name: "Others - Interns, Volunteers, PTCs", salary: 25000, id: 14, level: 8 },
-// ];
 
 const months = [
   "Qty1",
@@ -71,7 +65,7 @@ const months = [
   "Mar",
 ];
 
-const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status }) => {
+const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -79,17 +73,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession()
-  // const { data: subCategories,isLoading:subcategoryLoading } = api.get.getSubCats.useQuery({ categoryId });
-  // const { data: categoriesBudgetDetails, isLoading: categoryDetailsLoading, error:categoryDetailsError } = api.get.getCatsBudgetDetails.useQuery({
-  //   budgetId,
-  //   catId: categoryId,
-  //   deptId: Number(deptId),
-  // }
-  //   ,
-  //   {
-  //     enabled: !!subCategories ,
-  //   }
-  // );
+
   const { data: personnelCostData, isLoading: personnelCostDataLodaing } = api.get.getPersonalCatDetials.useQuery({
     budgetId,
     catId: categoryId,
@@ -182,15 +166,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       }
     })
   }
-  // const { data: levelEmployeesCount } = api.get.getLevelStaffCount.useQuery(
-  //   {
-  //     deptId: Number(deptId),
-  //   },
-  //   {
-  //     enabled:
-  //       ((categoriesBudgetDetails?.result.length === 0 || !!categoryDetailsError) && !!subCategories && !subcategoryLoading ),
-  //   }
-  // );
+
   const [avgQty, setAvgQty] = useState<avgQtySchema>({})
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) => {
@@ -354,69 +330,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       }      
     }    
   },[personnelCostData])
-  // useEffect(() => {
-  //   if (subCategories && levelEmployeesCount) {
-  //     console.log("After getting the level count")
-  //     const initialTableData: TableData = {};
-  //     const intialAvgQty: avgQtySchema = {}
-  //     const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-  //     subCategories?.subCategories?.forEach((sub, index) => {
-  //       const levelData = levelEmployeesCount?.find(
-  //         (level) => level.level === sub.subCategoryId
-  //       );
-  //       const employeeCount = levelData ? levelData.employeeCount : 0;
-  //       const salarySum = levelData?.salarySum ? Number(levelData?.salarySum) : 0;
-  //       const epfSum = levelData?.epfSum ? Number(levelData?.epfSum) : 0;
-  //       const insuranceSum = levelData?.insuranceSum ? Number(levelData?.insuranceSum) : 0;
-  //       const pwgPldSum = levelData?.pgwPldSum ? Number(levelData?.pgwPldSum) : 0;
-  //       const bonusSum = levelData?.bonusSum ? Number(levelData?.bonusSum) : 0;
-  //       const gratuitySum = levelData?.gratuitySum ? Number(levelData?.gratuitySum) : 0;
-  //       initialTableData[sub.subCategoryId] = {
-  //         Count: employeeCount,
-  //         Qty1: employeeCount,
-  //         Qty2: employeeCount,
-  //         Qty3: employeeCount,
-  //         Qty4: employeeCount,
-  //         Apr: salarySum + epfSum + insuranceSum,
-  //         May: salarySum + epfSum + pwgPldSum,
-  //         Jun: salarySum + epfSum,
-  //         Jul: salarySum + epfSum,
-  //         Aug: salarySum + epfSum + pwgPldSum,
-  //         Sep: salarySum + epfSum,
-  //         Oct: salarySum + epfSum,
-  //         Nov: salarySum + epfSum + pwgPldSum,
-  //         Dec: salarySum + epfSum,
-  //         Jan: salarySum + epfSum + bonusSum,
-  //         Feb: salarySum + epfSum + gratuitySum,
-  //         Mar: salarySum + epfSum,
-  //         budgetDetailsId: 0, // Default or placeholder value
-  //       };
-  //       intialAvgQty[sub.subCategoryId] = {
-  //         Apr: (salarySum + epfSum + insuranceSum) / employeeCount,
-  //         May: (salarySum + epfSum + pwgPldSum) / employeeCount,
-  //         Jun: (salarySum + epfSum) / employeeCount,
-  //         Jul: (salarySum + epfSum) / employeeCount,
-  //         Aug: (salarySum + epfSum + pwgPldSum) / employeeCount,
-  //         Sep: (salarySum + epfSum) / employeeCount,
-  //         Oct: (salarySum + epfSum) / employeeCount,
-  //         Nov: (salarySum + epfSum + pwgPldSum) / employeeCount,
-  //         Dec: (salarySum + epfSum) / employeeCount,
-  //         Jan: (salarySum + epfSum + bonusSum) / employeeCount,
-  //         Feb: (salarySum + epfSum + gratuitySum) / employeeCount,
-  //         Mar: (salarySum + epfSum) / employeeCount,
-  //       }
-  //       totalQtyAfterStaffCount.totalQ1 += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
-  //       totalQtyAfterStaffCount.totalQ2 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
-  //       totalQtyAfterStaffCount.totalQ3 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
-  //       totalQtyAfterStaffCount.totalQ4 += salarySum + epfSum + bonusSum + salarySum + epfSum + gratuitySum + salarySum + epfSum
-  //     });
-  //     setAvgQty(intialAvgQty)
-  //     setTableData(initialTableData);
-  //     setTotalQty(totalQtyAfterStaffCount)
-  //   }
-  // }, [subCategories, levelEmployeesCount]);
-
-  const createBudgetDetails = api.post.addBudgetDetails.useMutation();
+  const createBudgetDetails = api.post.savePersonalBudgetDetails.useMutation();
   const handleSave = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -458,6 +372,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
+          travelCatId
         },
         {
           onSuccess: (data) => {
@@ -603,7 +518,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     });
   };
   
-  const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
+  const updateBudgetDetails = api.post.updatePersonalBudgetDetails.useMutation();
   const handleUpdate = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -652,6 +567,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           budgetId,
           catId: categoryId,
           data: budgetDetails,
+          travelCatId
         },
         {
           onSuccess: (data) => {
@@ -693,17 +609,26 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   return (
   
     <div className="my-6 rounded-md bg-white shadow-lg">
-      {/* <ToastContainer/> */}
-    {/* {categoriesBudgetDetails && categoriesBudgetDetails.result.length > 0 && "data from the category details"} */}
-      <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500">
-        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none">
+      <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500"
+        open={sectionOpen == "PERSONNEL"}
+        onClick={(e) => {
+          e.preventDefault()
+        }}>
+        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
+          onClick={(e) => {
+            e.preventDefault()
+            if (sectionOpen == "PERSONNEL")
+              setSectionOpen(null)
+            else
+              setSectionOpen("PERSONNEL")
+          }}>
           <h1 className="uppercase">{section}</h1>
           {
             personnelCostDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1} Q2:{totalQty.totalQ2} Q3:{totalQty.totalQ3} Q4:{totalQty.totalQ4}</p>
+                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }

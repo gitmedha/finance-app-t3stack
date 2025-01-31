@@ -7,16 +7,23 @@ import { db } from "~/server/db";
 
 export const getTotalBudgetSum = protectedProcedure
     .input(z.object({
-        financialYear: z.string()
+        financialYear: z.string(),
+        departmentId:z.number().optional().nullable()
     }))
     .query(async ({ ctx, input }) => {
-        const { financialYear } = input;
+        const { financialYear ,departmentId} = input;
+        const baseConditions = [
+            eq(budgetMasterInFinanceProject.financialYear,financialYear),
+        ]
+        if(departmentId){
+            baseConditions.push(eq(budgetMasterInFinanceProject.departmentId,departmentId))
+        }
         const budgetMasterIds = await ctx.db
             .select({
                 id: budgetMasterInFinanceProject.id,
             })
             .from(budgetMasterInFinanceProject)
-            .where(eq(budgetMasterInFinanceProject.financialYear, financialYear));
+            .where(and(...baseConditions));
         if (!budgetMasterIds.length) {
             return 0; 
         }
@@ -46,16 +53,23 @@ export const getTotalBudgetSum = protectedProcedure
 export const getQuarterBudgetSum = protectedProcedure
     .input(z.object({
         financialYear:z.string(),
-        quarter:z.string()
+        quarter:z.string(),
+        departmentId: z.number().optional().nullable()
     }))
     .query(async({ctx,input})=>{
-        const { quarter,financialYear} = input
+        const { quarter,financialYear,departmentId} = input
+        const baseConditions = [
+            eq(budgetMasterInFinanceProject.financialYear, financialYear),
+        ]
+        if (departmentId) {
+            baseConditions.push(eq(budgetMasterInFinanceProject.departmentId, departmentId))
+        }
         const budgetMasterIds = await ctx.db
             .select({
                 id: budgetMasterInFinanceProject.id,
             })
             .from(budgetMasterInFinanceProject)
-            .where(eq(budgetMasterInFinanceProject.financialYear, financialYear));
+            .where(and(...baseConditions));
         if (!budgetMasterIds.length) {
             return 0;
         }

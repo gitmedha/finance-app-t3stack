@@ -24,6 +24,7 @@ const Budget: React.FC = () => {
   // Explicitly define the type for filters
   const userData = useSession()
   const [status,setStatus] = useState<string|undefined>(undefined)
+  const [sectionOpen, setSectionOpen] = useState<null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" |"OVERHEADS">(null)
   const [filters, setFilters] = useState<FilterOptions>({
     department: userData.data?.user.departmentId?.toString() ?? '', 
     departmentname: userData.data?.user.departmentName ?? " ",
@@ -81,12 +82,12 @@ const Budget: React.FC = () => {
       }
       {
         budgetId && !isLoading && <div>
-          <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} />
-          <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} status={status} />
-          <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} status={status} />
-          <ProgramOffice section='PROGRAM OFFICE' categoryId={data?.categories[3] ? data?.categories[3].categoryId : 4} budgetId={budgetId} deptId={filters.department} status={status} />
-          <CapitalCost section='CAPITAL COST' categoryId={data?.categories[4] ? data?.categories[4].categoryId : 5} budgetId={budgetId} deptId={filters.department} status={status} />
-          <OverHeads section='OVERHEADS' categoryId={data?.categories[5] ? data?.categories[5].categoryId : 6} budgetId={budgetId} deptId={filters.department} status={status} />
+          <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} travelCatId={data?.categories[2] ? data?.categories[2].categoryId : 3}/>
+          <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} />
+          <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen}/>
+          <ProgramOffice section='PROGRAM OFFICE' categoryId={data?.categories[3] ? data?.categories[3].categoryId : 4} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen} />
+          <CapitalCost section='CAPITAL COST' categoryId={data?.categories[4] ? data?.categories[4].categoryId : 5} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen}/>
+          <OverHeads section='OVERHEADS' categoryId={data?.categories[5] ? data?.categories[5].categoryId : 6} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen}/>
         </div>
       }      
     </div>

@@ -40,9 +40,8 @@ const AppBar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all ${
-        isScrolled ? "shadow-lg bg-primary/90" : "bg-primary"
-      }`}
+      className={`fixed top-0 left-0 w-full z-50 transition-all ${isScrolled ? "shadow-lg bg-primary/90" : "bg-primary"
+        }`}
     >
       <div className="container mx-auto flex justify-between items-center py-1">
         <div className="flex justify-center items-center">
@@ -55,21 +54,39 @@ const AppBar = () => {
         </div>
 
         <ul className="flex justify-start items-center space-x-6">
-          {menus.map((menu) => (
-            <li key={menu.menu}>
-              <Link
-                href={menu.path}
-                className={`text-white space-x-1 flex justify-start items-center ${
-                  pathname === menu.path
+          {menus.map((menu) => {
+            if (session?.user.role == 2 && (menu.menu == "Home" || menu.menu == "Budget") )
+            {
+              return <li key={menu.menu}>
+                <Link
+                  href={menu.path}
+                  className={`text-white space-x-1 flex justify-start items-center ${pathname === menu.path
                     ? "font-semibold border-b-2 border-white"
                     : ""
-                }`}
-              >
-                <span>{menu.icon}</span>
-                <span>{menu.menu}</span>
-              </Link>
-            </li>
-          ))}
+                    }`}
+                >
+                  <span>{menu.icon}</span>
+                  <span>{menu.menu}</span>
+                </Link>
+              </li>
+            }
+            else if (session?.user.role == 1)
+            {
+              return <li key={menu.menu}>
+                <Link
+                  href={menu.path}
+                  className={`text-white space-x-1 flex justify-start items-center ${pathname === menu.path
+                    ? "font-semibold border-b-2 border-white"
+                    : ""
+                    }`}
+                >
+                  <span>{menu.icon}</span>
+                  <span>{menu.menu}</span>
+                </Link>
+              </li>
+            }
+                        
+          })}
         </ul>
 
         <div className="flex justify-start items-center text-white space-x-2">

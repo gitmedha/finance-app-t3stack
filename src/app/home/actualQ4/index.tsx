@@ -1,5 +1,6 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import { api } from '~/trpc/react';
 
@@ -58,9 +59,10 @@ const data = [
     }
 ]
 const ActualQ4 = ({ financialYear }: { financialYear: string }) => {
+    const userData = useSession()
     const [tableData, setTableData] = useState<tableDataSchema>({})
     const { data: cat, isLoading: catsLoading } = api.get.getCats.useQuery()
-    const { data: q1data, isLoading: q1DataLoading } = api.get.getQuarterBudgetSum.useQuery({ financialYear: financialYear, quarter: "q4" }, { enabled: !!cat && !catsLoading })
+    const { data: q1data, isLoading: q1DataLoading } = api.get.getQuarterBudgetSum.useQuery({ financialYear: financialYear, quarter: "q4",departmentId:userData.data?.user.departmentId }, { enabled: !!cat && !catsLoading })
 
     useEffect(() => {
         if (cat?.categories && cat.categories.length > 0) {

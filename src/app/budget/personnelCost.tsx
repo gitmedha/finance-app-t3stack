@@ -11,6 +11,7 @@ interface PersonnelCostProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
+  travelCatId:number
 }
 
 interface LevelData {
@@ -64,7 +65,7 @@ const months = [
   "Mar",
 ];
 
-const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen }) => {
+const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -329,7 +330,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       }      
     }    
   },[personnelCostData])
-  const createBudgetDetails = api.post.addBudgetDetails.useMutation();
+  const createBudgetDetails = api.post.savePersonalBudgetDetails.useMutation();
   const handleSave = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -371,6 +372,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
+          travelCatId
         },
         {
           onSuccess: (data) => {
@@ -516,7 +518,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     });
   };
   
-  const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
+  const updateBudgetDetails = api.post.updatePersonalBudgetDetails.useMutation();
   const handleUpdate = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -565,6 +567,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           budgetId,
           catId: categoryId,
           data: budgetDetails,
+          travelCatId
         },
         {
           onSuccess: (data) => {

@@ -82,7 +82,7 @@ const Budget: React.FC = () => {
       }
       {
         budgetId && !isLoading && <div>
-          <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} />
+          <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} travelCatId={data?.categories[2] ? data?.categories[2].categoryId : 3}/>
           <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} />
           <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen}/>
           <ProgramOffice section='PROGRAM OFFICE' categoryId={data?.categories[3] ? data?.categories[3].categoryId : 4} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen} />

@@ -659,6 +659,14 @@ export const getTravelCatDetials = protectedProcedure
                     .from(budgetDetailsInFinanceProject)
                     .where(and(...baseConditions));
             }
+            // retriew the personal data also 
+            const personalData = await ctx.db
+                .select()
+                .from(budgetDetailsInFinanceProject)
+                .where(and(eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                    eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
+                    eq(budgetDetailsInFinanceProject.catid, input.searchSubCatId))
+                )
             // make a call for staff count
             const levelStats = await ctx.db
                 .select({
@@ -679,7 +687,7 @@ export const getTravelCatDetials = protectedProcedure
                 .groupBy(staffMasterInFinanceProject.level);
 
             return {
-                subCategories, levelStats, budgetId: input.budgetId, result
+                subCategories, levelStats, budgetId: input.budgetId, result, personalData
             };
 
         } catch (error) {
@@ -1111,6 +1119,350 @@ export const updateStatusBudgetDetails = protectedProcedure
         else
             return { message: "status update was not successfull" }
     })
+export const savePersonalBudgetDetails = protectedProcedure
+    .input(
+        z.object({
+            deptId: z.number(),
+            budgetId: z.number(),
+            catId: z.number(),
+            travelCatId:z.number(),
+            data: z.array(
+                z.object({
+                    budgetid: z.number(),
+                    catid: z.number(),
+                    subcategoryId: z.number(),
+                    unit: z.number(),
+                    rate: z.string(),
+                    total: z.string(),
+                    currency: z.string(),
+                    notes: z.string().optional(),
+                    description: z.string().optional(),
+                    april: z.string(),
+                    may: z.string(),
+                    june: z.string(),
+                    july: z.string(),
+                    august: z.string(),
+                    september: z.string(),
+                    october: z.string(),
+                    november: z.string(),
+                    december: z.string(),
+                    january: z.string(),
+                    february: z.string(),
+                    march: z.string(),
+                    activity: z.string().optional(),
+                    deptId: z.number(),
+                    clusterId: z.number().optional(),
+                    createdBy: z.number(),
+                    createdAt: z.string(),
+                    qty: z.number().optional(),
+                    qty1: z.number().optional(),
+                    rate1: z.string().optional(),
+                    amount1: z.string().optional(),
+                    qty2: z.number().optional(),
+                    rate2: z.string().optional(),
+                    amount2: z.string().optional(),
+                    qty3: z.number().optional(),
+                    rate3: z.string().optional(),
+                    amount3: z.string().optional(),
+                    qty4: z.number().optional(),
+                    rate4: z.string().optional(),
+                    amount4: z.string().optional(),
+                })
+            ),
+        })
+    )
+    .mutation(async ({ ctx, input }) => {
+        try {
+            // Extract data from input
+            const { deptId, budgetId, catId, travelCatId,data } = input;
+            // Map data to include shared fields and default values
+            const recordsToInsert = []
+            for (const item of data) {
+                const existingRecord = await ctx.db
+                    .select()
+                    .from(budgetDetailsInFinanceProject)
+                    .where(
+                        and(
+                            eq(budgetDetailsInFinanceProject.budgetid, budgetId),
+                            eq(budgetDetailsInFinanceProject.catid, catId),
+                            eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
+                            eq(budgetDetailsInFinanceProject.activity, item.activity ?? "")
+                        ))
+                if (!existingRecord || existingRecord.length == 0) {
+                    recordsToInsert.push({
+                        budgetid: budgetId,
+                        catid: catId,
+                        deptId,
+                        subcategoryId: item.subcategoryId,
+                        unit: item.unit,
+                        rate: item.rate,
+                        total: item.total,
+                        currency: item.currency,
+                        notes: item.notes ?? null,
+                        description: item.description ?? null,
+                        april: item.april.trim() === "" ? "0" : item.april, // Default to "0" if empty
+                        may: item.may.trim() === "" ? "0" : item.may,
+                        june: item.june.trim() === "" ? "0" : item.june,
+                        july: item.july.trim() === "" ? "0" : item.july,
+                        august: item.august.trim() === "" ? "0" : item.august,
+                        september: item.september.trim() === "" ? "0" : item.september,
+                        october: item.october.trim() === "" ? "0" : item.october,
+                        november: item.november.trim() === "" ? "0" : item.november,
+                        december: item.december.trim() === "" ? "0" : item.december,
+                        january: item.january.trim() === "" ? "0" : item.january,
+                        february: item.february.trim() === "" ? "0" : item.february,
+                        march: item.march.trim() === "" ? "0" : item.march,
+                        activity: item.activity ?? null,
+                        clusterId: item.clusterId ?? null,
+                        isactive: true,
+                        createdBy: item.createdBy,
+                        createdAt: item.createdAt,
+                        updatedAt: null,
+                        updatedBy: null,
+                        qqty: item.qty ?? 0,
+                        qty1: item.qty1 ?? 0,
+                        rate1: item.rate1?.trim() === "" ? "0" : item.rate1,
+                        amount1: item.amount1?.trim() === "" ? "0" : item.amount1,
+                        qty2: item.qty2 ?? 0,
+                        rate2: item.rate2?.trim() === "" ? "0" : item.rate2,
+                        amount2: item.amount2?.trim() === "" ? "0" : item.amount2,
+                        qty3: item.qty3 ?? 0,
+                        rate3: item.rate3?.trim() === "" ? "0" : item.rate3,
+                        amount3: item.amount3?.trim() === "" ? "0" : item.amount3,
+                        qty4: item.qty4 ?? 0,
+                        rate4: item.rate4?.trim() === "" ? "0" : item.rate4,
+                        amount4: item.amount4?.trim() === "" ? "0" : item.amount4,
+                        q1: (
+                            parseInt(item.april.trim() === "" ? "0" : item.april) +
+                            parseInt(item.may.trim() === "" ? "0" : item.may) +
+                            parseInt(item.june.trim() === "" ? "0" : item.june)
+                        ).toString(),
+                        q2: (
+                            parseInt(item.july.trim() === "" ? "0" : item.july) +
+                            parseInt(item.august.trim() === "" ? "0" : item.august) +
+                            parseInt(item.september.trim() === "" ? "0" : item.september)
+                        ).toString(),
+                        q3: (
+                            parseInt(item.october.trim() === "" ? "0" : item.october) +
+                            parseInt(item.november.trim() === "" ? "0" : item.november) +
+                            parseInt(item.december.trim() === "" ? "0" : item.december)
+                        ).toString(),
+                        q4: (
+                            parseInt(item.january.trim() === "" ? "0" : item.january) +
+                            parseInt(item.february.trim() === "" ? "0" : item.february) +
+                            parseInt(item.march.trim() === "" ? "0" : item.march)
+                        ).toString(),
+                    })
+                }
+            }
+            // Insert data using Drizzle
+            const insertedRecords = await ctx.db.insert(budgetDetailsInFinanceProject).values(recordsToInsert).returning();
+
+            const response = insertedRecords.map((record) => ({
+                budgetDetailsId: record.id,
+                subcategoryId: record.subcategoryId,
+                categoryId: record.catid,
+            }));
+            // if the travel data present then we going to update that from here only 
+            const travelData = await ctx.db
+            .select()
+            .from(budgetDetailsInFinanceProject)
+            .where(and(
+                eq(budgetDetailsInFinanceProject.budgetid,budgetId),
+                eq(budgetDetailsInFinanceProject.catid,travelCatId)
+            ))
+            // here we need to update the values
+            if (travelData && travelData.length>0 )
+            {
+                for(const item of data){
+                    const updates = {
+                        currency: item.currency,
+                        notes: item.notes ?? null,
+                        description: item.description ?? null,
+                        updatedBy: item.createdBy,
+                        updatedAt: item.createdAt,
+                        qty: item.qty ?? 0,
+                        qty1: item.qty1 ?? 0,
+                        qty2: item.qty2 ?? 0,
+                        qty3: item.qty3 ?? 0,
+                        qty4: item.qty4 ?? 0,
+                    };
+                    await ctx.db
+                        .update(budgetDetailsInFinanceProject)
+                        .set(updates)
+                        .where(and(
+                            eq(budgetDetailsInFinanceProject.budgetid, budgetId),
+                            eq(budgetDetailsInFinanceProject.subcategoryId,item.subcategoryId),
+                            eq(budgetDetailsInFinanceProject.catid,travelCatId)
+                        ));
+                }
+            }
+            return { success: true, message: "Budget details added successfully", data: response };
+        } catch (error) {
+            console.error("Error in adding budget details:", error);
+            throw new Error("Failed to add budget details. Please try again.");
+        }
+    });
+export const updatePersonalBudgetDetails = protectedProcedure
+    .input(
+        z.object({
+            deptId: z.number(),
+            budgetId: z.number(),
+            catId: z.number(),
+            travelCatId: z.number(),
+            data: z.array(
+                z.object({
+                    budgetDetailsId: z.number(),
+                    subcategoryId: z.number(),
+                    unit: z.number(),
+                    rate: z.string(),
+                    total: z.string(),
+                    currency: z.string(),
+                    notes: z.string().optional(),
+                    description: z.string().optional(),
+                    april: z.string(),
+                    may: z.string(),
+                    june: z.string(),
+                    july: z.string(),
+                    august: z.string(),
+                    september: z.string(),
+                    october: z.string(),
+                    november: z.string(),
+                    december: z.string(),
+                    january: z.string(),
+                    february: z.string(),
+                    march: z.string(),
+                    activity: z.string().optional(),
+                    clusterId: z.number().optional(),
+                    updatedBy: z.number(),
+                    updatedAt: z.string(),
+                    qty: z.number().optional(),
+                    qty1: z.number().optional(),
+                    rate1: z.string().optional(),
+                    amount1: z.string().optional(),
+                    qty2: z.number().optional(),
+                    rate2: z.string().optional(),
+                    amount2: z.string().optional(),
+                    qty3: z.number().optional(),
+                    rate3: z.string().optional(),
+                    amount3: z.string().optional(),
+                    qty4: z.number().optional(),
+                    rate4: z.string().optional(),
+                    amount4: z.string().optional(),
+                })
+            ),
+        })
+    )
+    .mutation(async ({ ctx, input }) => {
+        try {
+            const { data,budgetId,travelCatId } = input;
+
+            // Perform updates for each budget detail record
+            for (const item of data) {
+                const updates = {
+                    subcategoryId: item.subcategoryId,
+                    unit: item.unit,
+                    rate: item.rate,
+                    total: item.total,
+                    currency: item.currency,
+                    notes: item.notes ?? null,
+                    description: item.description ?? null,
+                    april: item.april.trim() === "" ? "0" : item.april,
+                    may: item.may.trim() === "" ? "0" : item.may,
+                    june: item.june.trim() === "" ? "0" : item.june,
+                    july: item.july.trim() === "" ? "0" : item.july,
+                    august: item.august.trim() === "" ? "0" : item.august,
+                    september: item.september.trim() === "" ? "0" : item.september,
+                    october: item.october.trim() === "" ? "0" : item.october,
+                    november: item.november.trim() === "" ? "0" : item.november,
+                    december: item.december.trim() === "" ? "0" : item.december,
+                    january: item.january.trim() === "" ? "0" : item.january,
+                    february: item.february.trim() === "" ? "0" : item.february,
+                    march: item.march.trim() === "" ? "0" : item.march,
+                    activity: item.activity ?? null,
+                    clusterId: item.clusterId ?? null,
+                    updatedBy: item.updatedBy,
+                    updatedAt: item.updatedAt,
+                    qty: item.qty ?? 0,
+                    qty1: item.qty1 ?? 0,
+                    rate1: item.rate1?.trim() === "" ? "0" : item.rate1,
+                    amount1: item.amount1?.trim() === "" ? "0" : item.amount1,
+                    qty2: item.qty2 ?? 0,
+                    rate2: item.rate2?.trim() === "" ? "0" : item.rate2,
+                    amount2: item.amount2?.trim() === "" ? "0" : item.amount2,
+                    qty3: item.qty3 ?? 0,
+                    rate3: item.rate3?.trim() === "" ? "0" : item.rate3,
+                    amount3: item.amount3?.trim() === "" ? "0" : item.amount3,
+                    qty4: item.qty4 ?? 0,
+                    rate4: item.rate4?.trim() === "" ? "0" : item.rate4,
+                    amount4: item.amount4?.trim() === "" ? "0" : item.amount4,
+                    q1: (
+                        parseInt(item.april.trim() === "" ? "0" : item.april) +
+                        parseInt(item.may.trim() === "" ? "0" : item.may) +
+                        parseInt(item.june.trim() === "" ? "0" : item.june)
+                    ).toString(),
+                    q2: (
+                        parseInt(item.july.trim() === "" ? "0" : item.july) +
+                        parseInt(item.august.trim() === "" ? "0" : item.august) +
+                        parseInt(item.september.trim() === "" ? "0" : item.september)
+                    ).toString(),
+                    q3: (
+                        parseInt(item.october.trim() === "" ? "0" : item.october) +
+                        parseInt(item.november.trim() === "" ? "0" : item.november) +
+                        parseInt(item.december.trim() === "" ? "0" : item.december)
+                    ).toString(),
+                    q4: (
+                        parseInt(item.january.trim() === "" ? "0" : item.january) +
+                        parseInt(item.february.trim() === "" ? "0" : item.february) +
+                        parseInt(item.march.trim() === "" ? "0" : item.march)
+                    ).toString(),
+                };
+
+                // Update record in the database
+                await ctx.db
+                    .update(budgetDetailsInFinanceProject)
+                    .set(updates)
+                    .where(eq(budgetDetailsInFinanceProject.id, item.budgetDetailsId));
+            }
+            const travelData = await ctx.db
+                .select()
+                .from(budgetDetailsInFinanceProject)
+                .where(and(
+                    eq(budgetDetailsInFinanceProject.budgetid, budgetId),
+                    eq(budgetDetailsInFinanceProject.catid, travelCatId)
+                ))
+            // here we need to update the values
+            if (travelData && travelData.length > 0) {
+                for (const item of data) {
+                    const updates = {
+                        currency: item.currency,
+                        notes: item.notes ?? null,
+                        description: item.description ?? null,
+                        updatedBy: item.updatedBy,
+                        updatedAt: item.updatedAt,
+                        qty: item.qty ?? 0,
+                        qty1: item.qty1 ?? 0,
+                        qty2: item.qty2 ?? 0,
+                        qty3: item.qty3 ?? 0,
+                        qty4: item.qty4 ?? 0,
+                    };
+                    await ctx.db
+                        .update(budgetDetailsInFinanceProject)
+                        .set(updates)
+                        .where(and(
+                            eq(budgetDetailsInFinanceProject.budgetid, budgetId),
+                            eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
+                            eq(budgetDetailsInFinanceProject.catid, travelCatId)
+                        ));
+                }
+            }
+
+            return { success: true, message: "Budget details updated successfully" };
+        } catch (error) {
+            console.error("Error in updating budget details:", error);
+            throw new Error("Failed to update budget details. Please try again.");
+        }
+    });
 
 
 

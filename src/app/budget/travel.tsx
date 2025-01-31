@@ -197,29 +197,58 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         });
         if (travelData.result && travelData.result.length > 0) {
           // console.log("After getting the categorydetails")
+          console.log("Data present")
           setSaveBtnState("edit")
           const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           travelData.result.forEach((item) => {
-            initialData[item.subcategoryId] = {
-              Count: Number(item.total),
-              Apr: item.april ? Number(item.april) : "0",
-              May: item.may ? Number(item.may) : "0",
-              Jun: item.june ? Number(item.june) : "0",
-              Jul: item.july ? Number(item.july) : "0",
-              Aug: item.august ? Number(item.august) : "0",
-              Sep: item.september ? Number(item.september) : "0",
-              Oct: item.october ? Number(item.october) : "0",
-              Nov: item.november ? Number(item.november) : "0",
-              Dec: item.december ? Number(item.december) : "0",
-              Jan: item.january ? Number(item.january) : "0",
-              Feb: item.february ? Number(item.february) : "0",
-              Mar: item.march ? Number(item.march) : "0",
-              Qty1: item.qty1 ? Number(item.qty1) : "0",
-              Qty2: item.qty2 ? Number(item.qty2) : "0",
-              Qty3: item.qty3 ? Number(item.qty3) : "0",
-              Qty4: item.qty4 ? Number(item.qty4) : "0",
-              budgetDetailsId: Number(item.id)
-            };
+            // !we can remove this if we are updating these values in the save and update function of the personal data
+            // const personalDataForSubCat = travelData.personalData.find((subCat)=> subCat.subcategoryId == item.subcategoryId)
+            // if(!personalDataForSubCat){
+              initialData[item.subcategoryId] = {
+                Count: Number(item.total),
+                Apr: item.april ? Number(item.april) : "0",
+                May: item.may ? Number(item.may) : "0",
+                Jun: item.june ? Number(item.june) : "0",
+                Jul: item.july ? Number(item.july) : "0",
+                Aug: item.august ? Number(item.august) : "0",
+                Sep: item.september ? Number(item.september) : "0",
+                Oct: item.october ? Number(item.october) : "0",
+                Nov: item.november ? Number(item.november) : "0",
+                Dec: item.december ? Number(item.december) : "0",
+                Jan: item.january ? Number(item.january) : "0",
+                Feb: item.february ? Number(item.february) : "0",
+                Mar: item.march ? Number(item.march) : "0",
+                Qty1: item.qty1 ? Number(item.qty1) : "0",
+                Qty2: item.qty2 ? Number(item.qty2) : "0",
+                Qty3: item.qty3 ? Number(item.qty3) : "0",
+                Qty4: item.qty4 ? Number(item.qty4) : "0",
+                budgetDetailsId: Number(item.id)
+              };
+            // }
+            // else{
+            //   console.log(personalDataForSubCat)
+            //   console.log("I am running")
+            //   initialData[item.subcategoryId] = {
+            //     Count: Number(item.total),
+            //     Apr: item.april ? Number(item.april) : "0",
+            //     May: item.may ? Number(item.may) : "0",
+            //     Jun: item.june ? Number(item.june) : "0",
+            //     Jul: item.july ? Number(item.july) : "0",
+            //     Aug: item.august ? Number(item.august) : "0",
+            //     Sep: item.september ? Number(item.september) : "0",
+            //     Oct: item.october ? Number(item.october) : "0",
+            //     Nov: item.november ? Number(item.november) : "0",
+            //     Dec: item.december ? Number(item.december) : "0",
+            //     Jan: item.january ? Number(item.january) : "0",
+            //     Feb: item.february ? Number(item.february) : "0",
+            //     Mar: item.march ? Number(item.march) : "0",
+            //     Qty1: personalDataForSubCat.qty1 ? Number(personalDataForSubCat.qty1) : "0",
+            //     Qty2: personalDataForSubCat.qty2 ? Number(personalDataForSubCat.qty2) : "0",
+            //     Qty3: personalDataForSubCat.qty3 ? Number(personalDataForSubCat.qty3) : "0",
+            //     Qty4: personalDataForSubCat.qty4 ? Number(personalDataForSubCat.qty4) : "0",
+            //     budgetDetailsId: Number(personalDataForSubCat.id)
+            //   };
+            // }
             totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
             totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
             totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
@@ -229,60 +258,111 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           setTableData(initialData);
           setTotalQty(totalQtyAfterBudgetDetails)
         }
-        else if (travelData.levelStats) {
+        else if (travelData.levelStats || travelData.personalData) {
           const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
           setTotalQty(totalQtyAfterBudgetDetails)
           setSaveBtnState("save")
           travelData.subCategories.forEach((sub, index) => {
-            const level = travelData.levelStats?.find(
-              (level) => level.level === sub.subCategoryId
-            );
-            if(filter?.map == 0)
+            if(travelData.personalData && travelData.personalData.length > 0)
             {
-              initialData[sub.subCategoryId] = {
-                Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
-                Qty1: level?.employeeCount ? Number(level?.employeeCount)*4 : 0,
-                Qty2: level?.employeeCount ? Number(level?.employeeCount)*4 : 0,
-                Qty3: level?.employeeCount ? Number(level?.employeeCount) *4: 0,
-                Qty4: level?.employeeCount ? Number(level?.employeeCount)*4 : 0,
-                Apr: "0",
-                May: "0",
-                Jun: "0",
-                Jul: "0",
-                Aug: "0",
-                Sep: "0",
-                Oct: "0",
-                Nov: "0",
-                Dec: "0",
-                Jan: "0",
-                Feb: "0",
-                Mar: "0",
-                budgetDetailsId: 0,
-              };
+              const level = travelData.personalData.find(
+                (level) => level.subcategoryId === sub.subCategoryId
+              );
+              if (filter?.map == 0) {
+                initialData[sub.subCategoryId] = {
+                  Count: level?.qty ? Number(level?.qty) : 0,
+                  Qty1: level?.qty1 ? Number(level?.qty1) * 4 : 0,
+                  Qty2: level?.qty2 ? Number(level?.qty2) * 4 : 0,
+                  Qty3: level?.qty3 ? Number(level?.qty3) * 4 : 0,
+                  Qty4: level?.qty4 ? Number(level?.qty4) * 4 : 0,
+                  Apr: "0",
+                  May: "0",
+                  Jun: "0",
+                  Jul: "0",
+                  Aug: "0",
+                  Sep: "0",
+                  Oct: "0",
+                  Nov: "0",
+                  Dec: "0",
+                  Jan: "0",
+                  Feb: "0",
+                  Mar: "0",
+                  budgetDetailsId: 0,
+                };
+              }
+              else {
+                initialData[sub.subCategoryId] = {
+                  Count: level?.qty ? Number(level?.qty) : 0,
+                  Qty1: level?.qty1 ? Number(level?.qty1) : 0,
+                  Qty2: level?.qty2 ? Number(level?.qty2) : 0,
+                  Qty3: level?.qty3 ? Number(level?.qty3) : 0,
+                  Qty4: level?.qty4 ? Number(level?.qty4) : 0,
+                  Apr: "0",
+                  May: "0",
+                  Jun: "0",
+                  Jul: "0",
+                  Aug: "0",
+                  Sep: "0",
+                  Oct: "0",
+                  Nov: "0",
+                  Dec: "0",
+                  Jan: "0",
+                  Feb: "0",
+                  Mar: "0",
+                  budgetDetailsId: 0,
+                };
+              }
             }
-            else{
-              initialData[sub.subCategoryId] = {
-                Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
-                Qty1: level?.employeeCount ? Number(level?.employeeCount) : 0,
-                Qty2: level?.employeeCount ? Number(level?.employeeCount) : 0,
-                Qty3: level?.employeeCount ? Number(level?.employeeCount) : 0,
-                Qty4: level?.employeeCount ? Number(level?.employeeCount) : 0,
-                Apr: "0",
-                May: "0",
-                Jun: "0",
-                Jul: "0",
-                Aug: "0",
-                Sep: "0",
-                Oct: "0",
-                Nov: "0",
-                Dec: "0",
-                Jan: "0",
-                Feb: "0",
-                Mar: "0",
-                budgetDetailsId: 0,
-              };
+            else
+            {
+              const level = travelData.levelStats?.find(
+                (level) => level.level === sub.subCategoryId
+              );
+              if (filter?.map == 0) {
+                initialData[sub.subCategoryId] = {
+                  Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                  Qty1: level?.employeeCount ? Number(level?.employeeCount) * 4 : 0,
+                  Qty2: level?.employeeCount ? Number(level?.employeeCount) * 4 : 0,
+                  Qty3: level?.employeeCount ? Number(level?.employeeCount) * 4 : 0,
+                  Qty4: level?.employeeCount ? Number(level?.employeeCount) * 4 : 0,
+                  Apr: "0",
+                  May: "0",
+                  Jun: "0",
+                  Jul: "0",
+                  Aug: "0",
+                  Sep: "0",
+                  Oct: "0",
+                  Nov: "0",
+                  Dec: "0",
+                  Jan: "0",
+                  Feb: "0",
+                  Mar: "0",
+                  budgetDetailsId: 0,
+                };
+              }
+              else {
+                initialData[sub.subCategoryId] = {
+                  Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                  Qty1: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                  Qty2: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                  Qty3: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                  Qty4: level?.employeeCount ? Number(level?.employeeCount) : 0,
+                  Apr: "0",
+                  May: "0",
+                  Jun: "0",
+                  Jul: "0",
+                  Aug: "0",
+                  Sep: "0",
+                  Oct: "0",
+                  Nov: "0",
+                  Dec: "0",
+                  Jan: "0",
+                  Feb: "0",
+                  Mar: "0",
+                  budgetDetailsId: 0,
+                };
+              }
             }
-            
           });
           setTableData(initialData);
         }

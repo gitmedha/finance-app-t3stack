@@ -1,6 +1,6 @@
 // pages/ProfileEditPage.tsx
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
 import { IconButton, Button, Flex } from "@radix-ui/themes";
@@ -22,22 +22,28 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
     register,
     control,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
     reset,
   } = useForm<Department>({
     defaultValues: item,
   });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const types = [
     { value: "Sub Department", label: "Sub Department" },
-    { value: "Cluster", label: "Cluster" },
     { value: "Department", label: "Department" },
   ];
-
+  useEffect(() => {
+    if (item) {
+      reset(item);  // Ensure form updates when item changes
+    }
+  }, [item, reset]);
   const handleSave = () => {
     setIsModalOpen(false);
   };
-
+  const { data: departmentData } = api.get.getHeadDepartments.useQuery();
   const { mutate: editDepartment } = api.post.editDepartment.useMutation({
     async onSuccess() {
       refetch();
@@ -48,14 +54,16 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
       console.error("Error adding staff:", err);
     },
   });
-
+  const selectedTypeData = watch("typeData");
   const onSubmit: SubmitHandler<Department> = async (data) => {
     try {
+      console.log(data.type)
       const submissionData = {
         id: data.id,
         departmentname: data.departmentname,
         deptCode: Number(data.deptCode),
         type: data.typeData.value ?? item.typeData.value,
+        departmentId:data.departmentData.value,
         updatedBy: userData.data?.user.id ?? 1,
         isactive: true,
         updatedAt: new Date().toISOString().split("T")[0] ?? "",
@@ -68,7 +76,6 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
       console.error("Error adding staff:", error);
     }
   };
-
   return (
     <>
       <IconButton
@@ -80,13 +87,13 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
 
       <Modal
         className=""
-        title="Add Departments"
-        description="Make changes to your profile."
+        title="Edit Department"
+        description="Make changes to existing department."
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
       >
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} >
           {/* Name Field */}
           <div>
             <label className="text-sm">
@@ -125,8 +132,8 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
           </div>
 
           {/* Types Dropdown */}
-          <div>
-            <label className="text-sm">
+          <div className={` ${selectedTypeData && selectedTypeData.value != "Sub Department" ? "pb-6":"" }`}>
+            <label className="text-sm" >
               Types <span className="text-red-400">*</span>
             </label>
             <Controller
@@ -139,17 +146,46 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
                   options={types}
                   placeholder="Select a Type"
                   isClearable
-                  aria-invalid={!!errors.type}
+                  aria-invalid={!!errors.typeData}
                 />
               )}
             />
 
-            {errors.type && (
+            {errors.typeData && (
               <span className="text-xs text-red-500">
-                {errors.type.message}
+                {errors.typeData.message}
               </span>
             )}
           </div>
+
+          {/*Departments dropdown  */}
+          {(selectedTypeData.value == "Sub Department") && <div className={`${isDropdownOpen?"pb-36":""}`}>
+            <label className="text-sm">
+              Parent Department <span className="text-red-400">*</span>
+            </label>
+            <Controller
+              name="departmentData"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onChange={field.onChange}
+                  defaultValue={item.departmentData}
+                  options={departmentData}
+                  placeholder="Select a Department"
+                  isClearable
+                  aria-invalid={!!errors.departmentData}
+                  onMenuOpen={()=>setIsDropdownOpen(true)}
+                  onMenuClose={()=>{setIsDropdownOpen(false)}}
+                />
+              )}
+            />
+
+            {errors.departmentData && (
+              <span className="text-xs text-red-500">
+                {errors.departmentData.message}
+              </span>
+            )}
+          </div> }
 
           <Flex gap="3" mt="4" justify="end">
             <Button

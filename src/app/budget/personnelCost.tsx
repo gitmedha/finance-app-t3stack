@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@radix-ui/themes";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { RiArrowDropDownLine } from "react-icons/ri";
+import { number } from "zod";
 interface PersonnelCostProps {
   section: string;
   categoryId: number;
@@ -13,7 +16,10 @@ interface PersonnelCostProps {
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
   travelCatId:number
 }
-
+interface subdepartmentSchema{
+  id:number,
+  name:string
+}
 interface LevelData {
   budgetDetailsId: number
   Count: string | number;
@@ -70,18 +76,27 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
+  const [filter, setFilter] = useState<undefined|{id:number,name:string}>(undefined)
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession()
-
-  const { data: personnelCostData, isLoading: personnelCostDataLodaing } = api.get.getPersonalCatDetials.useQuery({
+  const { data: subdepartmentData } = api.get.getSubDepts.useQuery({ deptId: Number(deptId)})
+  const { data: personnelCostData, isLoading: personnelCostDataLodaing } = api.get.getPersonalCatDetials.useQuery(
+    filter?{
+    subdeptId:filter.id,
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
+  }:{
+        subdeptId: 0,
+        budgetId,
+        catId: categoryId,
+        deptId: Number(deptId),
   }, {
     refetchOnMount: false,
     refetchOnWindowFocus:false,
     staleTime: 0, 
+    enabled:!!filter
   },)
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = []
@@ -166,7 +181,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       }
     })
   }
-
   const [avgQty, setAvgQty] = useState<avgQtySchema>({})
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) => {
@@ -175,6 +189,15 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       });
     });
   };
+  const handleSelect = (val: subdepartmentSchema) => {
+    setFilter(val)
+  }
+  useEffect(()=>{
+    if (subdepartmentData?.subdepartments && subdepartmentData.subdepartments.length > 0) {
+      setFilter(subdepartmentData.subdepartments.sort((a, b) => a.name.localeCompare(b.name))[0])
+    }
+  }, [subdepartmentData])
+  
   useEffect(()=>{
     if (personnelCostData?.budgetId == budgetId )
     {
@@ -337,6 +360,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       budgetid: budgetId,
       catid: categoryId,
       subcategoryId: parseInt(subCategoryId, 10),
+      subDeptId:filter?.id ?? 0,
       unit: 1,
       rate: "1",
       total: "1",
@@ -366,13 +390,17 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       qty4: Number(data.Qty4),
     }));
     try {
+      if(!filter)
+      {
+        throw new Error("Subdepartment needs to be there")
+      }
       createBudgetDetails.mutate(
         {
           deptId: Number(deptId),
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
-          travelCatId
+          travelCatId,
         },
         {
           onSuccess: (data) => {
@@ -567,7 +595,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           budgetId,
           catId: categoryId,
           data: budgetDetails,
-          travelCatId
+          travelCatId,
         },
         {
           onSuccess: (data) => {
@@ -633,6 +661,33 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               </div>
           }
         </summary>
+        {
+          subdepartmentData?.subdepartments && <div className='w-72 mt-3 z-10'>
+            <DropdownMenu.Root >
+              <DropdownMenu.Trigger asChild>
+                <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
+                  <span>{filter?.name} </span>
+                  <RiArrowDropDownLine size={30} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content
+                className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
+              >
+                {subdepartmentData?.subdepartments.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
+                  <DropdownMenu.Item
+                    key={ind}
+                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm"
+                    onSelect={() => handleSelect(val)}
+                  >
+                    {val.name}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+
+          </div>
+        }
+        
 
         <hr className="my-2 scale-x-150" />
 

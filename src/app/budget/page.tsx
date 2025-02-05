@@ -32,8 +32,6 @@ const Budget: React.FC = () => {
   });
   const [budgetId,setBudgetId] = useState<number|null>(null)
   const handleSelect = (name: string, value: HandleSelectValue) => {
-    // setBudgetId(null)
-    console.log("I am getting hitted")
     if (name === 'department' && typeof value === 'object' && value !== null) {
       const departmentValue = value as { id: string; departmentname: string }; // Narrow type
       setFilters((prev) => ({

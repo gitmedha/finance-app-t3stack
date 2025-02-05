@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 // import { BiComment } from "react-icons/bi";
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { api } from '~/trpc/react';
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
 
 interface ActivityBudgetProps {
   section: string;

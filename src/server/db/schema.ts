@@ -503,7 +503,7 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
   createdBy: integer("created_by").notNull(),
   updatedBy: integer("updated_by"),
   overhead: text("overhead"),
-  deptId: integer("deptId"),
+  deptid: integer("deptid"),
   clusterId: integer("clusterId"),
   subcategoryId: integer("subcategory_id").notNull(),
   april: numeric("april", { precision: 12, scale: 2 }),
@@ -536,6 +536,7 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
   qty4: integer("qty4"),
   rate4: numeric("rate4"),
   amount4: numeric("amount4"),
+  subDeptid: integer("sub_deptid"),
 },
   (table) => {
     return {
@@ -563,6 +564,11 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
         columns: [table.subcategoryId],
         foreignColumns: [categoryMasterInFinanceProject.id],
         name: "budget_details_subcategory_id_fkey"
+      }),
+      fkSubDept: foreignKey({
+        columns: [table.subDeptid],
+        foreignColumns: [departmentMasterInFinanceProject.id],
+        name: "fk_sub_dept"
       }),
     }
   });

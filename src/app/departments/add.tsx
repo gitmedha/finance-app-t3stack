@@ -13,10 +13,16 @@ interface SelectItemDto {
   value: string;
   label: string;
 }
+interface SelectParentDepartment{
+  value:number|null,
+  label:string|undefined
+}
 interface DepartmentFormData {
   departmentname: string;
   deptCode: number;
   type: SelectItemDto;
+  departmentData: SelectParentDepartment
+
 }
 
 interface AddDepartmentProps {
@@ -28,9 +34,9 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
 
   const types = [
     { value: "Sub Department", label: "Sub Department" },
-    { value: "Cluster", label: "Cluster" },
     { value: "Department", label: "Department" },
   ];
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const {
     register,
@@ -38,12 +44,13 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<DepartmentFormData>({
     defaultValues: {},
   });
 
   const addDepartmentMutation = api.post.addDepartment.useMutation();
-
+  const { data: departmentData } = api.get.getHeadDepartments.useQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
@@ -53,6 +60,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
         deptCode: Number(data.deptCode),
         type: data.type.value,
         createdBy: userData.data?.user.id ?? 1,
+        parentId: data.departmentData?.value ?? null,
         isactive: true,
         createdAt: new Date().toISOString().split("T")[0] ?? "",
       };
@@ -72,7 +80,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
   //       label: state.name,
   //     }),
   //   );
-
+  const selectedTypeData = watch("type");
   return (
     <>
       <IconButton
@@ -89,7 +97,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="">
           {/* Name Field */}
           <div>
             <label className="text-sm">
@@ -128,7 +136,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
           </div>
 
           {/* Types Dropdown */}
-          <div>
+          <div className={` ${selectedTypeData && selectedTypeData.value != "Sub Department" ? "" : "pb-6"}`}>
             <label className="text-sm">
               Types <span className="text-red-400">*</span>
             </label>
@@ -153,6 +161,34 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
             )}
           </div>
 
+            {/* Departments drop down */}
+          {selectedTypeData && selectedTypeData.value == "Sub Department" && <div className={`${isDropdownOpen ? "pb-36" : ""}`}>
+            <label className="text-sm">
+              Department <span className="text-red-400">*</span>
+            </label>
+            <Controller
+              name="departmentData"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onChange={field.onChange}
+                  options={departmentData}
+                  placeholder="Select a Department"
+                  isClearable
+                  aria-invalid={!!errors.departmentData}
+                  onMenuOpen={() => setIsDropdownOpen(true)}
+                  onMenuClose={() => { setIsDropdownOpen(false) }}
+                />
+              )}
+            />
+
+            {errors.departmentData && (
+              <span className="text-xs text-red-500">
+                {errors.departmentData.message}
+              </span>
+            )}
+          </div>}
+            
           <Flex gap="3" mt="4" justify="end">
             <Button
               onClick={() => setIsModalOpen(false)}

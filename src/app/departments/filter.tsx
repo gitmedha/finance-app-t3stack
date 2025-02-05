@@ -5,7 +5,6 @@ import type { DepartmentFilterFormProps } from "./department";
 const types = [
   { value: "", label: "" },
   { value: "Sub Department", label: "Sub Department" },
-  { value: "Cluster", label: "Cluster" },
   { value: "Department", label: "Department" },
 ];
 

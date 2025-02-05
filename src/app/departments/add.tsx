@@ -52,9 +52,11 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
   const addDepartmentMutation = api.post.addDepartment.useMutation();
   const { data: departmentData } = api.get.getHeadDepartments.useQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [typeData, setTypeData] = useState<null|{ label: string, value: string }>(null)
   const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
     try {
+      if (data.type.value == "Sub Department" && !data.departmentData.value)
+        throw new Error("Sub department needs to have the parent department")
       const submissionData = {
         ...data,
         deptCode: Number(data.deptCode),
@@ -80,7 +82,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
   //       label: state.name,
   //     }),
   //   );
-  const selectedTypeData = watch("type");
+  // const selectedTypeData = watch("type");
   return (
     <>
       <IconButton
@@ -98,96 +100,105 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
         onClose={() => setIsModalOpen(false)}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="">
-          {/* Name Field */}
-          <div>
-            <label className="text-sm">
-              Name <span className="text-red-400">*</span>
-            </label>
-            <input
-              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              placeholder="Enter department name"
-              {...register("departmentname", { required: "Name is required" })}
-            />
-            {errors.departmentname && (
-              <span className="text-xs text-red-500">
-                {errors.departmentname.message}
-              </span>
-            )}
-          </div>
-
-          {/* Code Field */}
-          <div>
-            <label className="text-sm">
-              Department Code <span className="text-red-400">*</span>
-            </label>
-            <input
-              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              placeholder="Enter Code"
-              type="number"
-              {...register("deptCode", {
-                required: "Department Code is required",
-              })}
-            />
-            {errors.deptCode && (
-              <span className="text-xs text-red-500">
-                {errors.deptCode.message}
-              </span>
-            )}
-          </div>
-
-          {/* Types Dropdown */}
-          <div className={` ${selectedTypeData && selectedTypeData.value != "Sub Department" ? "" : "pb-6"}`}>
-            <label className="text-sm">
-              Types <span className="text-red-400">*</span>
-            </label>
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onChange={field.onChange}
-                  options={types}
-                  placeholder="Select a Type"
-                  isClearable
-                  aria-invalid={!!errors.type}
-                />
+          <div className="flex gap-2">
+            {/* Name Field */}
+            <div className="w-1/2">
+              <label className="text-sm ">
+                Name <span className="text-red-400">*</span>
+              </label>
+              <input
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                placeholder="Enter department name"
+                {...register("departmentname", { required: "Name is required" })}
+              />
+              {errors.departmentname && (
+                <span className="text-xs text-red-500">
+                  {errors.departmentname.message}
+                </span>
               )}
-            />
-
-            {errors.type && (
-              <span className="text-xs text-red-500">
-                {errors.type.message}
-              </span>
-            )}
+            </div>
+            {/* Code Field */}
+            <div className="w-1/2">
+              <label className="text-sm">
+                Department Code <span className="text-red-400">*</span>
+              </label>
+              <input
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                placeholder="Enter Code"
+                type="number"
+                {...register("deptCode", {
+                  required: "Department Code is required",
+                })}
+              />
+              {errors.deptCode && (
+                <span className="text-xs text-red-500">
+                  {errors.deptCode.message}
+                </span>
+              )}
+            </div>
           </div>
+          
+          <div className="flex gap-2">
+            <div className={` ${typeData && typeData.value != "Sub Department" ? " " : "pb-6 w-1/2"} w-1/2`}>
+              <label className="text-sm">
+                Types <span className="text-red-400">*</span>
+              </label>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    onChange={(selectedOption) => {
+                      field.onChange(selectedOption); // Update React Hook Form state
+                      setTypeData(selectedOption);
+                    }}
+                    options={types}
+                    placeholder="Select a Type"
+                    isClearable
+                    aria-invalid={!!errors.type}
+                  />
+                )}
+              />
+
+              {errors.type && (
+                <span className="text-xs text-red-500">
+                  {errors.type.message}
+                </span>
+              )}
+            </div>
+            {typeData && typeData.value == "Sub Department" && <div className={`${isDropdownOpen ? "pb-52" : ""} w-1/2`}>
+              <label className="text-sm">
+                Parent Department <span className="text-red-400">*</span>
+              </label>
+              <Controller
+                name="departmentData"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onChange={field.onChange}
+                    options={departmentData}
+                    placeholder="Select a Department"
+                    isClearable
+                    aria-invalid={!!errors.departmentData}
+                    onMenuOpen={() => setIsDropdownOpen(true)}
+                    onMenuClose={() => { setIsDropdownOpen(false) }}
+                  />
+                )}
+              />
+
+              {errors.departmentData && (
+                <span className="text-xs text-red-500">
+                  {errors.departmentData.message}
+                </span>
+              )}
+            </div>}
+          </div>
+          {/* Types Dropdown */}
+          
 
             {/* Departments drop down */}
-          {selectedTypeData && selectedTypeData.value == "Sub Department" && <div className={`${isDropdownOpen ? "pb-36" : ""}`}>
-            <label className="text-sm">
-              Department <span className="text-red-400">*</span>
-            </label>
-            <Controller
-              name="departmentData"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onChange={field.onChange}
-                  options={departmentData}
-                  placeholder="Select a Department"
-                  isClearable
-                  aria-invalid={!!errors.departmentData}
-                  onMenuOpen={() => setIsDropdownOpen(true)}
-                  onMenuClose={() => { setIsDropdownOpen(false) }}
-                />
-              )}
-            />
-
-            {errors.departmentData && (
-              <span className="text-xs text-red-500">
-                {errors.departmentData.message}
-              </span>
-            )}
-          </div>}
+          
             
           <Flex gap="3" mt="4" justify="end">
             <Button

@@ -22,7 +22,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
     register,
     control,
     handleSubmit,
-    setValue,
+    // setValue,
     watch,
     formState: { errors },
     reset,
@@ -40,6 +40,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
       reset(item);  // Ensure form updates when item changes
     }
   }, [item, reset]);
+  const [typeData, setTypeData] = useState<null|{ label: string, value: string }>(item.typeData)
   const handleSave = () => {
     setIsModalOpen(false);
   };
@@ -54,10 +55,11 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
       console.error("Error adding staff:", err);
     },
   });
-  const selectedTypeData = watch("typeData");
+  // const selectedTypeData = watch("typeData");
   const onSubmit: SubmitHandler<Department> = async (data) => {
     try {
-      console.log(data.type)
+      if (data.typeData.value == "Sub Department" && !data.departmentData.value )
+        throw new Error("Sub department needs to have the parent department")
       const submissionData = {
         id: data.id,
         departmentname: data.departmentname,
@@ -94,98 +96,106 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
         onSave={handleSave}
       >
         <form onSubmit={handleSubmit(onSubmit)} >
-          {/* Name Field */}
-          <div>
-            <label className="text-sm">
-              Name <span className="text-red-400">*</span>
-            </label>
-            <input
-              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              placeholder="Enter department name"
-              {...register("departmentname", { required: "Name is required" })}
-            />
-            {errors.departmentname && (
-              <span className="text-xs text-red-500">
-                {errors.departmentname.message}
-              </span>
-            )}
-          </div>
-
-          {/* Code Field */}
-          <div>
-            <label className="text-sm">
-              Department Code <span className="text-red-400">*</span>
-            </label>
-            <input
-              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              placeholder="Enter Code"
-              type="number"
-              {...register("deptCode", {
-                required: "Department Code is required",
-              })}
-            />
-            {errors.deptCode && (
-              <span className="text-xs text-red-500">
-                {errors.deptCode.message}
-              </span>
-            )}
-          </div>
-
-          {/* Types Dropdown */}
-          <div className={` ${selectedTypeData && selectedTypeData.value != "Sub Department" ? "pb-6":"" }`}>
-            <label className="text-sm" >
-              Types <span className="text-red-400">*</span>
-            </label>
-            <Controller
-              name="typeData"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onChange={field.onChange}
-                  defaultValue={item.typeData}
-                  options={types}
-                  placeholder="Select a Type"
-                  isClearable
-                  aria-invalid={!!errors.typeData}
-                />
+          <div className="flex gap-2">
+            {/* Name Field */}
+            <div className="w-1/2">
+              <label className="text-sm">
+                Name <span className="text-red-400">*</span>
+              </label>
+              <input
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                placeholder="Enter department name"
+                {...register("departmentname", { required: "Name is required" })}
+              />
+              {errors.departmentname && (
+                <span className="text-xs text-red-500">
+                  {errors.departmentname.message}
+                </span>
               )}
-            />
-
-            {errors.typeData && (
-              <span className="text-xs text-red-500">
-                {errors.typeData.message}
-              </span>
-            )}
-          </div>
-
-          {/*Departments dropdown  */}
-          {(selectedTypeData.value == "Sub Department") && <div className={`${isDropdownOpen?"pb-36":""}`}>
-            <label className="text-sm">
-              Parent Department <span className="text-red-400">*</span>
-            </label>
-            <Controller
-              name="departmentData"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onChange={field.onChange}
-                  defaultValue={item.departmentData}
-                  options={departmentData}
-                  placeholder="Select a Department"
-                  isClearable
-                  aria-invalid={!!errors.departmentData}
-                  onMenuOpen={()=>setIsDropdownOpen(true)}
-                  onMenuClose={()=>{setIsDropdownOpen(false)}}
-                />
+            </div>
+            {/* Code Field */}
+            <div className="w-1/2">
+              <label className="text-sm">
+                Department Code <span className="text-red-400">*</span>
+              </label>
+              <input
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                placeholder="Enter Code"
+                type="number"
+                {...register("deptCode", {
+                  required: "Department Code is required",
+                })}
+              />
+              {errors.deptCode && (
+                <span className="text-xs text-red-500">
+                  {errors.deptCode.message}
+                </span>
               )}
-            />
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            {/* Types Dropdown */}
+            <div className={` ${typeData && typeData.value != "Sub Department" ? " " : "pb-6 w-1/2"} w-1/2`}>
+              <label className="text-sm" >
+                Types <span className="text-red-400">*</span>
+              </label>
+              <Controller
+                name="typeData"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    onChange={(selectedOption) => {
+                      field.onChange(selectedOption); // Update React Hook Form state
+                      setTypeData(selectedOption);
+                    }}
+                    defaultValue={item.typeData}
+                    options={types}
+                    placeholder="Select a Type"
+                    isClearable
+                    aria-invalid={!!errors.typeData}
+                  />
+                )}
+              />
 
-            {errors.departmentData && (
-              <span className="text-xs text-red-500">
-                {errors.departmentData.message}
-              </span>
-            )}
-          </div> }
+              {errors.typeData && (
+                <span className="text-xs text-red-500">
+                  {errors.typeData.message}
+                </span>
+              )}
+            </div>
+
+            {/*Departments dropdown  */}
+            {(typeData && typeData.value == "Sub Department") && <div className={`${isDropdownOpen ? "pb-52" : ""} w-1/2`}>
+              <label className="text-sm">
+                Parent Department <span className="text-red-400">*</span>
+              </label>
+              <Controller
+                name="departmentData"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onChange={field.onChange}
+                    defaultValue={item.departmentData}
+                    options={departmentData}
+                    placeholder="Select a Department"
+                    isClearable
+                    aria-invalid={!!errors.departmentData}
+                    onMenuOpen={() => setIsDropdownOpen(true)}
+                    onMenuClose={() => { setIsDropdownOpen(false) }}
+                  />
+                )}
+              />
+
+              {errors.departmentData && (
+                <span className="text-xs text-red-500">
+                  {errors.departmentData.message}
+                </span>
+              )}
+            </div>}
+          </div>
+          
 
           <Flex gap="3" mt="4" justify="end">
             <Button

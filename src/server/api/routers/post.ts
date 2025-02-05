@@ -8,7 +8,7 @@ import {
   addStaffSalaryDetails,
   editStaffSalaryDetails,
 } from "../controller/salaryDetails";
-import { addBudgetDetails, createBudget, savePersonalBudgetDetails, updateBudgetDetails, updatePersonalBudgetDetails, updateStatusBudgetDetails } from "../controller/budget";
+import { addBudgetDetails, createBudget, savePersonalBudgetDetails, saveTravelBudgetDetails, updateBudgetDetails, updatePersonalBudgetDetails, updateStatusBudgetDetails } from "../controller/budget";
 
 export const postRouter = createTRPCRouter({
   login,
@@ -28,4 +28,5 @@ export const postRouter = createTRPCRouter({
   updateStatusBudgetDetails,
   savePersonalBudgetDetails,
   updatePersonalBudgetDetails,
+  saveTravelBudgetDetails,
 });

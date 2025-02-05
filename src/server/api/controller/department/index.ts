@@ -133,7 +133,7 @@ export const getHeadDepartments = protectedProcedure.query(async ({ ctx }) => {
     };
   });
 });
-export const getDepartmentsTypes = protectedProcedure.query(async ({ ctx, input }) => {
+export const getDepartmentsTypes = protectedProcedure.query(async ({ ctx}) => {
   const departmentsType = await ctx.db.select({
     type: departmentMaster.type,
   })
@@ -200,7 +200,6 @@ export const editDepartment = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      console.log(input)
       const { id, updatedBy, updatedAt, departmentId, ...fieldsToUpdate} = input;
 
       // Check if the department exists
@@ -226,7 +225,7 @@ export const editDepartment = protectedProcedure
       // .returning("*");
       // if the type moved from department to sub department or if sub department changed 
       let updateHirarchey = null;
-      if(departmentId)
+      if (departmentId && fieldsToUpdate.type == "Sub Department")
       {
         // do we have department id in the hirarchey table 
         const existingHirarcheyId = await ctx.db.query.departmentHierarchyInFinanceProject.findFirst({
@@ -235,6 +234,7 @@ export const editDepartment = protectedProcedure
         // if  yes then we just going to update the existing data
         if(existingHirarcheyId)
         {
+          
           updateHirarchey = await ctx.db.update(departmentHierarchyInFinanceProject)
             .set(
               {parentId:departmentId,
@@ -258,7 +258,8 @@ export const editDepartment = protectedProcedure
         })
         // if they made like that then we going to make it is active false
         if(existingHirarcheyId){
-           await ctx.db.update(departmentHierarchyInFinanceProject)
+          
+            await ctx.db.update(departmentHierarchyInFinanceProject)
             .set(
               {
                 isactive:false,
@@ -269,6 +270,7 @@ export const editDepartment = protectedProcedure
             .where(eq(departmentHierarchyInFinanceProject.deptId, id))
             .returning()
         }
+        
       }
 
       return {

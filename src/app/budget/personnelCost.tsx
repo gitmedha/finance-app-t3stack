@@ -80,7 +80,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession()
-  const { data: subdepartmentData } = api.get.getSubDepts.useQuery({ deptId: Number(deptId)})
+  const { data: subdepartmentData } = api.get.getSubDepts.useQuery({ deptId: Number(deptId)},{
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0, 
+  })
   const { data: personnelCostData, isLoading: personnelCostDataLodaing } = api.get.getPersonalCatDetials.useQuery(
     filter?{
     subdeptId:filter.id,

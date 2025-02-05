@@ -36,11 +36,10 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
     { value: "Department", label: "Department" },
   ];
   useEffect(() => {
-    if (item) {
-      reset(item);  // Ensure form updates when item changes
-    }
-  }, [item, reset]);
+      reset(item); 
+  }, [item,reset]);
   const [typeData, setTypeData] = useState<null|{ label: string, value: string }>(item.typeData)
+  
   const handleSave = () => {
     setIsModalOpen(false);
   };

@@ -22,7 +22,15 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
     deptId: userData.data.user.departmentId
   }:{
     deptId:undefined
+  },{
+    enabled:userData.data?.user.role !=3
   })
+  useEffect(() => {
+    if (userData.data?.user.departmentId && userData.data?.user.departmentName)
+      handleSelect("department", { value: userData.data?.user.departmentId, label: userData.data?.user.departmentName })
+    if (userData.data?.user.subDepartmentId && userData.data?.user.subDepartmentName)
+      handleSelect("subdepartment", { value: userData.data?.user.subDepartmentId, label: userData.data?.user.subDepartmentName })
+  }, [userData])
   // Trigger refetch on page or limit change
   useEffect(() => {
     void designationsFetch();

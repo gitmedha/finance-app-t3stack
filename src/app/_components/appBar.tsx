@@ -55,7 +55,7 @@ const AppBar = () => {
 
         <ul className="flex justify-start items-center space-x-6">
           {menus.map((menu) => {
-            if (session?.user.role == 2 && (menu.menu == "Home" || menu.menu == "Budget" || menu.menu == "Staff") )
+            if (session?.user.role != 1 && (menu.menu == "Home" || menu.menu == "Budget" || menu.menu == "Staff") )
             {
               return <li key={menu.menu}>
                 <Link

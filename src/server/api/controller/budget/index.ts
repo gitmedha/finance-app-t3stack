@@ -1,13 +1,12 @@
-import { and, count, eq, ilike, desc, isNull, sql, isNotNull, } from "drizzle-orm";
+import { and,  eq,   isNull, sql, isNotNull, } from "drizzle-orm";
 import { departmentHierarchyInFinanceProject, departmentMasterInFinanceProject } from "drizzle/schema";
 import { z } from "zod";
 import { protectedProcedure } from "~/server/api/trpc";
-import { db } from "~/server/db";
 import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject, categoryHierarchyInFinanceProject, categoryMasterInFinanceProject, salaryDetailsInFinanceProject, staffMasterInFinanceProject } from "~/server/db/schema";
 
 
 export const getCats = protectedProcedure
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
         const categories = await ctx.db
             .select({
                 categoryId: categoryMasterInFinanceProject.id,
@@ -81,7 +80,7 @@ export const addBudgetDetails = protectedProcedure
             deptId: z.number(),
             budgetId: z.number(),
             catId: z.number(),
-            subDeptId:z.number().nullable().optional(),
+            subDeptId:z.number(),
             data: z.array(
                 z.object({
                     budgetid: z.number(),
@@ -140,11 +139,8 @@ export const addBudgetDetails = protectedProcedure
                     eq(budgetDetailsInFinanceProject.catid, catId),
                     eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
                     eq(budgetDetailsInFinanceProject.activity, item.activity ?? ""),
+                    eq(budgetDetailsInFinanceProject.subDeptid, subDeptId)
                     ]
-                if(subDeptId)
-                {
-                    baseConditions.push(eq(budgetDetailsInFinanceProject.subDeptid, subDeptId ))
-                }
                 
                 const existingRecord = await ctx.db
                     .select()
@@ -156,6 +152,7 @@ export const addBudgetDetails = protectedProcedure
                     recordsToInsert.push({
                         budgetid: budgetId,
                         catid: catId,
+                        subDeptid:subDeptId,
                         deptid:deptId,
                         subcategoryId: item.subcategoryId,
                         unit: item.unit,
@@ -481,7 +478,8 @@ export const getPersonalCatDetials = protectedProcedure
                 .where(
                     and(
                         eq(staffMasterInFinanceProject.department, input.deptId),
-                        isNotNull(salaryDetailsInFinanceProject.salary)
+                        isNotNull(salaryDetailsInFinanceProject.salary),
+                        eq(staffMasterInFinanceProject.subDeptid,input.subdeptId)
                     )
                 )
                 .groupBy(staffMasterInFinanceProject.level);
@@ -502,6 +500,7 @@ export const getProgramActivities = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            subDeptId:z.number()
         })
     )
     .query(async ({ ctx, input }) => {
@@ -525,6 +524,7 @@ export const getProgramActivities = protectedProcedure
                 eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -681,7 +681,9 @@ export const getTravelCatDetials = protectedProcedure
                 .from(budgetDetailsInFinanceProject)
                 .where(and(eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                     eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
-                    eq(budgetDetailsInFinanceProject.catid, input.searchSubCatId))
+                    eq(budgetDetailsInFinanceProject.catid, input.searchSubCatId),
+                    eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)),
+                    
                 )
             // make a call for staff count
             const levelStats = await ctx.db
@@ -697,7 +699,8 @@ export const getTravelCatDetials = protectedProcedure
                 .where(
                     and(
                         eq(staffMasterInFinanceProject.department, input.deptId),
-                        isNotNull(salaryDetailsInFinanceProject.salary)
+                        isNotNull(salaryDetailsInFinanceProject.salary),
+                        eq(staffMasterInFinanceProject.subDeptid,input.subDeptId)
                     )
                 )
                 .groupBy(staffMasterInFinanceProject.level);
@@ -718,6 +721,7 @@ export const getProgramOfficeData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            subDeptId: z.number()
         })
     )
     .query(async ({ ctx, input }) => {
@@ -741,6 +745,7 @@ export const getProgramOfficeData = protectedProcedure
                 eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -811,6 +816,7 @@ export const getCapitalCostData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            subDeptId: z.number()
         })
     )
     .query(async ({ ctx, input }) => {
@@ -834,6 +840,7 @@ export const getCapitalCostData = protectedProcedure
                 eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -904,6 +911,7 @@ export const getOverHeadsData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            subDeptId: z.number()
         })
     )
     .query(async ({ ctx, input }) => {
@@ -927,6 +935,7 @@ export const getOverHeadsData = protectedProcedure
                 eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -1142,6 +1151,7 @@ export const savePersonalBudgetDetails = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             travelCatId:z.number(),
+            subDeptId:z.number(),
             data: z.array(
                 z.object({
                     budgetid: z.number(),
@@ -1288,7 +1298,8 @@ export const savePersonalBudgetDetails = protectedProcedure
             .from(budgetDetailsInFinanceProject)
             .where(and(
                 eq(budgetDetailsInFinanceProject.budgetid,budgetId),
-                eq(budgetDetailsInFinanceProject.catid,travelCatId)
+                eq(budgetDetailsInFinanceProject.catid,travelCatId),
+                eq(budgetDetailsInFinanceProject.subcategoryId,input.subDeptId)
             ))
             // here we need to update the values
             if (travelData && travelData.length>0 )
@@ -1312,7 +1323,8 @@ export const savePersonalBudgetDetails = protectedProcedure
                         .where(and(
                             eq(budgetDetailsInFinanceProject.budgetid, budgetId),
                             eq(budgetDetailsInFinanceProject.subcategoryId,item.subcategoryId),
-                            eq(budgetDetailsInFinanceProject.catid,travelCatId)
+                            eq(budgetDetailsInFinanceProject.catid,travelCatId),
+                            eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
                         ));
                 }
             }
@@ -1329,7 +1341,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             travelCatId: z.number(),
-            // subDeptId: z.number(),
+            subDeptId: z.number(),
             data: z.array(
                 z.object({
                     budgetDetailsId: z.number(),
@@ -1449,7 +1461,8 @@ export const updatePersonalBudgetDetails = protectedProcedure
                 .from(budgetDetailsInFinanceProject)
                 .where(and(
                     eq(budgetDetailsInFinanceProject.budgetid, budgetId),
-                    eq(budgetDetailsInFinanceProject.catid, travelCatId)
+                    eq(budgetDetailsInFinanceProject.catid, travelCatId),
+                    eq(budgetDetailsInFinanceProject.subcategoryId,input.subDeptId)
                 ))
             // here we need to update the values
             if (travelData && travelData.length > 0) {
@@ -1472,7 +1485,8 @@ export const updatePersonalBudgetDetails = protectedProcedure
                         .where(and(
                             eq(budgetDetailsInFinanceProject.budgetid, budgetId),
                             eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
-                            eq(budgetDetailsInFinanceProject.catid, travelCatId)
+                            eq(budgetDetailsInFinanceProject.catid, travelCatId),
+                            eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
                         ));
                 }
             }

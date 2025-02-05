@@ -21,6 +21,8 @@ interface UserInfo {
   phonenumber: number | string;
   departmentName:string|null
   departmentId:number|null
+  subDepartmentId:number|null
+  subDepartmentName:string|null
 }
 
 declare module "next-auth" {
@@ -40,6 +42,8 @@ declare module "next-auth" {
     phonenumber: number | string;
     departmentName: string | null
     departmentId: number | null
+    subDepartmentId: number | null
+    subDepartmentName: string | null
   }
 
   interface Session extends DefaultSession {
@@ -78,9 +82,12 @@ export const authOptions: NextAuthOptions = {
             updatedBy: data.updatedBy,
             phonenumber: data.phonenumber,
             departmentId:null,
-            departmentName:null
+            departmentName:null,
+            subDepartmentId:null,
+            subDepartmentName:null
           };
-          if(user.role == 2)
+          // if user is department head
+          if(user.role != 1 )
           {
             const departmentDetails = await db.select({
               departmentId: departmentMasterInFinanceProject.id,
@@ -92,6 +99,20 @@ export const authOptions: NextAuthOptions = {
             
             user.departmentId =  departmentDetails[0]?.departmentId ?? null
             user.departmentName = departmentDetails[0]?.departmentName??null
+          }
+          // if user is sub department head
+          if(user.role == 3)
+          {
+            const departmentDetails = await db.select({
+              departmentId: departmentMasterInFinanceProject.id,
+              departmentName: departmentMasterInFinanceProject.departmentname
+            }).from(departmentMasterInFinanceProject)
+              .innerJoin(staffMasterInFinanceProject,
+                eq(staffMasterInFinanceProject.subDeptid, departmentMasterInFinanceProject.id)
+              ).where(eq(staffMasterInFinanceProject.email, credentials.email))
+
+            user.subDepartmentId = departmentDetails[0]?.departmentId ?? null
+            user.subDepartmentName = departmentDetails[0]?.departmentName ?? null
           }
           return user;
         }
@@ -117,7 +138,9 @@ export const authOptions: NextAuthOptions = {
         token.updatedBy = user.updatedBy;
         token.phonenumber = user.phonenumber;
         token.departmentId = user.departmentId;
-        token.departmentName = user.departmentName
+        token.departmentName = user.departmentName;
+        token.subDepartmentName = user.subDepartmentName;
+        token.subDepartmentId = user.subDepartmentId;
       }
       return token;
     },
@@ -139,7 +162,9 @@ export const authOptions: NextAuthOptions = {
           updatedBy: token.updatedBy as number | undefined,
           phonenumber: token.phonenumber as number | string,
           departmentId: token.departmentId as number,
-          departmentName: token.departmentName as string
+          departmentName: token.departmentName as string,
+          subDepartmentName: token.subDepartmentName as string,
+          subDepartmentId: token.subDepartmentId as number,
         };
       }
       return session;

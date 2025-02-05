@@ -38,8 +38,8 @@ export default function Staff() {
     departmentname: userData.data?.user.departmentName ? userData.data?.user.departmentName : "",
     status: "Active",
     designation: "",
-    subdepartment:0,
-    subdepartmentname:"",
+    subdepartment:userData.data?.user.subDepartmentId ?? 0,
+    subdepartmentname:userData.data?.user.subDepartmentName?? "",
   });
 
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
@@ -167,11 +167,25 @@ export default function Staff() {
               <thead>
                 <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
                   {cols?.map((col) => {
-                    return (
-                      <th key={col} className="p-2">
-                        {col}
-                      </th>
-                    );
+                    if (col == "Actions")
+                    {
+                      if (userData.data?.user.role == 1)
+                      {
+                        return (
+                          <th key={col} className="p-2">
+                            {col}
+                          </th>
+                        );
+                      }
+                    }
+                    else{
+                      return (
+                        <th key={col} className="p-2">
+                          {col}
+                        </th>
+                      );
+                    }
+                    
                   })}
                 </tr>
               </thead>

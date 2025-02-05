@@ -16,6 +16,7 @@ interface ActivityBudgetProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
+  subdepartmentId: number
 }
 interface totalschema {
   totalQ1: number
@@ -80,7 +81,7 @@ const months = [
   "Mar",
 ];
 
-const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen }) => {
+const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [inputStates, setInputStates] = useState<boolean>(true)
   const userData = useSession()
@@ -148,7 +149,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
-    activity: (filter?.map)?.toString()
+    activity: (filter?.map)?.toString(),
+    subDeptId:subdepartmentId
   },{
     staleTime:0
   })
@@ -371,6 +373,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {

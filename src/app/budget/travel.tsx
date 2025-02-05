@@ -5,8 +5,8 @@ import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from "~/trpc/react";
-import { ToastContainer, toast,Bounce } from 'react-toastify';
-import { unstable_renderSubtreeIntoContainer } from 'react-dom';
+import {  toast,Bounce } from 'react-toastify';
+
 
 interface TravelBudgetProps {
   section: string;
@@ -17,6 +17,7 @@ interface TravelBudgetProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
+  subdepartmentId: number
 }
 
 interface subTravelSchema {
@@ -64,30 +65,19 @@ const months = [
   "Mar",
 ];
 
-const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId,searchSubCatId,status ,sectionOpen,setSectionOpen}) => {
-  const { data: subdepartmentData } = api.get.getSubDepts.useQuery({ deptId: Number(deptId) }, {
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-  })
+const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId, searchSubCatId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const userData = useSession()
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
-
   const [tableData, setTableData] = useState<TableData>({});
-  const [selectedSub, setSelectedSub] = useState<undefined | { id: number, name: string }>(undefined)
   const [filter, setFilter] = useState(subTravels.sort((a, b) => a.name.localeCompare(b.name))[0])
   const handleSubCatSelect = (val: subTravelSchema) => {
     setSaveBtnState("loading")
     setFilter(val)
     
-  }
-  const handleSubDeptSelect = (val: {id:number,name:string}) => {
-    setSaveBtnState("loading")
-    setSelectedSub(val)
   }
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = []
@@ -149,31 +139,17 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
       });
     });
   };
-  
   const { data: travelData, isLoading: travelDataLodaing } = api.get.getTravelCatDetials.useQuery(
-    selectedSub?{
+  {
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
     activity: (filter?.map)?.toString(),
     searchSubCatId:searchSubCatId,
-    subDeptId:selectedSub.id
-  }:{
-        budgetId,
-        catId: categoryId,
-        deptId: Number(deptId),
-        activity: (filter?.map)?.toString(),
-        searchSubCatId: searchSubCatId,
-        subDeptId: 0
+    subDeptId:subdepartmentId
   },{
     staleTime:0,
-      enabled: !!selectedSub
   })
-  useEffect(() => {
-    if (subdepartmentData?.subdepartments && subdepartmentData.subdepartments.length > 0) {
-      setSelectedSub(subdepartmentData.subdepartments.sort((a, b) => a.name.localeCompare(b.name))[0])
-    }
-  }, [subdepartmentData])
   useEffect(() => {
     if (travelData?.budgetId == budgetId) {
       const initialData: TableData = {};
@@ -427,15 +403,13 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
     }));
 
     try {
-      if (!selectedSub)
-        throw new Error("Need to give the sub category id")
       createBudgetDetails.mutate(
         {
           deptId: Number(deptId),
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
-          subDeptId:selectedSub.id
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {
@@ -624,33 +598,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
             </DropdownMenu.Root>
 
           </div>
-
-          {
-            subdepartmentData?.subdepartments && <div className='w-72 mt-3 z-10'>
-              <DropdownMenu.Root >
-                <DropdownMenu.Trigger asChild>
-                  <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
-                    <span>{selectedSub?.name} </span>
-                    <RiArrowDropDownLine size={30} />
-                  </button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content
-                  className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
-                >
-                  {subdepartmentData?.subdepartments.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
-                    <DropdownMenu.Item
-                      key={ind}
-                      className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm"
-                      onSelect={() => handleSubDeptSelect(val)}
-                    >
-                      {val.name}
-                    </DropdownMenu.Item>
-                  ))}
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-
-            </div>
-          }
           </div>
         
 

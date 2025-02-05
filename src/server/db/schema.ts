@@ -366,47 +366,6 @@ export const tallyStaffInFinanceProject = financeProject.table("tally_staff", {
     }
   });
 
-export const staffMasterInFinanceProject = financeProject.table("staff_master", {
-  id: serial("id").primaryKey().notNull(),
-  name: varchar("name", { length: 25 }).notNull(),
-  empNo: text("emp_no").notNull(),
-  isactive: boolean("isactive").notNull(),
-  notes: varchar("notes", { length: 255 }),
-  description: varchar("description", { length: 255 }),
-  createdAt: timestamp("created_at", { mode: 'string' }),
-  updatedAt: timestamp("updated_at", { mode: 'string' }),
-  createdBy: integer("created_by").notNull(),
-  updatedBy: integer("updated_by"),
-  department: integer("department").notNull(),
-  designation: varchar("designation", { length: 155 }),
-  natureOfEmployment: varchar("nature_of_employment", { length: 70 }),
-  program: varchar("program", { length: 70 }),
-  stateId: varchar("state_id", { length: 255 }),
-  locationId: varchar("location_id", { length: 255 }),
-  level: integer("level"),
-  email: varchar("email", { length: 255 }),
-},
-  (table) => {
-    return {
-      departmentMasterByFkey: foreignKey({
-        columns: [table.department],
-        foreignColumns: [departmentMasterInFinanceProject.id],
-        name: "department_master_by_fkey"
-      }),
-      staffMasterCreatedByFkey: foreignKey({
-        columns: [table.createdBy],
-        foreignColumns: [userMasterInFinanceProject.id],
-        name: "staff_master_created_by_fkey"
-      }),
-      staffMasterUpdatedByFkey: foreignKey({
-        columns: [table.updatedBy],
-        foreignColumns: [userMasterInFinanceProject.id],
-        name: "staff_master_updated_by_fkey"
-      }),
-      staffMasterEmpNoKey: unique("staff_master_emp_no_key").on(table.empNo),
-    }
-  });
-
 export const tallyDepartmentInFinanceProject = financeProject.table("tally_department", {
   id: serial("id").primaryKey().notNull(),
   voucherName: varchar("voucher_name", { length: 25 }).notNull(),
@@ -446,6 +405,53 @@ export const tallyDepartmentInFinanceProject = financeProject.table("tally_depar
         foreignColumns: [userMasterInFinanceProject.id],
         name: "tally_department_updated_by_fkey"
       }),
+    }
+  });
+
+export const staffMasterInFinanceProject = financeProject.table("staff_master", {
+  id: serial("id").primaryKey().notNull(),
+  name: varchar("name", { length: 25 }).notNull(),
+  empNo: text("emp_no").notNull(),
+  isactive: boolean("isactive").notNull(),
+  notes: varchar("notes", { length: 255 }),
+  description: varchar("description", { length: 255 }),
+  createdAt: timestamp("created_at", { mode: 'string' }),
+  updatedAt: timestamp("updated_at", { mode: 'string' }),
+  createdBy: integer("created_by").notNull(),
+  updatedBy: integer("updated_by"),
+  department: integer("department").notNull(),
+  designation: varchar("designation", { length: 155 }),
+  natureOfEmployment: varchar("nature_of_employment", { length: 70 }),
+  program: varchar("program", { length: 70 }),
+  stateId: varchar("state_id", { length: 255 }),
+  locationId: varchar("location_id", { length: 255 }),
+  level: integer("level"),
+  email: varchar("email", { length: 255 }),
+  subDeptid: integer("sub_deptid"),
+},
+  (table) => {
+    return {
+      departmentMasterByFkey: foreignKey({
+        columns: [table.department],
+        foreignColumns: [departmentMasterInFinanceProject.id],
+        name: "department_master_by_fkey"
+      }),
+      staffMasterCreatedByFkey: foreignKey({
+        columns: [table.createdBy],
+        foreignColumns: [userMasterInFinanceProject.id],
+        name: "staff_master_created_by_fkey"
+      }),
+      staffMasterUpdatedByFkey: foreignKey({
+        columns: [table.updatedBy],
+        foreignColumns: [userMasterInFinanceProject.id],
+        name: "staff_master_updated_by_fkey"
+      }),
+      fkSubDeptid: foreignKey({
+        columns: [table.subDeptid],
+        foreignColumns: [departmentMasterInFinanceProject.id],
+        name: "fk_sub_deptid"
+      }),
+      staffMasterEmpNoKey: unique("staff_master_emp_no_key").on(table.empNo),
     }
   });
 

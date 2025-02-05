@@ -4,17 +4,25 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import type { StaffFilterFormProps } from "./staff";
 import { api } from '~/trpc/react';
 import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 // Department, designation ,  status ( Active or Inactive ),  
 const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect }) => {
-
+  const userData = useSession()
   // Fetch data with pagination
   const { data: designations, refetch: designationsFetch } = api.get.getDesignation.useQuery();
-  const { data, refetch } = api.get.getDepartments.useQuery(
-    { page: 1, limit: 100 },
-    { enabled: false } // Disable automatic query execution
-  );
-
+  // get head departments 
+  // const { data, refetch } = api.get.getDepartments.useQuery(
+  //   { page: 1, limit: 100 },
+  //   { enabled: false } // Disable automatic query execution
+  // );
+  const {data,refetch} = api.get.getHeadDepartments.useQuery()
+  // get subdepartmen{ts of that department if not  every sub department
+  const {data:subDeptsData} = api.get.getSubDepartments.useQuery(userData.data?.user.departmentId?{
+    deptId: userData.data.user.departmentId
+  }:{
+    deptId:undefined
+  })
   // Trigger refetch on page or limit change
   useEffect(() => {
     void designationsFetch();
@@ -23,8 +31,8 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
 
   return (
     <>
-      <div className='w-52'>
-        <DropdownMenu.Root>
+      <div className='w-44'>
+        {/* <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
               <span>
@@ -51,10 +59,78 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>
+        </DropdownMenu.Root> */}
+        
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+              <span>
+                {filters.departmentname || 'Select Department'}
+              </span>
+
+              <RiArrowDropDownLine size={30} />
+            </button>
+          </DropdownMenu.Trigger>
+          {
+            userData.data?.user.role == 1 && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+              <DropdownMenu.Item
+                className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                onSelect={() => handleSelect('department', { departmentname: '' })}
+              >
+                All
+              </DropdownMenu.Item>
+              {data?.map((dep) => (
+                <DropdownMenu.Item
+                  key={dep?.value}
+                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                  onSelect={() => handleSelect('department', dep)}
+                >
+                  {dep.label}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Content>
+          }
+          
         </DropdownMenu.Root>
       </div>
 
-      <div className='w-52'>
+      {/* sub departments here */}
+      <div className='w-44'>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+              <span>
+                {filters.subdepartmentname || 'Select Sub Dept'}
+              </span>
+
+              <RiArrowDropDownLine size={30} />
+            </button>
+          </DropdownMenu.Trigger>
+          {
+            (userData.data?.user.role == 2 || userData.data?.user.role == 1) && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+               <DropdownMenu.Item
+                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                  onSelect={() => handleSelect('subdepartment', { subdepartmentname: '' })}
+                >
+                  All
+                </DropdownMenu.Item>
+              
+              {subDeptsData?.map((dep) => (
+                <DropdownMenu.Item
+                  key={dep?.value}
+                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                  onSelect={() => handleSelect('subdepartment', dep)}
+                >
+                  {dep.label}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Content>
+          }
+          
+        </DropdownMenu.Root>
+      </div>
+
+      <div className='w-44'>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
@@ -85,7 +161,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
         </DropdownMenu.Root>
       </div>
 
-      <div className='w-52'>
+      <div className='w-44'>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger className="w-full" asChild>
             <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>

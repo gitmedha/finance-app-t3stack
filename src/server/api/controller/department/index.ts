@@ -133,6 +133,32 @@ export const getHeadDepartments = protectedProcedure.query(async ({ ctx }) => {
     };
   });
 });
+export const getSubDepartments = protectedProcedure
+  .input(z.object({
+    deptId:z.number().optional()
+  }))
+  .query(async ({ctx,input})=>{
+    const baseConditions = [eq(departmentMaster.type, "Sub Department")]
+    if(input.deptId)
+    {
+      baseConditions.push(eq(departmentHierarchyInFinanceProject.parentId,input.deptId))
+    }
+    const subDepartments = await ctx.db
+      .select({
+        id: departmentMaster.id,
+        name: departmentMaster.departmentname,
+      })
+      .from(departmentMaster)
+      .leftJoin(departmentHierarchyInFinanceProject,eq(departmentHierarchyInFinanceProject.deptId,departmentMaster.id))
+      .where(and(...baseConditions))
+
+    return subDepartments.map((sub)=>{
+      return {
+        value: sub.id,
+        label: sub.name,
+      }
+    })
+  })
 export const getDepartmentsTypes = protectedProcedure.query(async ({ ctx}) => {
   const departmentsType = await ctx.db.select({
     type: departmentMaster.type,

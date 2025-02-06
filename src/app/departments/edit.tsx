@@ -1,6 +1,6 @@
 // pages/ProfileEditPage.tsx
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
 import { IconButton, Button, Flex } from "@radix-ui/themes";
@@ -22,22 +22,28 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
     register,
     control,
     handleSubmit,
+    // setValue,
+    watch,
     formState: { errors },
     reset,
   } = useForm<Department>({
     defaultValues: item,
   });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const types = [
     { value: "Sub Department", label: "Sub Department" },
-    { value: "Cluster", label: "Cluster" },
     { value: "Department", label: "Department" },
   ];
-
+  useEffect(() => {
+      reset(item); 
+  }, [item,reset]);
+  const [typeData, setTypeData] = useState<null|{ label: string, value: string }>(item.typeData)
+  
   const handleSave = () => {
     setIsModalOpen(false);
   };
-
+  const { data: departmentData } = api.get.getHeadDepartments.useQuery();
   const { mutate: editDepartment } = api.post.editDepartment.useMutation({
     async onSuccess() {
       refetch();
@@ -48,14 +54,17 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
       console.error("Error adding staff:", err);
     },
   });
-
+  // const selectedTypeData = watch("typeData");
   const onSubmit: SubmitHandler<Department> = async (data) => {
     try {
+      if (data.typeData.value == "Sub Department" && !data.departmentData.value )
+        throw new Error("Sub department needs to have the parent department")
       const submissionData = {
         id: data.id,
         departmentname: data.departmentname,
         deptCode: Number(data.deptCode),
         type: data.typeData.value ?? item.typeData.value,
+        departmentId:data.departmentData.value,
         updatedBy: userData.data?.user.id ?? 1,
         isactive: true,
         updatedAt: new Date().toISOString().split("T")[0] ?? "",
@@ -68,7 +77,6 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
       console.error("Error adding staff:", error);
     }
   };
-
   return (
     <>
       <IconButton
@@ -80,76 +88,113 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
 
       <Modal
         className=""
-        title="Add Departments"
-        description="Make changes to your profile."
+        title="Edit Department"
+        description="Make changes to existing department."
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
       >
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Name Field */}
-          <div>
-            <label className="text-sm">
-              Name <span className="text-red-400">*</span>
-            </label>
-            <input
-              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              placeholder="Enter department name"
-              {...register("departmentname", { required: "Name is required" })}
-            />
-            {errors.departmentname && (
-              <span className="text-xs text-red-500">
-                {errors.departmentname.message}
-              </span>
-            )}
-          </div>
-
-          {/* Code Field */}
-          <div>
-            <label className="text-sm">
-              Department Code <span className="text-red-400">*</span>
-            </label>
-            <input
-              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              placeholder="Enter Code"
-              type="number"
-              {...register("deptCode", {
-                required: "Department Code is required",
-              })}
-            />
-            {errors.deptCode && (
-              <span className="text-xs text-red-500">
-                {errors.deptCode.message}
-              </span>
-            )}
-          </div>
-
-          {/* Types Dropdown */}
-          <div>
-            <label className="text-sm">
-              Types <span className="text-red-400">*</span>
-            </label>
-            <Controller
-              name="typeData"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onChange={field.onChange}
-                  defaultValue={item.typeData}
-                  options={types}
-                  placeholder="Select a Type"
-                  isClearable
-                  aria-invalid={!!errors.type}
-                />
+        <form onSubmit={handleSubmit(onSubmit)} >
+          <div className="flex gap-2">
+            {/* Name Field */}
+            <div className="w-1/2">
+              <label className="text-sm">
+                Name <span className="text-red-400">*</span>
+              </label>
+              <input
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                placeholder="Enter department name"
+                {...register("departmentname", { required: "Name is required" })}
+              />
+              {errors.departmentname && (
+                <span className="text-xs text-red-500">
+                  {errors.departmentname.message}
+                </span>
               )}
-            />
-
-            {errors.type && (
-              <span className="text-xs text-red-500">
-                {errors.type.message}
-              </span>
-            )}
+            </div>
+            {/* Code Field */}
+            <div className="w-1/2">
+              <label className="text-sm">
+                Department Code <span className="text-red-400">*</span>
+              </label>
+              <input
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                placeholder="Enter Code"
+                type="number"
+                {...register("deptCode", {
+                  required: "Department Code is required",
+                })}
+              />
+              {errors.deptCode && (
+                <span className="text-xs text-red-500">
+                  {errors.deptCode.message}
+                </span>
+              )}
+            </div>
           </div>
+          
+          <div className="flex gap-2">
+            {/* Types Dropdown */}
+            <div className={` ${typeData && typeData.value != "Sub Department" ? " " : "pb-6 w-1/2"} w-1/2`}>
+              <label className="text-sm" >
+                Types <span className="text-red-400">*</span>
+              </label>
+              <Controller
+                name="typeData"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    onChange={(selectedOption) => {
+                      field.onChange(selectedOption); // Update React Hook Form state
+                      setTypeData(selectedOption);
+                    }}
+                    defaultValue={item.typeData}
+                    options={types}
+                    placeholder="Select a Type"
+                    isClearable
+                    aria-invalid={!!errors.typeData}
+                  />
+                )}
+              />
+
+              {errors.typeData && (
+                <span className="text-xs text-red-500">
+                  {errors.typeData.message}
+                </span>
+              )}
+            </div>
+
+            {/*Departments dropdown  */}
+            {(typeData && typeData.value == "Sub Department") && <div className={`${isDropdownOpen ? "pb-52" : ""} w-1/2`}>
+              <label className="text-sm">
+                Parent Department <span className="text-red-400">*</span>
+              </label>
+              <Controller
+                name="departmentData"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onChange={field.onChange}
+                    defaultValue={item.departmentData}
+                    options={departmentData}
+                    placeholder="Select a Department"
+                    isClearable
+                    aria-invalid={!!errors.departmentData}
+                    onMenuOpen={() => setIsDropdownOpen(true)}
+                    onMenuClose={() => { setIsDropdownOpen(false) }}
+                  />
+                )}
+              />
+
+              {errors.departmentData && (
+                <span className="text-xs text-red-500">
+                  {errors.departmentData.message}
+                </span>
+              )}
+            </div>}
+          </div>
+          
 
           <Flex gap="3" mt="4" justify="end">
             <Button

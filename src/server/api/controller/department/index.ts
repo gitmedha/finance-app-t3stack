@@ -5,7 +5,7 @@ import {
   protectedProcedure,
 } from "~/server/api/trpc";
 import { db } from "~/server/db";
-import { departmentMasterInFinanceProject as departmentMaster } from "~/server/db/schema";
+import { departmentHierarchyInFinanceProject, departmentMasterInFinanceProject as departmentMaster, departmentMasterInFinanceProject } from "~/server/db/schema";
 
 export const getDepartments = protectedProcedure
   .input(
@@ -29,7 +29,7 @@ export const getDepartments = protectedProcedure
       ? eq(departmentMaster.isactive, status === "Active")
       : undefined;
     const typeCondition = type ? eq(departmentMaster.type, type) : undefined;
-
+    const departmentMasterAlias = departmentMaster 
     const departments = await ctx.db
       .select({
         id: departmentMaster.id,
@@ -43,9 +43,20 @@ export const getDepartments = protectedProcedure
         updatedAt: departmentMaster.updatedAt,
         createdBy: departmentMaster.createdBy,
         updatedBy: departmentMaster.updatedBy,
+        parentId: departmentHierarchyInFinanceProject.parentId, 
         // count: count()
       })
       .from(departmentMaster)
+      .leftJoin(
+        departmentHierarchyInFinanceProject,
+        and(eq(departmentMasterInFinanceProject.id, departmentHierarchyInFinanceProject.deptId), eq(departmentMasterInFinanceProject.isactive, true))
+        
+      )
+      // .leftJoin(
+      //   departmentMasterAlias,
+      //   eq(departmentHierarchyInFinanceProject.parentId, departmentMasterAlias.id)
+      // )
+
       .where(and(searchCondition, statusCondition, typeCondition))
       .orderBy(desc(departmentMaster.createdAt))
       .offset(offset)
@@ -56,6 +67,7 @@ export const getDepartments = protectedProcedure
       .from(departmentMaster)
       .where(and(searchCondition, statusCondition, typeCondition)); // Count with filter if searchCondition is defined
 
+
     const totalCount = totalCountResult[0]?.count ?? 0;
     const updatedDepartment = [];
     for (const department of departments) {
@@ -63,10 +75,21 @@ export const getDepartments = protectedProcedure
         value: department.type ?? "",
         label: department.type ?? "",
       };
-
+      const departmentData:{value:number|null,label:string|undefined} = {
+        value: department.parentId,
+        label:undefined
+      }
+      if(departmentData.value)
+      {
+        const departmentName = await ctx.db.select({ departmentName: departmentMaster.departmentname}).from(departmentMaster).where(eq(departmentMaster.id,departmentData.value))
+        departmentData.label = departmentName[0]?.departmentName
+      }
+      
+      
       updatedDepartment.push({
         ...department,
         typeData,
+        departmentData
       });
     }
 
@@ -93,16 +116,59 @@ export const getAllDepartments = protectedProcedure.query(async ({ ctx }) => {
   });
 });
 
-// export const getDepartmentsTypes = protectedProcedure.query(async ({ ctx, input }) => {
-//   const departmentsType = await ctx.db.select({
-//     type: departmentMaster.type,
-//   })
-//   .from(departmentMaster).groupBy(departmentMaster.type); // Group by type to get unique values
+export const getHeadDepartments = protectedProcedure.query(async ({ ctx }) => {
+  const departments = await ctx.db
+    .select({
+      id: departmentMaster.id,
+      name: departmentMaster.departmentname,
+    })
+    .from(departmentMaster)
+    .where(eq(departmentMaster.type,"Department"))
+    
 
-//   return {
-//     departmentsType,
-//   };
-// })
+  return departments.map((department) => {
+    return {
+      value: department.id,
+      label: department.name,
+    };
+  });
+});
+export const getSubDepartments = protectedProcedure
+  .input(z.object({
+    deptId:z.number().optional()
+  }))
+  .query(async ({ctx,input})=>{
+    const baseConditions = [eq(departmentMaster.type, "Sub Department")]
+    if(input.deptId)
+    {
+      baseConditions.push(eq(departmentHierarchyInFinanceProject.parentId,input.deptId))
+    }
+    const subDepartments = await ctx.db
+      .select({
+        id: departmentMaster.id,
+        name: departmentMaster.departmentname,
+      })
+      .from(departmentMaster)
+      .leftJoin(departmentHierarchyInFinanceProject,eq(departmentHierarchyInFinanceProject.deptId,departmentMaster.id))
+      .where(and(...baseConditions))
+
+    return subDepartments.map((sub)=>{
+      return {
+        value: sub.id,
+        label: sub.name,
+      }
+    })
+  })
+export const getDepartmentsTypes = protectedProcedure.query(async ({ ctx}) => {
+  const departmentsType = await ctx.db.select({
+    type: departmentMaster.type,
+  })
+  .from(departmentMaster).groupBy(departmentMaster.type); // Group by type to get unique values
+
+  return {
+    departmentsType,
+  };
+})
 
 export const addDepartment = protectedProcedure
   .input(
@@ -115,23 +181,29 @@ export const addDepartment = protectedProcedure
       description: z.string().optional().nullable(),
       createdBy: z.number().min(1, "Invalid creator ID"),
       createdAt: z.string(),
+      parentId:z.number().optional().nullable()
     }),
   )
   .mutation(async ({ ctx, input }) => {
     try {
       // Format data for insertion
-      const formattedInput = {
-        ...input,
-      };
+      const {parentId,...formattedInput} =input;
 
       // Insert new department member into the database
       const result = await ctx.db
         .insert(departmentMaster)
-        .values(formattedInput);
+        .values(formattedInput)
+        .returning()
+      let createdHirarchey = null
+      if(result[0] && parentId )
+      {
+        createdHirarchey = await ctx.db.insert(departmentHierarchyInFinanceProject).values({ deptId: result[0].id, parentId, createdAt: formattedInput.createdAt, createdBy: formattedInput.createdBy, isactive: formattedInput.isactive ?? false }).returning()
+      }
       return {
         success: true,
         message: "Department member added successfully",
         department: result[0], // Return the created department record
+        createdHirarchey:createdHirarchey ? createdHirarchey[0]:null
       };
     } catch (error) {
       console.error("Error adding department:", error);
@@ -145,6 +217,7 @@ export const editDepartment = protectedProcedure
       id: z.number().min(1, "Department ID is required"),
       departmentname: z.string().optional(),
       type: z.string().optional(),
+      departmentId:z.number().optional().nullable(),
       deptCode: z.number().optional(),
       isactive: z.boolean().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
@@ -153,7 +226,7 @@ export const editDepartment = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      const { id, updatedBy, updatedAt, ...fieldsToUpdate } = input;
+      const { id, updatedBy, updatedAt, departmentId, ...fieldsToUpdate} = input;
 
       // Check if the department exists
       const existingDepartment =
@@ -176,11 +249,61 @@ export const editDepartment = protectedProcedure
         .where(eq(departmentMaster.id, id))
         .returning(); // Correct usage of eq()
       // .returning("*");
+      // if the type moved from department to sub department or if sub department changed 
+      let updateHirarchey = null;
+      if (departmentId && fieldsToUpdate.type == "Sub Department")
+      {
+        // do we have department id in the hirarchey table 
+        const existingHirarcheyId = await ctx.db.query.departmentHierarchyInFinanceProject.findFirst({
+          where: eq(departmentHierarchyInFinanceProject.deptId,id)
+        })
+        // if  yes then we just going to update the existing data
+        if(existingHirarcheyId)
+        {
+          
+          updateHirarchey = await ctx.db.update(departmentHierarchyInFinanceProject)
+            .set(
+              {parentId:departmentId,
+                isactive:true,
+                updatedAt,
+                updatedBy
+              }
+            )
+            .where(eq(departmentHierarchyInFinanceProject.deptId,id))
+            .returning()
+        }
+        // if the hirarchey not present then we going to create new one
+        else{
+          updateHirarchey = await ctx.db.insert(departmentHierarchyInFinanceProject).values({ deptId: id, parentId: departmentId, createdAt: updatedAt, createdBy: updatedBy, isactive: fieldsToUpdate.isactive ?? false})
+        }
+      }
+      // this runs when the type is department thinking that they may have changed the type sub dept to dept
+      else{
+        const existingHirarcheyId = await ctx.db.query.departmentHierarchyInFinanceProject.findFirst({
+          where: eq(departmentHierarchyInFinanceProject.deptId, id)
+        })
+        // if they made like that then we going to make it is active false
+        if(existingHirarcheyId){
+          
+            await ctx.db.update(departmentHierarchyInFinanceProject)
+            .set(
+              {
+                isactive:false,
+                updatedAt,
+                updatedBy
+              }
+            )
+            .where(eq(departmentHierarchyInFinanceProject.deptId, id))
+            .returning()
+        }
+        
+      }
 
       return {
         success: true,
         message: "Department updated successfully",
         department: updatedDepartment[0], // Return the updated department record
+        parentId:updateHirarchey ? updateHirarchey[0]?.parentId : null, 
       };
     } catch (error) {
       console.error("Error updating department:", error);
@@ -192,11 +315,13 @@ export const deleteDepartment = protectedProcedure
   .input(
     z.object({
       id: z.number().min(1, "Department ID is required"), // Department ID to locate the record
+      updatedBy: z.number().min(1, "Invalid updater ID"),
+      updatedAt: z.string(),
     }),
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      const { id } = input;
+      const { id ,updatedAt,updatedBy} = input;
 
       // Check if the department exists
       const existingDepartment =
@@ -213,11 +338,27 @@ export const deleteDepartment = protectedProcedure
         .update(departmentMaster)
         .set({
           isactive: false,
+          updatedAt,
+          updatedBy
         })
         .where(eq(departmentMaster.id, id))
         .returning(); // Correct usage of eq()
       // .returning("*");
-
+      const existingHirarcheyId = await ctx.db.query.departmentHierarchyInFinanceProject.findFirst({
+        where: eq(departmentHierarchyInFinanceProject.deptId, id)
+      })
+      if (existingHirarcheyId) {
+        await ctx.db.update(departmentHierarchyInFinanceProject)
+          .set(
+            {
+              isactive: false,
+              updatedAt,
+              updatedBy
+            }
+          )
+          .where(eq(departmentHierarchyInFinanceProject.deptId, id))
+          .returning()
+      }
       return {
         success: true,
         message: "Department member deleted successfully",

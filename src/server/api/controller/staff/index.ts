@@ -24,11 +24,12 @@ export const getStaffs = protectedProcedure
       department: z.number().optional().default(0), 
       status: z.string().optional().default("Active"), 
       designation: z.string().optional().default(""), 
+      subdepartment:z.number().optional().default(0),
     }),
   )
   .query(async ({ ctx, input }) => {
     console.log(input)
-    const { page, limit, searchTerm, status, department, designation } = input;
+    const { page, limit, searchTerm, status, department, designation ,subdepartment} = input;
     const offset = (page - 1) * limit;
     // Apply the search condition only if searchTerm is not an empty string
     const searchCondition = searchTerm
@@ -36,6 +37,8 @@ export const getStaffs = protectedProcedure
       : undefined;
     const departmentCondition =
       department === 0 ? undefined : eq(staffMaster.department, department);
+    const subdepartmentCondition = 
+      subdepartment == 0 ? undefined:eq(staffMaster.subDeptid,subdepartment)
     const statusCondition = eq(staffMaster.isactive, status === "Active");
     const designationCondition = designation
       ? eq(staffMaster.designation, designation)
@@ -93,6 +96,7 @@ export const getStaffs = protectedProcedure
           departmentCondition,
           statusCondition,
           designationCondition,
+          subdepartmentCondition,
         ),
       )
       .orderBy(desc(staffMaster.createdAt))

@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 // import { BiComment } from "react-icons/bi";
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { api } from '~/trpc/react';
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
 
 interface ActivityBudgetProps {
   section: string;
@@ -16,6 +16,7 @@ interface ActivityBudgetProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
+  subdepartmentId: number
 }
 interface totalschema {
   totalQ1: number
@@ -80,7 +81,7 @@ const months = [
   "Mar",
 ];
 
-const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen }) => {
+const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [inputStates, setInputStates] = useState<boolean>(true)
   const userData = useSession()
@@ -148,12 +149,13 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
-    activity: (filter?.map)?.toString()
+    activity: (filter?.map)?.toString(),
+    subDeptId:subdepartmentId
   },{
     staleTime:0
   })
   useEffect(() => {
-    if (programData?.budgetId == budgetId) {
+    if (programData?.budgetId == budgetId && programData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (programData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
@@ -371,6 +373,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {

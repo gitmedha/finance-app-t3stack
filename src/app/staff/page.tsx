@@ -11,6 +11,7 @@ import DeleteStaff from "./delete";
 import AddStaff from "./add";
 import { api } from "~/trpc/react";
 import type { GetStaffsResponse, StaffItem } from "./staff";
+import { useSession } from "next-auth/react";
 
 const cols = [
   "Name",
@@ -27,15 +28,18 @@ const cols = [
 ];
 
 export default function Staff() {
+  const userData = useSession()
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearch] = useState("");
 
   const [filters, setFilters] = useState({
-    department: 0,
-    departmentname: "",
+    department: userData.data?.user.departmentId ? userData.data?.user.departmentId: 0,
+    departmentname: userData.data?.user.departmentName ? userData.data?.user.departmentName : "",
     status: "Active",
     designation: "",
+    subdepartment:userData.data?.user.subDepartmentId ?? 0,
+    subdepartmentname:userData.data?.user.subDepartmentName?? "",
   });
 
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
@@ -71,10 +75,19 @@ export default function Staff() {
     if (name === "department") {
       setFilters((prev) => ({
         ...prev,
-        [name]: (value as any)?.id ?? 0, // Using 'any' with optional chaining
-        departmentname: (value as any)?.departmentname, // Using 'any' with optional chaining
+        [name]: (value as any)?.value ?? 0, // Using 'any' with optional chaining
+        departmentname: (value as any)?.label, // Using 'any' with optional chaining
       }));
-    } else if (name === "status") {
+    }
+    else if (name == "subdepartment")
+    {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: (value as any)?.value ?? 0, // Using 'any' with optional chaining
+        subdepartmentname: (value as any)?.label, // Using 'any' with optional chaining
+      }));
+    } 
+    else if (name === "status") {
       setFilters((prev) => ({
         ...prev,
         [name]: (value as any)?.value, // Using 'any' with optional chaining
@@ -130,7 +143,10 @@ export default function Staff() {
               selectedLimit={limit}
               onLimitChange={handleLimitChange}
             />
-            <AddStaff refetch={refetch}/>
+            {
+              userData.data?.user.role == 1 && <AddStaff refetch={refetch} />
+            }
+            
           </div>
         </div>
 
@@ -151,11 +167,25 @@ export default function Staff() {
               <thead>
                 <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
                   {cols?.map((col) => {
-                    return (
-                      <th key={col} className="p-2">
-                        {col}
-                      </th>
-                    );
+                    if (col == "Actions")
+                    {
+                      if (userData.data?.user.role == 1)
+                      {
+                        return (
+                          <th key={col} className="p-2">
+                            {col}
+                          </th>
+                        );
+                      }
+                    }
+                    else{
+                      return (
+                        <th key={col} className="p-2">
+                          {col}
+                        </th>
+                      );
+                    }
+                    
                   })}
                 </tr>
               </thead>
@@ -187,10 +217,13 @@ export default function Staff() {
                         {item.isactive ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="space-x-2 p-1">
-                      <EditStaff item={item} refetch={refetch} />
-                      <DeleteStaff item={item} refetchStaffs={refetch} />
-                    </td>
+                    {
+                      userData.data?.user.role == 1 && <td className="space-x-2 p-1">
+                        <EditStaff item={item} refetch={refetch} />
+                        <DeleteStaff item={item} refetchStaffs={refetch} />
+                      </td>
+                    }
+                    
                   </tr>
                 ))}
               </tbody>

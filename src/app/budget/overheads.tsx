@@ -14,6 +14,7 @@ interface OverHeadsProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
+  subdepartmentId: number
 }
 
 interface LevelData {
@@ -34,7 +35,7 @@ const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
-const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, deptId ,status,sectionOpen,setSectionOpen}) => {
+const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, deptId ,status,sectionOpen,setSectionOpen,subdepartmentId}) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   
   const userData = useSession()
@@ -130,18 +131,18 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       }
     })
   }
-  // const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
-  //   budgetId,
-  //   catId: categoryId,
-  //   deptId: Number(deptId),
-  // });
   const { data: overHeadData, isLoading:overHeadDataLodaing } = api.get.getOverHeadsData.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
+    subDeptId:subdepartmentId
+  },{
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0, 
   })
   useEffect(() => {
-    if (overHeadData?.budgetId == budgetId) {
+    if (overHeadData?.budgetId == budgetId && overHeadData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (overHeadData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
@@ -242,6 +243,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {

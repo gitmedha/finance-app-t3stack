@@ -7,6 +7,8 @@ interface FilterOptions {
   department: string; // Department ID as string
   departmentname: string; // Department name as string
   year: string; // Year as string
+  subdepartmentId:number
+  subdepartmentName:string
 }
 interface BudgetFilterFormProps {
   filters: FilterOptions;

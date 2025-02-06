@@ -20,6 +20,7 @@ type HandleSelectValue =
   | number; // For numeric values
 
 
+
 const Budget: React.FC = () => {
   // Explicitly define the type for filters
   const userData = useSession()
@@ -29,11 +30,12 @@ const Budget: React.FC = () => {
     department: userData.data?.user.departmentId?.toString() ?? '', 
     departmentname: userData.data?.user.departmentName ?? " ",
     year: '',
+    // need to be updated wit respect to user login
+    subdepartmentId: userData.data?.user.subDepartmentId ?? 0,
+    subdepartmentName: userData.data?.user.subDepartmentName ?? ""
   });
   const [budgetId,setBudgetId] = useState<number|null>(null)
   const handleSelect = (name: string, value: HandleSelectValue) => {
-    // setBudgetId(null)
-    console.log("I am getting hitted")
     if (name === 'department' && typeof value === 'object' && value !== null) {
       const departmentValue = value as { id: string; departmentname: string }; // Narrow type
       setFilters((prev) => ({
@@ -41,7 +43,16 @@ const Budget: React.FC = () => {
         department: departmentValue.id, // Use the explicit type
         departmentname: departmentValue.departmentname, // Extract department name
       }));
-    } else if (name === 'year' && typeof value === 'string') {
+    }
+    else if (name === 'subdepartment' && typeof value === 'object' && value !== null){
+      const subDeptVal = value as { id: number; departmentname: string }; // Narrow type
+      setFilters((prev) => ({
+        ...prev,
+        subdepartmentId: subDeptVal.id, 
+        subdepartmentName: subDeptVal.departmentname,
+      }));
+    } 
+    else if (name === 'year' && typeof value === 'string') {
       setFilters((prev) => ({
         ...prev,
         [name]: value, // Year is a string
@@ -82,12 +93,12 @@ const Budget: React.FC = () => {
       }
       {
         budgetId && !isLoading && <div>
-          <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} travelCatId={data?.categories[2] ? data?.categories[2].categoryId : 3}/>
-          <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} />
-          <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen}/>
-          <ProgramOffice section='PROGRAM OFFICE' categoryId={data?.categories[3] ? data?.categories[3].categoryId : 4} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen} />
-          <CapitalCost section='CAPITAL COST' categoryId={data?.categories[4] ? data?.categories[4].categoryId : 5} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen}/>
-          <OverHeads section='OVERHEADS' categoryId={data?.categories[5] ? data?.categories[5].categoryId : 6} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen}/>
+          <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} travelCatId={data?.categories[2] ? data?.categories[2].categoryId : 3} subdepartmentId={filters.subdepartmentId}/>
+          <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} subdepartmentId={filters.subdepartmentId} />
+          <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} subdepartmentId={filters.subdepartmentId} />
+          <ProgramOffice section='PROGRAM OFFICE' categoryId={data?.categories[3] ? data?.categories[3].categoryId : 4} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen} subdepartmentId={filters.subdepartmentId} />
+          <CapitalCost section='CAPITAL COST' categoryId={data?.categories[4] ? data?.categories[4].categoryId : 5} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen} subdepartmentId={filters.subdepartmentId} />
+          <OverHeads section='OVERHEADS' categoryId={data?.categories[5] ? data?.categories[5].categoryId : 6} budgetId={budgetId} deptId={filters.department} status={status} sectionOpen={sectionOpen} setSectionOpen={setSectionOpen} subdepartmentId={filters.subdepartmentId} />
         </div>
       }      
     </div>

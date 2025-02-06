@@ -4,7 +4,7 @@ import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 interface ProgramOfficeProps {
   section: string;
   categoryId: number;
@@ -13,6 +13,7 @@ interface ProgramOfficeProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
+  subdepartmentId: number
 }
 
 interface LevelData {
@@ -33,8 +34,8 @@ const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
-const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen }) => {
-  const userData = useSession()
+const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen,subdepartmentId}) => {
+const userData = useSession()
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -125,18 +126,19 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       });
     });
   };
-  // const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
-  //   budgetId,
-  //   catId: categoryId,
-  //   deptId: Number(deptId),
-  // });
+
   const { data: programOfficeData, isLoading: programOfficeDataLodaing } = api.get.getProgramOfficeData.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
+    subDeptId:subdepartmentId
+  },{
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0, 
   })
   useEffect(() => {
-    if (programOfficeData?.budgetId == budgetId) {
+    if (programOfficeData?.budgetId == budgetId && programOfficeData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (programOfficeData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
@@ -197,7 +199,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
       }
     }
   }, [programOfficeData])
-  // useEffect(() => {
+ 
   //   const initialData: TableData = {};
 
   //   if (data?.subCategories) {
@@ -287,6 +289,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {

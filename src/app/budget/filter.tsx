@@ -18,6 +18,12 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
       refetchOnWindowFocus: false,
       staleTime: 0, }
   );
+  const { data: subdepartmentData } = api.get.getSubDepts.useQuery({ deptId: Number(filters.department) }, {
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    enabled: !!filters.department
+  })
   // Define years from 2023-24 to 2029-30
   const years = [
      "2023-24", "2024-25", "2025-26", "2026-27",
@@ -75,9 +81,10 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     }
   }
   useEffect(() => {
-    console.log(userData.data)
     if (userData.data?.user.departmentId && userData.data?.user.departmentName)
       handleSelect("department", { id: userData.data?.user.departmentId, departmentname: userData.data?.user.departmentName })
+    if (userData.data?.user.subDepartmentId && userData.data?.user.subDepartmentName)
+      handleSelect("subdepartment", { id: userData.data?.user.subDepartmentId, departmentname: userData.data?.user.subDepartmentName })
   }, [userData])
   useEffect(()=>{
     if (years[0]){
@@ -96,7 +103,20 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
         }
       }
     }
+
   }, [data]);
+  useEffect(()=>{
+    if (!userData.data?.user.subDepartmentId && !userData.data?.user.subDepartmentName) {
+      if (subdepartmentData?.subdepartments?.length) {
+        const sortedDepartments = [...subdepartmentData.subdepartments].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        if (sortedDepartments[0]) {
+          handleSelect("subdepartment", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].name })
+        }
+      }
+    }
+  }, [subdepartmentData])
 
   // creating the budget
   const createBudgetMutation = api.post.createBudget.useMutation();
@@ -125,13 +145,13 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   return (
     <div>
       <div className='flex justify-between'>
-        <div className="flex justify-start items-center space-x-2">
+        <div className="flex justify-start items-center space-x-4">
           <div className="w-52">
             {/* Department Dropdown */}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                  <span>{filters.departmentname}</span>
+                  <span>{filters.departmentname}{filters.department}</span>
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
@@ -155,7 +175,34 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             </DropdownMenu.Root>
 
           </div>
+          {/* Sub department dropdown */}
+          <div className="w-58">
+          <DropdownMenu.Root >
+            <DropdownMenu.Trigger asChild className='!w-full'>
+              <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                <span>{filters.subdepartmentName}{filters.subdepartmentId}</span>
+                <RiArrowDropDownLine size={30} />
+              </button>
+            </DropdownMenu.Trigger>
+            {/* drop down only when user role is 1 that means when the user is admin */}
+            {
+              userData.data?.user.role != 3 && 
+              <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-fit">
+                {subdepartmentData?.subdepartments.sort((a, b) => a.name.localeCompare(b.name))
+                  .map((dep) => (
+                    <DropdownMenu.Item
+                      key={dep.id}
+                      className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                      onSelect={() => handleSelect("subdepartment", { id: dep.id, departmentname: dep.name })} // Pass entire department object
+                    >
+                      {dep.name}
+                    </DropdownMenu.Item>
+                  ))}
 
+              </DropdownMenu.Content>
+            }
+          </DropdownMenu.Root>
+          </div>
           <div className="w-52">
             {/* Year Dropdown */}
             <DropdownMenu.Root>
@@ -195,7 +242,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           {
             budgetId && <div className='flex justify-end items-center space-x-2'>
               {
-                userData.data?.user.role != 1 && status == "draft" && <Button
+                userData.data?.user.role == 2 && status == "draft" && <Button
                   type="button"
                   className="!cursor-pointer !text-white !bg-primary px-2"
                   variant="soft"

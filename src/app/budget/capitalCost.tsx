@@ -2,7 +2,7 @@ import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
 interface CapitalCostProps {
   section: string;
   categoryId: number;
@@ -11,6 +11,7 @@ interface CapitalCostProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS")=>void
+  subdepartmentId: number
 }
 
 interface LevelData {
@@ -30,7 +31,7 @@ const months = [
   "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
 ];
 
-const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status,sectionOpen,setSectionOpen }) => {
+const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
   // state to disable and enable the save and edit button
   const[inputStates,setInputStates] = useState<boolean>(true)
   const [saveBtnState,setSaveBtnState] = useState<"loading"|"edit"|"save">("loading")
@@ -125,24 +126,21 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     });
   };
 
-  // const { data: categoriesBudgetDetails, isLoading, error } = api.get.getCatsBudgetDetails.useQuery({
-  //   budgetId,
-  //   catId: categoryId,
-  //   deptId: Number(deptId),
-  // },{
-  //   enabled:!!budgetId
-  // });
   const { data: capitalCostData, isLoading: capitalCostDataLodaing } = api.get.getCapitalCostData.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
+    subDeptId:subdepartmentId
+  },{
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0, 
   })
   useEffect(() => {
-    if (capitalCostData?.budgetId == budgetId) {
+    if (capitalCostData?.budgetId == budgetId && capitalCostData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (capitalCostData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-        console.log("After getting the subcategories")
         capitalCostData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
             Count: "",
@@ -199,61 +197,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
 
     }
   }, [capitalCostData])
-  // useEffect(() => {
-  //   const initialData: TableData = {};
-
-  //   if (data?.subCategories) {
-  //     data.subCategories.forEach((sub) => {
-  //       initialData[sub.subCategoryId] = {
-  //         Count: "",
-  //         Apr: "0",
-  //         May: "0",
-  //         Jun: "0",
-  //         Jul: "0",
-  //         Aug: "0",
-  //         Sep: "0",
-  //         Oct: "0",
-  //         Nov: "0",
-  //         Dec: "0",
-  //         Jan: "0",
-  //         Feb: "0",
-  //         Mar: "0",
-  //         budgetDetailsId: 0,
-  //       };
-  //     });
-  //   }
-  //   if (categoriesBudgetDetails && categoriesBudgetDetails.result.length > 0 && budgetId == categoriesBudgetDetails.budgeId) {
-  //     const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-  //     categoriesBudgetDetails.result.forEach((item) => {
-  //       initialData[item.subcategoryId] = {
-  //         Count: Number(item.total),
-  //         Apr: Number(item.april) ?? "0",
-  //         May: Number(item.may) ?? "0",
-  //         Jun: Number(item.june) ?? "0",
-  //         Jul: Number(item.july) ?? "0",
-  //         Aug: Number(item.august) ?? "0",
-  //         Sep: Number(item.september) ?? "0",
-  //         Oct: Number(item.october) ?? "0",
-  //         Nov: Number(item.november) ?? "0",
-  //         Dec: Number(item.december) ?? "0",
-  //         Jan: Number(item.january) ?? "0",
-  //         Feb: Number(item.february) ?? "0",
-  //         Mar: Number(item.march) ?? "0",
-  //         budgetDetailsId: Number(item.id),
-  //       };
-  //       totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-  //       totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-  //       totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-  //       totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
-  //     });
-  //     setTotalQty(totalQty)
-  //   }
-  //   setTableData(initialData);
-  // }, [data, categoriesBudgetDetails]);
-
 
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
-
   const handleSave = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -292,6 +237,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {
@@ -420,9 +366,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       setSaveBtnState("edit")
     }
   };
-
-  // if (isLoading) return <p>Loading...</p>;
-  // if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg" >

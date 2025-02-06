@@ -1,12 +1,12 @@
-import { and, count, eq, ilike, desc, isNull, sql, isNotNull, } from "drizzle-orm";
+import { and,  eq,   isNull, sql, isNotNull, } from "drizzle-orm";
+import { departmentHierarchyInFinanceProject, departmentMasterInFinanceProject } from "drizzle/schema";
 import { z } from "zod";
 import { protectedProcedure } from "~/server/api/trpc";
-import { db } from "~/server/db";
 import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject, categoryHierarchyInFinanceProject, categoryMasterInFinanceProject, salaryDetailsInFinanceProject, staffMasterInFinanceProject } from "~/server/db/schema";
 
 
 export const getCats = protectedProcedure
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
         const categories = await ctx.db
             .select({
                 categoryId: categoryMasterInFinanceProject.id,
@@ -80,6 +80,7 @@ export const addBudgetDetails = protectedProcedure
             deptId: z.number(),
             budgetId: z.number(),
             catId: z.number(),
+            subDeptId:z.number(),
             data: z.array(
                 z.object({
                     budgetid: z.number(),
@@ -123,31 +124,36 @@ export const addBudgetDetails = protectedProcedure
                     amount4: z.string().optional(),
                 })
             ),
+
         })
     )
     .mutation(async ({ ctx, input }) => {
         try {
             // Extract data from input
-            const { deptId, budgetId, catId, data } = input;
+            const { deptId, budgetId, catId,subDeptId, data } = input;
             // Map data to include shared fields and default values
+            
             const recordsToInsert = []
             for (const item of data) {
+                const baseConditions = [eq(budgetDetailsInFinanceProject.budgetid, budgetId),
+                    eq(budgetDetailsInFinanceProject.catid, catId),
+                    eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
+                    eq(budgetDetailsInFinanceProject.activity, item.activity ?? ""),
+                    eq(budgetDetailsInFinanceProject.subDeptid, subDeptId)
+                    ]
+                
                 const existingRecord = await ctx.db
                     .select()
                     .from(budgetDetailsInFinanceProject)
                     .where(
-                        and(
-                            eq(budgetDetailsInFinanceProject.budgetid, budgetId),
-                            eq(budgetDetailsInFinanceProject.catid, catId),
-                            eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
-                            eq(budgetDetailsInFinanceProject.activity, item.activity ?? "")
-                        ))
+                        and(...baseConditions))
                 if(!existingRecord || existingRecord.length == 0)
                 {
                     recordsToInsert.push({
                         budgetid: budgetId,
                         catid: catId,
-                        deptId,
+                        subDeptid:subDeptId,
+                        deptid:deptId,
                         subcategoryId: item.subcategoryId,
                         unit: item.unit,
                         rate: item.rate,
@@ -263,7 +269,7 @@ export const getCatsBudgetDetails = protectedProcedure
     )
     .query(async ({ ctx, input }) => {
         const baseConditions = [
-            eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+            eq(budgetDetailsInFinanceProject.deptid, input.deptId),
             eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
             eq(budgetDetailsInFinanceProject.catid, input.catId),
         ];
@@ -367,6 +373,7 @@ export const getLevelStaffCount = protectedProcedure
 export const getPersonalCatDetials = protectedProcedure
     .input(
         z.object({
+            subdeptId:z.number(),
             deptId: z.number(),
             budgetId: z.number(),
             catId: z.number(),
@@ -389,11 +396,14 @@ export const getPersonalCatDetials = protectedProcedure
                 .where(eq(categoryHierarchyInFinanceProject.parentId, input.catId));
             if (!subCategories)
                 throw new Error("Failed to get the subcategories")
+            // we going to get the sub departments
+            
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid,input.subdeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -468,13 +478,14 @@ export const getPersonalCatDetials = protectedProcedure
                 .where(
                     and(
                         eq(staffMasterInFinanceProject.department, input.deptId),
-                        isNotNull(salaryDetailsInFinanceProject.salary)
+                        isNotNull(salaryDetailsInFinanceProject.salary),
+                        eq(staffMasterInFinanceProject.subDeptid,input.subdeptId)
                     )
                 )
                 .groupBy(staffMasterInFinanceProject.level);
 
             return {
-                subCategories, levelStats, budgetId: input.budgetId, result
+                subCategories, levelStats, budgetId: input.budgetId, result,subDeptId:input.subdeptId
             };
 
         } catch (error) {
@@ -489,6 +500,7 @@ export const getProgramActivities = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            subDeptId:z.number()
         })
     )
     .query(async ({ ctx, input }) => {
@@ -509,9 +521,10 @@ export const getProgramActivities = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -567,7 +580,7 @@ export const getProgramActivities = protectedProcedure
             }
             
             return {
-                subCategories,budgetId: input.budgetId, result
+                subCategories,budgetId: input.budgetId, result,subDeptId:input.subDeptId
             };
 
         } catch (error) {
@@ -582,12 +595,14 @@ export const getTravelCatDetials = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
-            searchSubCatId:z.number()
+            searchSubCatId:z.number(),
+            subDeptId:z.number()
         })
     )
     .query(async ({ ctx, input }) => {
         try {
             // get sub categories
+            console.log(input)
             const subCategories = await ctx.db
                 .select({
                     subCategoryId: categoryHierarchyInFinanceProject.catId,
@@ -603,9 +618,10 @@ export const getTravelCatDetials = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -663,9 +679,11 @@ export const getTravelCatDetials = protectedProcedure
             const personalData = await ctx.db
                 .select()
                 .from(budgetDetailsInFinanceProject)
-                .where(and(eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                .where(and(eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                     eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
-                    eq(budgetDetailsInFinanceProject.catid, input.searchSubCatId))
+                    eq(budgetDetailsInFinanceProject.catid, input.searchSubCatId),
+                    eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)),
+                    
                 )
             // make a call for staff count
             const levelStats = await ctx.db
@@ -681,13 +699,14 @@ export const getTravelCatDetials = protectedProcedure
                 .where(
                     and(
                         eq(staffMasterInFinanceProject.department, input.deptId),
-                        isNotNull(salaryDetailsInFinanceProject.salary)
+                        isNotNull(salaryDetailsInFinanceProject.salary),
+                        eq(staffMasterInFinanceProject.subDeptid,input.subDeptId)
                     )
                 )
                 .groupBy(staffMasterInFinanceProject.level);
 
             return {
-                subCategories, levelStats, budgetId: input.budgetId, result, personalData
+                subCategories, levelStats, budgetId: input.budgetId, result, personalData, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -702,6 +721,7 @@ export const getProgramOfficeData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            subDeptId: z.number()
         })
     )
     .query(async ({ ctx, input }) => {
@@ -722,9 +742,10 @@ export const getProgramOfficeData = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -780,7 +801,7 @@ export const getProgramOfficeData = protectedProcedure
             }
 
             return {
-                subCategories, budgetId: input.budgetId, result
+                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -795,6 +816,7 @@ export const getCapitalCostData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            subDeptId: z.number()
         })
     )
     .query(async ({ ctx, input }) => {
@@ -815,9 +837,10 @@ export const getCapitalCostData = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -873,7 +896,7 @@ export const getCapitalCostData = protectedProcedure
             }
 
             return {
-                subCategories, budgetId: input.budgetId, result
+                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -888,6 +911,7 @@ export const getOverHeadsData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            subDeptId: z.number()
         })
     )
     .query(async ({ ctx, input }) => {
@@ -908,9 +932,10 @@ export const getOverHeadsData = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptId, input.deptId),
+                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
                 eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                 eq(budgetDetailsInFinanceProject.catid, input.catId),
+                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
             ];
 
             // Add activity condition if it is not null or undefined
@@ -966,7 +991,7 @@ export const getOverHeadsData = protectedProcedure
             }
 
             return {
-                subCategories, budgetId: input.budgetId, result
+                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -1126,9 +1151,11 @@ export const savePersonalBudgetDetails = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             travelCatId:z.number(),
+            subDeptId:z.number(),
             data: z.array(
                 z.object({
                     budgetid: z.number(),
+                    subDeptId: z.number(),
                     catid: z.number(),
                     subcategoryId: z.number(),
                     unit: z.number(),
@@ -1186,13 +1213,14 @@ export const savePersonalBudgetDetails = protectedProcedure
                             eq(budgetDetailsInFinanceProject.budgetid, budgetId),
                             eq(budgetDetailsInFinanceProject.catid, catId),
                             eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
-                            eq(budgetDetailsInFinanceProject.activity, item.activity ?? "")
+                            eq(budgetDetailsInFinanceProject.activity, item.activity ?? ""),
+                            eq(budgetDetailsInFinanceProject.subDeptid, item.subDeptId)
                         ))
                 if (!existingRecord || existingRecord.length == 0) {
                     recordsToInsert.push({
                         budgetid: budgetId,
                         catid: catId,
-                        deptId,
+                        deptid:deptId,
                         subcategoryId: item.subcategoryId,
                         unit: item.unit,
                         rate: item.rate,
@@ -1219,6 +1247,7 @@ export const savePersonalBudgetDetails = protectedProcedure
                         createdAt: item.createdAt,
                         updatedAt: null,
                         updatedBy: null,
+                        subDeptid:item.subDeptId,
                         qqty: item.qty ?? 0,
                         qty1: item.qty1 ?? 0,
                         rate1: item.rate1?.trim() === "" ? "0" : item.rate1,
@@ -1269,7 +1298,8 @@ export const savePersonalBudgetDetails = protectedProcedure
             .from(budgetDetailsInFinanceProject)
             .where(and(
                 eq(budgetDetailsInFinanceProject.budgetid,budgetId),
-                eq(budgetDetailsInFinanceProject.catid,travelCatId)
+                eq(budgetDetailsInFinanceProject.catid,travelCatId),
+                eq(budgetDetailsInFinanceProject.subcategoryId,input.subDeptId)
             ))
             // here we need to update the values
             if (travelData && travelData.length>0 )
@@ -1293,7 +1323,8 @@ export const savePersonalBudgetDetails = protectedProcedure
                         .where(and(
                             eq(budgetDetailsInFinanceProject.budgetid, budgetId),
                             eq(budgetDetailsInFinanceProject.subcategoryId,item.subcategoryId),
-                            eq(budgetDetailsInFinanceProject.catid,travelCatId)
+                            eq(budgetDetailsInFinanceProject.catid,travelCatId),
+                            eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
                         ));
                 }
             }
@@ -1310,6 +1341,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             travelCatId: z.number(),
+            subDeptId: z.number(),
             data: z.array(
                 z.object({
                     budgetDetailsId: z.number(),
@@ -1356,6 +1388,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
     .mutation(async ({ ctx, input }) => {
         try {
             const { data,budgetId,travelCatId } = input;
+            console.log(budgetId, travelCatId,input.subDeptId)
 
             // Perform updates for each budget detail record
             for (const item of data) {
@@ -1429,8 +1462,10 @@ export const updatePersonalBudgetDetails = protectedProcedure
                 .from(budgetDetailsInFinanceProject)
                 .where(and(
                     eq(budgetDetailsInFinanceProject.budgetid, budgetId),
-                    eq(budgetDetailsInFinanceProject.catid, travelCatId)
+                    eq(budgetDetailsInFinanceProject.catid, travelCatId),
+                    eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
                 ))
+            console.log(travelData)
             // here we need to update the values
             if (travelData && travelData.length > 0) {
                 for (const item of data) {
@@ -1452,7 +1487,8 @@ export const updatePersonalBudgetDetails = protectedProcedure
                         .where(and(
                             eq(budgetDetailsInFinanceProject.budgetid, budgetId),
                             eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
-                            eq(budgetDetailsInFinanceProject.catid, travelCatId)
+                            eq(budgetDetailsInFinanceProject.catid, travelCatId),
+                            eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
                         ));
                 }
             }
@@ -1464,6 +1500,177 @@ export const updatePersonalBudgetDetails = protectedProcedure
         }
     });
 
+export const getSubDepts = protectedProcedure
+    .input(z.object({
+        deptId: z.number()
+    }))
+    .query(async({ctx,input})=>{
+        const {deptId} = input
+        const subdepartments = await ctx.db
+            .select({
+                id: departmentMasterInFinanceProject.id,
+                name: departmentMasterInFinanceProject.departmentname
+            })
+            .from(departmentMasterInFinanceProject)
+            .innerJoin(departmentHierarchyInFinanceProject, eq(departmentHierarchyInFinanceProject.deptId, departmentMasterInFinanceProject.id))
+            .where(eq(departmentHierarchyInFinanceProject.parentId, deptId))
+        return { subdepartments }
+    })
+export const saveTravelBudgetDetails = protectedProcedure
+    .input(
+        z.object({
+            deptId: z.number(),
+            budgetId: z.number(),
+            catId: z.number(),
+            subDeptId: z.number(),
+            data: z.array(
+                z.object({
+                    budgetid: z.number(),
+                    catid: z.number(),
+                    subcategoryId: z.number(),
+                    unit: z.number(),
+                    rate: z.string(),
+                    total: z.string(),
+                    currency: z.string(),
+                    notes: z.string().optional(),
+                    description: z.string().optional(),
+                    april: z.string(),
+                    may: z.string(),
+                    june: z.string(),
+                    july: z.string(),
+                    august: z.string(),
+                    september: z.string(),
+                    october: z.string(),
+                    november: z.string(),
+                    december: z.string(),
+                    january: z.string(),
+                    february: z.string(),
+                    march: z.string(),
+                    activity: z.string().optional(),
+                    deptId: z.number(),
+                    clusterId: z.number().optional(),
+                    createdBy: z.number(),
+                    createdAt: z.string(),
+                    qty: z.number().optional(),
+                    qty1: z.number().optional(),
+                    rate1: z.string().optional(),
+                    amount1: z.string().optional(),
+                    qty2: z.number().optional(),
+                    rate2: z.string().optional(),
+                    amount2: z.string().optional(),
+                    qty3: z.number().optional(),
+                    rate3: z.string().optional(),
+                    amount3: z.string().optional(),
+                    qty4: z.number().optional(),
+                    rate4: z.string().optional(),
+                    amount4: z.string().optional(),
+                })
+            ),
+        })
+    )
+    .mutation(async ({ ctx, input }) => {
+        try {
+            // Extract data from input
+            const { deptId, budgetId, catId, subDeptId, data } = input;
+            // Map data to include shared fields and default values
+
+            const recordsToInsert = []
+            for (const item of data) {
+                const baseConditions = [eq(budgetDetailsInFinanceProject.budgetid, budgetId),
+                eq(budgetDetailsInFinanceProject.catid, catId),
+                eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
+                eq(budgetDetailsInFinanceProject.activity, item.activity ?? ""),
+                eq(budgetDetailsInFinanceProject.subDeptid, subDeptId)
+                ]
+
+                const existingRecord = await ctx.db
+                    .select()
+                    .from(budgetDetailsInFinanceProject)
+                    .where(
+                        and(...baseConditions))
+                if (!existingRecord || existingRecord.length == 0) {
+                    recordsToInsert.push({
+                        budgetid: budgetId,
+                        catid: catId,
+                        subDeptid:input.subDeptId,
+                        deptid: deptId,
+                        subcategoryId: item.subcategoryId,
+                        unit: item.unit,
+                        rate: item.rate,
+                        total: item.total,
+                        currency: item.currency,
+                        notes: item.notes ?? null,
+                        description: item.description ?? null,
+                        april: item.april.trim() === "" ? "0" : item.april, // Default to "0" if empty
+                        may: item.may.trim() === "" ? "0" : item.may,
+                        june: item.june.trim() === "" ? "0" : item.june,
+                        july: item.july.trim() === "" ? "0" : item.july,
+                        august: item.august.trim() === "" ? "0" : item.august,
+                        september: item.september.trim() === "" ? "0" : item.september,
+                        october: item.october.trim() === "" ? "0" : item.october,
+                        november: item.november.trim() === "" ? "0" : item.november,
+                        december: item.december.trim() === "" ? "0" : item.december,
+                        january: item.january.trim() === "" ? "0" : item.january,
+                        february: item.february.trim() === "" ? "0" : item.february,
+                        march: item.march.trim() === "" ? "0" : item.march,
+                        activity: item.activity ?? null,
+                        clusterId: item.clusterId ?? null,
+                        isactive: true,
+                        createdBy: item.createdBy,
+                        createdAt: item.createdAt,
+                        updatedAt: null,
+                        updatedBy: null,
+                        qqty: item.qty ?? 0,
+                        qty1: item.qty1 ?? 0,
+                        rate1: item.rate1?.trim() === "" ? "0" : item.rate1,
+                        amount1: item.amount1?.trim() === "" ? "0" : item.amount1,
+                        qty2: item.qty2 ?? 0,
+                        rate2: item.rate2?.trim() === "" ? "0" : item.rate2,
+                        amount2: item.amount2?.trim() === "" ? "0" : item.amount2,
+                        qty3: item.qty3 ?? 0,
+                        rate3: item.rate3?.trim() === "" ? "0" : item.rate3,
+                        amount3: item.amount3?.trim() === "" ? "0" : item.amount3,
+                        qty4: item.qty4 ?? 0,
+                        rate4: item.rate4?.trim() === "" ? "0" : item.rate4,
+                        amount4: item.amount4?.trim() === "" ? "0" : item.amount4,
+                        q1: (
+                            parseInt(item.april.trim() === "" ? "0" : item.april) +
+                            parseInt(item.may.trim() === "" ? "0" : item.may) +
+                            parseInt(item.june.trim() === "" ? "0" : item.june)
+                        ).toString(),
+                        q2: (
+                            parseInt(item.july.trim() === "" ? "0" : item.july) +
+                            parseInt(item.august.trim() === "" ? "0" : item.august) +
+                            parseInt(item.september.trim() === "" ? "0" : item.september)
+                        ).toString(),
+                        q3: (
+                            parseInt(item.october.trim() === "" ? "0" : item.october) +
+                            parseInt(item.november.trim() === "" ? "0" : item.november) +
+                            parseInt(item.december.trim() === "" ? "0" : item.december)
+                        ).toString(),
+                        q4: (
+                            parseInt(item.january.trim() === "" ? "0" : item.january) +
+                            parseInt(item.february.trim() === "" ? "0" : item.february) +
+                            parseInt(item.march.trim() === "" ? "0" : item.march)
+                        ).toString(),
+                    })
+                }
+            }
+            // Insert data using Drizzle
+            const insertedRecords = await ctx.db.insert(budgetDetailsInFinanceProject).values(recordsToInsert).returning();
+
+            const response = insertedRecords.map((record) => ({
+                budgetDetailsId: record.id,
+                subcategoryId: record.subcategoryId,
+                categoryId: record.catid,
+            }));
+
+            return { success: true, message: "Budget details added successfully", data: response };
+        } catch (error) {
+            console.error("Error in adding budget details:", error);
+            throw new Error("Failed to add budget details. Please try again.");
+        }
+    });
 
 
 

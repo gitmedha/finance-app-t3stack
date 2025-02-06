@@ -95,6 +95,8 @@ interface FilterOptions {
   departmentname: string;
   status: string;
   designation: string;
+  subdepartment: number|null|string
+  subdepartmentname: string
 }
 
 interface StaffFilterFormProps {

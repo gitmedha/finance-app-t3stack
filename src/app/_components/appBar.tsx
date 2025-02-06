@@ -31,10 +31,10 @@ const AppBar = () => {
   const menus = [
     { menu: "Home", path: "/home", icon: <IoHome /> },
     { menu: "Budget", path: "/budget", icon: <HiBanknotes /> },
-    { menu: "Donors", path: "/donors", icon: <FaHandHoldingHeart /> },
+    // { menu: "Donors", path: "/donors", icon: <FaHandHoldingHeart /> },
     { menu: "Departments", path: "/departments", icon: <GiOfficeChair /> },
-    { menu: "Cost Centers", path: "/cost-centers", icon: <GiMoneyStack /> },
-    { menu: "Expenses", path: "/expenses", icon: <GiExpense /> },
+    // { menu: "Cost Centers", path: "/cost-centers", icon: <GiMoneyStack /> },
+    // { menu: "Expenses", path: "/expenses", icon: <GiExpense /> },
     { menu: "Staff", path: "/staff", icon: <FaUser /> },
   ];
 
@@ -55,7 +55,7 @@ const AppBar = () => {
 
         <ul className="flex justify-start items-center space-x-6">
           {menus.map((menu) => {
-            if (session?.user.role == 2 && (menu.menu == "Home" || menu.menu == "Budget") )
+            if (session?.user.role != 1 && (menu.menu == "Home" || menu.menu == "Budget" || menu.menu == "Staff") )
             {
               return <li key={menu.menu}>
                 <Link

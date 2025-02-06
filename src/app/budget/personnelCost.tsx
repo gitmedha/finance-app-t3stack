@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@radix-ui/themes";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
 interface PersonnelCostProps {
   section: string;
   categoryId: number;
@@ -12,8 +12,8 @@ interface PersonnelCostProps {
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
   travelCatId:number
+  subdepartmentId:number
 }
-
 interface LevelData {
   budgetDetailsId: number
   Count: string | number;
@@ -65,7 +65,7 @@ const months = [
   "Mar",
 ];
 
-const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId }) => {
+const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId, subdepartmentId }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
@@ -73,8 +73,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession()
-
-  const { data: personnelCostData, isLoading: personnelCostDataLodaing } = api.get.getPersonalCatDetials.useQuery({
+  const { data: personnelCostData, isLoading: personnelCostDataLodaing } = api.get.getPersonalCatDetials.useQuery(
+    {
+    subdeptId:subdepartmentId,
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
@@ -166,7 +167,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       }
     })
   }
-
   const [avgQty, setAvgQty] = useState<avgQtySchema>({})
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) => {
@@ -175,8 +175,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       });
     });
   };
+
   useEffect(()=>{
-    if (personnelCostData?.budgetId == budgetId )
+    if (personnelCostData?.budgetId == budgetId && personnelCostData.subDeptId == subdepartmentId)
     {
       const initialData: TableData = {};
       const intialAvgQty: avgQtySchema = {}
@@ -337,6 +338,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       budgetid: budgetId,
       catid: categoryId,
       subcategoryId: parseInt(subCategoryId, 10),
+      subDeptId: subdepartmentId ,
       unit: 1,
       rate: "1",
       total: "1",
@@ -372,7 +374,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
-          travelCatId
+          travelCatId,
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {
@@ -567,7 +570,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           budgetId,
           catId: categoryId,
           data: budgetDetails,
-          travelCatId
+          travelCatId,
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {
@@ -632,7 +636,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }
-        </summary>
+        </summary>     
 
         <hr className="my-2 scale-x-150" />
 

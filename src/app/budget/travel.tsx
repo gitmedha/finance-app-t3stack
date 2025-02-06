@@ -5,7 +5,8 @@ import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from "~/trpc/react";
-import { ToastContainer, toast,Bounce } from 'react-toastify';
+import {  toast,Bounce } from 'react-toastify';
+
 
 interface TravelBudgetProps {
   section: string;
@@ -16,6 +17,7 @@ interface TravelBudgetProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
+  subdepartmentId: number
 }
 
 interface subTravelSchema {
@@ -63,21 +65,19 @@ const months = [
   "Mar",
 ];
 
-const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId,searchSubCatId,status ,sectionOpen,setSectionOpen}) => {
-
+const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId, searchSubCatId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const userData = useSession()
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
-  // const { data: subCategories } = api.get.getSubCats.useQuery({ categoryId:searchSubCatId });
   const [tableData, setTableData] = useState<TableData>({});
-
   const [filter, setFilter] = useState(subTravels.sort((a, b) => a.name.localeCompare(b.name))[0])
-  const handleSelect = (val: subTravelSchema) => {
+  const handleSubCatSelect = (val: subTravelSchema) => {
     setSaveBtnState("loading")
     setFilter(val)
+    
   }
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = []
@@ -139,36 +139,19 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
       });
     });
   };
-  
-  //   budgetId,
-  //   catId: categoryId,
-  //   deptId: Number(deptId),
-  //   activity: (filter?.map)?.toString()
-  // }, {
-  //   enabled: !!filter
-  // });
-  // const { data: levelEmployeesCount } = api.get.getLevelStaffCount.useQuery(
-  //   {
-  //     deptId: Number(deptId),
-  //   },
-  //   {
-  //     enabled:
-  //       !categoryDetailsLoading &&
-  //       (!!error || !categoriesBudgetDetails || categoriesBudgetDetails.length === 0),
-  //   }
-  // );
-  // making a call to get the travel section detatils
-  const { data: travelData, isLoading: travelDataLodaing } = api.get.getTravelCatDetials.useQuery({
+  const { data: travelData, isLoading: travelDataLodaing } = api.get.getTravelCatDetials.useQuery(
+  {
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
     activity: (filter?.map)?.toString(),
-    searchSubCatId:searchSubCatId
+    searchSubCatId:searchSubCatId,
+    subDeptId:subdepartmentId
   },{
-    staleTime:0
+    staleTime:0,
   })
   useEffect(() => {
-    if (travelData?.budgetId == budgetId) {
+    if (travelData?.budgetId == budgetId && travelData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (travelData?.subCategories) {
         // console.log("After getting the subcategories")
@@ -224,31 +207,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
                 Qty4: item.qty4 ? Number(item.qty4) : "0",
                 budgetDetailsId: Number(item.id)
               };
-            // }
-            // else{
-            //   console.log(personalDataForSubCat)
-            //   console.log("I am running")
-            //   initialData[item.subcategoryId] = {
-            //     Count: Number(item.total),
-            //     Apr: item.april ? Number(item.april) : "0",
-            //     May: item.may ? Number(item.may) : "0",
-            //     Jun: item.june ? Number(item.june) : "0",
-            //     Jul: item.july ? Number(item.july) : "0",
-            //     Aug: item.august ? Number(item.august) : "0",
-            //     Sep: item.september ? Number(item.september) : "0",
-            //     Oct: item.october ? Number(item.october) : "0",
-            //     Nov: item.november ? Number(item.november) : "0",
-            //     Dec: item.december ? Number(item.december) : "0",
-            //     Jan: item.january ? Number(item.january) : "0",
-            //     Feb: item.february ? Number(item.february) : "0",
-            //     Mar: item.march ? Number(item.march) : "0",
-            //     Qty1: personalDataForSubCat.qty1 ? Number(personalDataForSubCat.qty1) : "0",
-            //     Qty2: personalDataForSubCat.qty2 ? Number(personalDataForSubCat.qty2) : "0",
-            //     Qty3: personalDataForSubCat.qty3 ? Number(personalDataForSubCat.qty3) : "0",
-            //     Qty4: personalDataForSubCat.qty4 ? Number(personalDataForSubCat.qty4) : "0",
-            //     budgetDetailsId: Number(personalDataForSubCat.id)
-            //   };
-            // }
             totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
             totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
             totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
@@ -375,97 +333,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
     handelnputDisable(true)
   }, [filter])
 
-  //   const initialData: TableData = {};
-  //   if (subCategories?.subCategories) {
-  //     subCategories.subCategories.forEach((sub) => {
-  //       initialData[sub.subCategoryId] = {
-  //         Count: "",
-  //         Qty1: 0,
-  //         Apr: "0",
-  //         May: "0",
-  //         Jun: "0",
-  //         Qty2: 0,
-  //         Jul: "0",
-  //         Aug: "0",
-  //         Sep: "0",
-  //         Qty3: 0,
-  //         Oct: "0",
-  //         Nov: "0",
-  //         Dec: "0",
-  //         Qty4: "0",
-  //         Jan: "0",
-  //         Feb: "0",
-  //         Mar: "0",
-  //         budgetDetailsId: 0
-  //       };
-  //     });
-  //   }
-  //   if (categoriesBudgetDetails) {
-  //     const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-  //     categoriesBudgetDetails.forEach((item) => {
-  //       initialData[item.subcategoryId] = {
-  //         Count: Number(item.total),
-  //         Apr: item.april ? Number(item.april) : "0",
-  //         May: item.may ? Number(item.may) : "0",
-  //         Jun: item.june ? Number(item.june) : "0",
-  //         Jul: item.july ? Number(item.july) : "0",
-  //         Aug: item.august ? Number(item.august) : "0",
-  //         Sep: item.september ? Number(item.september) : "0",
-  //         Oct: item.october ? Number(item.october) : "0",
-  //         Nov: item.november ? Number(item.november) : "0",
-  //         Dec: item.december ? Number(item.december) : "0",
-  //         Jan: item.january ? Number(item.january) : "0",
-  //         Feb: item.february ? Number(item.february) : "0",
-  //         Mar: item.march ? Number(item.march) : "0",
-  //         Qty1: item.qty1 ? Number(item.qty1) : "0",
-  //         Qty2: item.qty2 ? Number(item.qty2) : "0",
-  //         Qty3: item.qty3 ? Number(item.qty3) : "0",
-  //         Qty4: item.qty4 ? Number(item.qty4) : "0",
-  //         budgetDetailsId: Number(item.id)
-  //       };
-  //       totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-  //       totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-  //       totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-  //       totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
-  //     });
-  //     setTableData(initialData);
-  //     setTotalQty(totalQty)
-  //   }
-  //   else {
-  //     setTableData({});
-  //   }
-  // }, [categoriesBudgetDetails]);
-  // useEffect(() => {
-  //   if (subCategories && levelEmployeesCount) {
-  //     const initialTableData: TableData = {};
-  //     subCategories?.subCategories?.forEach((sub, index) => {
-  //       const level = levelEmployeesCount?.find(
-  //         (l) => l.level === sub.subCategoryId
-  //       );
-  //       initialTableData[sub.subCategoryId] = {
-  //         Count: level?.employeeCount ? Number(level?.employeeCount) : 0,
-  //         Qty1: level?.employeeCount ? Number(level?.employeeCount):0,
-  //         Qty2: level?.employeeCount ? Number(level?.employeeCount) : 0,
-  //         Qty3: level?.employeeCount ? Number(level?.employeeCount) : 0,
-  //         Qty4: level?.employeeCount ? Number(level?.employeeCount) : 0,
-  //         Apr:"0",
-  //         May:"0",
-  //         Jun:"0",
-  //         Jul:"0",
-  //         Aug:"0",
-  //         Sep:"0",
-  //         Oct:"0",
-  //         Nov:"0",
-  //         Dec:"0",
-  //         Jan:"0",
-  //         Feb:"0",
-  //         Mar:"0",
-  //         budgetDetailsId: 0,
-  //       };
-  //     })
-  //     setTableData(initialTableData);
-  //   }
-  // }, [subCategories, levelEmployeesCount]);
+
   const handleInputChange = (
     subCategoryId: number,
     month: string,
@@ -498,7 +366,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
     });
   };
 
-  const createBudgetDetails = api.post.addBudgetDetails.useMutation();
+  const createBudgetDetails = api.post.saveTravelBudgetDetails.useMutation();
   const handleSave = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -541,6 +409,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
+          subDeptId:subdepartmentId
         },
         {
           onSuccess: (data) => {
@@ -704,30 +573,33 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           }
         </summary>
 
-        <div className='w-72 mt-3 z-10'>
-          <DropdownMenu.Root >
-            <DropdownMenu.Trigger asChild>
-              <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
-                <span>{filter?.name} </span>
-                <RiArrowDropDownLine size={30} />
-              </button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content
-              className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
-            >
-              {subTravels.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
-                <DropdownMenu.Item
-                  key={ind}
-                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm"
-                  onSelect={() => handleSelect(val)} 
-                >
-                  {val.name}
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
+          <div className='flex gap-2'>
+          <div className='w-72 mt-3 z-10'>
+            <DropdownMenu.Root >
+              <DropdownMenu.Trigger asChild>
+                <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
+                  <span>{filter?.name} </span>
+                  <RiArrowDropDownLine size={30} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content
+                className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
+              >
+                {subTravels.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
+                  <DropdownMenu.Item
+                    key={ind}
+                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm"
+                    onSelect={() => handleSubCatSelect(val)}
+                  >
+                    {val.name}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
 
-        </div>
+          </div>
+          </div>
+        
 
         <hr className="my-2 scale-x-150" />
         

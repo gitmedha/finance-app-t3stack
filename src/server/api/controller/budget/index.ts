@@ -485,7 +485,7 @@ export const getPersonalCatDetials = protectedProcedure
                 .groupBy(staffMasterInFinanceProject.level);
 
             return {
-                subCategories, levelStats, budgetId: input.budgetId, result
+                subCategories, levelStats, budgetId: input.budgetId, result,subDeptId:input.subdeptId
             };
 
         } catch (error) {
@@ -580,7 +580,7 @@ export const getProgramActivities = protectedProcedure
             }
             
             return {
-                subCategories,budgetId: input.budgetId, result
+                subCategories,budgetId: input.budgetId, result,subDeptId:input.subDeptId
             };
 
         } catch (error) {
@@ -706,7 +706,7 @@ export const getTravelCatDetials = protectedProcedure
                 .groupBy(staffMasterInFinanceProject.level);
 
             return {
-                subCategories, levelStats, budgetId: input.budgetId, result, personalData
+                subCategories, levelStats, budgetId: input.budgetId, result, personalData, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -801,7 +801,7 @@ export const getProgramOfficeData = protectedProcedure
             }
 
             return {
-                subCategories, budgetId: input.budgetId, result
+                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -896,7 +896,7 @@ export const getCapitalCostData = protectedProcedure
             }
 
             return {
-                subCategories, budgetId: input.budgetId, result
+                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -991,7 +991,7 @@ export const getOverHeadsData = protectedProcedure
             }
 
             return {
-                subCategories, budgetId: input.budgetId, result
+                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -1388,6 +1388,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
     .mutation(async ({ ctx, input }) => {
         try {
             const { data,budgetId,travelCatId } = input;
+            console.log(budgetId, travelCatId,input.subDeptId)
 
             // Perform updates for each budget detail record
             for (const item of data) {
@@ -1462,8 +1463,9 @@ export const updatePersonalBudgetDetails = protectedProcedure
                 .where(and(
                     eq(budgetDetailsInFinanceProject.budgetid, budgetId),
                     eq(budgetDetailsInFinanceProject.catid, travelCatId),
-                    eq(budgetDetailsInFinanceProject.subcategoryId,input.subDeptId)
+                    eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
                 ))
+            console.log(travelData)
             // here we need to update the values
             if (travelData && travelData.length > 0) {
                 for (const item of data) {

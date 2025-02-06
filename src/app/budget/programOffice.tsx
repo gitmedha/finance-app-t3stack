@@ -138,7 +138,7 @@ const userData = useSession()
     staleTime: 0, 
   })
   useEffect(() => {
-    if (programOfficeData?.budgetId == budgetId) {
+    if (programOfficeData?.budgetId == budgetId && programOfficeData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (programOfficeData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }

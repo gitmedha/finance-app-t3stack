@@ -142,7 +142,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
     staleTime: 0, 
   })
   useEffect(() => {
-    if (overHeadData?.budgetId == budgetId) {
+    if (overHeadData?.budgetId == budgetId && overHeadData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (overHeadData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }

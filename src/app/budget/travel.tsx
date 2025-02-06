@@ -151,7 +151,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
     staleTime:0,
   })
   useEffect(() => {
-    if (travelData?.budgetId == budgetId) {
+    if (travelData?.budgetId == budgetId && travelData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (travelData?.subCategories) {
         // console.log("After getting the subcategories")

@@ -151,7 +151,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                  <span>{filters.departmentname}</span>
+                  <span>{filters.departmentname}{filters.department}</span>
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
@@ -180,7 +180,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           <DropdownMenu.Root >
             <DropdownMenu.Trigger asChild className='!w-full'>
               <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                <span>{filters.subdepartmentName}</span>
+                <span>{filters.subdepartmentName}{filters.subdepartmentId}</span>
                 <RiArrowDropDownLine size={30} />
               </button>
             </DropdownMenu.Trigger>

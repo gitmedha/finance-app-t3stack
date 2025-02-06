@@ -137,7 +137,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     staleTime: 0, 
   })
   useEffect(() => {
-    if (capitalCostData?.budgetId == budgetId) {
+    if (capitalCostData?.budgetId == budgetId && capitalCostData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (capitalCostData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }

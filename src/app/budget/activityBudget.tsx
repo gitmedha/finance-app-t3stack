@@ -155,7 +155,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     staleTime:0
   })
   useEffect(() => {
-    if (programData?.budgetId == budgetId) {
+    if (programData?.budgetId == budgetId && programData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (programData?.subCategories) {
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }

@@ -177,7 +177,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   };
 
   useEffect(()=>{
-    if (personnelCostData?.budgetId == budgetId )
+    if (personnelCostData?.budgetId == budgetId && personnelCostData.subDeptId == subdepartmentId)
     {
       const initialData: TableData = {};
       const intialAvgQty: avgQtySchema = {}

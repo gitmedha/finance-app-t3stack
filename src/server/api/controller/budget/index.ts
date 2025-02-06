@@ -1,8 +1,7 @@
 import { and,  eq,   isNull, sql, isNotNull, } from "drizzle-orm";
-import { departmentHierarchyInFinanceProject, departmentMasterInFinanceProject } from "drizzle/schema";
 import { z } from "zod";
 import { protectedProcedure } from "~/server/api/trpc";
-import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject, categoryHierarchyInFinanceProject, categoryMasterInFinanceProject, salaryDetailsInFinanceProject, staffMasterInFinanceProject } from "~/server/db/schema";
+import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject, categoryHierarchyInFinanceProject, categoryMasterInFinanceProject, salaryDetailsInFinanceProject, staffMasterInFinanceProject, departmentHierarchyInFinanceProject, departmentMasterInFinanceProject } from "~/server/db/schema";
 
 
 export const getCats = protectedProcedure

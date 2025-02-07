@@ -86,11 +86,11 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     if (userData.data?.user.subDepartmentId && userData.data?.user.subDepartmentName)
       handleSelect("subdepartment", { id: userData.data?.user.subDepartmentId, departmentname: userData.data?.user.subDepartmentName })
   }, [userData])
-  useEffect(()=>{
-    if (years[0]){
-      handleSelect("year", years[0])
-    }
-  },[])
+  // useEffect(()=>{
+  //   if (years[0]){
+  //     handleSelect("year", years[0])
+  //   }
+  // },[handleSelect, years])
   useEffect(() => {
     if (!userData.data?.user.departmentId && !userData.data?.user.departmentName)
     {

@@ -24,12 +24,14 @@ type HandleSelectValue =
 const Budget: React.FC = () => {
   // Explicitly define the type for filters
   const userData = useSession()
+  const year = new Date().getFullYear()
+  const month = new Date().getMonth()
   const [status,setStatus] = useState<string|undefined>(undefined)
   const [sectionOpen, setSectionOpen] = useState<null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" |"OVERHEADS">(null)
   const [filters, setFilters] = useState<FilterOptions>({
     department: userData.data?.user.departmentId?.toString() ?? '', 
     departmentname: userData.data?.user.departmentName ?? " ",
-    year: '',
+    year: month >= 3 ? `${year.toString()}-${(year + 1).toString().slice(2)}` : `${(year - 1).toString()}-${year.toString().slice(2)}` ,
     // need to be updated wit respect to user login
     subdepartmentId: userData.data?.user.subDepartmentId ?? 0,
     subdepartmentName: userData.data?.user.subDepartmentName ?? ""
@@ -60,7 +62,7 @@ const Budget: React.FC = () => {
     }
   };
   const shouldFetch = filters.department !== "" && filters.year !== "";
-  const { data: budgetRes, isLoading, error } = api.get.getBudgetMaster.useQuery(
+  const { data: budgetRes, isLoading} = api.get.getBudgetMaster.useQuery(
     shouldFetch
       ? {
         deptId: Number(filters.department),

@@ -18,10 +18,10 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   // );
   const {data,refetch} = api.get.getHeadDepartments.useQuery()
   // get subdepartmen{ts of that department if not  every sub department
-  const {data:subDeptsData} = api.get.getSubDepartments.useQuery(userData.data?.user.departmentId?{
+  const {data:subDeptsData,refetch:subDeptRefetch} = api.get.getSubDepartments.useQuery(userData.data?.user.departmentId?{
     deptId: userData.data.user.departmentId
   }:{
-    deptId:0
+    deptId:Number(filters.department)
   },{
     enabled:userData.data?.user.role !=3
   })
@@ -36,7 +36,9 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
     void designationsFetch();
     void refetch();
   }, [refetch, designationsFetch]);
-
+  useEffect(()=>{
+    void subDeptRefetch()
+  },[subDeptRefetch,filters.department])
   return (
     <>
       <div className='w-44'>

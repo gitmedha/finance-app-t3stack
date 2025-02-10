@@ -97,11 +97,11 @@ interface GetStaffsResponse {
 }
 
 interface FilterOptions {
-  department: number | null | string;
+  department: number | string;
   departmentname: string;
   status: string;
   designation: string;
-  subdepartment: number|null|string
+  subdepartment: number|string
   subdepartmentname: string
 }
 

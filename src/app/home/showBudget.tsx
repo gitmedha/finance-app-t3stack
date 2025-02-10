@@ -18,7 +18,7 @@ const ShowBudget = ({ filters }: { filters: FilterOptions }) => {
     const [tableData, setTable] = useState<tableSchema>({})
 
     useEffect(() => {
-        if (!budgetData || !Array.isArray(budgetData)) return; // Ensure budgetData is valid
+        if (!budgetData || !Array.isArray(budgetData.budgetData)) return; // Ensure budgetData is valid
         if(budgetData.budgetData.length > 0 && Number(filters.department) == budgetData.departmentId && filters.subdepartmentId == budgetData.subDeptId && filters.year == budgetData.financialYear)
         {
             const transformedData = budgetData.budgetData.reduce((acc, curr) => {
@@ -27,7 +27,7 @@ const ShowBudget = ({ filters }: { filters: FilterOptions }) => {
                         if (!acc[key]) {
                             acc[key] = {};
                         }
-                        acc[key][curr.catid] = value;
+                        acc[key][curr.catid] = Math.round(value);
                     }
                 });
                 return acc;
@@ -39,7 +39,7 @@ const ShowBudget = ({ filters }: { filters: FilterOptions }) => {
 
 
     return <div className="bg-white shadow-lg w-full p-2 rounded-md">
-        {JSON.stringify(budgetData)}
+        {/* {JSON.stringify(budgetData)} */}
         {/* {JSON.stringify(tableData)} */}
         <table className="w-full table-auto border-collapse">
             <thead>

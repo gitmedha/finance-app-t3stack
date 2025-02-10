@@ -98,7 +98,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                         <DropdownMenu.Root>
                             <DropdownMenu.Trigger asChild>
                                 <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                                    <span>{filters.departmentname}{filters.department}</span>
+                                    <span>{filters.departmentname}</span>
                                     <RiArrowDropDownLine size={30} />
                                 </button>
                             </DropdownMenu.Trigger>
@@ -134,7 +134,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                         <DropdownMenu.Root >
                             <DropdownMenu.Trigger asChild>
                                 <button className="cursor-pointer !w-[280px] py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                                    <span >{filters.subdepartmentName}{filters.subdepartmentId}</span>
+                                    <span >{filters.subdepartmentName}</span>
                                     <RiArrowDropDownLine size={30} />
                                 </button>
                             </DropdownMenu.Trigger>

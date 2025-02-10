@@ -197,8 +197,8 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           {/* Sub department dropdown */}
           <div className="w-58">
           <DropdownMenu.Root >
-            <DropdownMenu.Trigger asChild className='!w-full'>
-              <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+            <DropdownMenu.Trigger asChild>
+                <button className="cursor-pointer !w-[280px] py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
                 <span>{filters.subdepartmentName}</span>
                 <RiArrowDropDownLine size={30} />
               </button>
@@ -206,7 +206,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             {/* drop down only when user role is 1 that means when the user is admin */}
             {
               userData.data?.user.role != 3 && 
-              <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-fit">
+                <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]">
                 {subdepartmentData?.subdepartments.sort((a, b) => a.name.localeCompare(b.name))
                   .map((dep) => (
                     <DropdownMenu.Item

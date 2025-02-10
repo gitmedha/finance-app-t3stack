@@ -18,7 +18,12 @@ const ShowBudget = ({ filters }: { filters: FilterOptions }) => {
     const [tableData, setTable] = useState<tableSchema>({})
 
     useEffect(() => {
-        if (!budgetData || !Array.isArray(budgetData.budgetData)) return; // Ensure budgetData is valid
+        if (!budgetData || !Array.isArray(budgetData.budgetData) || budgetData.budgetData.length<=0) {
+            console.log("I am running")
+            setTable({})
+            return 
+        }; 
+        
         if(budgetData.budgetData.length > 0 && Number(filters.department) == budgetData.departmentId && filters.subdepartmentId == budgetData.subDeptId && filters.year == budgetData.financialYear)
         {
             const transformedData = budgetData.budgetData.reduce((acc, curr) => {
@@ -32,7 +37,6 @@ const ShowBudget = ({ filters }: { filters: FilterOptions }) => {
                 });
                 return acc;
             }, {} as Record<string, Record<number, number>>);
-            console.log(transformedData)
             setTable(transformedData);
         }
     }, [budgetData]);

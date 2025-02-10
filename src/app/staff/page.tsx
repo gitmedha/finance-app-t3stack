@@ -111,9 +111,9 @@ export default function Staff() {
   };
 
   return (
-    <div className="mt-5 flex justify-center">
-      <div className="container mt-6 min-h-[400px] rounded bg-white p-4 shadow lg:mt-0">
-        <div className="mb-1 flex items-center justify-between px-2">
+    <div className="mt-5 flex justify-center ">
+      <div className="container mt-6 min-h-[400px] rounded bg-white py-4 px-3 shadow lg:mt-0">
+        <div className="mb-1 flex items-center justify-between px-1 gap-2">
           <div className="flex items-center justify-start space-x-2">
             <span className="font-semibold">
               Count: {result?.staffs ? result.totalCount : ""}

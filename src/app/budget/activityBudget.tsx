@@ -82,78 +82,28 @@ const months = [
 ];
 
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
+  const userData = useSession()
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [inputStates, setInputStates] = useState<boolean>(true)
-  const userData = useSession()
-  // const { data, refetch } = api.get.getSubCats.useQuery({ categoryId});
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
   })
   const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
-  const handelnputDisable = (disable: boolean) => {
-    const subcategoryIds = []
-    setInputStates(disable)
-    for (const [subcategoryId, subcategoryData] of Object.entries(tableData)) {
-      subcategoryIds.push(subcategoryId)
-    }
-    subcategoryIds.forEach((id) => {
-      const rate1In = document.getElementById(id + "Rate1") as HTMLInputElement;
-      const rate2In = document.getElementById(id + "Rate2") as HTMLInputElement;
-      const rate3In = document.getElementById(id + "Rate3") as HTMLInputElement;
-      const rate4In = document.getElementById(id + "Rate4") as HTMLInputElement;
-      const qty1In = document.getElementById(id + "Qty1") as HTMLInputElement;
-      const qty2In = document.getElementById(id + "Qty2") as HTMLInputElement;
-      const qty3In = document.getElementById(id + "Qty3") as HTMLInputElement;
-      const qty4In = document.getElementById(id + "Qty4") as HTMLInputElement;
-      const aprIn = document.getElementById(id + "Apr") as HTMLInputElement;
-      const mayIn = document.getElementById(id + "May") as HTMLInputElement;
-      const junIn = document.getElementById(id + "Jun") as HTMLInputElement;
-      const julIn = document.getElementById(id + "Jul") as HTMLInputElement;
-      const augIn = document.getElementById(id + "Aug") as HTMLInputElement;
-      const sepIn = document.getElementById(id + "Sep") as HTMLInputElement;
-      const octIn = document.getElementById(id + "Oct") as HTMLInputElement;
-      const novIn = document.getElementById(id + "Nov") as HTMLInputElement;
-      const decIn = document.getElementById(id + "Dec") as HTMLInputElement;
-      const janIn = document.getElementById(id + "Jan") as HTMLInputElement;
-      const febIn = document.getElementById(id + "Feb") as HTMLInputElement;
-      const marIn = document.getElementById(id + "Mar") as HTMLInputElement;
-      if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn && rate1In && rate2In && rate3In && rate4In && qty1In && qty2In && qty3In && qty4In) {
-        aprIn.disabled = disable;
-        mayIn.disabled = disable;
-        junIn.disabled = disable;
-        octIn.disabled = disable;
-        novIn.disabled = disable;
-        decIn.disabled = disable;
-        julIn.disabled = disable;
-        augIn.disabled = disable;
-        sepIn.disabled = disable;
-        janIn.disabled = disable;
-        febIn.disabled = disable;
-        marIn.disabled = disable;
-        rate1In.disabled = disable;
-        rate2In.disabled = disable;
-        rate3In.disabled = disable;
-        rate4In.disabled = disable;
-        qty1In.disabled = disable;
-        qty2In.disabled = disable;
-        qty3In.disabled = disable;
-        qty4In.disabled = disable;
-      } 
-      // else {
-      //   console.error(`Input element with ID  not found.`);
-      //   console.log(aprIn, rate1In, rate2In, rate3In, qty1In, qty2In)
-      // }
-    })
-  }
+  const [tableData, setTableData] = useState<TableData>({});
+
+  // api calls
   const { data: programData, isLoading: programDataLodaing } = api.get.getProgramActivities.useQuery({
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
     activity: (filter?.map)?.toString(),
-    subDeptId:subdepartmentId
-  },{
-    staleTime:0
+    subDeptId: subdepartmentId
+  }, {
+    staleTime: 0
   })
+  const createBudgetDetails = api.post.addBudgetDetails.useMutation();
+  const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
+  // useEffect hooks
   useEffect(() => {
     if (programData?.budgetId == budgetId && programData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
@@ -243,14 +193,69 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
   useEffect(() => {
     handelnputDisable(true)
   }, [filter])
-  const [tableData, setTableData] = useState<TableData>({});
+
+  // Other fuctions
+  const handelnputDisable = (disable: boolean) => {
+    const subcategoryIds = []
+    setInputStates(disable)
+    for (const [subcategoryId] of Object.entries(tableData)) {
+      subcategoryIds.push(subcategoryId)
+    }
+    subcategoryIds.forEach((id) => {
+      const rate1In = document.getElementById(id + "Rate1") as HTMLInputElement;
+      const rate2In = document.getElementById(id + "Rate2") as HTMLInputElement;
+      const rate3In = document.getElementById(id + "Rate3") as HTMLInputElement;
+      const rate4In = document.getElementById(id + "Rate4") as HTMLInputElement;
+      const qty1In = document.getElementById(id + "Qty1") as HTMLInputElement;
+      const qty2In = document.getElementById(id + "Qty2") as HTMLInputElement;
+      const qty3In = document.getElementById(id + "Qty3") as HTMLInputElement;
+      const qty4In = document.getElementById(id + "Qty4") as HTMLInputElement;
+      const aprIn = document.getElementById(id + "Apr") as HTMLInputElement;
+      const mayIn = document.getElementById(id + "May") as HTMLInputElement;
+      const junIn = document.getElementById(id + "Jun") as HTMLInputElement;
+      const julIn = document.getElementById(id + "Jul") as HTMLInputElement;
+      const augIn = document.getElementById(id + "Aug") as HTMLInputElement;
+      const sepIn = document.getElementById(id + "Sep") as HTMLInputElement;
+      const octIn = document.getElementById(id + "Oct") as HTMLInputElement;
+      const novIn = document.getElementById(id + "Nov") as HTMLInputElement;
+      const decIn = document.getElementById(id + "Dec") as HTMLInputElement;
+      const janIn = document.getElementById(id + "Jan") as HTMLInputElement;
+      const febIn = document.getElementById(id + "Feb") as HTMLInputElement;
+      const marIn = document.getElementById(id + "Mar") as HTMLInputElement;
+      if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn && rate1In && rate2In && rate3In && rate4In && qty1In && qty2In && qty3In && qty4In) {
+        aprIn.disabled = disable;
+        mayIn.disabled = disable;
+        junIn.disabled = disable;
+        octIn.disabled = disable;
+        novIn.disabled = disable;
+        decIn.disabled = disable;
+        julIn.disabled = disable;
+        augIn.disabled = disable;
+        sepIn.disabled = disable;
+        janIn.disabled = disable;
+        febIn.disabled = disable;
+        marIn.disabled = disable;
+        rate1In.disabled = disable;
+        rate2In.disabled = disable;
+        rate3In.disabled = disable;
+        rate4In.disabled = disable;
+        qty1In.disabled = disable;
+        qty2In.disabled = disable;
+        qty3In.disabled = disable;
+        qty4In.disabled = disable;
+      } 
+      // else {
+      //   console.error(`Input element with ID  not found.`);
+      //   console.log(aprIn, rate1In, rate2In, rate3In, qty1In, qty2In)
+      // }
+    })
+  }
   const handleSelect = (val: subProgramActivitesSchema) => {
     setFilter(val)
   }
   const updateTotalQtyVals = (which: string, difference: number) => {
     setTotalQty((prev) => {
       const updatedTotal = { ...prev };
-      console.log(difference)
       updatedTotal[which as keyof typeof prev] += difference;
       return updatedTotal;
     });
@@ -319,9 +324,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       return updatedData;
     });
   };
-
-
-  const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const handleSave = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -425,7 +427,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       });
     }
   };
-  const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
+  
   const handleUpdate = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -732,10 +734,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
             }
             {inputStates ? <Button
               type="button"
-              className="cursor-pointer !text-primary  px-2 !w-20 !text-lg  border-primary border-2 !disabled:cursor-not-allowed"
+              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
               style={{ cursor: "pointer" }}
-              // disabled={isSaveDisabled()}
               onClick={() => handelnputDisable(false)}
             >
               Edit
@@ -745,7 +746,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                 className="cursor-pointer !text-primary  px-2 !w-20 !text-lg border border-primary !disabled:cursor-not-allowed"
                 variant="soft"
                 style={{ cursor: "pointer" }}
-                // disabled={isSaveDisabled()}
                 onClick={() => handelnputDisable(true)}
               >
                 Cancel

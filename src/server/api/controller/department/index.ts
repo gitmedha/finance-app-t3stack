@@ -139,6 +139,8 @@ export const getSubDepartments = protectedProcedure
   }))
   .query(async ({ctx,input})=>{
     const baseConditions = [eq(departmentMaster.type, "Sub Department")]
+    if(!input.deptId && input.deptId !=0)
+        return []
     if(input.deptId)
     {
       baseConditions.push(eq(departmentHierarchyInFinanceProject.parentId,input.deptId))

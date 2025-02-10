@@ -6,6 +6,7 @@ import { api } from "~/trpc/react";
 import Select from "react-select";
 import { type StaffItem } from "../staff";
 import useStaff from "../store/staffStore";
+import {toast} from "react-toastify"
 
 interface ItemDetailProps {
   item: StaffItem;
@@ -33,6 +34,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   });
 
   const stateName = watch("statesData")?.label ?? "";
+  const departmentId = watch("departmentData")?.value
 
   const { mutate: editStaff } = api.post.editStaff.useMutation({
     async onSuccess(data) {
@@ -53,6 +55,10 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       stateName,
     });
   const { data: levelsData = [] } = api.get.getLevels.useQuery()
+  const { data: subDepartsmentData = [], refetch:subDepartmentsRefectch } =
+    api.get.getSubDepartments.useQuery({
+      deptId: departmentId
+    });
 
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
     try {
@@ -68,16 +74,37 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         updatedBy: userData.data?.user.id ?? 1,
         isactive: true,
         level: data.levelData?.value,
+        subDeptid:data.subDeptData?.value,
         updatedAt: new Date().toISOString().split("T")[0] ?? "",
       };
 
       editStaff(submissionData);
       reset(submissionData);
+      toast.success('Successfully Edited', {
+        position: "bottom-left",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       // reset();
       // await apiContext.get.getStaffs.invalidate();
       // setIsModalOpen(false);
     } catch (error) {
       console.error("Error adding staff:", error);
+      toast.warn('Error While Editing ', {
+        position: "bottom-left",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
 
@@ -86,6 +113,12 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       void refetch();
     }
   }, [refetch, stateName]);
+  useEffect(()=>{
+    if(departmentId)
+    {
+      void subDepartmentsRefectch()
+    }
+  }, [subDepartmentsRefectch, departmentId])
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -256,6 +289,30 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             </span>
           )}
         </div>
+      </div>
+      
+      {/* Sub department */}
+      <div className="w-1/2">
+        <label className="text-sm">Sub Department</label>
+        <Controller
+          name="subDeptData"
+          control={control}
+          render={({ field }) => (
+            <Select
+              onChange={field.onChange}
+              defaultValue={item.subDeptData}
+              options={subDepartsmentData}
+              placeholder="Select a Sub Department"
+              isClearable
+              aria-invalid={!!errors.subDepartment}
+            />
+          )}
+        />
+        {errors.subDepartment && (
+          <span className="text-xs text-red-500">
+            {errors.subDepartment.message}
+          </span>
+        )}
       </div>
 
       <Flex gap="3" mt="4" justify="end">

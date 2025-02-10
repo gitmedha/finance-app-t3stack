@@ -30,11 +30,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     "2027-28", "2028-29", "2029-30",
   ];
   const updateBudgetStatus = api.post.updateStatusBudgetDetails.useMutation()
-  // useEffect(() => {
-  //   if (data && data.departments.length === 0) {
-  //     void refetch(); // Trigger refetch if departments are empty
-  //   }
-  // }, [data]);
+
   const handelStatusUpdate = (status: string,userId:number) => {
     try {
       if (budgetId) {

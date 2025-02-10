@@ -24,6 +24,8 @@ interface StaffItem {
     updatedBy: number | null;
     department: number;
     departmentname: string | null;
+    subDepartment: number;
+    subDepartmentname: string | null;
     state: string | null;
     stateId: string | null;
     location: string | null;
@@ -43,6 +45,8 @@ interface StaffItem {
   empNo: string;
   department: number;
   departmentname: string;
+  subDepartment: number;
+  subDepartmentname: string;
   designation: string;
   nature_of_employment?: string;
   state?: string;
@@ -51,6 +55,7 @@ interface StaffItem {
   locationId?: string;
   program?: string;
   departmentData?: ISelectItem;
+  subDeptData?:ISelectItem;
   statesData?: ISelectItem;
   locationData?: ISelectItem;
   levelData?:ISelectItem
@@ -68,6 +73,7 @@ interface StaffFormData {
   state: ISelectItem;
   location: ISelectItem;
   department: ISelectItem;
+  subDepartmnet: ISelectItem;
   designation: string;
   isactive: boolean;
   natureOfEmployment: string;

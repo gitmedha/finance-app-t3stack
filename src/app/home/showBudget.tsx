@@ -11,38 +11,30 @@ const Labels = [{ map: 1, name: "FY Plan" }, { map: 2, name: "FY Actual" }, { ma
 
 const ShowBudget = ({ filters }: { filters: FilterOptions }) => {
     const { data: cat, isLoading: catsLoading } = api.get.getCats.useQuery()
-    const { data: budgetData } = api.get.getBudgetSum.useQuery({ financialYear: filters.year,departmentId:Number(filters.department),subDeptId:filters.subdepartmentId})
+    const { data: budgetData } = api.get.getBudgetSum.useQuery({ financialYear: filters.year,departmentId:Number(filters.department),subDeptId:filters.subdepartmentId},{
+        enabled:!!cat,
+        staleTime:0
+    })
     const [tableData, setTable] = useState<tableSchema>({})
-    // useEffect(() => {
-    //     const formattedData = Labels.reduce((acc, label) => {
-    //         acc[label.map] = {
-    //             "PERSONNEL": "NA",
-    //             "PROGRAM ACTIVITIES": "NA",
-    //             "PROGRAM TRAVEL": "NA",
-    //             "CAPITAL COST": "NA",
-    //             "PROGRAM OFFICE": "NA",
-    //             "OVERHEADS":"NA"
-    //         }
-    //         return acc;
-    //     }, {} as tableSchema)
-    //     setTable(formattedData)
-    // }, [cat])
+
     useEffect(() => {
         if (!budgetData || !Array.isArray(budgetData)) return; // Ensure budgetData is valid
-
-        const transformedData = budgetData.reduce((acc, curr) => {
-            Object.entries(curr).forEach(([key, value]) => {
-                if (key !== "catid") {
-                    if (!acc[key]) {
-                        acc[key] = {};
+        if(budgetData.budgetData.length > 0 && Number(filters.department) == budgetData.departmentId && filters.subdepartmentId == budgetData.subDeptId && filters.year == budgetData.financialYear)
+        {
+            const transformedData = budgetData.budgetData.reduce((acc, curr) => {
+                Object.entries(curr).forEach(([key, value]) => {
+                    if (key !== "catid") {
+                        if (!acc[key]) {
+                            acc[key] = {};
+                        }
+                        acc[key][curr.catid] = value;
                     }
-                    acc[key][curr.catid] = value;
-                }
-            });
-            return acc;
-        }, {} as Record<string, Record<number, number>>);
-        console.log(transformedData)
-        setTable(transformedData);
+                });
+                return acc;
+            }, {} as Record<string, Record<number, number>>);
+            console.log(transformedData)
+            setTable(transformedData);
+        }
     }, [budgetData]);
 
 
@@ -59,7 +51,7 @@ const ShowBudget = ({ filters }: { filters: FilterOptions }) => {
                 </tr>
             </thead>
 
-            {cat && <tbody>
+            {!catsLoading  && <tbody>
                 {
                     Labels.map((label) => (
                         <tr key={label.map} className="text-sm transition hover:bg-gray-100">

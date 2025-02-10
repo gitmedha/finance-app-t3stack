@@ -35,32 +35,32 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
             handleSelect("subdepartment", { id: userData.data?.user.subDepartmentId, departmentname: userData.data?.user.subDepartmentName })
     }, [userData])
 
-    useEffect(() => {
-        if (!userData.data?.user.departmentId && !userData.data?.user.departmentName) {
-            if (data?.departments?.length) {
-                const sortedDepartments = [...data.departments].sort((a, b) =>
-                    a.departmentname.localeCompare(b.departmentname)
-                );
-                if (sortedDepartments[0]) {
-                    handleSelect("department", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].departmentname })
-                }
-            }
-        }
+    // useEffect(() => {
+    //     if (!userData.data?.user.departmentId && !userData.data?.user.departmentName) {
+    //         if (data?.departments?.length) {
+    //             const sortedDepartments = [...data.departments].sort((a, b) =>
+    //                 a.departmentname.localeCompare(b.departmentname)
+    //             );
+    //             if (sortedDepartments[0]) {
+    //                 handleSelect("department", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].departmentname })
+    //             }
+    //         }
+    //     }
 
-    }, [data]);
+    // }, [data]);
 
-    useEffect(() => {
-        if (!userData.data?.user.subDepartmentId && !userData.data?.user.subDepartmentName) {
-            if (subdepartmentData?.subdepartments?.length) {
-                const sortedDepartments = [...subdepartmentData.subdepartments].sort((a, b) =>
-                    a.name.localeCompare(b.name)
-                );
-                if (sortedDepartments[0]) {
-                    handleSelect("subdepartment", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].name })
-                }
-            }
-        }
-    }, [subdepartmentData])
+    // useEffect(() => {
+    //     if (!userData.data?.user.subDepartmentId && !userData.data?.user.subDepartmentName) {
+    //         if (subdepartmentData?.subdepartments?.length) {
+    //             const sortedDepartments = [...subdepartmentData.subdepartments].sort((a, b) =>
+    //                 a.name.localeCompare(b.name)
+    //             );
+    //             if (sortedDepartments[0]) {
+    //                 handleSelect("subdepartment", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].name })
+    //             }
+    //         }
+    //     }
+    // }, [subdepartmentData])
 
 
     return (
@@ -98,13 +98,20 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                         <DropdownMenu.Root>
                             <DropdownMenu.Trigger asChild>
                                 <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                                    <span>{filters.departmentname}{filters.department}</span>
+                                    <span>{filters.departmentname}</span>
                                     <RiArrowDropDownLine size={30} />
                                 </button>
                             </DropdownMenu.Trigger>
                             {/* drop down only when user role is 1 that means when the user is admin */}
                             {
                                 userData.data?.user.role == 1 && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+                                    <DropdownMenu.Item
+                                        // key={}
+                                        className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                                        onSelect={() => handleSelect('department', { id: 0, departmentname:"All" })} // Set selected year
+                                    >
+                                        ALL
+                                    </DropdownMenu.Item>
                                     {data?.departments
                                         ?.sort((a, b) => a.departmentname.localeCompare(b.departmentname)) // Sorting alphabetically by department name
                                         .map((dep) => (
@@ -125,16 +132,23 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                     {/* Sub department dropdown */}
                     <div className="w-58">
                         <DropdownMenu.Root >
-                            <DropdownMenu.Trigger asChild className='!w-full'>
-                                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                                    <span>{filters.subdepartmentName}{filters.subdepartmentId}</span>
+                            <DropdownMenu.Trigger asChild>
+                                <button className="cursor-pointer !w-[280px] py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                                    <span >{filters.subdepartmentName}</span>
                                     <RiArrowDropDownLine size={30} />
                                 </button>
                             </DropdownMenu.Trigger>
                             {/* drop down only when user role is 1 that means when the user is admin */}
                             {
                                 userData.data?.user.role != 3 &&
-                                <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-fit">
+                                <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]">
+                                        <DropdownMenu.Item
+                                            // key={dep.id}
+                                            className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                                            onSelect={() => handleSelect("subdepartment", { id: 0, departmentname:"ALL" })} // Pass entire department object
+                                        >
+                                            ALL
+                                        </DropdownMenu.Item>
                                     {subdepartmentData?.subdepartments.sort((a, b) => a.name.localeCompare(b.name))
                                         .map((dep) => (
                                             <DropdownMenu.Item

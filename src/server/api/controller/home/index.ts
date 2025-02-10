@@ -1,8 +1,8 @@
 import { protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
-import { and, count, eq, ilike, desc, isNull, sql, isNotNull, inArray} from "drizzle-orm";
-import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject, categoryMasterInFinanceProject } from "~/server/db/schema";
-import { db } from "~/server/db";
+import { and,  eq,    sql,  inArray} from "drizzle-orm";
+import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject } from "~/server/db/schema";
+
 
 
 export const getTotalBudgetSum = protectedProcedure
@@ -141,7 +141,7 @@ export const getBudgetSum = protectedProcedure
         const baseConditions = [
             eq(budgetMasterInFinanceProject.financialYear, financialYear),
         ]
-        if (departmentId) {
+        if (departmentId && departmentId!=0) {
             baseConditions.push(eq(budgetMasterInFinanceProject.departmentId, departmentId))
         }
         const budgetMasterIds = await ctx.db
@@ -157,7 +157,7 @@ export const getBudgetSum = protectedProcedure
         const detailsCondition = [
             inArray(budgetDetailsInFinanceProject.budgetid, budgetIds)
         ]
-        if (subDeptId)
+        if (subDeptId &&subDeptId!=0)
             detailsCondition.push(eq(budgetDetailsInFinanceProject.subDeptid,subDeptId))
             const quarterBudget = await ctx.db
                 .select({
@@ -175,7 +175,7 @@ export const getBudgetSum = protectedProcedure
                 )
 
         
-        return quarterBudget.map((q) => (
+        return {budgetData:quarterBudget.map((q) => (
             {
                 catid: q.catid,
                 // catName:q.catName,
@@ -185,7 +185,7 @@ export const getBudgetSum = protectedProcedure
                 13: Number(q.q3Sum),
                 17: Number(q.q4Sum)
             }
-        ))
+        )),departmentId,subDeptId,financialYear}
        
 
     })

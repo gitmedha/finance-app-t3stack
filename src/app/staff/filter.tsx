@@ -21,7 +21,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   const {data:subDeptsData} = api.get.getSubDepartments.useQuery(userData.data?.user.departmentId?{
     deptId: userData.data.user.departmentId
   }:{
-    deptId:undefined
+    deptId:0
   },{
     enabled:userData.data?.user.role !=3
   })

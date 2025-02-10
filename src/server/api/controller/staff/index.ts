@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike } from "drizzle-orm";
+import { and, count, desc, eq, ilike,aliasedTable } from "drizzle-orm";
 import { z } from "zod";
 import {
   //   createTRPCRouter,
@@ -15,6 +15,7 @@ import {
   categoryMasterInFinanceProject,
 } from "~/server/db/schema";
 
+const subDepartmentTable = aliasedTable(departmentMaster,"subDepartmentTable")
 export const getStaffs = protectedProcedure
   .input(
     z.object({
@@ -28,7 +29,6 @@ export const getStaffs = protectedProcedure
     }),
   )
   .query(async ({ ctx, input }) => {
-    console.log(input)
     const { page, limit, searchTerm, status, department, designation ,subdepartment} = input;
     const offset = (page - 1) * limit;
     // Apply the search condition only if searchTerm is not an empty string
@@ -74,6 +74,8 @@ export const getStaffs = protectedProcedure
         gratuity: salaryMaster.gratuity,
         epf: salaryMaster.epf,
         pgwPld: salaryMaster.pgwPld,
+        subDeptid:staffMaster.subDeptid,
+        subDeptName:subDepartmentTable.departmentname
       })
       .from(staffMaster)
       .leftJoin(
@@ -81,6 +83,13 @@ export const getStaffs = protectedProcedure
         and(
           eq(departmentMaster.isactive, true),
           eq(departmentMaster.id, staffMaster.department),
+        ),
+      )
+      .leftJoin(
+        subDepartmentTable, // Joining again for sub-department
+        and(
+          eq(subDepartmentTable.id, staffMaster.subDeptid),
+          eq(subDepartmentTable.isactive, true),
         ),
       )
       .leftJoin(
@@ -135,6 +144,10 @@ export const getStaffs = protectedProcedure
         value: staff.department,
         label: staff.departmentname,
       };
+      const subDeptData = {
+        value:staff.subDeptid,
+        label:staff.subDeptName
+      }
       const levelData = {
         value:staff.level,
         label:staff.levelName
@@ -145,7 +158,8 @@ export const getStaffs = protectedProcedure
         statesData,
         locationData,
         departmentData,
-        levelData
+        levelData,
+        subDeptData
       });
     }
 
@@ -173,6 +187,7 @@ export const addStaff = protectedProcedure
       description: z.string().optional().nullable(),
       createdBy: z.number().min(1, "Invalid creator ID"),
       createdAt: z.string(),
+      subDeptId:z.number().optional()
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -180,7 +195,8 @@ export const addStaff = protectedProcedure
       // Format data for insertion
       const formattedInput = {
         ...input,
-        department: input.departmentId
+        department: input.departmentId,
+        subDeptid:input.subDeptId,
         // id: undefined, // Ensure ID is not manually set
         // state: undefined, // Ensure no conflicting state field
         // location: undefined, // Ensure no conflicting location field
@@ -221,6 +237,7 @@ export const editStaff = protectedProcedure
       level:z.number().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
+      subDeptid: z.number().optional()
     }),
   )
   .mutation(async ({ ctx, input }) => {

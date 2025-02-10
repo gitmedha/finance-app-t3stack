@@ -1505,6 +1505,11 @@ export const getSubDepts = protectedProcedure
     }))
     .query(async({ctx,input})=>{
         const {deptId} = input
+        const baseConditions = []
+        if(deptId != 0)
+        {
+            baseConditions.push(eq(departmentHierarchyInFinanceProject.parentId, deptId))
+        }
         const subdepartments = await ctx.db
             .select({
                 id: departmentMasterInFinanceProject.id,
@@ -1512,7 +1517,7 @@ export const getSubDepts = protectedProcedure
             })
             .from(departmentMasterInFinanceProject)
             .innerJoin(departmentHierarchyInFinanceProject, eq(departmentHierarchyInFinanceProject.deptId, departmentMasterInFinanceProject.id))
-            .where(eq(departmentHierarchyInFinanceProject.parentId, deptId))
+            .where(and(...baseConditions))
         return { subdepartments }
     })
 export const saveTravelBudgetDetails = protectedProcedure

@@ -1,5 +1,5 @@
 import { useSession } from "next-auth/react";
-import { useEffect, useState, type FC } from "react";
+import {  type FC } from "react";
 import { api } from "~/trpc/react";
 
 // Define types for maricsList items
@@ -13,10 +13,10 @@ interface MetricItem {
 
 const maricsList: MetricItem[] = [
     { count: "", title: 'Financial Year', name: 'noofweektimesheetpendingapproval' },
-    { count: 33, title: 'Annual Budget', name: 'totalnoofskills',addOn:"INR"},
-    { count: 4, title: 'Annual Actual', name: 'totalprojectsworked',addOn:"INR"},
-    { count: 40, title: 'Annual Balance', name: 'noofweektimesheetpendingsubmission',addOn:"INR"},
-    { count: 1, title: 'Annual Utilized %', name: 'noofweektimesheetpendingapproval',addOn:"%"},
+    { count: 33, title: 'Budget Planned', name: 'totalnoofskills',addOn:"INR"},
+    { count: 4, title: 'Budget Actual', name: 'totalprojectsworked',addOn:"INR"},
+    { count: 40, title: 'Budget Balance', name: 'noofweektimesheetpendingsubmission',addOn:"INR"},
+    { count: 1, title: 'Budget Utilized %', name: 'noofweektimesheetpendingapproval',addOn:"%"},
 ];
 
 // Define types for PendingCard props
@@ -42,7 +42,7 @@ const PendingCard: FC<PendingCardProps> = ({ count, title,addOn }) => {
 const AnnualBudget = ({ financialYear }: { financialYear :string}) => {
     const userData = useSession()
     // call to get total sum 
-    const { data: totalBudgetSum, isLoading: totalBudgetSumLoading } = api.get.getTotalBudgetSum.useQuery(
+    const { data: totalBudgetSum } = api.get.getTotalBudgetSum.useQuery(
         { financialYear:financialYear,departmentId:userData.data?.user.departmentId}
     )
     return (
@@ -50,7 +50,7 @@ const AnnualBudget = ({ financialYear }: { financialYear :string}) => {
                     {maricsList.map((item) => (
                         <PendingCard
                             key={item.title}
-                            count={item.title == "Annual Budget" ? totalBudgetSum ? Math.round(Number(totalBudgetSum)) : 0 : item.title == "Financial Year" ? financialYear : item.count}
+                            count={item.title == "Budget Planned" ? totalBudgetSum ? Math.round(Number(totalBudgetSum)) : 0 : item.title == "Financial Year" ? financialYear : item.count}
                             title={item.title}
                             addOn={item.addOn}
                         />

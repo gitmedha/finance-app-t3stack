@@ -1,4 +1,4 @@
-import { type ISelectItem } from "../common/types/genericField";
+// import { type ISelectItem } from "../common/types/genericField";
 
 // Use a type-only export to avoid conflicts with isolatedModules
 export type { FilterOptions, BudgetFilterFormProps };

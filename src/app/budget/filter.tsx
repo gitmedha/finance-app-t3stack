@@ -30,11 +30,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     "2027-28", "2028-29", "2029-30",
   ];
   const updateBudgetStatus = api.post.updateStatusBudgetDetails.useMutation()
-  // useEffect(() => {
-  //   if (data && data.departments.length === 0) {
-  //     void refetch(); // Trigger refetch if departments are empty
-  //   }
-  // }, [data]);
+
   const handelStatusUpdate = (status: string,userId:number) => {
     try {
       if (budgetId) {
@@ -86,11 +82,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     if (userData.data?.user.subDepartmentId && userData.data?.user.subDepartmentName)
       handleSelect("subdepartment", { id: userData.data?.user.subDepartmentId, departmentname: userData.data?.user.subDepartmentName })
   }, [userData])
-  // useEffect(()=>{
-  //   if (years[0]){
-  //     handleSelect("year", years[0])
-  //   }
-  // },[handleSelect, years])
+
   useEffect(() => {
     if (!userData.data?.user.departmentId && !userData.data?.user.departmentName)
     {
@@ -105,6 +97,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     }
 
   }, [data]);
+  
   useEffect(()=>{
     if (!userData.data?.user.subDepartmentId && !userData.data?.user.subDepartmentName) {
       if (subdepartmentData?.subdepartments?.length) {
@@ -146,12 +139,38 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     <div>
       <div className='flex justify-between'>
         <div className="flex justify-start items-center space-x-4">
+
+          {/* Year Dropdown */}
+          <div className="w-52">
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                  <span>
+                    {filters.year || 'Select Year'}
+                  </span>
+                  <RiArrowDropDownLine size={30} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+                {years.map((year) => (
+                  <DropdownMenu.Item
+                    key={year}
+                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                    onSelect={() => handleSelect('year', year)} // Set selected year
+                  >
+                    {year}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          </div>
+          {/* Department */}
           <div className="w-52">
             {/* Department Dropdown */}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                  <span>{filters.departmentname}{filters.department}</span>
+                  <span>{filters.departmentname}</span>
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
@@ -180,7 +199,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           <DropdownMenu.Root >
             <DropdownMenu.Trigger asChild className='!w-full'>
               <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                <span>{filters.subdepartmentName}{filters.subdepartmentId}</span>
+                <span>{filters.subdepartmentName}</span>
                 <RiArrowDropDownLine size={30} />
               </button>
             </DropdownMenu.Trigger>
@@ -203,30 +222,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             }
           </DropdownMenu.Root>
           </div>
-          <div className="w-52">
-            {/* Year Dropdown */}
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger asChild>
-                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
-                  <span>
-                    {filters.year || 'Select Year'}
-                  </span>
-                  <RiArrowDropDownLine size={30} />
-                </button>
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-                {years.map((year) => (
-                  <DropdownMenu.Item
-                    key={year}
-                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                    onSelect={() => handleSelect('year', year)} // Set selected year
-                  >
-                    {year}
-                  </DropdownMenu.Item>
-                ))}
-              </DropdownMenu.Content>
-            </DropdownMenu.Root>
-          </div>
+          
         </div>
         <div className='flex justify-end items-center space-x-2'>
           {

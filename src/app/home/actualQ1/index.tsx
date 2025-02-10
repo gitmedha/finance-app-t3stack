@@ -74,15 +74,6 @@ const ActualQ1 = ({ financialYear }: { financialYear: string }) => {
           </tr>
         </thead>
         <tbody>
-          {/* {data.map((item, i) => (
-            <tr key={i} className="hover:bg-gray-100 text-sm transition-colors">
-              <td className="p-1 border">{item.bHead}</td>
-              <td className="p-1 border">{item.actQ1}</td>
-              <td className="p-1 border">{item.q1bal}</td>
-              <td className="p-1 border">{item.util}</td>
-              <td className="p-1 border">{item.budget}</td>
-            </tr>
-          ))} */}
           {
             Object.keys(tableData).map((k) => {
               const item = tableData[k]

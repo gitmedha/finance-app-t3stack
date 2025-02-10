@@ -6,7 +6,7 @@ import { api } from "~/trpc/react";
 import Select from "react-select";
 import { type ISelectItem } from "../../common/types/genericField";
 import useStaff from "../store/staffStore";
-
+import { toast } from "react-toastify"
 interface ItemDetailProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   refetchStaffs: () => void;
@@ -20,6 +20,7 @@ interface StaffFormData {
   stateData: ISelectItem;
   locationData: ISelectItem;
   departmenData: ISelectItem;
+  subDepartmentData:ISelectItem;
   designation: string;
   isactive: boolean;
   natureOfEmployment: string;
@@ -44,6 +45,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
     defaultValues: activeStaffDetails,
   });
   const stateName = watch("stateData");
+  const departmentId = watch("departmenData")
 
   // const addStaffMutation = api.post.addStaff.useMutation();
 
@@ -64,6 +66,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const { data: statesData } = api.get.getAllStates.useQuery();
   const { data: locationsData = [], refetch } =api.get.getAllLocations.useQuery({stateName: stateName?.label,});
   const{data:levelsData=[]} = api.get.getLevels.useQuery()
+  const { data: suDeptData = [], refetch: subDeptRefetch } = api.get.getSubDepartments.useQuery({ deptId: departmentId?.value })
 
   const onSubmit: SubmitHandler<StaffFormData> = async (data) => {
     try {
@@ -76,18 +79,42 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         locationId: data.locationData.label.toString(),
         departmentId: Number(data.departmenData.value),
         level:Number(data.levelData.value),
+        subDeptId:data.subDepartmentData.value
       };
       setActiveStaffDetails(submissionData);
       addStaff(submissionData);
+      toast.success('Successfully Saved', {
+        position: "bottom-left",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       // // reset(submissionData);
     } catch (error) {
       console.error("Error adding staff:", error);
+      toast.warn('Error While Saving ', {
+        position: "bottom-left",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
 
   useEffect(() => {
     void refetch();
   }, [refetch, stateName]);
+  useEffect(() => {
+    void subDeptRefetch();
+  }, [subDeptRefetch, departmentId]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -210,6 +237,56 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           )}
         </div>
       </div>
+      <div className="flex gap-2">
+        {/* department */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            Department <span className="text-red-400">*</span>
+          </label>
+          <Controller
+            name="departmenData"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                options={departmentData}
+                placeholder="Select a Department"
+                isClearable
+                aria-invalid={!!errors.departmenData}
+              />
+            )}
+          />
+          {errors.departmenData && (
+            <span className="text-xs text-red-500">
+              {errors.departmenData.message}
+            </span>
+          )}
+        </div>
+        {/* Sub department  */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            Sub Department <span className="text-red-400">*</span>
+          </label>
+          <Controller
+            name="subDepartmentData"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                options={suDeptData}
+                placeholder="Select a Sub Department"
+                isClearable
+                aria-invalid={!!errors.subDepartmentData}
+              />
+            )}
+          />
+          {errors.subDepartmentData && (
+            <span className="text-xs text-red-500">
+              {errors.subDepartmentData.message}
+            </span>
+          )}
+        </div>
+      </div>
           
       <div className="flex gap-2">
         {/* Designation Field */}
@@ -240,30 +317,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           />
         </div>
       </div>
-      {/* department */}
-      <div >
-        <label className="text-sm">
-          Department <span className="text-red-400">*</span>
-        </label>
-        <Controller
-          name="departmenData"
-          control={control}
-          render={({ field }) => (
-            <Select
-              onChange={field.onChange}
-              options={departmentData}
-              placeholder="Select a Department"
-              isClearable
-              aria-invalid={!!errors.departmenData}
-            />
-          )}
-        />
-        {errors.departmenData && (
-          <span className="text-xs text-red-500">
-            {errors.departmenData.message}
-          </span>
-        )}
-      </div>
+
+      
+      
 
       <Flex gap="3" mt="4" justify="end">
         <Button

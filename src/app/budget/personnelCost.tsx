@@ -719,7 +719,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             }
             {inputStates ? <Button
               type="button"
-              className="cursor-pointer !text-primary  px-2 !w-20 !text-lg  border-primary border-2 !disabled:cursor-not-allowed"
+              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
               variant="soft"
               style={{ cursor: "pointer" }}
               // disabled={isSaveDisabled()}

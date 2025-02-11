@@ -351,7 +351,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       march: (data.Mar ?? "").toString(),
       activity: (filter?.map ?? "").toString(),
       deptId: Number(deptId),
-      clusterId: undefined,
       createdBy: userData.data?.user.id ?? 1,
       createdAt: new Date().toISOString(),
       rate1: (data.Rate1 ?? "").toString(),
@@ -454,7 +453,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       february: (data.Feb ?? "").toString(),
       march: (data.Mar ?? "").toString(),
       activity: (filter?.map ?? "").toString(),
-      clusterId: undefined,
       updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
       rate1: (data.Rate1 ?? "").toString(),
@@ -534,13 +532,13 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
             else
               setSectionOpen("Program Activities")
           }}>
-          <h1 className=" uppercase ">{section}</h1>
+          <h1 className=" capitalize text-md ">{section.toLowerCase()}</h1>
           {
             programDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
+                <p className="text-md">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }
@@ -550,7 +548,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           <DropdownMenu.Root >
             <DropdownMenu.Trigger asChild>
               <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
-                <span>{filter?.name} </span>
+                <span className='capitalize'>{filter?.name.toLowerCase()} </span>
                 <RiArrowDropDownLine size={30} />
               </button>
             </DropdownMenu.Trigger>
@@ -560,10 +558,10 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
               {subProgramActivites.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
                 <DropdownMenu.Item
                   key={ind}
-                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm"
+                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm capitalize"
                   onSelect={() => handleSelect(val)}
                 >
-                  {val.name}
+                  {val.name.toLowerCase()}
                 </DropdownMenu.Item>
               ))}
             </DropdownMenu.Content>
@@ -575,96 +573,22 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           {/* Table */}
           <table className="w-full table-auto border-collapse">
             <thead>
-              <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                <th className="border p-2">Particulars</th>
-                <th scope="col" className="border p-2">
-                  Qty&nbsp;&nbsp;
-                </th>
-                <th scope="col" className="border p-2">
-                  Rate
-                </th>
-                <th scope="col" className="border p-2">
-                  Amount
-                </th>
-                <th scope="col" className="border p-2">
-                  Apr
-                </th>
-                <th scope="col" className="border p-2">
-                  May
-                </th>
-                <th scope="col" className="border p-2">
-                  Jun
-                </th>
-
-                <th scope="col" className="border p-2">
-                  Qty&nbsp;&nbsp;
-                </th>
-                <th scope="col" className="border p-2">
-                  Rate
-                </th>
-                <th scope="col" className="border p-2">
-                  Amount
-                </th>
-                <th scope="col" className="border p-2">
-                  Jul
-                </th>
-                <th scope="col" className="border p-2">
-                  Aug
-                </th>
-                <th scope="col" className="border p-2">
-                  Sep
-                </th>
-
-                <th scope="col" className="border p-2">
-                  Qty&nbsp;&nbsp;
-                </th>
-                <th scope="col" className="border p-2">
-                  Rate
-                </th>
-                <th scope="col" className="border p-2">
-                  Amount
-                </th>
-                <th scope="col" className="border p-2">
-                  Oct
-                </th>
-                <th scope="col" className="border p-2">
-                  Nov
-                </th>
-                <th scope="col" className="border p-2">
-                  Dec
-                </th>
-                <th scope="col" className="border p-2">
-                  Qty&nbsp;&nbsp;
-                </th>
-                <th scope="col" className="border p-2">
-                  Rate
-                </th>
-                <th scope="col" className="border p-2">
-                  Amount
-                </th>
-                <th scope="col" className="border p-2">
-                  Jan
-                </th>
-                <th scope="col" className="border p-2">
-                  Feb
-                </th>
-                <th scope="col" className="border p-2">
-                  Mar
-                </th>
-                {/* <th scope="col" className="border p-2">
-                  Notes
-                </th> */}
+              <tr className="bg-gray-200 text-left text-sm  text-gray-600">
+                <th className="border p-2 capitalize">{"Particular".toLowerCase()}</th>
+                {months.map((month) => (
+                  <th key={month} className="border p-2 capitalize">{month.toLowerCase()}</th>
+                ))}
               </tr>
             </thead>
             {
               !programDataLodaing && <tbody>
-                {programData?.subCategories.map((sub, key) => (
+                {programData?.subCategories.map((sub) => (
                   <tr
                     key={sub.subCategoryId}
                     className="text-sm transition hover:bg-gray-100"
                   >
 
-                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toLowerCase()}</td>
                     {months.map((month, key) => (
                       <td key={month} className="border p-2">
                         <input

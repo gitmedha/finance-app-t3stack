@@ -14,12 +14,36 @@ const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({
 }) => {
   return (
     <>
-      <div className="w-52">
+      <div className="w-56">
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger className="w-full" asChild>
+            <button
+              color="gray"
+              className="flex w-full cursor-pointer items-center justify-between rounded-lg border py-1 pl-2 text-left text-md font-normal text-gray-500"
+            >
+              <span>{filters.type || "Select Type"}</span>
+              <RiArrowDropDownLine size={30} />
+            </button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content className="max-h-56 !w-[220px] overflow-y-scroll rounded-lg bg-white p-2 shadow-lg">
+            {types.map((type, i) => (
+              <DropdownMenu.Item
+                key={type?.value || i}
+                className="cursor-pointer rounded p-2 hover:bg-gray-100 focus:ring-0"
+                onSelect={() => handleSelect("type", type)}
+              >
+                {type?.value || "All"}
+              </DropdownMenu.Item>
+            ))}
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      </div>
+      <div className="w-56">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button
               color="gray"
-              className="flex w-full cursor-pointer items-center justify-between rounded-lg border py-1 pl-2 text-left text-sm font-normal text-gray-500"
+              className="flex w-full cursor-pointer items-center justify-between rounded-lg border py-1 pl-2 text-left text-md font-normal text-gray-500"
             >
               <span>{filters.status || "Select Status"}</span>
               <RiArrowDropDownLine size={30} />
@@ -43,30 +67,7 @@ const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({
         </DropdownMenu.Root>
       </div>
 
-      <div className="w-52">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger className="w-full" asChild>
-            <button
-              color="gray"
-              className="flex w-full cursor-pointer items-center justify-between rounded-lg border py-1 pl-2 text-left text-sm font-normal text-gray-500"
-            >
-              <span>{filters.type || "Select Type"}</span>
-              <RiArrowDropDownLine size={30} />
-            </button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content className="max-h-56 !w-[220px] overflow-y-scroll rounded-lg bg-white p-2 shadow-lg">
-            {types.map((type, i) => (
-              <DropdownMenu.Item
-                key={type?.value || i}
-                className="cursor-pointer rounded p-2 hover:bg-gray-100 focus:ring-0"
-                onSelect={() => handleSelect("type", type)}
-              >
-                {type?.value || "All"}
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </div>
+      
     </>
   );
 };

@@ -287,9 +287,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       january: (data.Jan ?? "").toString(),
       february: (data.Feb ?? "").toString(),
       march: (data.Mar ?? "").toString(),
-      activity: "",
       deptId: Number(deptId),
-      clusterId: undefined,
       createdBy: userData.data?.user.id ?? 1,
       createdAt: new Date().toISOString(),
       rate1: (data.Rate1 ?? "").toString(),
@@ -389,8 +387,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       january: (data.Jan ?? "").toString(),
       february: (data.Feb ?? "").toString(),
       march: (data.Mar ?? "").toString(),
-      activity: "",
-      clusterId: undefined,
       updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
       rate1: (data.Rate1 ?? "").toString(),
@@ -467,13 +463,13 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             else
               setSectionOpen("CAPITAL COST")
           }} >
-          <h1 className="uppercase">{section}</h1>
+          <h1 className="capitalize">{section.toLowerCase()}</h1>
           {
             capitalCostDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> : 
             <div className="flex items-center space-x-2">
-              <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
+              <p className="text-md">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
               <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
             </div>
           }
@@ -487,10 +483,10 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         <div className="bg-gray-50 overflow-scroll">
           <table className="w-full table-auto border-collapse">
             <thead>
-              <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                <th className="border p-2">CAPITAL COST</th>
+              <tr className="bg-gray-200 text-left text-sm  text-gray-600">
+                <th className="border p-2 capitalize">{"CAPITAL COST".toLowerCase()}</th>
                 {months.map((month) => (
-                  <th key={month} className="border p-2">{month}</th>
+                  <th key={month} className="border p-2 capitalize">{month.toLowerCase()}</th>
                 ))}
               </tr>
             </thead>
@@ -498,7 +494,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
               !capitalCostDataLodaing && <tbody>
                 {capitalCostData?.subCategories.map((sub) => (
                   <tr key={sub.subCategoryId} className="text-sm transition hover:bg-gray-100">
-                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toLowerCase()}</td>
                     {months.map((month,key) => (
                       <td key={month} className="border p-2">
                         <input

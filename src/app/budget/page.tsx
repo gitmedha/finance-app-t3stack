@@ -88,13 +88,25 @@ const Budget: React.FC = () => {
   // get all main categories 
   const { data} = api.get.getCats.useQuery();
   return (
-    <div className="mt-10 overflow-hidden m-2 p-2">
+    <div className="mt-0 overflow-hidden  p-2">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId} status={status} setStatus={setStatus}/>
       {
         isLoading && <div>loading</div>
       }
+      
       {
-        budgetId && !isLoading && <div>
+        budgetId && !isLoading && <div className="m-2 mt-24">
+          <div className='text-right p-2 text-green-900 font-black mt-20'>
+            {
+              status == "submitted" && <p>{status.toUpperCase()}</p>
+            }
+            {
+              status == "draft" && userData.data?.user.role == 1 && <p className='text-red-900'>{status.toUpperCase()}</p>
+            }
+            {
+              status == "approved" && <p>{status.toUpperCase()}</p>
+            }
+          </div>
           <PersonnelCost section='PERSONNEL' categoryId={data?.categories[0] ? data?.categories[0].categoryId : 1} deptId={filters.department} budgetId={budgetId} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} travelCatId={data?.categories[2] ? data?.categories[2].categoryId : 3} subdepartmentId={filters.subdepartmentId}/>
           <ActivityBudget section='Program Activities' categoryId={data?.categories[1] ? data?.categories[1].categoryId : 2} budgetId={budgetId} deptId={filters.department} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} subdepartmentId={filters.subdepartmentId} />
           <TravelBudget section='Travel' categoryId={data?.categories[2] ? data?.categories[2].categoryId : 3} deptId={filters.department} budgetId={budgetId} searchSubCatId={data?.categories[0] ? data?.categories[0].categoryId : 1} status={status} setSectionOpen={setSectionOpen} sectionOpen={sectionOpen} subdepartmentId={filters.subdepartmentId} />

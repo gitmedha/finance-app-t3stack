@@ -218,13 +218,17 @@ export default function Staff() {
                             {item.isactive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        {userData.data?.user.role === 1 && (
-                          <td className="space-x-2 p-1  w-[120px]">
-                            <EditStaff item={item} refetch={refetch} />
-                            <DeleteStaff item={item} refetchStaffs={refetch} />
+                        <td className="space-x-2 p-1  w-[120px] ">
+                            {
+                              userData.data?.user.role === 1 && <EditStaff item={item} refetch={refetch} />
+                            }
+                            {
+                              userData.data?.user.role === 1 && <DeleteStaff item={item} refetchStaffs={refetch} />
+                            }
+                            
+                            
                             <ViewStaff item={item} refetch={refetch} />
                           </td>
-                        )}
                       </tr>
                     ))}
                   </tbody>

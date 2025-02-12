@@ -148,7 +148,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           setSaveBtnState("edit")
           const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0 }
           programData.result.forEach((item) => {
-            console.log(Number(item.april), Number(item.may), Number(item.june))
             initialData[item.subcategoryId] = {
               Count: item.total ? Number(item.total) : 0,
               Apr: item.april ? Number(item.april) : "0",
@@ -574,6 +573,21 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
 
         </div>
         <hr className="my-2 scale-x-150" />
+        <div className='flex flex-col w-full items-end pr-10 font-medium gap-1'>
+          {
+            subProgramActivites.map((pa)=>{
+              if(pa.name == "All")
+                return 
+              const activityData = programData?.activityTotals.find((activity)=>
+              Number(activity.activityId) == pa.map
+              )
+              return <div key={pa.map} className=''>
+                {pa.name} | FY : {activityData ? Number(activityData?.total) : "NA"} | Q1 : {activityData ? Number(activityData?.q1) : "NA"} | Q2: {activityData ? Number(activityData?.q2) : "NA"} | Q3 : {activityData ? Number(activityData?.q3) : "NA"} | Q4: {activityData ? Number(activityData?.q4) : "NA"} 
+              </div>
+              
+            })
+          }
+        </div>
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
           <table className="w-full table-auto border-collapse">
@@ -624,7 +638,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           </table>
         </div>
         {
-          filter?.map != 0 && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
+          filter?.map != 0 && subdepartmentId != 0 && deptId != "0" &&  ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
             {
               !inputStates && <div>
                 {

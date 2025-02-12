@@ -681,7 +681,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           </table>
         </div>
         {
-          ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
+           subdepartmentId != 0 && deptId != "0" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
             {
               !inputStates && <div>
                 {

@@ -1,10 +1,9 @@
-import { and, count, desc, eq, ilike } from "drizzle-orm";
+import {  eq } from "drizzle-orm";
 import { z } from "zod";
 import {
   //   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { db } from "~/server/db";
 import {
   salaryDetailsInFinanceProject as salaryMaster,
 } from "~/server/db/schema";

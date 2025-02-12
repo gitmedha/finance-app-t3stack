@@ -18,6 +18,7 @@ interface TravelBudgetProps {
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
   subdepartmentId: number
+  financialYear:string
 }
 
 interface subTravelSchema {
@@ -51,7 +52,7 @@ const months = [
   "Qty1", "Rate1", "Amount1", "Apr", "May", "Jun", "Qty2", "Rate2", "Amount2", "Jul", "Aug", "Sep", "Qty3", "Rate3", "Amount3", "Oct", "Nov", "Dec", "Qty4", "Rate4", "Amount4","Jan","Feb","Mar",
 ];
 
-const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId, searchSubCatId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
+const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budgetId, deptId, searchSubCatId, status, sectionOpen, setSectionOpen, subdepartmentId, financialYear }) => {
   const userData = useSession()
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
@@ -69,7 +70,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
       deptId: Number(deptId),
       travel_typeid: filter?.map,
       searchSubCatId: searchSubCatId,
-      subDeptId: subdepartmentId
+      subDeptId: subdepartmentId,
+      financialYear
     }, {
     staleTime: 0,
   })
@@ -680,6 +682,21 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         
 
         <hr className="my-2 scale-x-150" />
+        <div className='flex flex-col w-full items-end pr-10 font-medium gap-1'>
+          {
+            subTravels.map((t) => {
+              if (t.name == "All")
+                return
+              const activityData = travelData?.travelTypesTotal.find((activity) =>
+                Number(activity.travelTypeId) == t.map
+              )
+              return <div key={t.map} className=''>
+                {t.name} | FY : {activityData ? Number(activityData?.total) : "NA"} | Q1 : {activityData ? Number(activityData?.q1) : "NA"} | Q2: {activityData ? Number(activityData?.q2) : "NA"} | Q3 : {activityData ? Number(activityData?.q3) : "NA"} | Q4: {activityData ? Number(activityData?.q4) : "NA"}
+              </div>
+
+            })
+          }
+        </div>
         
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
@@ -724,7 +741,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           </table> 
         </div>
         {
-          filter?.map != 0 && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft"))  && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
+          filter?.map != 0 && subdepartmentId != 0 && deptId != "0" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft"))  && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
             {
               !inputStates && <div>
                 {

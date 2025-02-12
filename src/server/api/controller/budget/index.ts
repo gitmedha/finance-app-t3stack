@@ -696,9 +696,37 @@ export const getProgramActivities = protectedProcedure
                     .from(budgetDetailsInFinanceProject)
                     .where(and(...baseConditions));
             }
-
+            const activityTotalCondition = [
+                eq(budgetDetailsInFinanceProject.catid,input.catId)
+            ]
+            if(input.deptId == 0)
+            {
+                const budgetMasterIds = await ctx.db
+                    .select({
+                        id: budgetMasterInFinanceProject.id,
+                    })
+                    .from(budgetMasterInFinanceProject)
+                    .where(and(...budgetMasterbaseCondition));
+                const budgetIds = budgetMasterIds.map((record) => record.id);
+                activityTotalCondition.push(inArray(budgetDetailsInFinanceProject.budgetid, budgetIds))
+            }
+            else{
+                activityTotalCondition.push(eq(budgetDetailsInFinanceProject.deptid,input.deptId))
+            }
+            if(input.subDeptId != 0)
+                activityTotalCondition.push(eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId))
+            const activityTotals = await ctx.db.select({
+                q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                total: sql`SUM(${budgetDetailsInFinanceProject.q1, budgetDetailsInFinanceProject.q2, budgetDetailsInFinanceProject.q3, budgetDetailsInFinanceProject.q4})`.as("q4"),
+                activityId:budgetDetailsInFinanceProject.activity
+            }).from(budgetDetailsInFinanceProject)
+            .where(and(...activityTotalCondition))
+            .groupBy(budgetDetailsInFinanceProject.activity)
             return {
-                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId
+                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId, activityTotals
             };
 
         } catch (error) {
@@ -881,9 +909,37 @@ export const getTravelCatDetials = protectedProcedure
                     and(...levelStatsBaseCondition)
                 )
                 .groupBy(staffMasterInFinanceProject.level);
+            const travelTypesTotalCondition = [
+                eq(budgetDetailsInFinanceProject.catid, input.catId)
+            ]
+            if (input.deptId == 0) {
+                const budgetMasterIds = await ctx.db
+                    .select({
+                        id: budgetMasterInFinanceProject.id,
+                    })
+                    .from(budgetMasterInFinanceProject)
+                    .where(and(...budgetMasterbaseCondition));
+                const budgetIds = budgetMasterIds.map((record) => record.id);
+                travelTypesTotalCondition.push(inArray(budgetDetailsInFinanceProject.budgetid, budgetIds))
+            }
+            else {
+                travelTypesTotalCondition.push(eq(budgetDetailsInFinanceProject.deptid, input.deptId))
+            }
+            if (input.subDeptId != 0)
+                travelTypesTotalCondition.push(eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId))
+            const travelTypesTotal = await ctx.db.select({
+                q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                total: sql`SUM(${budgetDetailsInFinanceProject.q1, budgetDetailsInFinanceProject.q2, budgetDetailsInFinanceProject.q3, budgetDetailsInFinanceProject.q4})`.as("q4"),
+                travelTypeId: budgetDetailsInFinanceProject.travelTypeid
+            }).from(budgetDetailsInFinanceProject)
+                .where(and(...travelTypesTotalCondition))
+                .groupBy(budgetDetailsInFinanceProject.travelTypeid)
 
             return {
-                subCategories, levelStats, budgetId: input.budgetId, result, personalData, subDeptId: input.subDeptId
+                subCategories, levelStats, budgetId: input.budgetId, result, personalData, subDeptId: input.subDeptId, travelTypesTotal
             };
 
         } catch (error) {

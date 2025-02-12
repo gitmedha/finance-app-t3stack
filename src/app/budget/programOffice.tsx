@@ -101,7 +101,6 @@ const userData = useSession()
       }
       if (programOfficeData.result.length > 0 && programOfficeData.subCategories.length > 0) {
         setSaveBtnState("edit")
-        console.log("After getting the categorydetails")
         const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 ,totalFY:0}
         programOfficeData.result.forEach((item) => {
           initialData[item.subcategoryId] = {
@@ -158,7 +157,7 @@ const userData = useSession()
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = []
     setInputStates(disable)
-    for (const [subcategoryId, subcategoryData] of Object.entries(tableData)) {
+    for (const [subcategoryId] of Object.entries(tableData)) {
       subcategoryIds.push(subcategoryId)
     }
     subcategoryIds.forEach((id) => {
@@ -532,7 +531,7 @@ const userData = useSession()
         </div>
 
         {
-          ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
+          subdepartmentId != 0 && deptId != "0" &&((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
             {!inputStates && <div>
               {
                 saveBtnState == "loading" && <Button

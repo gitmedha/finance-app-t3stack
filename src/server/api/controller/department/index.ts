@@ -29,7 +29,6 @@ export const getDepartments = protectedProcedure
       ? eq(departmentMaster.isactive, status === "Active")
       : undefined;
     const typeCondition = type ? eq(departmentMaster.type, type) : undefined;
-    const departmentMasterAlias = departmentMaster 
     const departments = await ctx.db
       .select({
         id: departmentMaster.id,

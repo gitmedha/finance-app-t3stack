@@ -8,8 +8,8 @@ import { db } from "~/server/db";
 import {
   departmentMasterInFinanceProject as departmentMaster,
   staffMasterInFinanceProject as staffMaster,
-  statesMasterInFinanceProject as stateMaster,
-  locationMasterInFinanceProject as locationMaster,
+  // statesMasterInFinanceProject as stateMaster,
+  // locationMasterInFinanceProject as locationMaster,
   salaryDetailsInFinanceProject as salaryMaster,
   categoryHierarchyInFinanceProject,
   categoryMasterInFinanceProject,
@@ -332,7 +332,7 @@ export const deleteStaff = protectedProcedure
     }
   });
 
-export const getLevels = protectedProcedure.query(async ({ ctx, input}) => {
+export const getLevels = protectedProcedure.query(async ({ ctx}) => {
   const subCategories = await ctx.db
     .select({
       subCategoryId: categoryHierarchyInFinanceProject.catId,

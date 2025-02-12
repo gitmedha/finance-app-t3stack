@@ -19,6 +19,7 @@ interface ActivityBudgetProps {
   subdepartmentId: number
 }
 interface totalschema {
+  totalFY:number
   totalQ1: number
   totalQ2: number
   totalQ3: number
@@ -86,7 +87,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
+    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0
   })
   const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
   const [tableData, setTableData] = useState<TableData>({});
@@ -108,7 +109,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     if (programData?.budgetId == budgetId && programData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (programData?.subCategories) {
-        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0 }
         setTotalQty(totalQtyAfterBudgetDetails)
         programData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
@@ -143,7 +144,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         setTableData(initialData);
         if (programData.result.length > 0 && programData.subCategories.length > 0) {
           setSaveBtnState("edit")
-          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0 }
           programData.result.forEach((item) => {
             console.log(Number(item.april), Number(item.may), Number(item.june))
             initialData[item.subcategoryId] = {
@@ -174,6 +175,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
               Amount4: item.amount4 ? Number(item.amount4) : "0",
               budgetDetailsId: item.id ? Number(Number(item.id)) : 0
             };
+            totalQtyAfterBudgetDetails.totalFY += Number(item.january) + Number(item.february) + Number(item.march) + Number(item.april) + Number(item.may) + Number(item.june) + Number(item.july) + Number(item.august) + Number(item.september) + Number(item.october) + Number(item.november) + Number(item.december)
             totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
             totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
             totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
@@ -257,6 +259,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     setTotalQty((prev) => {
       const updatedTotal = { ...prev };
       updatedTotal[which as keyof typeof prev] += difference;
+      updatedTotal["totalFY" as keyof typeof prev] += difference
       return updatedTotal;
     });
   };
@@ -532,13 +535,13 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
             else
               setSectionOpen("Program Activities")
           }}>
-          <h1 className=" capitalize text-md ">{section.toLowerCase()}</h1>
+          <h1 className=" capitalize text-md font-medium">{section.toLowerCase()}</h1>
           {
             programDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-md">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
+                <p className="text-md font-medium">FY: {totalQty.totalFY}, Q1: {totalQty.totalQ1}, Q2: {totalQty.totalQ2}, Q3: {totalQty.totalQ3}, Q4: {totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }

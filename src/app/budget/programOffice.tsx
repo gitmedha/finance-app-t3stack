@@ -22,6 +22,7 @@ interface LevelData {
   [month: string]: string | number;
 }
 interface totalschema {
+  totalFY:number
   totalQ1: number
   totalQ2: number
   totalQ3: number
@@ -38,7 +39,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({ section, categoryId, budg
 const userData = useSession()
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
+    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0
   })
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [tableData, setTableData] = useState<TableData>({});
@@ -62,7 +63,7 @@ const userData = useSession()
     if (programOfficeData?.budgetId == budgetId && programOfficeData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (programOfficeData?.subCategories) {
-        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 ,totalFY:0}
         setTotalQty(totalQtyAfterBudgetDetails)
         programOfficeData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
@@ -99,9 +100,8 @@ const userData = useSession()
       if (programOfficeData.result.length > 0 && programOfficeData.subCategories.length > 0) {
         setSaveBtnState("edit")
         console.log("After getting the categorydetails")
-        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 ,totalFY:0}
         programOfficeData.result.forEach((item) => {
-          console.log(Number(item.april), Number(item.may), Number(item.june))
           initialData[item.subcategoryId] = {
             Count: Number(item.total),
             Apr: Number(item.april) ?? "0",
@@ -130,6 +130,7 @@ const userData = useSession()
             Amount4: item.amount4 ? Number(item.amount4) : "0",
             budgetDetailsId: Number(item.id),
           };
+          totalQtyAfterBudgetDetails.totalFY += Number(item.january) + Number(item.february) + Number(item.march) + Number(item.april) + Number(item.may) + Number(item.june) + Number(item.july) + Number(item.august) + Number(item.september) + Number(item.october) + Number(item.november) + Number(item.december)
           totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
           totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
           totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
@@ -148,7 +149,7 @@ const userData = useSession()
     setTotalQty((prev) => {
       const updatedTotal = { ...prev };
       updatedTotal[which as keyof typeof prev] += difference;
-      console.log(updatedTotal)
+      updatedTotal["totalFY" as keyof typeof prev] += difference
       return updatedTotal;
     });
   };
@@ -469,13 +470,13 @@ const userData = useSession()
             else
               setSectionOpen("PROGRAM OFFICE")
           }}>
-          <h1 className=" capitalize ">{section.toLowerCase()}</h1>
+          <h1 className=" capitalize font-medium">{section.toLowerCase()}</h1>
           {
             programOfficeDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-md">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
+                <p className="text-md font-medium">FY: {totalQty.totalFY}, Q1: {totalQty.totalQ1}, Q2: {totalQty.totalQ2}, Q3: {totalQty.totalQ3}, Q4: {totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }

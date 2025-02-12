@@ -38,6 +38,7 @@ interface qtySchema {
   Mar: number
 }
 interface totalschema {
+  totalFY:number
   totalQ1: number
   totalQ2: number
   totalQ3: number
@@ -68,7 +69,7 @@ const months = [
 const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId, subdepartmentId }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0
+    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0
   })
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [tableData, setTableData] = useState<TableData>({});
@@ -222,8 +223,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         });
         if (personnelCostData.result && personnelCostData.result.length > 0) {
           setSaveBtnState("edit")
-          console.log("Am i hitting this or not ")
-          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
+          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 ,totalFY:0}
           personnelCostData.result.forEach((item) => {
             
             initialData[item.subcategoryId] = {
@@ -260,6 +260,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               Feb: Number(item.february) / (item.qty4 ? Number(item.qty4) : 1),
               Mar: Number(item.march) / (item.qty4 ? Number(item.qty4) : 1),
             }
+            totalQtyAfterBudgetDetails.totalFY += Number(item.january) + Number(item.february) + Number(item.march) + Number(item.april) + Number(item.may) + Number(item.june) + Number(item.july) + Number(item.august) + Number(item.september) + Number(item.october) + Number(item.november) + Number(item.december)
             totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
             totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
             totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
@@ -271,8 +272,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         }
         else if (personnelCostData.levelStats) {
           setSaveBtnState("save")
-          const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 }
-          personnelCostData.subCategories.forEach((sub, index) => {
+          const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 ,totalFY:0}
+          personnelCostData.subCategories.forEach((sub) => {
             const levelData = personnelCostData.levelStats?.find(
               (level) => level.level === sub.subCategoryId
             );
@@ -317,6 +318,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               Feb: employeeCount != 0 ?(salarySum + epfSum + gratuitySum) / employeeCount:0,
               Mar: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
             }
+            totalQtyAfterStaffCount.totalFY += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + bonusSum + salarySum + epfSum + gratuitySum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ1 += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ2 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ3 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
@@ -430,7 +432,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     setTotalQty((prev) => {
       const updatedTotal = { ...prev };
       updatedTotal[which as keyof typeof prev] += difference;
-      console.log(updatedTotal)
+      updatedTotal["totalFY" as keyof typeof prev] += difference
       return updatedTotal;
     });
   };
@@ -624,13 +626,13 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             else
               setSectionOpen("PERSONNEL")
           }}>
-          <h1 className="capitalize">{section.toLowerCase()}</h1>
+          <h1 className="capitalize font-medium">{section.toLowerCase()}</h1>
           {
             personnelCostDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-md">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
+                <p className="text-md font-medium">FY: {totalQty.totalFY}, Q1: {totalQty.totalQ1}, Q2: {totalQty.totalQ2}, Q3: {totalQty.totalQ3}, Q4: {totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }

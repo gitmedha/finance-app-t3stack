@@ -13,6 +13,7 @@ interface PersonnelCostProps {
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
   travelCatId:number
   subdepartmentId:number
+  financialYear:string
 }
 interface LevelData {
   budgetDetailsId: number
@@ -66,7 +67,7 @@ const months = [
   "Mar",
 ];
 
-const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId, subdepartmentId }) => {
+const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId, subdepartmentId, financialYear }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0
@@ -80,6 +81,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
+    financialYear: financialYear
   }, {
     refetchOnMount: false,
     refetchOnWindowFocus:false,

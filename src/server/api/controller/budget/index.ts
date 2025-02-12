@@ -1,4 +1,4 @@
-import { and,  eq,   isNull, sql, isNotNull, } from "drizzle-orm";
+import { and, eq, isNull, sql, isNotNull, inArray, } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "~/server/api/trpc";
 import { budgetDetailsInFinanceProject, budgetMasterInFinanceProject, categoryHierarchyInFinanceProject, categoryMasterInFinanceProject, salaryDetailsInFinanceProject, staffMasterInFinanceProject, departmentHierarchyInFinanceProject, departmentMasterInFinanceProject } from "~/server/db/schema";
@@ -79,7 +79,7 @@ export const addBudgetDetails = protectedProcedure
             deptId: z.number(),
             budgetId: z.number(),
             catId: z.number(),
-            subDeptId:z.number(),
+            subDeptId: z.number(),
             data: z.array(
                 z.object({
                     budgetid: z.number(),
@@ -128,30 +128,29 @@ export const addBudgetDetails = protectedProcedure
     .mutation(async ({ ctx, input }) => {
         try {
             // Extract data from input
-            const { deptId, budgetId, catId,subDeptId, data } = input;
+            const { deptId, budgetId, catId, subDeptId, data } = input;
             // Map data to include shared fields and default values
-            
+
             const recordsToInsert = []
             for (const item of data) {
                 const baseConditions = [eq(budgetDetailsInFinanceProject.budgetid, budgetId),
-                    eq(budgetDetailsInFinanceProject.catid, catId),
-                    eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
-                    eq(budgetDetailsInFinanceProject.activity, item.activity ?? ""),
-                    eq(budgetDetailsInFinanceProject.subDeptid, subDeptId)
-                    ]
-                
+                eq(budgetDetailsInFinanceProject.catid, catId),
+                eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
+                eq(budgetDetailsInFinanceProject.activity, item.activity ?? ""),
+                eq(budgetDetailsInFinanceProject.subDeptid, subDeptId)
+                ]
+
                 const existingRecord = await ctx.db
                     .select()
                     .from(budgetDetailsInFinanceProject)
                     .where(
                         and(...baseConditions))
-                if(!existingRecord || existingRecord.length == 0)
-                {
+                if (!existingRecord || existingRecord.length == 0) {
                     recordsToInsert.push({
                         budgetid: budgetId,
                         catid: catId,
-                        subDeptid:subDeptId,
-                        deptid:deptId,
+                        subDeptid: subDeptId,
+                        deptid: deptId,
                         subcategoryId: item.subcategoryId,
                         unit: item.unit,
                         rate: item.rate,
@@ -237,6 +236,8 @@ export const getBudgetMaster = protectedProcedure
         }
         ))
     .query(async ({ ctx, input }) => {
+        if (input.deptId == 0)
+            return { budgetId: 0, status: undefined }
         const budget = await ctx.db
             .select({
                 budgetId: budgetMasterInFinanceProject.id,
@@ -370,11 +371,12 @@ export const getLevelStaffCount = protectedProcedure
 export const getPersonalCatDetials = protectedProcedure
     .input(
         z.object({
-            subdeptId:z.number(),
+            subdeptId: z.number(),
             deptId: z.number(),
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
+            financialYear: z.string(),
         })
     )
     .query(async ({ ctx, input }) => {
@@ -394,14 +396,22 @@ export const getPersonalCatDetials = protectedProcedure
             if (!subCategories)
                 throw new Error("Failed to get the subcategories")
             // we going to get the sub departments
-            
+
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
-                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
-                eq(budgetDetailsInFinanceProject.catid, input.catId),
-                eq(budgetDetailsInFinanceProject.subDeptid,input.subdeptId)
+                eq(budgetDetailsInFinanceProject.catid, input.catId)
             ];
+            const budgetMasterbaseCondition = [
+                eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
+            ]
+            if (input.budgetId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),)
+            if (input.deptId != 0) {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.deptid, input.deptId))
+                budgetMasterbaseCondition.push(eq(budgetMasterInFinanceProject.departmentId, input.deptId))
+            }
+            if (input.subdeptId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.subDeptid, input.subdeptId))
 
             // Add activity condition if it is not null or undefined
             if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
@@ -449,6 +459,55 @@ export const getPersonalCatDetials = protectedProcedure
                     .where(and(...baseConditions))
                     .groupBy(budgetDetailsInFinanceProject.subcategoryId);
             }
+            else if (input.deptId == 0 || input.subdeptId == 0) {
+                const budgetMasterIds = await ctx.db
+                    .select({
+                        id: budgetMasterInFinanceProject.id,
+                    })
+                    .from(budgetMasterInFinanceProject)
+                    .where(and(...budgetMasterbaseCondition));
+                const budgetIds = budgetMasterIds.map((record) => record.id);
+                const budgetRetrivalConditions = [
+                    ...baseConditions, inArray(budgetDetailsInFinanceProject.budgetid, budgetIds)
+                ]
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...budgetRetrivalConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
             else {
                 result = await ctx.db
                     .select()
@@ -456,6 +515,13 @@ export const getPersonalCatDetials = protectedProcedure
                     .where(and(...baseConditions));
             }
             // make a call for staff count
+            const levelStatsBaseCondition = [
+                isNotNull(salaryDetailsInFinanceProject.salary),
+            ]
+            if (input.deptId != 0)
+                levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.department, input.deptId))
+            if (input.subdeptId != 0)
+                levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.subDeptid, input.subdeptId))
             const levelStats = await ctx.db
                 .select({
                     level: staffMasterInFinanceProject.level,
@@ -473,16 +539,12 @@ export const getPersonalCatDetials = protectedProcedure
                     eq(salaryDetailsInFinanceProject.empId, staffMasterInFinanceProject.id)
                 )
                 .where(
-                    and(
-                        eq(staffMasterInFinanceProject.department, input.deptId),
-                        isNotNull(salaryDetailsInFinanceProject.salary),
-                        eq(staffMasterInFinanceProject.subDeptid,input.subdeptId)
-                    )
+                    and(...levelStatsBaseCondition)
                 )
                 .groupBy(staffMasterInFinanceProject.level);
 
             return {
-                subCategories, levelStats, budgetId: input.budgetId, result,subDeptId:input.subdeptId
+                subCategories, levelStats, budgetId: input.budgetId, result, subDeptId: input.subdeptId
             };
 
         } catch (error) {
@@ -497,7 +559,8 @@ export const getProgramActivities = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
-            subDeptId:z.number()
+            subDeptId: z.number(),
+            financialYear: z.string(),
         })
     )
     .query(async ({ ctx, input }) => {
@@ -518,19 +581,77 @@ export const getProgramActivities = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
-                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
-                eq(budgetDetailsInFinanceProject.catid, input.catId),
-                eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
+                eq(budgetDetailsInFinanceProject.catid, input.catId)
             ];
+            const budgetMasterbaseCondition = [
+                eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
+            ]
+            if (input.budgetId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),)
+            if (input.deptId != 0) {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.deptid, input.deptId))
+                budgetMasterbaseCondition.push(eq(budgetMasterInFinanceProject.departmentId, input.deptId))
+            }
+            if (input.subDeptId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId))
+
 
             // Add activity condition if it is not null or undefined
             if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
                 baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
             }
             let result
+            if (input.deptId == 0 || input.subDeptId == 0) {
+                const budgetMasterIds = await ctx.db
+                    .select({
+                        id: budgetMasterInFinanceProject.id,
+                    })
+                    .from(budgetMasterInFinanceProject)
+                    .where(and(...budgetMasterbaseCondition));
+                const budgetIds = budgetMasterIds.map((record) => record.id);
+                const budgetRetrivalConditions = [
+                    ...baseConditions, inArray(budgetDetailsInFinanceProject.budgetid, budgetIds)
+                ]
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...budgetRetrivalConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
             // Execute the query with all conditions
-            if (input.activity == "0") {
+            else if (input.activity == "0") {
                 result = await ctx.db
                     .select({
                         subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
@@ -575,9 +696,9 @@ export const getProgramActivities = protectedProcedure
                     .from(budgetDetailsInFinanceProject)
                     .where(and(...baseConditions));
             }
-            
+
             return {
-                subCategories,budgetId: input.budgetId, result,subDeptId:input.subDeptId
+                subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId
             };
 
         } catch (error) {
@@ -591,9 +712,10 @@ export const getTravelCatDetials = protectedProcedure
             deptId: z.number(),
             budgetId: z.number(),
             catId: z.number(),
-            travel_typeid:z.number().optional(),
-            searchSubCatId:z.number(),
-            subDeptId:z.number()
+            travel_typeid: z.number().optional(),
+            searchSubCatId: z.number(),
+            subDeptId: z.number(),
+            financialYear: z.string(),
         })
     )
     .query(async ({ ctx, input }) => {
@@ -614,19 +736,75 @@ export const getTravelCatDetials = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
-                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
-                eq(budgetDetailsInFinanceProject.catid, input.catId),
-                eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
+                eq(budgetDetailsInFinanceProject.catid, input.catId)
             ];
-
+            const budgetMasterbaseCondition = [
+                eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
+            ]
+            if (input.budgetId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),)
+            if (input.deptId != 0) {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.deptid, input.deptId))
+                budgetMasterbaseCondition.push(eq(budgetMasterInFinanceProject.departmentId, input.deptId))
+            }
+            if (input.subDeptId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId))
             // Add activity condition if it is not null or undefined
             if (input.travel_typeid !== null && input.travel_typeid !== undefined && input.travel_typeid != 0) {
                 baseConditions.push(eq(budgetDetailsInFinanceProject.travelTypeid, input.travel_typeid));
             }
             let result
             // Execute the query with all conditions
-            if (input.travel_typeid == 0) {
+            if (input.deptId == 0 || input.subDeptId == 0) {
+                const budgetMasterIds = await ctx.db
+                    .select({
+                        id: budgetMasterInFinanceProject.id,
+                    })
+                    .from(budgetMasterInFinanceProject)
+                    .where(and(...budgetMasterbaseCondition));
+                const budgetIds = budgetMasterIds.map((record) => record.id);
+                const budgetRetrivalConditions = [
+                    ...baseConditions, inArray(budgetDetailsInFinanceProject.budgetid, budgetIds)
+                ]
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...budgetRetrivalConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
+            else if (input.travel_typeid == 0) {
                 result = await ctx.db
                     .select({
                         subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
@@ -679,9 +857,16 @@ export const getTravelCatDetials = protectedProcedure
                     eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
                     eq(budgetDetailsInFinanceProject.catid, input.searchSubCatId),
                     eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)),
-                    
+
                 )
             // make a call for staff count
+            const levelStatsBaseCondition = [
+                isNotNull(salaryDetailsInFinanceProject.salary),
+            ]
+            if (input.deptId != 0)
+                levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.department, input.deptId))
+            if (input.subDeptId != 0)
+                levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.subDeptid, input.subDeptId))
             const levelStats = await ctx.db
                 .select({
                     level: staffMasterInFinanceProject.level,
@@ -693,11 +878,7 @@ export const getTravelCatDetials = protectedProcedure
                     eq(salaryDetailsInFinanceProject.empId, staffMasterInFinanceProject.id)
                 )
                 .where(
-                    and(
-                        eq(staffMasterInFinanceProject.department, input.deptId),
-                        isNotNull(salaryDetailsInFinanceProject.salary),
-                        eq(staffMasterInFinanceProject.subDeptid,input.subDeptId)
-                    )
+                    and(...levelStatsBaseCondition)
                 )
                 .groupBy(staffMasterInFinanceProject.level);
 
@@ -717,7 +898,8 @@ export const getProgramOfficeData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
-            subDeptId: z.number()
+            subDeptId: z.number(),
+            financialYear: z.string(),
         })
     )
     .query(async ({ ctx, input }) => {
@@ -738,11 +920,19 @@ export const getProgramOfficeData = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
-                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
-                eq(budgetDetailsInFinanceProject.catid, input.catId),
-                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
+                eq(budgetDetailsInFinanceProject.catid, input.catId)
             ];
+            const budgetMasterbaseCondition = [
+                eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
+            ]
+            if (input.budgetId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),)
+            if (input.deptId != 0) {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.deptid, input.deptId))
+                budgetMasterbaseCondition.push(eq(budgetMasterInFinanceProject.departmentId, input.deptId))
+            }
+            if (input.subDeptId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId))
 
             // Add activity condition if it is not null or undefined
             if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
@@ -787,6 +977,55 @@ export const getProgramOfficeData = protectedProcedure
                     })
                     .from(budgetDetailsInFinanceProject)
                     .where(and(...baseConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
+            else if (input.deptId == 0 || input.subDeptId == 0) {
+                const budgetMasterIds = await ctx.db
+                    .select({
+                        id: budgetMasterInFinanceProject.id,
+                    })
+                    .from(budgetMasterInFinanceProject)
+                    .where(and(...budgetMasterbaseCondition));
+                const budgetIds = budgetMasterIds.map((record) => record.id);
+                const budgetRetrivalConditions = [
+                    ...baseConditions, inArray(budgetDetailsInFinanceProject.budgetid, budgetIds)
+                ]
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...budgetRetrivalConditions))
                     .groupBy(budgetDetailsInFinanceProject.subcategoryId);
             }
             else {
@@ -812,7 +1051,8 @@ export const getCapitalCostData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
-            subDeptId: z.number()
+            subDeptId: z.number(),
+            financialYear: z.string(),
         })
     )
     .query(async ({ ctx, input }) => {
@@ -833,11 +1073,19 @@ export const getCapitalCostData = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
-                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
-                eq(budgetDetailsInFinanceProject.catid, input.catId),
-                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
+                eq(budgetDetailsInFinanceProject.catid, input.catId)
             ];
+            const budgetMasterbaseCondition = [
+                eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
+            ]
+            if (input.budgetId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),)
+            if (input.deptId != 0) {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.deptid, input.deptId))
+                budgetMasterbaseCondition.push(eq(budgetMasterInFinanceProject.departmentId, input.deptId))
+            }
+            if (input.subDeptId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId))
 
             // Add activity condition if it is not null or undefined
             if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
@@ -884,6 +1132,55 @@ export const getCapitalCostData = protectedProcedure
                     .where(and(...baseConditions))
                     .groupBy(budgetDetailsInFinanceProject.subcategoryId);
             }
+            else if (input.deptId == 0 || input.subDeptId == 0) {
+                const budgetMasterIds = await ctx.db
+                    .select({
+                        id: budgetMasterInFinanceProject.id,
+                    })
+                    .from(budgetMasterInFinanceProject)
+                    .where(and(...budgetMasterbaseCondition));
+                const budgetIds = budgetMasterIds.map((record) => record.id);
+                const budgetRetrivalConditions = [
+                    ...baseConditions, inArray(budgetDetailsInFinanceProject.budgetid, budgetIds)
+                ]
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...budgetRetrivalConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
             else {
                 result = await ctx.db
                     .select()
@@ -907,7 +1204,8 @@ export const getOverHeadsData = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             activity: z.string().optional(),
-            subDeptId: z.number()
+            subDeptId: z.number(),
+            financialYear: z.string(),
         })
     )
     .query(async ({ ctx, input }) => {
@@ -928,11 +1226,19 @@ export const getOverHeadsData = protectedProcedure
                 throw new Error("Failed to get the subcategories")
             // category budgetDetails call
             const baseConditions = [
-                eq(budgetDetailsInFinanceProject.deptid, input.deptId),
-                eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),
-                eq(budgetDetailsInFinanceProject.catid, input.catId),
-                eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
+                eq(budgetDetailsInFinanceProject.catid, input.catId)
             ];
+            const budgetMasterbaseCondition = [
+                eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
+            ]
+            if (input.budgetId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),)
+            if (input.deptId != 0) {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.deptid, input.deptId))
+                budgetMasterbaseCondition.push(eq(budgetMasterInFinanceProject.departmentId, input.deptId))
+            }
+            if (input.subDeptId != 0)
+                baseConditions.push(eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId))
 
             // Add activity condition if it is not null or undefined
             if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
@@ -977,6 +1283,55 @@ export const getOverHeadsData = protectedProcedure
                     })
                     .from(budgetDetailsInFinanceProject)
                     .where(and(...baseConditions))
+                    .groupBy(budgetDetailsInFinanceProject.subcategoryId);
+            }
+            else if (input.deptId == 0 || input.subDeptId == 0) {
+                const budgetMasterIds = await ctx.db
+                    .select({
+                        id: budgetMasterInFinanceProject.id,
+                    })
+                    .from(budgetMasterInFinanceProject)
+                    .where(and(...budgetMasterbaseCondition));
+                const budgetIds = budgetMasterIds.map((record) => record.id);
+                const budgetRetrivalConditions = [
+                    ...baseConditions, inArray(budgetDetailsInFinanceProject.budgetid, budgetIds)
+                ]
+                result = await ctx.db
+                    .select({
+                        subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
+                        april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
+                        may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
+                        june: sql`SUM(${budgetDetailsInFinanceProject.june})`.as("june"),
+                        july: sql`SUM(${budgetDetailsInFinanceProject.july})`.as("july"),
+                        august: sql`SUM(${budgetDetailsInFinanceProject.august})`.as("august"),
+                        september: sql`SUM(${budgetDetailsInFinanceProject.september})`.as("september"),
+                        october: sql`SUM(${budgetDetailsInFinanceProject.october})`.as("october"),
+                        november: sql`SUM(${budgetDetailsInFinanceProject.november})`.as("november"),
+                        december: sql`SUM(${budgetDetailsInFinanceProject.december})`.as("december"),
+                        january: sql`SUM(${budgetDetailsInFinanceProject.january})`.as("january"),
+                        february: sql`SUM(${budgetDetailsInFinanceProject.february})`.as("february"),
+                        march: sql`SUM(${budgetDetailsInFinanceProject.march})`.as("march"),
+                        q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
+                        q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
+                        q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
+                        q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
+                        amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as("amount1"),
+                        amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as("amount2"),
+                        amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as("amount3"),
+                        amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as("amount4"),
+                        rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
+                        rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
+                        rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
+                        rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
+                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                        id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
+                    })
+                    .from(budgetDetailsInFinanceProject)
+                    .where(and(...budgetRetrivalConditions))
                     .groupBy(budgetDetailsInFinanceProject.subcategoryId);
             }
             else {
@@ -1125,13 +1480,13 @@ export const updateStatusBudgetDetails = protectedProcedure
     .input(z.object({
         budgetId: z.number(),
         status: z.string(),
-        userId:z.number()
+        userId: z.number()
     }))
     .mutation(async ({ ctx, input }) => {
-        const { status, budgetId ,userId} = input
+        const { status, budgetId, userId } = input
         const updatedStatus = await ctx.db
             .update(budgetMasterInFinanceProject)
-            .set({ status, approvedBy:userId })
+            .set({ status, approvedBy: userId })
             .where(eq(budgetMasterInFinanceProject.id, budgetId))
         if (updatedStatus)
             return { message: "status update successfull" }
@@ -1144,8 +1499,8 @@ export const savePersonalBudgetDetails = protectedProcedure
             deptId: z.number(),
             budgetId: z.number(),
             catId: z.number(),
-            travelCatId:z.number(),
-            subDeptId:z.number(),
+            travelCatId: z.number(),
+            subDeptId: z.number(),
             data: z.array(
                 z.object({
                     budgetid: z.number(),
@@ -1194,7 +1549,7 @@ export const savePersonalBudgetDetails = protectedProcedure
     .mutation(async ({ ctx, input }) => {
         try {
             // Extract data from input
-            const { deptId, budgetId, catId, travelCatId,data } = input;
+            const { deptId, budgetId, catId, travelCatId, data } = input;
             // Map data to include shared fields and default values
             const recordsToInsert = []
             for (const item of data) {
@@ -1213,7 +1568,7 @@ export const savePersonalBudgetDetails = protectedProcedure
                     recordsToInsert.push({
                         budgetid: budgetId,
                         catid: catId,
-                        deptid:deptId,
+                        deptid: deptId,
                         subcategoryId: item.subcategoryId,
                         unit: item.unit,
                         rate: item.rate,
@@ -1239,7 +1594,7 @@ export const savePersonalBudgetDetails = protectedProcedure
                         createdAt: item.createdAt,
                         updatedAt: null,
                         updatedBy: null,
-                        subDeptid:item.subDeptId,
+                        subDeptid: item.subDeptId,
                         qqty: item.qty ?? 0,
                         qty1: item.qty1 ?? 0,
                         rate1: item.rate1?.trim() === "" ? "0" : item.rate1,
@@ -1286,17 +1641,16 @@ export const savePersonalBudgetDetails = protectedProcedure
             }));
             // if the travel data present then we going to update that from here only 
             const travelData = await ctx.db
-            .select()
-            .from(budgetDetailsInFinanceProject)
-            .where(and(
-                eq(budgetDetailsInFinanceProject.budgetid,budgetId),
-                eq(budgetDetailsInFinanceProject.catid,travelCatId),
-                eq(budgetDetailsInFinanceProject.subcategoryId,input.subDeptId)
-            ))
+                .select()
+                .from(budgetDetailsInFinanceProject)
+                .where(and(
+                    eq(budgetDetailsInFinanceProject.budgetid, budgetId),
+                    eq(budgetDetailsInFinanceProject.catid, travelCatId),
+                    eq(budgetDetailsInFinanceProject.subcategoryId, input.subDeptId)
+                ))
             // here we need to update the values
-            if (travelData && travelData.length>0 )
-            {
-                for(const item of data){
+            if (travelData && travelData.length > 0) {
+                for (const item of data) {
                     const updates = {
                         currency: item.currency,
                         notes: item.notes ?? null,
@@ -1314,9 +1668,9 @@ export const savePersonalBudgetDetails = protectedProcedure
                         .set(updates)
                         .where(and(
                             eq(budgetDetailsInFinanceProject.budgetid, budgetId),
-                            eq(budgetDetailsInFinanceProject.subcategoryId,item.subcategoryId),
-                            eq(budgetDetailsInFinanceProject.catid,travelCatId),
-                            eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
+                            eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
+                            eq(budgetDetailsInFinanceProject.catid, travelCatId),
+                            eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
                         ));
                 }
             }
@@ -1378,8 +1732,8 @@ export const updatePersonalBudgetDetails = protectedProcedure
     )
     .mutation(async ({ ctx, input }) => {
         try {
-            const { data,budgetId,travelCatId } = input;
-            console.log(budgetId, travelCatId,input.subDeptId)
+            const { data, budgetId, travelCatId } = input;
+            console.log(budgetId, travelCatId, input.subDeptId)
 
             // Perform updates for each budget detail record
             for (const item of data) {
@@ -1453,7 +1807,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
                 .where(and(
                     eq(budgetDetailsInFinanceProject.budgetid, budgetId),
                     eq(budgetDetailsInFinanceProject.catid, travelCatId),
-                    eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
+                    eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
                 ))
             console.log(travelData)
             // here we need to update the values
@@ -1478,7 +1832,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
                             eq(budgetDetailsInFinanceProject.budgetid, budgetId),
                             eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
                             eq(budgetDetailsInFinanceProject.catid, travelCatId),
-                            eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId)
+                            eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId)
                         ));
                 }
             }
@@ -1494,11 +1848,10 @@ export const getSubDepts = protectedProcedure
     .input(z.object({
         deptId: z.number()
     }))
-    .query(async({ctx,input})=>{
-        const {deptId} = input
+    .query(async ({ ctx, input }) => {
+        const { deptId } = input
         const baseConditions = []
-        if(deptId != 0)
-        {
+        if (deptId != 0) {
             baseConditions.push(eq(departmentHierarchyInFinanceProject.parentId, deptId))
         }
         const subdepartments = await ctx.db
@@ -1518,7 +1871,7 @@ export const saveTravelBudgetDetails = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             subDeptId: z.number(),
-            travel_typeid:z.number(),
+            travel_typeid: z.number(),
             data: z.array(
                 z.object({
                     budgetid: z.number(),
@@ -1585,10 +1938,10 @@ export const saveTravelBudgetDetails = protectedProcedure
                         and(...baseConditions))
                 if (!existingRecord || existingRecord.length == 0) {
                     recordsToInsert.push({
-                        travel_typeid:input.travel_typeid,
+                        travel_typeid: input.travel_typeid,
                         budgetid: budgetId,
                         catid: catId,
-                        subDeptid:input.subDeptId,
+                        subDeptid: input.subDeptId,
                         deptid: deptId,
                         subcategoryId: item.subcategoryId,
                         unit: item.unit,

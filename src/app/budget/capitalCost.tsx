@@ -11,7 +11,8 @@ interface CapitalCostProps {
   status: string | undefined
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS")=>void
-  subdepartmentId: number
+  subdepartmentId: number,
+  financialYear:string
 }
 
 interface LevelData {
@@ -32,7 +33,7 @@ const months = [
   "Qty1", "Rate1", "Amount1", "Apr", "May", "Jun", "Qty2", "Rate2", "Amount2", "Jul", "Aug", "Sep", "Qty3", "Rate3", "Amount3", "Oct", "Nov", "Dec", "Qty4", "Rate4", "Amount4", "Jan", "Feb", "Mar",
 ];
 
-const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
+const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId, financialYear }) => {
   const userData = useSession()
   const[inputStates,setInputStates] = useState<boolean>(true)
   const [saveBtnState,setSaveBtnState] = useState<"loading"|"edit"|"save">("loading")
@@ -47,7 +48,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     budgetId,
     catId: categoryId,
     deptId: Number(deptId),
-    subDeptId: subdepartmentId
+    subDeptId: subdepartmentId,
+    financialYear:financialYear
   }, {
     refetchOnMount: false,
     refetchOnWindowFocus: false,

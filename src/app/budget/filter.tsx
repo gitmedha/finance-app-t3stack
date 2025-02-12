@@ -83,33 +83,33 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
       handleSelect("subdepartment", { id: userData.data?.user.subDepartmentId, departmentname: userData.data?.user.subDepartmentName })
   }, [userData])
 
-  useEffect(() => {
-    if (!userData.data?.user.departmentId && !userData.data?.user.departmentName)
-    {
-      if (data?.departments?.length) {
-        const sortedDepartments = [...data.departments].sort((a, b) =>
-          a.departmentname.localeCompare(b.departmentname)
-        );
-        if (sortedDepartments[0]) {
-          handleSelect("department", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].departmentname })
-        }
-      }
-    }
+  // useEffect(() => {
+  //   if (!userData.data?.user.departmentId && !userData.data?.user.departmentName)
+  //   {
+  //     if (data?.departments?.length) {
+  //       const sortedDepartments = [...data.departments].sort((a, b) =>
+  //         a.departmentname.localeCompare(b.departmentname)
+  //       );
+  //       if (sortedDepartments[0]) {
+  //         handleSelect("department", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].departmentname })
+  //       }
+  //     }
+  //   }
 
-  }, [data]);
+  // }, [data]);
   
-  useEffect(()=>{
-    if (!userData.data?.user.subDepartmentId && !userData.data?.user.subDepartmentName) {
-      if (subdepartmentData?.subdepartments?.length) {
-        const sortedDepartments = [...subdepartmentData.subdepartments].sort((a, b) =>
-          a.name.localeCompare(b.name)
-        );
-        if (sortedDepartments[0]) {
-          handleSelect("subdepartment", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].name })
-        }
-      }
-    }
-  }, [subdepartmentData])
+  // useEffect(()=>{
+  //   if (!userData.data?.user.subDepartmentId && !userData.data?.user.subDepartmentName) {
+  //     if (subdepartmentData?.subdepartments?.length) {
+  //       const sortedDepartments = [...subdepartmentData.subdepartments].sort((a, b) =>
+  //         a.name.localeCompare(b.name)
+  //       );
+  //       if (sortedDepartments[0]) {
+  //         handleSelect("subdepartment", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].name })
+  //       }
+  //     }
+  //   }
+  // }, [subdepartmentData])
 
   // creating the budget
   const createBudgetMutation = api.post.createBudget.useMutation();
@@ -182,6 +182,12 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
               {/* drop down only when user role is 1 that means when the user is admin */}
               {
                 userData.data?.user.role == 1 && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
+                  <DropdownMenu.Item
+                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                    onSelect={() => handleSelect("department", { id: 0, departmentname:"All" })} // Pass entire department object
+                  >
+                    All
+                  </DropdownMenu.Item>
                   {data?.departments
                     ?.sort((a, b) => a.departmentname.localeCompare(b.departmentname)) // Sorting alphabetically by department name
                     .map((dep) => (
@@ -215,6 +221,12 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             {
               userData.data?.user.role != 3 && 
                 <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-1 !w-[356px]">
+                    <DropdownMenu.Item
+                      className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                      onSelect={() => handleSelect("subdepartment", { id: 0, departmentname: "All" })}
+                    >
+                      All
+                    </DropdownMenu.Item>
                 {subdepartmentData?.subdepartments.sort((a, b) => a.name.localeCompare(b.name))
                   .map((dep) => (
                     <DropdownMenu.Item
@@ -232,47 +244,50 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           </div>
           
         </div>
-        <div className='flex justify-end items-center space-x-2'>
-          {
-            !budgetId && userData.data?.user.role == 2 &&<Button
-              type="button"
-              className="!cursor-pointer !text-white !bg-primary px-2"
-              variant="soft"
-              onClick={handelCreateBudget}
-            >
-              Create Budget
-            </Button>
-          }
-          {
-            budgetId && <div className='flex justify-end items-center space-x-2 pr-4'>
-              {
-                userData.data?.user.role == 2 && status == "draft" && <Button
-                  type="button"
-                  className="!cursor-pointer !text-white !bg-primary px-2"
-                  variant="soft"
-                  onClick={() =>
-                    setIsModalOpen(true) 
-                  }
-                >
-                  Submit
-                </Button>
-              }
-              {
-                userData.data?.user.role == 1 && status == "submitted" && <Button
-                  type="button"
-                  className="!cursor-pointer !text-white !bg-primary px-2"
-                  variant="soft"
-                  onClick={() => 
-                    setIsModalOpen(true) 
-                  }
-                >
-                  Approve
-                </Button>
-              }
-            </div>
-          }
+        {
+          budgetId != 0 && <div className='flex justify-end items-center space-x-2'>
+            {
+              !budgetId && userData.data?.user.role == 2 && <Button
+                type="button"
+                className="!cursor-pointer !text-white !bg-primary px-2"
+                variant="soft"
+                onClick={handelCreateBudget}
+              >
+                Create Budget
+              </Button>
+            }
+            {
+              budgetId && <div className='flex justify-end items-center space-x-2 pr-4'>
+                {
+                  userData.data?.user.role == 2 && status == "draft" && <Button
+                    type="button"
+                    className="!cursor-pointer !text-white !bg-primary px-2"
+                    variant="soft"
+                    onClick={() =>
+                      setIsModalOpen(true)
+                    }
+                  >
+                    Submit
+                  </Button>
+                }
+                {
+                  userData.data?.user.role == 1 && status == "submitted" && <Button
+                    type="button"
+                    className="!cursor-pointer !text-white !bg-primary px-2"
+                    variant="soft"
+                    onClick={() =>
+                      setIsModalOpen(true)
+                    }
+                  >
+                    Approve
+                  </Button>
+                }
+              </div>
+            }
 
-        </div>
+          </div>
+        }
+        
       </div>
 
       <Modal

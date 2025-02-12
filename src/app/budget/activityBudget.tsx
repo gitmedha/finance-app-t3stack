@@ -17,6 +17,7 @@ interface ActivityBudgetProps {
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
   subdepartmentId: number
+  financialYear:string
 }
 interface totalschema {
   totalFY:number
@@ -82,7 +83,7 @@ const months = [
   "Mar",
 ];
 
-const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId }) => {
+const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId, financialYear }) => {
   const userData = useSession()
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [inputStates, setInputStates] = useState<boolean>(true)
@@ -98,7 +99,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     catId: categoryId,
     deptId: Number(deptId),
     activity: (filter?.map)?.toString(),
-    subDeptId: subdepartmentId
+    subDeptId: subdepartmentId,
+    financialYear
   }, {
     staleTime: 0
   })

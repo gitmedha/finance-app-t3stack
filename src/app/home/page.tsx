@@ -48,7 +48,7 @@ export default function Home() {
         }
     };
     return (
-        <div className="mt-4 gap-4 p-2 flex-col flex">
+        <div className="mt-20 gap-4 p-2 flex-col flex ">
             <div>
                 <HomeFilterForm filters={filters} handleSelect={handleSelect} />
             </div>

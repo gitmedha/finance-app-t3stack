@@ -136,15 +136,18 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   };
 
   return (
-    <div>
-      <div className='flex justify-between'>
+    <div className=' bg-[#F3F4F6F4] z-50 w-full '>
+      <div className='flex justify-between fixed bg-[#F3F4F6F4]  w-full py-5 px-2'>
         <div className="flex justify-start items-center space-x-4">
 
           {/* Year Dropdown */}
-          <div className="w-52">
+          <div className="w-56 flex flex-col gap-1">
+            <label htmlFor="year-dropdown" className="text-md font-medium text-gray-700">
+              Select Year :
+            </label>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                <button className="cursor-pointer w-full py-1 border-2 border-green-700 rounded-lg text-left text-gray-500 text-md pl-2 font-normal flex justify-between items-center ">
                   <span>
                     {filters.year || 'Select Year'}
                   </span>
@@ -165,11 +168,13 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             </DropdownMenu.Root>
           </div>
           {/* Department */}
-          <div className="w-52">
-            {/* Department Dropdown */}
+          <div className="w-56 flex flex-col gap-1">
+            <label htmlFor="department-dropdown" className="text-md font-medium text-gray-700">
+              Select Department :
+            </label>
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                <button className="cursor-pointer w-full py-1 border-2 border-green-700 rounded-lg text-left text-gray-500 text-md pl-2 font-normal flex justify-between items-center">
                   <span>{filters.departmentname}</span>
                   <RiArrowDropDownLine size={30} />
                 </button>
@@ -195,10 +200,13 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
 
           </div>
           {/* Sub department dropdown */}
-          <div className="w-58">
+          <div className="w-66 flex flex-col gap-1">
+            <label htmlFor="sub-department-dropdown" className="text-md font-medium text-gray-700">
+              Select Sub Department :
+            </label>
           <DropdownMenu.Root >
-            <DropdownMenu.Trigger asChild className='!w-full'>
-              <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+            <DropdownMenu.Trigger asChild>
+                <button className="cursor-pointer !w-[352px] py-1 border-2 border-green-700 rounded-lg text-left text-gray-500 text-md pl-2 font-normal flex justify-between items-center">
                 <span>{filters.subdepartmentName}</span>
                 <RiArrowDropDownLine size={30} />
               </button>
@@ -206,13 +214,13 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             {/* drop down only when user role is 1 that means when the user is admin */}
             {
               userData.data?.user.role != 3 && 
-              <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-fit">
+                <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-1 !w-[356px]">
                 {subdepartmentData?.subdepartments.sort((a, b) => a.name.localeCompare(b.name))
                   .map((dep) => (
                     <DropdownMenu.Item
                       key={dep.id}
                       className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                      onSelect={() => handleSelect("subdepartment", { id: dep.id, departmentname: dep.name })} // Pass entire department object
+                      onSelect={() => handleSelect("subdepartment", { id: dep.id, departmentname: dep.name })} 
                     >
                       {dep.name}
                     </DropdownMenu.Item>
@@ -236,7 +244,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             </Button>
           }
           {
-            budgetId && <div className='flex justify-end items-center space-x-2'>
+            budgetId && <div className='flex justify-end items-center space-x-2 pr-4'>
               {
                 userData.data?.user.role == 2 && status == "draft" && <Button
                   type="button"
@@ -265,17 +273,6 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           }
 
         </div>
-      </div>
-      <div className='text-right p-2 text-green-900 font-black'>
-          {
-          status == "submitted" && <p>{status.toUpperCase()}</p>
-          }
-        {
-          status == "draft" && userData.data?.user.role == 1 && <p className='text-red-900'>{status.toUpperCase()}</p>
-        }
-        {
-          status == "approved" && <p>{status.toUpperCase()}</p>
-        }
       </div>
 
       <Modal

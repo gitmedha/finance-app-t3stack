@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, foreignKey, unique, serial, varchar, boolean, date, integer, text, numeric, timestamp, doublePrecision, bigint } from "drizzle-orm/pg-core"
+import {  pgSchema, foreignKey, unique, serial, varchar, boolean, date, integer, text, numeric, timestamp, doublePrecision, bigint } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const financeProject = pgSchema("finance_project");
@@ -510,7 +510,7 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
   updatedBy: integer("updated_by"),
   overhead: text("overhead"),
   deptid: integer("deptid"),
-  clusterId: integer("clusterId"),
+  travelTypeid: integer("travel_typeid"),
   subcategoryId: integer("subcategory_id").notNull(),
   april: numeric("april", { precision: 12, scale: 2 }),
   may: numeric("may", { precision: 12, scale: 2 }),

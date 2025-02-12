@@ -12,17 +12,20 @@ import AddStaff from "./add";
 import { api } from "~/trpc/react";
 import type { GetStaffsResponse, StaffItem } from "./staff";
 import { useSession } from "next-auth/react";
+import ViewStaff from "./view";
+
 
 const cols = [
   "Name",
   "Emp ID",
-  "Nature of Employment",
+  "Type",
   "Designation",
   "Department",
+  "SubDepartment",
+  "Level",
   "State",
-  "Program",
   "Location",
-  "Joining Date",
+  "Joining",
   "Status",
   "Actions",
 ];
@@ -111,12 +114,12 @@ export default function Staff() {
   };
 
   return (
-    <div className="mt-5 flex justify-center">
-      <div className="container mt-6 min-h-[400px] rounded bg-white p-4 shadow lg:mt-0">
-        <div className="mb-1 flex items-center justify-between px-2">
+    <div className="mt-20 flex justify-center ">
+      <div className="container mt-6 min-h-[400px] rounded bg-white py-4 px-3 shadow lg:mt-0  min-w-full ">
+        <div className="mb-1 flex items-center justify-between px-1 gap-2">
           <div className="flex items-center justify-start space-x-2">
             <span className="font-semibold">
-              Count: {result?.staffs ? result.totalCount : ""}
+              Count: {result?.staffs.length ? result?.staffs.length : 0 }
             </span>
             <div className="w-[200px]">
               <SearchInput
@@ -163,71 +166,77 @@ export default function Staff() {
           </div>
         ) : (
           result?.staffs && (
-            <table className="min-w-full table-auto border-collapse p-2">
-              <thead>
-                <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                  {cols?.map((col) => {
-                    if (col == "Actions")
-                    {
-                      if (userData.data?.user.role == 1)
-                      {
+              <div className="w-full overflow-x-auto">
+                <table className="w-full table-fixed border-collapse border border-gray-200">
+                  <thead>
+                    <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
+                      {cols?.map((col, key) => {
+                        // Define width mapping based on key index
+                        const widthMapping: Record<number, string> = {
+                          0: "w-[100px]",
+                          9: "w-[100px]",
+                          1: "w-[80px]",
+                          2: "w-[80px]",
+                          10: "w-[80px]",
+                          3: "w-[140px]",
+                          4: "w-[140px]",
+                          5: "w-[140px]",
+                          7: "w-[140px]",
+                          11: "w-[140px]",
+                          6: "w-[120px]",
+                          8: "w-[120px]",
+                        };
+
                         return (
-                          <th key={col} className="p-2">
-                            {col}
+                          <th key={col} className={`p-2 ${widthMapping[key] ?? ""}`}>
+                            {col.toLowerCase()}
                           </th>
                         );
-                      }
-                    }
-                    else{
-                      return (
-                        <th key={col} className="p-2">
-                          {col}
-                        </th>
-                      );
-                    }
-                    
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {result?.staffs.map((item: StaffItem) => (
-                  <tr
-                    key={item?.id}
-                    className="border-b text-sm transition-colors hover:bg-gray-100"
-                  >
-                    <td className="p-2">{item.name}</td>
-                    <td className="p-2">{item.empNo}</td>
-                    <td className="p-2">{item.nature_of_employment}</td>
-                    <td className="p-2">{item.designation}</td>
-                    <td className="p-2">{item.departmentname}</td>
-                    <td className="p-2">{item.state}</td>
-                    <td className="p-2">{item.program}</td>
-                    <td className="p-2">{item.location}</td>
-                    <td className="p-2">
-                      {moment(item.createdAt).format("DD/MM/YYYY")}
-                    </td>
-                    <td className="p-2">
-                      <span
-                        className={`rounded-lg px-2 py-1 text-sm ${
-                          item.isactive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {item.isactive ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    {
-                      userData.data?.user.role == 1 && <td className="space-x-2 p-1">
-                        <EditStaff item={item} refetch={refetch} />
-                        <DeleteStaff item={item} refetchStaffs={refetch} />
-                      </td>
-                    }
-                    
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      })}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result?.staffs.map((item: StaffItem) => (
+                      <tr key={item?.id} className="border-b text-sm transition-colors hover:bg-gray-100">
+                        <td className="p-2 ">{item.name}</td>
+                        <td className="p-2 ">{item.empNo}</td>
+                        <td className="p-2 ">{item.nature_of_employment}</td>
+                        <td className="p-2 ">{item.designation}</td>
+                        <td className="p-2 ">{item.departmentname}</td>
+                        <td className="p-2 ">{item.subDeptData?.label}</td>
+                        <td className="p-2 ">{item.levelData?.label}</td>
+                        <td className="p-2 ">{item.state}</td>
+                        <td className="p-2 ">{item.location}</td>
+                        <td className="p-2 ">
+                          {moment(item.createdAt).format("DD/MM/YYYY")}
+                        </td>
+                        <td className="">
+                          <span
+                            className={`rounded-lg px-2 py-1 text-sm ${item.isactive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                              }`}
+                          >
+                            {item.isactive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td className="space-x-2 p-1  w-[120px] ">
+                          <ViewStaff item={item} refetch={refetch} />
+                            {
+                              userData.data?.user.role === 1 && <EditStaff item={item} refetch={refetch} />
+                            }
+                            {
+                              userData.data?.user.role === 1 && <DeleteStaff item={item} refetchStaffs={refetch} />
+                            }
+                            
+                            
+                            
+                          </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+
           )
         )}
       </div>

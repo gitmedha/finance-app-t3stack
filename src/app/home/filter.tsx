@@ -69,10 +69,13 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                 <div className="flex justify-start items-center space-x-4">
 
                     {/* Year Dropdown */}
-                    <div className="w-52">
+                    <div className="w-52 flex flex-col gap-1">
+                        <label htmlFor="year-dropdown" className="text-sm font-medium text-gray-700">
+                            Select Year :
+                        </label>
                         <DropdownMenu.Root>
                             <DropdownMenu.Trigger asChild>
-                                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                                <button className="cursor-pointer w-full py-1 border-2 rounded-lg text-left text-gray-500 text-md pl-2 font-normal flex justify-between items-center border-green-700 ">
                                     <span>
                                         {filters.year || 'Select Year'}
                                     </span>
@@ -93,11 +96,13 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                         </DropdownMenu.Root>
                     </div>
                     {/* Department */}
-                    <div className="w-52">
-                        {/* Department Dropdown */}
+                    <div className="w-52 flex flex-col gap-1">
+                        <label htmlFor="department-dropdown" className="text-sm font-medium text-gray-700">
+                            Select Department :
+                        </label>
                         <DropdownMenu.Root>
                             <DropdownMenu.Trigger asChild>
-                                <button className="cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                                <button className="cursor-pointer w-full py-1 border-2 border-green-700 rounded-lg text-left text-gray-500 text-md pl-2 font-normal flex justify-between items-center">
                                     <span>{filters.departmentname}</span>
                                     <RiArrowDropDownLine size={30} />
                                 </button>
@@ -130,10 +135,13 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
 
                     </div>
                     {/* Sub department dropdown */}
-                    <div className="w-58">
+                    <div className="w-58 flex flex-col gap-1">
+                        <label htmlFor="sub-department-dropdown" className="text-sm font-medium text-gray-700">
+                            Select Sub Department :
+                        </label>
                         <DropdownMenu.Root >
                             <DropdownMenu.Trigger asChild>
-                                <button className="cursor-pointer !w-[280px] py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center">
+                                <button className="cursor-pointer !w-[352px] py-1 border-2 border-green-700 rounded-lg text-left text-gray-500 text-md pl-2 font-normal flex justify-between items-center">
                                     <span >{filters.subdepartmentName}</span>
                                     <RiArrowDropDownLine size={30} />
                                 </button>
@@ -141,7 +149,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                             {/* drop down only when user role is 1 that means when the user is admin */}
                             {
                                 userData.data?.user.role != 3 &&
-                                <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]">
+                                <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-1 !w-[356px]">
                                         <DropdownMenu.Item
                                             // key={dep.id}
                                             className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"

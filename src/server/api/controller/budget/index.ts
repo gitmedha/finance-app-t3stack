@@ -105,7 +105,6 @@ export const addBudgetDetails = protectedProcedure
                     march: z.string(),
                     activity: z.string().optional(),
                     deptId: z.number(),
-                    clusterId: z.number().optional(),
                     createdBy: z.number(),
                     createdAt: z.string(),
                     qty: z.number().optional(),
@@ -173,7 +172,6 @@ export const addBudgetDetails = protectedProcedure
                         february: item.february.trim() === "" ? "0" : item.february,
                         march: item.march.trim() === "" ? "0" : item.march,
                         activity: item.activity ?? null,
-                        clusterId: item.clusterId ?? null,
                         isactive: true,
                         createdBy: item.createdBy,
                         createdAt: item.createdAt,
@@ -593,7 +591,7 @@ export const getTravelCatDetials = protectedProcedure
             deptId: z.number(),
             budgetId: z.number(),
             catId: z.number(),
-            activity: z.string().optional(),
+            travel_typeid:z.number().optional(),
             searchSubCatId:z.number(),
             subDeptId:z.number()
         })
@@ -601,7 +599,6 @@ export const getTravelCatDetials = protectedProcedure
     .query(async ({ ctx, input }) => {
         try {
             // get sub categories
-            console.log(input)
             const subCategories = await ctx.db
                 .select({
                     subCategoryId: categoryHierarchyInFinanceProject.catId,
@@ -624,12 +621,12 @@ export const getTravelCatDetials = protectedProcedure
             ];
 
             // Add activity condition if it is not null or undefined
-            if (input.activity !== null && input.activity !== undefined && input.activity != "0") {
-                baseConditions.push(eq(budgetDetailsInFinanceProject.activity, input.activity));
+            if (input.travel_typeid !== null && input.travel_typeid !== undefined && input.travel_typeid != 0) {
+                baseConditions.push(eq(budgetDetailsInFinanceProject.travelTypeid, input.travel_typeid));
             }
             let result
             // Execute the query with all conditions
-            if (input.activity == "0") {
+            if (input.travel_typeid == 0) {
                 result = await ctx.db
                     .select({
                         subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
@@ -1027,7 +1024,6 @@ export const updateBudgetDetails = protectedProcedure
                     february: z.string(),
                     march: z.string(),
                     activity: z.string().optional(),
-                    clusterId: z.number().optional(),
                     updatedBy: z.number(),
                     updatedAt: z.string(),
                     qty: z.number().optional(),
@@ -1074,7 +1070,6 @@ export const updateBudgetDetails = protectedProcedure
                     february: item.february.trim() === "" ? "0" : item.february,
                     march: item.march.trim() === "" ? "0" : item.march,
                     activity: item.activity ?? null,
-                    clusterId: item.clusterId ?? null,
                     updatedBy: item.updatedBy,
                     updatedAt: item.updatedAt,
                     qty: item.qty ?? 0,
@@ -1177,7 +1172,6 @@ export const savePersonalBudgetDetails = protectedProcedure
                     march: z.string(),
                     activity: z.string().optional(),
                     deptId: z.number(),
-                    clusterId: z.number().optional(),
                     createdBy: z.number(),
                     createdAt: z.string(),
                     qty: z.number().optional(),
@@ -1240,7 +1234,6 @@ export const savePersonalBudgetDetails = protectedProcedure
                         february: item.february.trim() === "" ? "0" : item.february,
                         march: item.march.trim() === "" ? "0" : item.march,
                         activity: item.activity ?? null,
-                        clusterId: item.clusterId ?? null,
                         isactive: true,
                         createdBy: item.createdBy,
                         createdAt: item.createdAt,
@@ -1364,7 +1357,6 @@ export const updatePersonalBudgetDetails = protectedProcedure
                     february: z.string(),
                     march: z.string(),
                     activity: z.string().optional(),
-                    clusterId: z.number().optional(),
                     updatedBy: z.number(),
                     updatedAt: z.string(),
                     qty: z.number().optional(),
@@ -1412,7 +1404,6 @@ export const updatePersonalBudgetDetails = protectedProcedure
                     february: item.february.trim() === "" ? "0" : item.february,
                     march: item.march.trim() === "" ? "0" : item.march,
                     activity: item.activity ?? null,
-                    clusterId: item.clusterId ?? null,
                     updatedBy: item.updatedBy,
                     updatedAt: item.updatedAt,
                     qty: item.qty ?? 0,
@@ -1527,6 +1518,7 @@ export const saveTravelBudgetDetails = protectedProcedure
             budgetId: z.number(),
             catId: z.number(),
             subDeptId: z.number(),
+            travel_typeid:z.number(),
             data: z.array(
                 z.object({
                     budgetid: z.number(),
@@ -1552,7 +1544,6 @@ export const saveTravelBudgetDetails = protectedProcedure
                     march: z.string(),
                     activity: z.string().optional(),
                     deptId: z.number(),
-                    clusterId: z.number().optional(),
                     createdBy: z.number(),
                     createdAt: z.string(),
                     qty: z.number().optional(),
@@ -1594,6 +1585,7 @@ export const saveTravelBudgetDetails = protectedProcedure
                         and(...baseConditions))
                 if (!existingRecord || existingRecord.length == 0) {
                     recordsToInsert.push({
+                        travel_typeid:input.travel_typeid,
                         budgetid: budgetId,
                         catid: catId,
                         subDeptid:input.subDeptId,
@@ -1618,7 +1610,6 @@ export const saveTravelBudgetDetails = protectedProcedure
                         february: item.february.trim() === "" ? "0" : item.february,
                         march: item.march.trim() === "" ? "0" : item.march,
                         activity: item.activity ?? null,
-                        clusterId: item.clusterId ?? null,
                         isactive: true,
                         createdBy: item.createdBy,
                         createdAt: item.createdAt,

@@ -300,9 +300,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       qty2: Number(data.Qty2),
       qty3: Number(data.Qty3),
       qty4: Number(data.Qty4),
-      activity: "",
       deptId: Number(deptId),
-      clusterId: undefined,
       createdBy: userData.data?.user.id ?? 1,
       createdAt: new Date().toISOString(),
     }));
@@ -388,8 +386,6 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       january: (data.Jan ?? "").toString(),
       february: (data.Feb ?? "").toString(),
       march: (data.Mar ?? "").toString(),
-      activity: "",
-      clusterId: undefined,
       updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
       rate1: (data.Rate1 ?? "").toString(),
@@ -469,13 +465,13 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
             else
               setSectionOpen("OVERHEADS")
           }}>
-          <h1 className=" uppercase ">{section}</h1>
+          <h1 className=" capitalize ">{section.toLowerCase()}</h1>
           {
             overHeadDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
+                <p className="text-md">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }
@@ -486,10 +482,10 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         <div className="bg-gray-50 overflow-scroll">
           <table className="w-full table-auto border-collapse">
             <thead>
-              <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                <th className="border p-2">OVERHEADS</th>
+              <tr className="bg-gray-200 text-left text-sm  text-gray-600">
+                <th className="border p-2 capitalize">{"OVERHEADS".toLowerCase()}</th>
                 {months.map((month) => (
-                  <th key={month} className="border p-2">{month}</th>
+                  <th key={month} className="border p-2 capitalize">{month.toLowerCase()}</th>
                 ))}
               </tr>
             </thead>
@@ -501,7 +497,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
                     className="text-sm transition hover:bg-gray-100"
                   >
                     {/* Level Name */}
-                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toLowerCase()}</td>
                     {months.map((month,key) => (
                       <td key={month} className="border p-2">
                         <input

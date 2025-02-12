@@ -289,9 +289,7 @@ const userData = useSession()
       january: (data.Jan ?? "").toString(),
       february: (data.Feb ?? "").toString(),
       march: (data.Mar ?? "").toString(),
-      activity: "",
       deptId: Number(deptId),
-      clusterId: undefined,
       createdBy: userData.data?.user.id ?? 1,
       createdAt: new Date().toISOString(),
       rate1: (data.Rate1 ?? "").toString(),
@@ -390,8 +388,6 @@ const userData = useSession()
       january: (data.Jan ?? "").toString(),
       february: (data.Feb ?? "").toString(),
       march: (data.Mar ?? "").toString(),
-      activity: "",
-      clusterId: undefined,
       updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
       rate1: (data.Rate1 ?? "").toString(),
@@ -473,13 +469,13 @@ const userData = useSession()
             else
               setSectionOpen("PROGRAM OFFICE")
           }}>
-          <h1 className=" uppercase ">{section}</h1>
+          <h1 className=" capitalize ">{section.toLowerCase()}</h1>
           {
             programOfficeDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
+                <p className="text-md">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }
@@ -492,10 +488,10 @@ const userData = useSession()
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                <th className="border p-2">PROGRAM OFFICE</th>
+                <th className="border p-2 capitalize">{"PROGRAM OFFICE".toLowerCase()}</th>
 
                 {months.map((month) => (
-                  <th key={month} className="border p-2">{month}</th>
+                  <th key={month} className="border p-2 capitalize">{month.toLowerCase()}</th>
                 ))}
 
               </tr>
@@ -508,7 +504,7 @@ const userData = useSession()
                     className="text-sm transition hover:bg-gray-100"
                   >
                     {/* Level Name */}
-                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toLowerCase()}</td>
                     {months.map((month,key) => (
                       <td key={month} className="border p-2">
                         <input

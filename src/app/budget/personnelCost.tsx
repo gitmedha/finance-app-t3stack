@@ -87,7 +87,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = []
     setInputStates(disable)
-    for (const [subcategoryId, subcategoryData] of Object.entries(tableData)) {
+    for (const [subcategoryId] of Object.entries(tableData)) {
       subcategoryIds.push(subcategoryId)
     }
     subcategoryIds.forEach((id) => {
@@ -359,7 +359,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       march: (data.Mar ?? "0").toString(),
       activity: undefined,
       deptId: 9,
-      clusterId: undefined,
       createdBy: userData.data?.user.id ?? 1,
       createdAt: "2022-12-11",
       qty1: Number(data.Qty1),
@@ -547,7 +546,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       january: (data.Jan ?? "0").toString(),
       february: (data.Feb ?? "0").toString(),
       march: (data.Mar ?? "0").toString(),
-      clusterId: undefined,
       updatedBy: userData.data?.user.id ?? 1,
       updatedAt: new Date().toISOString(),
       rate1: (data.rate1 ?? "0").toString(),
@@ -626,13 +624,13 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             else
               setSectionOpen("PERSONNEL")
           }}>
-          <h1 className="uppercase">{section}</h1>
+          <h1 className="capitalize">{section.toLowerCase()}</h1>
           {
             personnelCostDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-sm">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
+                <p className="text-md">Total Cost: Q1:{totalQty.totalQ1}, Q2:{totalQty.totalQ2}, Q3:{totalQty.totalQ3}, Q4:{totalQty.totalQ4}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }
@@ -643,11 +641,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         <div className="bg-gray-50 overflow-scroll">
           <table className="w-full table-auto border-collapse">
             <thead>
-              <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                <th className="border p-2">Level</th>
+              <tr className="bg-gray-200 text-left text-sm  text-gray-600">
+                <th className="border p-2 capitalize">Level</th>
                 {months.map((month) => (
-                  <th key={month} className="border p-2">
-                    {month}
+                  <th key={month} className="border p-2 capitalize">
+                    {month.toLowerCase()}
                   </th>
                 ))}
               </tr>
@@ -657,7 +655,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                 ?.sort((a, b) => a.subCategoryId - b.subCategoryId)
                 .map((sub) => (
                   <tr key={sub.subCategoryId} className="text-sm transition hover:bg-gray-100">
-                    <td className="border p-2 font-medium">{sub.subCategoryName}</td>
+                    <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toLowerCase()}</td>
                     {months.map((month, idx) => (
                       <td key={month} className="border p-2">
                         <input

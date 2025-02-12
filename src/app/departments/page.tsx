@@ -70,7 +70,7 @@ export default function DepartmentReport() {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full mt-20">
       <div className="mt-8 flex justify-center">
         <div className="container mt-6 min-h-[400px] rounded bg-white p-4 shadow lg:mt-0">
           <div className="mb-1 flex items-center justify-between px-2">

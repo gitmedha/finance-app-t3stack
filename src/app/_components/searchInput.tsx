@@ -12,8 +12,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onChange,
 }) => {
   return (
-    <div className="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white disabled:bg-white">
-      <div className="pointer-events-none inset-y-0 left-0 flex items-center pl-2">
+    <div className="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white disabled:bg-white ">
+      <div className="pointer-events-none inset-y-0 left-0 ex items-center pl-2">
         <svg
           className="h-6 w-6"
           fill="text-gray-500"
@@ -30,7 +30,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         type="search"
         placeholder={placeholder}
         onChange={onChange}
-        className={`outlined text-textSecondary block w-full rounded-lg pl-1 text-sm outline-none placeholder:text-gray-600 focus:ring-0 disabled:bg-white ${className}`}
+        className={`outlined text-textSecondary block w-full rounded-lg pl-1 text-md outline-none placeholder:text-gray-600 focus:ring-0 disabled:bg-white ${className}`}
       />
     </div>
   );

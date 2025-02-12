@@ -25,7 +25,7 @@ const cols = [
   "Level",
   "State",
   "Location",
-  "Joining Date",
+  "Joining",
   "Status",
   "Actions",
 ];
@@ -119,7 +119,7 @@ export default function Staff() {
         <div className="mb-1 flex items-center justify-between px-1 gap-2">
           <div className="flex items-center justify-start space-x-2">
             <span className="font-semibold">
-              Count: {result?.staffs ? result.totalCount : ""}
+              Count: {result?.staffs.length ? result?.staffs.length : 0 }
             </span>
             <div className="w-[200px]">
               <SearchInput
@@ -219,6 +219,7 @@ export default function Staff() {
                           </span>
                         </td>
                         <td className="space-x-2 p-1  w-[120px] ">
+                          <ViewStaff item={item} refetch={refetch} />
                             {
                               userData.data?.user.role === 1 && <EditStaff item={item} refetch={refetch} />
                             }
@@ -227,7 +228,7 @@ export default function Staff() {
                             }
                             
                             
-                            <ViewStaff item={item} refetch={refetch} />
+                            
                           </td>
                       </tr>
                     ))}

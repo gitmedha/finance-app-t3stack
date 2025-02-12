@@ -69,14 +69,15 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         {/* State Dropdown */}
         <div className="w-1/2">
           <div>
-            <label className="text-sm">State</label>
+            <label className="text-sm" >State</label>
             <Controller
-            disabled={true}
               name="statesData"
               control={control}
               render={({ field }) => (
                 <Select
+                className="!disabled:text-black"
                   onChange={field.onChange}
+                  isDisabled={true}
                   defaultValue={item.statesData}
                   placeholder="Select a state"
                   isClearable
@@ -101,6 +102,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
               render={({ field }) => (
                 <Select
                   onChange={field.onChange}
+                  isDisabled={true}
                   defaultValue={item.locationData}
                   placeholder="Select a location"
                   isClearable
@@ -161,6 +163,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             render={({ field }) => (
               <Select
                 onChange={field.onChange}
+                isDisabled={true}
                 defaultValue={item.departmentData}
                 placeholder="Select a Department"
                 isClearable
@@ -187,6 +190,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             render={({ field }) => (
               <Select
                 onChange={field.onChange}
+                isDisabled={true}
                 defaultValue={item.levelData}
                 placeholder="Select Level"
                 isClearable
@@ -213,6 +217,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           render={({ field }) => (
             <Select
               onChange={field.onChange}
+              isDisabled={true}
               defaultValue={item.subDeptData}
               placeholder="Select a Sub Department"
               isClearable

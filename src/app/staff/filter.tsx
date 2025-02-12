@@ -105,10 +105,10 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
       </div>
 
       {/* sub departments here */}
-      <div className='w-44'>
+      <div className='w-76'>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
-            <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+            <button color="gray" className='cursor-pointer !w-[320px] py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
               <span>
                 {filters.subdepartmentname || 'Select Sub Dept'}
               </span>
@@ -117,7 +117,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
             </button>
           </DropdownMenu.Trigger>
           {
-            (userData.data?.user.role == 2 || userData.data?.user.role == 1) && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[180px]">
+            (userData.data?.user.role == 2 || userData.data?.user.role == 1) && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[320px]">
                <DropdownMenu.Item
                   className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
                   onSelect={() => handleSelect('subdepartment', { subdepartmentname: '' })}

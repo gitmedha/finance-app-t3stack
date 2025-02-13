@@ -14,6 +14,17 @@ interface ItemDetailProps {
   refetchStaffs: () => void;
 }
 
+interface typeMappingSchema {
+  value: string
+  label: string
+}
+const typeMapping: typeMappingSchema[] = [
+  { label: "Full Time Consultant", value: "FTC" },
+  { label: "Full Time Employee", value: "FTE" },
+  { label: "On Contract", value: "CON" },
+  { label: "Full Time Consultant (M.Corp)", value: "FTCM" },
+  { label: "Part time Consultant", value: "PTC" }
+]
 const BasicDetails: React.FC<ItemDetailProps> = ({
   item,
   setIsModalOpen,
@@ -57,7 +68,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const { data: levelsData = [] } = api.get.getLevels.useQuery()
   const { data: subDepartsmentData = [], refetch:subDepartmentsRefectch } =
     api.get.getSubDepartments.useQuery({
-      deptId: departmentId
+      deptId: Number(departmentId)
     });
 
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
@@ -68,13 +79,13 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         empNo: data.empNo,
         designation: data.designation,
         nature_of_employment: data.nature_of_employment,
-        department: data.departmentData?.value,
+        department: Number(data.departmentData?.value),
         stateId: data.statesData?.label.toString(),
         locationId: data.locationData?.label.toString(),
         updatedBy: userData.data?.user.id ?? 1,
         isactive: true,
-        level: data.levelData?.value,
-        subDeptid:data.subDeptData?.value,
+        level: Number(data.levelData?.value),
+        subDeptid:Number(data.subDeptData?.value),
         updatedAt: new Date().toISOString().split("T")[0] ?? "",
       };
 
@@ -228,14 +239,27 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           </div>
         </div>
 
-        {/* Emp Type */}
         <div className="w-1/2">
           <label className="text-sm">Emp Type</label>
-          <input
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="Enter employment type"
-            {...register("nature_of_employment")}
+          <Controller
+            name="nature_of_employment"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                defaultValue={typeMapping.find((map) => map.value == item.nature_of_employment)}
+                options={typeMapping}
+                placeholder="Enter employment type"
+                isClearable
+                aria-invalid={!!errors.nature_of_employment}
+              />
+            )}
           />
+          {errors.nature_of_employment && (
+            <span className="text-xs text-red-500">
+              {errors.nature_of_employment.message}
+            </span>
+          )}
         </div>
       </div>
 
@@ -291,29 +315,32 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         </div>
       </div>
       
-      {/* Sub department */}
-      <div className="w-1/2">
-        <label className="text-sm">Sub Department</label>
-        <Controller
-          name="subDeptData"
-          control={control}
-          render={({ field }) => (
-            <Select
-              onChange={field.onChange}
-              defaultValue={item.subDeptData}
-              options={subDepartsmentData}
-              placeholder="Select a Sub Department"
-              isClearable
-              aria-invalid={!!errors.subDepartment}
-            />
+      <div>
+        {/* Sub department */}
+        <div className="w-1/2">
+          <label className="text-sm">Sub Department</label>
+          <Controller
+            name="subDeptData"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                defaultValue={item.subDeptData}
+                options={subDepartsmentData}
+                placeholder="Select a Sub Department"
+                isClearable
+                aria-invalid={!!errors.subDepartment}
+              />
+            )}
+          />
+          {errors.subDepartment && (
+            <span className="text-xs text-red-500">
+              {errors.subDepartment.message}
+            </span>
           )}
-        />
-        {errors.subDepartment && (
-          <span className="text-xs text-red-500">
-            {errors.subDepartment.message}
-          </span>
-        )}
+        </div>
       </div>
+      
 
       <Flex gap="3" mt="4" justify="end">
         <Button

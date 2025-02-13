@@ -242,8 +242,8 @@ export const editStaff = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      const { id, updatedBy, updatedAt, ...fieldsToUpdate } = input;
-
+      const { id, updatedBy, updatedAt, natureOfEmployment,...fieldsToUpdate } = input;
+      console.log(natureOfEmployment)
       // Check if the staff member exists
       const existingStaff =
         await ctx.db.query.staffMasterInFinanceProject.findFirst({
@@ -259,13 +259,12 @@ export const editStaff = protectedProcedure
         .update(staffMaster)
         .set({
           ...fieldsToUpdate,
+          natureOfEmployment:natureOfEmployment,
           updatedBy,
           updatedAt,
         })
         .where(eq(staffMaster.id, id))
-        .returning({
-          id: staffMaster.id,
-        });
+        .returning()
 
       return {
         success: true,

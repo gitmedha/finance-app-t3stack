@@ -1,4 +1,4 @@
-import { type ISelectItem,type ISelectType } from "../common/types/genericField";
+import { type ISelectItem } from "../common/types/genericField";
 
 // Use a type-only export to avoid conflicts with isolatedModules
 export type {
@@ -66,6 +66,7 @@ interface StaffItem {
   epf: string | null;
   pgwPld: string | null;
   salaryDetailsId: number | null;
+  typeData?: ISelectItem;
 }
 interface StaffFormData {
   name: string;

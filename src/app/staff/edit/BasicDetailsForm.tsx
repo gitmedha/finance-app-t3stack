@@ -69,6 +69,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const { data: subDepartsmentData = [], refetch:subDepartmentsRefectch } =
     api.get.getSubDepartments.useQuery({
       deptId: Number(departmentId)
+    },{
+      enabled:!!departmentId
     });
 
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
@@ -78,7 +80,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         name: data.name,
         empNo: data.empNo,
         designation: data.designation,
-        nature_of_employment: data.nature_of_employment,
+        natureOfEmployment: data.typeData?.value.toString(),
         department: Number(data.departmentData?.value),
         stateId: data.statesData?.label.toString(),
         locationId: data.locationData?.label.toString(),
@@ -242,7 +244,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         <div className="w-1/2">
           <label className="text-sm">Emp Type</label>
           <Controller
-            name="nature_of_employment"
+            name="typeData"
             control={control}
             render={({ field }) => (
               <Select
@@ -251,13 +253,13 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
                 options={typeMapping}
                 placeholder="Enter employment type"
                 isClearable
-                aria-invalid={!!errors.nature_of_employment}
+                aria-invalid={!!errors.typeData}
               />
             )}
           />
-          {errors.nature_of_employment && (
+          {errors.typeData && (
             <span className="text-xs text-red-500">
-              {errors.nature_of_employment.message}
+              {errors.typeData.message}
             </span>
           )}
         </div>

@@ -34,6 +34,9 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
         if (userData.data?.user.subDepartmentId && userData.data?.user.subDepartmentName)
             handleSelect("subdepartment", { id: userData.data?.user.subDepartmentId, departmentname: userData.data?.user.subDepartmentName })
     }, [userData])
+    useEffect(() => {
+        handleSelect("subdepartment", { id: 0, departmentname: "All" })
+    }, [filters.department])
 
     // useEffect(() => {
     //     if (!userData.data?.user.departmentId && !userData.data?.user.departmentName) {

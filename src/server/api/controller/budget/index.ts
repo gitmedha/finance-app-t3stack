@@ -516,12 +516,13 @@ export const getPersonalCatDetials = protectedProcedure
             }
             // make a call for staff count
             const levelStatsBaseCondition = [
-                isNotNull(salaryDetailsInFinanceProject.salary),
+                // isNotNull(salaryDetailsInFinanceProject.salary),
             ]
             if (input.deptId != 0)
                 levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.department, input.deptId))
             if (input.subdeptId != 0)
                 levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.subDeptid, input.subdeptId))
+            // console.log(levelStatsBaseCondition)
             const levelStats = await ctx.db
                 .select({
                     level: staffMasterInFinanceProject.level,
@@ -720,7 +721,6 @@ export const getProgramActivities = protectedProcedure
                 q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
                 q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
                 q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
-                total: sql`SUM(${budgetDetailsInFinanceProject.q1, budgetDetailsInFinanceProject.q2, budgetDetailsInFinanceProject.q3, budgetDetailsInFinanceProject.q4})`.as("q4"),
                 activityId:budgetDetailsInFinanceProject.activity
             }).from(budgetDetailsInFinanceProject)
             .where(and(...activityTotalCondition))
@@ -932,7 +932,6 @@ export const getTravelCatDetials = protectedProcedure
                 q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
                 q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
                 q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
-                total: sql`SUM(${budgetDetailsInFinanceProject.q1, budgetDetailsInFinanceProject.q2, budgetDetailsInFinanceProject.q3, budgetDetailsInFinanceProject.q4})`.as("q4"),
                 travelTypeId: budgetDetailsInFinanceProject.travelTypeid
             }).from(budgetDetailsInFinanceProject)
                 .where(and(...travelTypesTotalCondition))

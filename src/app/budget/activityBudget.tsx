@@ -6,7 +6,8 @@ import React, { useEffect, useState } from "react";
 // import { BiComment } from "react-icons/bi";
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { api } from '~/trpc/react';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+import Marquee from "react-fast-marquee";
 
 interface ActivityBudgetProps {
   section: string;
@@ -17,10 +18,10 @@ interface ActivityBudgetProps {
   sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
   setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
   subdepartmentId: number
-  financialYear:string
+  financialYear: string
 }
 interface totalschema {
-  totalFY:number
+  totalFY: number
   totalQ1: number
   totalQ2: number
   totalQ3: number
@@ -88,7 +89,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [inputStates, setInputStates] = useState<boolean>(true)
   const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0
+    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0, totalFY: 0
   })
   const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
   const [tableData, setTableData] = useState<TableData>({});
@@ -111,7 +112,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
     if (programData?.budgetId == budgetId && programData.subDeptId == subdepartmentId) {
       const initialData: TableData = {};
       if (programData?.subCategories) {
-        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0 }
+        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0, totalFY: 0 }
         setTotalQty(totalQtyAfterBudgetDetails)
         programData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
@@ -146,7 +147,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         setTableData(initialData);
         if (programData.result.length > 0 && programData.subCategories.length > 0) {
           setSaveBtnState("edit")
-          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0 }
+          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0, totalFY: 0 }
           programData.result.forEach((item) => {
             initialData[item.subcategoryId] = {
               Count: item.total ? Number(item.total) : 0,
@@ -246,7 +247,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
         qty2In.disabled = disable;
         qty3In.disabled = disable;
         qty4In.disabled = disable;
-      } 
+      }
       // else {
       //   console.error(`Input element with ID  not found.`);
       //   console.log(aprIn, rate1In, rate2In, rate3In, qty1In, qty2In)
@@ -378,7 +379,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
-          subDeptId:subdepartmentId
+          subDeptId: subdepartmentId
         },
         {
           onSuccess: (data) => {
@@ -430,7 +431,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
       });
     }
   };
-  
+
   const handleUpdate = async () => {
     setSaveBtnState("loading")
     const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
@@ -548,46 +549,50 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           }
         </summary>
 
-        <div className='w-72 mt-3 z-10'>
-          <DropdownMenu.Root >
-            <DropdownMenu.Trigger asChild>
-              <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
-                <span className='capitalize'>{filter?.name.toLowerCase()} </span>
-                <RiArrowDropDownLine size={30} />
-              </button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content
-              className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
-            >
-              {subProgramActivites.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
-                <DropdownMenu.Item
-                  key={ind}
-                  className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm capitalize"
-                  onSelect={() => handleSelect(val)}
-                >
-                  {val.name.toLowerCase()}
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
+        <div className='flex gap-2 items-center'>
+          <div className='w-72 mt-3 z-10'>
+            <DropdownMenu.Root >
+              <DropdownMenu.Trigger asChild>
+                <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
+                  <span className='capitalize'>{filter?.name.toLowerCase()} </span>
+                  <RiArrowDropDownLine size={30} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content
+                className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
+              >
+                {subProgramActivites.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
+                  <DropdownMenu.Item
+                    key={ind}
+                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm capitalize"
+                    onSelect={() => handleSelect(val)}
+                  >
+                    {val.name.toLowerCase()}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          </div>
+          <Marquee className='flex flex-col w-full items-end pr-10 font-medium gap-1'>
+            {
+              subProgramActivites.map((pa) => {
+                if (pa.name == "All")
+                  return
+                const activityData = programData?.activityTotals.find((activity) =>
+                  Number(activity.activityId) == pa.map
+                )
+                return <span key={pa.map} className='mr-2 text-medium'>
+                  <span className='text-green-800 font-semibold'> {pa.name}</span> | FY : {activityData ? Number(activityData?.q1) + Number(activityData?.q2) + Number(activityData?.q3) + Number(activityData?.q4) : "NA"} | Q1 : {activityData ? Number(activityData?.q1) : "NA"} | Q2: {activityData ? Number(activityData?.q2) : "NA"} | Q3 : {activityData ? Number(activityData?.q3) : "NA"} | Q4: {activityData ? Number(activityData?.q4) : "NA"}
+                </span>
+
+              })
+            }
+          </Marquee>
 
         </div>
+
         <hr className="my-2 scale-x-150" />
-        <div className='flex flex-col w-full items-end pr-10 font-medium gap-1'>
-          {
-            subProgramActivites.map((pa)=>{
-              if(pa.name == "All")
-                return 
-              const activityData = programData?.activityTotals.find((activity)=>
-              Number(activity.activityId) == pa.map
-              )
-              return <div key={pa.map} className=''>
-                {pa.name} | FY : {activityData ? Number(activityData?.total) : "NA"} | Q1 : {activityData ? Number(activityData?.q1) : "NA"} | Q2: {activityData ? Number(activityData?.q2) : "NA"} | Q3 : {activityData ? Number(activityData?.q3) : "NA"} | Q4: {activityData ? Number(activityData?.q4) : "NA"} 
-              </div>
-              
-            })
-          }
-        </div>
+
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}
           <table className="w-full table-auto border-collapse">
@@ -638,7 +643,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           </table>
         </div>
         {
-          filter?.map != 0 && subdepartmentId != 0 && deptId != "0" &&  ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
+          filter?.map != 0 && subdepartmentId != 0 && deptId != "0" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
             {
               !inputStates && <div>
                 {

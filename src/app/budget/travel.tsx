@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from "~/trpc/react";
 import {  toast,Bounce } from 'react-toastify';
-
+import Marquee from "react-fast-marquee";
 
 interface TravelBudgetProps {
   section: string;
@@ -653,8 +653,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
           }
         </summary>
 
-          <div className='flex gap-2'>
-          <div className='w-72 mt-3 z-10'>
+          <div className='flex gap-2 justify-center'>
+          <div className='w-1/4 mt-3 z-10'>
             <DropdownMenu.Root >
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
@@ -678,25 +678,26 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
             </DropdownMenu.Root>
 
           </div>
+          <Marquee className='mr-2 w-3/4 border'>
+            {
+              subTravels.map((t) => {
+                if (t.name == "All")
+                  return
+                const activityData = travelData?.travelTypesTotal.find((activity) =>
+                  Number(activity.travelTypeId) == t.map
+                )
+                return <span key={t.map} className='mr-2 text-medium'>
+                  <span className='text-green-800 font-semibold'> {t.name}</span> | FY : {activityData ? Number(activityData?.q1) + Number(activityData?.q2) + Number(activityData?.q3) + Number(activityData?.q4) : "NA"} | Q1 : {activityData ? Number(activityData?.q1) : "NA"} | Q2: {activityData ? Number(activityData?.q2) : "NA"} | Q3 : {activityData ? Number(activityData?.q3) : "NA"} | Q4: {activityData ? Number(activityData?.q4) : "NA"}
+                </span>
+
+              })
+            }
+          </Marquee>
           </div>
         
 
         <hr className="my-2 scale-x-150" />
-        <div className='flex flex-col w-full items-end pr-10 font-medium gap-1'>
-          {
-            subTravels.map((t) => {
-              if (t.name == "All")
-                return
-              const activityData = travelData?.travelTypesTotal.find((activity) =>
-                Number(activity.travelTypeId) == t.map
-              )
-              return <div key={t.map} className=''>
-                {t.name} | FY : {activityData ? Number(activityData?.total) : "NA"} | Q1 : {activityData ? Number(activityData?.q1) : "NA"} | Q2: {activityData ? Number(activityData?.q2) : "NA"} | Q3 : {activityData ? Number(activityData?.q3) : "NA"} | Q4: {activityData ? Number(activityData?.q4) : "NA"}
-              </div>
-
-            })
-          }
-        </div>
+        
         
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}

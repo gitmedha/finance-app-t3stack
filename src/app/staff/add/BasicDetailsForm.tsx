@@ -4,7 +4,7 @@ import { useForm, type SubmitHandler, Controller } from "react-hook-form";
 import { Button, Flex } from "@radix-ui/themes";
 import { api } from "~/trpc/react";
 import Select from "react-select";
-import { type ISelectItem } from "../../common/types/genericField";
+import {  type ISelectItem } from "../../common/types/genericField";
 import useStaff from "../store/staffStore";
 import { toast } from "react-toastify"
 interface ItemDetailProps {
@@ -12,6 +12,10 @@ interface ItemDetailProps {
   refetchStaffs: () => void;
 }
 
+interface typeMappingSchema{
+  value:string
+  label:string
+}
 interface StaffFormData {
   name: string;
   email:string
@@ -23,11 +27,17 @@ interface StaffFormData {
   subDepartmentData:ISelectItem;
   designation: string;
   isactive: boolean;
-  natureOfEmployment: string;
+  natureOfEmployment: ISelectItem;
   createdBy: number;
   createdAt: string; 
 }
-
+const typeMapping: typeMappingSchema []= [
+  { label:"Full Time Consultant",value:"FTC"},
+  { label:"Full Time Employee",value:"FTE"},
+  { label:"On Contract",value:"CON"},
+  { label:"Full Time Consultant (M.Corp)",value:"FTCM"},
+  { label:"Part time Consultant",value:"PTC"}
+]
 const BasicDetails: React.FC<ItemDetailProps> = ({
   setIsModalOpen,
   refetchStaffs,
@@ -62,16 +72,17 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
     },
   });
 
-  const { data: departmentData } = api.get.getAllDepartments.useQuery();
+  const { data: departmentData } = api.get.getHeadDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
   const { data: locationsData = [], refetch } =api.get.getAllLocations.useQuery({stateName: stateName?.label,});
   const{data:levelsData=[]} = api.get.getLevels.useQuery()
-  const { data: suDeptData = [], refetch: subDeptRefetch } = api.get.getSubDepartments.useQuery({ deptId: departmentId?.value })
+  const { data: suDeptData = [], refetch: subDeptRefetch } = api.get.getSubDepartments.useQuery({ deptId: Number(departmentId?.value) })
 
   const onSubmit: SubmitHandler<StaffFormData> = async (data) => {
     try {
       const submissionData = {
         ...data,
+        natureOfEmployment:data.natureOfEmployment.value.toString(),
         createdBy: userData.data?.user.id ?? 1,
         isactive: true,
         createdAt: new Date().toISOString().split("T")[0] ?? "",
@@ -79,7 +90,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         locationId: data.locationData.label.toString(),
         departmentId: Number(data.departmenData.value),
         level:Number(data.levelData.value),
-        subDeptId:data.subDepartmentData.value
+        subDeptId: Number(data.subDepartmentData.value)
       };
       setActiveStaffDetails(submissionData);
       addStaff(submissionData);
@@ -309,17 +320,37 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         </div>
         {/* Emp Type */}
         <div className="w-1/2">
+          <label className="text-sm">
+            Emp Type <span className="text-red-400">*</span>
+          </label>
+          <Controller
+            name="natureOfEmployment"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                options={typeMapping}
+                placeholder="Enter employment type"
+                isClearable
+                aria-invalid={!!errors.natureOfEmployment}
+              />
+            )}
+          />
+          {errors.natureOfEmployment && (
+            <span className="text-xs text-red-500">
+              {errors.natureOfEmployment.message}
+            </span>
+          )}
+        </div>
+        {/* <div className="w-1/2">
           <label className="text-sm">Emp Type</label>
           <input
             className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
             placeholder="Enter employment type"
             {...register("natureOfEmployment")}
           />
-        </div>
+        </div> */}
       </div>
-
-      
-      
 
       <Flex gap="3" mt="4" justify="end">
         <Button

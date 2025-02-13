@@ -20,7 +20,6 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
   const {
     register,
     handleSubmit,
-    reset
   } = useForm<StaffItem>({
     defaultValues: {}, // Pre-populate the form fields with item data
   });

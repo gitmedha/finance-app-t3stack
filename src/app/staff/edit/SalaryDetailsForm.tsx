@@ -17,7 +17,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
   refetch,
 }) => {
   const userData = useSession();
-  const { register, handleSubmit, reset } = useForm<StaffItem>({
+  const { register, handleSubmit } = useForm<StaffItem>({
     defaultValues: item, // Pre-populate the form fields with item data
   });
 

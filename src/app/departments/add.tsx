@@ -44,7 +44,6 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
   } = useForm<DepartmentFormData>({
     defaultValues: {},
   });

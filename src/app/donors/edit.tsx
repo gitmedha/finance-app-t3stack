@@ -57,7 +57,7 @@ const EditDonor: React.FC<ItemDetailProps> = ({ item }) => {
     if (newValue) {
       setFormData((prev) => ({
         ...prev,
-        costCenter: newValue.value,
+        costCenter: Number(newValue.value),
       }));
     }
   };

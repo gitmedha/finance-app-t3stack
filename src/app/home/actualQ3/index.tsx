@@ -12,55 +12,12 @@ interface BudgetData {
     budget: string;
 }
 type tableDataSchema = Record<string, BudgetData>
-const data = [
-    {
-        bHead: 'PERSONNEL',
-        actQ1: "",
-        q1bal: "",
-        util: "",
-        budget: ""
-    },
-    {
-        bHead: 'PROGRAM ACTIVITIES',
-        actQ1: "",
-        q1bal: "",
-        util: "",
-        budget: ""
-    },
-    {
-        bHead: 'TRAVEL ',
-        actQ1: "",
-        q1bal: "",
-        util: "",
-        budget: ""
-    },
-    {
-        bHead: 'PROGRAM OFFICE',
-        actQ1: "",
-        q1bal: "",
-        util: "",
-        budget: ""
-    },
-    {
-        bHead: 'CAPITAL COST',
-        actQ1: "",
-        q1bal: "",
-        util: "",
-        budget: ""
-    },
-    {
-        bHead: 'OVERHEADS',
-        actQ1: "",
-        q1bal: "",
-        util: "",
-        budget: ""
-    }
-]
+
 const ActualQ3 = ({ financialYear }: { financialYear: string }) => {
     const userData = useSession()
     const [tableData, setTableData] = useState<tableDataSchema>({})
     const { data: cat, isLoading: catsLoading } = api.get.getCats.useQuery()
-    const { data: q1data, isLoading: q1DataLoading } = api.get.getQuarterBudgetSum.useQuery({ financialYear: financialYear, quarter: "q3",departmentId:userData.data?.user.departmentId }, { enabled: !!cat && !catsLoading })
+    const { data: q1data } = api.get.getQuarterBudgetSum.useQuery({ financialYear: financialYear, quarter: "q3",departmentId:userData.data?.user.departmentId }, { enabled: !!cat && !catsLoading })
 
     useEffect(() => {
         if (cat?.categories && cat.categories.length > 0) {

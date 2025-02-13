@@ -23,7 +23,6 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
     control,
     handleSubmit,
     // setValue,
-    watch,
     formState: { errors },
     reset,
   } = useForm<Department>({

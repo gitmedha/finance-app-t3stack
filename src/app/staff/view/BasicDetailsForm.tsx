@@ -9,6 +9,13 @@ interface ItemDetailProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   refetchStaffs: () => void;
 }
+const typeMapping = [
+  { label: "Full Time Consultant", value: "FTC" },
+  { label: "Full Time Employee", value: "FTE" },
+  { label: "On Contract", value: "CON" },
+  { label: "Full Time Consultant (M.Corp)", value: "FTCM" },
+  { label: "Part time Consultant", value: "PTC" }
+]
 
 const BasicDetails: React.FC<ItemDetailProps> = ({
   item,
@@ -23,9 +30,6 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   } = useForm<StaffItem>({
     defaultValues: item,
   });
-
-
-
 
   return (
     <form >
@@ -140,15 +144,28 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           </div>
         </div>
 
-        {/* Emp Type */}
         <div className="w-1/2">
           <label className="text-sm">Emp Type</label>
-          <input
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="Enter employment type"
-            disabled={true}
-            {...register("nature_of_employment")}
+          <Controller
+            name="typeData"
+            control={control}
+            render={({ field }) => (
+              <Select
+              isDisabled={true}
+                onChange={field.onChange}
+                defaultValue={typeMapping.find((map) => map.value == item.nature_of_employment)}
+                options={typeMapping}
+                placeholder="Enter employment type"
+                isClearable
+                aria-invalid={!!errors.typeData}
+              />
+            )}
           />
+          {errors.typeData && (
+            <span className="text-xs text-red-500">
+              {errors.typeData.message}
+            </span>
+          )}
         </div>
       </div>
 

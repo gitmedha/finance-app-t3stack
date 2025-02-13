@@ -66,6 +66,7 @@ interface StaffItem {
   epf: string | null;
   pgwPld: string | null;
   salaryDetailsId: number | null;
+  typeData?: ISelectItem;
 }
 interface StaffFormData {
   name: string;

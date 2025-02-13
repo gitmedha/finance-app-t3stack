@@ -8,8 +8,8 @@ import { db } from "~/server/db";
 import {
   departmentMasterInFinanceProject as departmentMaster,
   staffMasterInFinanceProject as staffMaster,
-  statesMasterInFinanceProject as stateMaster,
-  locationMasterInFinanceProject as locationMaster,
+  // statesMasterInFinanceProject as stateMaster,
+  // locationMasterInFinanceProject as locationMaster,
   salaryDetailsInFinanceProject as salaryMaster,
   categoryHierarchyInFinanceProject,
   categoryMasterInFinanceProject,
@@ -242,8 +242,8 @@ export const editStaff = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      const { id, updatedBy, updatedAt, ...fieldsToUpdate } = input;
-
+      const { id, updatedBy, updatedAt, natureOfEmployment,...fieldsToUpdate } = input;
+      console.log(natureOfEmployment)
       // Check if the staff member exists
       const existingStaff =
         await ctx.db.query.staffMasterInFinanceProject.findFirst({
@@ -259,13 +259,12 @@ export const editStaff = protectedProcedure
         .update(staffMaster)
         .set({
           ...fieldsToUpdate,
+          natureOfEmployment:natureOfEmployment,
           updatedBy,
           updatedAt,
         })
         .where(eq(staffMaster.id, id))
-        .returning({
-          id: staffMaster.id,
-        });
+        .returning()
 
       return {
         success: true,
@@ -332,7 +331,7 @@ export const deleteStaff = protectedProcedure
     }
   });
 
-export const getLevels = protectedProcedure.query(async ({ ctx, input}) => {
+export const getLevels = protectedProcedure.query(async ({ ctx}) => {
   const subCategories = await ctx.db
     .select({
       subCategoryId: categoryHierarchyInFinanceProject.catId,

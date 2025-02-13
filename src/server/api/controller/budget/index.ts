@@ -516,7 +516,8 @@ export const getPersonalCatDetials = protectedProcedure
             }
             // make a call for staff count
             const levelStatsBaseCondition = [
-                // isNotNull(salaryDetailsInFinanceProject.salary),
+                isNotNull(salaryDetailsInFinanceProject.salary),
+                eq(staffMasterInFinanceProject.isactive,true)
             ]
             if (input.deptId != 0)
                 levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.department, input.deptId))

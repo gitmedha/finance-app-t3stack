@@ -31,9 +31,6 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
     defaultValues: item,
   });
 
-
-
-
   return (
     <form >
       <div className="flex gap-2">

@@ -3,7 +3,7 @@ import { useForm,  Controller } from "react-hook-form";
 import { Button, Flex } from "@radix-ui/themes";
 import Select from "react-select";
 import { type StaffItem } from "../staff";
-
+import { MdCancel } from "react-icons/md";
 interface ItemDetailProps {
   item: StaffItem;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -253,11 +253,12 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         <Button
           onClick={() => setIsModalOpen(false)}
           type="button"
-          className="!cursor-pointer"
+          className="!cursor-pointer "
           variant="soft"
-          color="gray"
+          color="red"
+          
         >
-          Cancel
+          <MdCancel size={20} />
         </Button>
       </Flex>
     </form>

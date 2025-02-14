@@ -1,9 +1,9 @@
 import React from "react";
 import { useForm,  Controller } from "react-hook-form";
-import { Button, Flex } from "@radix-ui/themes";
+// import { Button, Flex } from "@radix-ui/themes";
 import Select from "react-select";
 import { type StaffItem } from "../staff";
-import { MdCancel } from "react-icons/md";
+// import { MdCancel } from "react-icons/md";
 interface ItemDetailProps {
   item: StaffItem;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,7 +19,7 @@ const typeMapping = [
 
 const BasicDetails: React.FC<ItemDetailProps> = ({
   item,
-  setIsModalOpen,
+  // setIsModalOpen,
 
 }) => {
   const {
@@ -224,7 +224,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       </div>
       
       {/* Sub department */}
-      <div className="w-1/2" >
+      <div className="w-full" >
         <label className="text-sm">Sub Department</label>
         <Controller
           name="subDeptData"
@@ -249,18 +249,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         )}
       </div>
 
-      <Flex gap="3" mt="4" justify="end">
-        <Button
-          onClick={() => setIsModalOpen(false)}
-          type="button"
-          className="!cursor-pointer "
-          variant="soft"
-          color="red"
-          
-        >
-          <MdCancel size={20} />
-        </Button>
-      </Flex>
+      {/* <Flex gap="3" mt="4" justify="end">
+        
+      </Flex> */}
     </form>
   );
 };

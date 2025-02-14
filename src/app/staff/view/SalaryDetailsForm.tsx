@@ -2,8 +2,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { type StaffItem } from "../staff";
-import { MdCancel } from "react-icons/md";
-import {Button} from "@radix-ui/themes";
+
 interface SalaryDetailsFormProps {
   item: StaffItem;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,16 +11,13 @@ interface SalaryDetailsFormProps {
 
 const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
   item,
-  setIsModalOpen,
 }) => {
   const { register} = useForm<StaffItem>({
     defaultValues: item, // Pre-populate the form fields with item data
   });
 
-
-
-
   return (
+    
     <form className="space-y-1">
       {/* Salary Field */}
       <div>
@@ -95,19 +91,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
         />
       </div>
 
-      {/* Submit and Cancel Buttons */}
-      <div className="flex justify-end space-x-2">
-        <Button
-          onClick={() => setIsModalOpen(false)}
-          type="button"
-          className="!cursor-pointer "
-          variant="soft"
-          color="red"
-
-        >
-          <MdCancel size={20} />
-        </Button>
-      </div>
+      
     </form>
   );
 };

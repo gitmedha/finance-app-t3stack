@@ -1,12 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { IconButton, Tabs } from "@radix-ui/themes";
+import {  IconButton, Tabs } from "@radix-ui/themes";
 import Modal from "../../_components/Modal";
 import { FaEye } from "react-icons/fa";
 import { type StaffItem } from "../staff";
 import BasicDetails from "./BasicDetailsForm";
 import SalaryDetailsForm from "./SalaryDetailsForm";
 import { useSession } from "next-auth/react";
+
 
 interface ItemDetailProps {
     item: StaffItem;
@@ -32,7 +33,9 @@ const ViewStaff: React.FC<ItemDetailProps> = ({ item, refetch }) => {
                 description=""
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                view
             >
+
                 {/* Tab Container */}
                 <Tabs.Root className="w-full" defaultValue="basicDetails">
                     {/* Tab List */}

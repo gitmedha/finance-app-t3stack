@@ -647,7 +647,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-md font-medium">FY: {totalQty.totalFY}, Q1: {totalQty.totalQ1}, Q2: {totalQty.totalQ2}, Q3: {totalQty.totalQ3}, Q4: {totalQty.totalQ4}</p>
+                <p className="text-md font-medium">FY: {(totalQty.totalFY).toLocaleString('hi-IN')} | Q1: {(totalQty.totalQ1).toLocaleString('hi-IN')} | Q2: {(totalQty.totalQ2).toLocaleString('hi-IN')} | Q3: {(totalQty.totalQ3).toLocaleString('hi-IN')} | Q4: {(totalQty.totalQ4).toLocaleString('hi-IN')}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }
@@ -687,7 +687,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
                   Number(activity.travelTypeId) == t.map
                 )
                 return <span key={t.map} className='mr-2 text-medium'>
-                  <span className='text-green-800 font-semibold'> {t.name}</span> | FY : {activityData ? Number(activityData?.q1) + Number(activityData?.q2) + Number(activityData?.q3) + Number(activityData?.q4) : "NA"} | Q1 : {activityData ? Number(activityData?.q1) : "NA"} | Q2: {activityData ? Number(activityData?.q2) : "NA"} | Q3 : {activityData ? Number(activityData?.q3) : "NA"} | Q4: {activityData ? Number(activityData?.q4) : "NA"}
+                  <span className='text-green-800 font-semibold'> {t.name}</span> | FY : {activityData ? (Number(activityData?.q1) + Number(activityData?.q2) + Number(activityData?.q3) + Number(activityData?.q4)).toLocaleString('hi-IN') : "NA"} | Q1 : {activityData ? Number(activityData?.q1).toLocaleString('hi-IN') : "NA"} | Q2: {activityData ? Number(activityData?.q2).toLocaleString('hi-IN') : "NA"} | Q3 : {activityData ? Number(activityData?.q3).toLocaleString('hi-IN') : "NA"} | Q4: {activityData ? Number(activityData?.q4).toLocaleString('hi-IN') : "NA"}
                 </span>
 
               })

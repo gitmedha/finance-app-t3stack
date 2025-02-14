@@ -31,11 +31,11 @@ const ShowBudget = ({ filters }: { filters: FilterOptions }) => {
                         if (!acc[key]) {
                             acc[key] = {};
                         }
-                        acc[key][curr.catid] = Math.round(value);
+                        acc[key][curr.catid] = Math.round(value).toLocaleString('hi-IN');
                     }
                 });
                 return acc;
-            }, {} as Record<string, Record<number, number>>);
+            }, {} as Record<string, Record<number, number|string>>);
             setTable(transformedData);
         }
     }, [budgetData]);

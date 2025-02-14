@@ -1,6 +1,6 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { useEffect} from 'react';
+import { useEffect } from 'react';
 import type { HomeFilterFormProps } from "./home";
 import { api } from "~/trpc/react";
 import { useSession } from 'next-auth/react';
@@ -26,7 +26,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
     const years = [
         "2023-24", "2024-25", "2025-26", "2026-27",
         "2027-28", "2028-29", "2029-30",
-    ];    
+    ];
 
     useEffect(() => {
         if (userData.data?.user.departmentId && userData.data?.user.departmentName)
@@ -35,7 +35,8 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
             handleSelect("subdepartment", { id: userData.data?.user.subDepartmentId, departmentname: userData.data?.user.subDepartmentName })
     }, [userData])
     useEffect(() => {
-        handleSelect("subdepartment", { id: 0, departmentname: "All" })
+        if (userData.data?.user.role != 3)
+            handleSelect("subdepartment", { id: 0, departmentname: "All" })
     }, [filters.department])
 
     // useEffect(() => {
@@ -73,7 +74,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
 
                     {/* Year Dropdown */}
                     <div className="w-52 flex flex-col gap-1">
-                        <label htmlFor="year-dropdown" className="text-sm font-medium text-gray-700">
+                        <label htmlFor="year-dropdown" className="text-md font-medium text-gray-700">
                             Select Year :
                         </label>
                         <DropdownMenu.Root>
@@ -100,7 +101,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                     </div>
                     {/* Department */}
                     <div className="w-52 flex flex-col gap-1">
-                        <label htmlFor="department-dropdown" className="text-sm font-medium text-gray-700">
+                        <label htmlFor="department-dropdown" className="text-md font-medium text-gray-700">
                             Select Department :
                         </label>
                         <DropdownMenu.Root>
@@ -116,7 +117,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                                     <DropdownMenu.Item
                                         // key={}
                                         className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                                        onSelect={() => handleSelect('department', { id: 0, departmentname:"All" })} // Set selected year
+                                        onSelect={() => handleSelect('department', { id: 0, departmentname: "All" })} // Set selected year
                                     >
                                         ALL
                                     </DropdownMenu.Item>
@@ -139,7 +140,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                     </div>
                     {/* Sub department dropdown */}
                     <div className="w-58 flex flex-col gap-1">
-                        <label htmlFor="sub-department-dropdown" className="text-sm font-medium text-gray-700">
+                        <label htmlFor="sub-department-dropdown" className="text-md font-medium text-gray-700">
                             Select Sub Department :
                         </label>
                         <DropdownMenu.Root >
@@ -153,13 +154,13 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({ filters, handleSelect }
                             {
                                 userData.data?.user.role != 3 &&
                                 <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-1 !w-[356px]">
-                                        <DropdownMenu.Item
-                                            // key={dep.id}
-                                            className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                                            onSelect={() => handleSelect("subdepartment", { id: 0, departmentname:"ALL" })} // Pass entire department object
-                                        >
-                                            ALL
-                                        </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        // key={dep.id}
+                                        className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                                        onSelect={() => handleSelect("subdepartment", { id: 0, departmentname: "ALL" })} // Pass entire department object
+                                    >
+                                        ALL
+                                    </DropdownMenu.Item>
                                     {subdepartmentData?.subdepartments.sort((a, b) => a.name.localeCompare(b.name))
                                         .map((dep) => (
                                             <DropdownMenu.Item

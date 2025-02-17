@@ -3,7 +3,6 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { type StaffItem } from "../staff";
 
-
 interface SalaryDetailsFormProps {
   item: StaffItem;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,16 +11,13 @@ interface SalaryDetailsFormProps {
 
 const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
   item,
-  setIsModalOpen,
 }) => {
   const { register} = useForm<StaffItem>({
     defaultValues: item, // Pre-populate the form fields with item data
   });
 
-
-
-
   return (
+    
     <form className="space-y-1">
       {/* Salary Field */}
       <div>
@@ -95,17 +91,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
         />
       </div>
 
-      {/* Submit and Cancel Buttons */}
-      <div className="flex justify-end space-x-2">
-        <button
-          type="button"
-          
-          className="rounded-lg border px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
-          onClick={() => setIsModalOpen(false)}
-        >
-          Cancel
-        </button>
-      </div>
+      
     </form>
   );
 };

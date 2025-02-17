@@ -543,14 +543,14 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
               <p className="text-sm">Loading.....</p>
             </div> :
               <div className="flex items-center space-x-2">
-                <p className="text-md font-medium">FY: {totalQty.totalFY}, Q1: {totalQty.totalQ1}, Q2: {totalQty.totalQ2}, Q3: {totalQty.totalQ3}, Q4: {totalQty.totalQ4}</p>
+                <p className="text-md font-medium">FY: {(totalQty.totalFY).toLocaleString('hi-IN')} | Q1: {(totalQty.totalQ1).toLocaleString('hi-IN')} | Q2: {(totalQty.totalQ2).toLocaleString('hi-IN')} | Q3: {(totalQty.totalQ3).toLocaleString('hi-IN')} | Q4: {(totalQty.totalQ4).toLocaleString('hi-IN')}</p>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }
         </summary>
 
         <div className='flex gap-2 items-center'>
-          <div className='w-72 mt-3 z-10'>
+          <div className='w-72 mt-3 '>
             <DropdownMenu.Root >
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
@@ -573,7 +573,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
               </DropdownMenu.Content>
             </DropdownMenu.Root>
           </div>
-          <Marquee className='flex flex-col w-full items-end pr-10 font-medium gap-1'>
+          <Marquee className='flex flex-col w-full items-end pr-10 font-medium gap-1 '>
             {
               subProgramActivites.map((pa) => {
                 if (pa.name == "All")
@@ -582,7 +582,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                   Number(activity.activityId) == pa.map
                 )
                 return <span key={pa.map} className='mr-2 text-medium'>
-                  <span className='text-green-800 font-semibold'> {pa.name}</span> | FY : {activityData ? Number(activityData?.q1) + Number(activityData?.q2) + Number(activityData?.q3) + Number(activityData?.q4) : "NA"} | Q1 : {activityData ? Number(activityData?.q1) : "NA"} | Q2: {activityData ? Number(activityData?.q2) : "NA"} | Q3 : {activityData ? Number(activityData?.q3) : "NA"} | Q4: {activityData ? Number(activityData?.q4) : "NA"}
+                  <span className='text-green-800 font-semibold'> {pa.name}</span> | FY : {activityData ? (Number(activityData?.q1) + Number(activityData?.q2) + Number(activityData?.q3) + Number(activityData?.q4)).toLocaleString('hi-IN') : "NA"} | Q1 : {activityData ? Number(activityData?.q1).toLocaleString('hi-IN') : "NA"} | Q2: {activityData ? Number(activityData?.q2).toLocaleString('hi-IN') : "NA"} | Q3 : {activityData ? Number(activityData?.q3).toLocaleString('hi-IN') : "NA"} | Q4: {activityData ? Number(activityData?.q4).toLocaleString('hi-IN') : "NA"}
                 </span>
 
               })
@@ -591,7 +591,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
 
         </div>
 
-        <hr className="my-2 scale-x-150" />
+        <hr className="my-2 scale-x-150 " />
 
         <div className="bg-gray-50 overflow-scroll">
           {/* Table */}

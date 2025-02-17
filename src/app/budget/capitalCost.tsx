@@ -473,10 +473,10 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             capitalCostDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> : 
-            <div className="flex items-center space-x-2">
-              <p className="text-md font-medium">FY: {totalQty.totalFY}, Q1: {totalQty.totalQ1}, Q2: {totalQty.totalQ2}, Q3: {totalQty.totalQ3}, Q4: {totalQty.totalQ4}</p>
-              <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
-            </div>
+              <div className="flex items-center space-x-2">
+                <p className="text-md font-medium">FY: {(totalQty.totalFY).toLocaleString('hi-IN')} | Q1: {(totalQty.totalQ1).toLocaleString('hi-IN')} | Q2: {(totalQty.totalQ2).toLocaleString('hi-IN')} | Q3: {(totalQty.totalQ3).toLocaleString('hi-IN')} | Q4: {(totalQty.totalQ4).toLocaleString('hi-IN')}</p>
+                <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+              </div>
           }
           
         </summary>

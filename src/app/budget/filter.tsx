@@ -83,6 +83,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
       handleSelect("subdepartment", { id: userData.data?.user.subDepartmentId, departmentname: userData.data?.user.subDepartmentName })
   }, [userData])
   useEffect(()=>{
+    if (userData.data?.user.role != 3)
             handleSelect("subdepartment", { id: 0, departmentname:"All" })
   },[filters.department])
 
@@ -139,8 +140,8 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   };
 
   return (
-    <div className=' bg-[#F3F4F6F4] z-50 w-full '>
-      <div className='flex justify-between fixed bg-[#F3F4F6F4]  w-full py-5 px-2'>
+    <div className=' bg-white fixed w-full  z-50'>
+      <div className='flex justify-between  bg-white   w-full py-5 px-2'>
         <div className="flex justify-start items-center space-x-4">
 
           {/* Year Dropdown */}

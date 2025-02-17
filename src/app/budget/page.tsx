@@ -88,7 +88,7 @@ const Budget: React.FC = () => {
   // get all main categories 
   const { data} = api.get.getCats.useQuery();
   return (
-    <div className="mt-0 overflow-hidden  p-2">
+    <div className=" overflow-hidden ">
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId} status={status} setStatus={setStatus}/>
       {
         isLoading && <div>loading</div>

@@ -516,7 +516,7 @@ export const getPersonalCatDetials = protectedProcedure
             }
             // make a call for staff count
             const levelStatsBaseCondition = [
-                isNotNull(salaryDetailsInFinanceProject.salary),
+                // isNotNull(salaryDetailsInFinanceProject.salary),
                 eq(staffMasterInFinanceProject.isactive,true)
             ]
             if (input.deptId != 0)
@@ -536,7 +536,7 @@ export const getPersonalCatDetials = protectedProcedure
                     pgwPldSum: sql<number>`SUM(${salaryDetailsInFinanceProject.pgwPld})`.as("pgw_pld_sum"),
                 })
                 .from(staffMasterInFinanceProject)
-                .innerJoin(
+                .leftJoin(
                     salaryDetailsInFinanceProject,
                     eq(salaryDetailsInFinanceProject.empId, staffMasterInFinanceProject.id)
                 )
@@ -890,7 +890,8 @@ export const getTravelCatDetials = protectedProcedure
                 )
             // make a call for staff count
             const levelStatsBaseCondition = [
-                isNotNull(salaryDetailsInFinanceProject.salary),
+                // isNotNull(salaryDetailsInFinanceProject.salary),
+                eq(staffMasterInFinanceProject.isactive, true)
             ]
             if (input.deptId != 0)
                 levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.department, input.deptId))
@@ -902,7 +903,7 @@ export const getTravelCatDetials = protectedProcedure
                     employeeCount: sql<number>`COUNT(${staffMasterInFinanceProject.id})`.as("employee_count"),
                 })
                 .from(staffMasterInFinanceProject)
-                .innerJoin(
+                .leftJoin(
                     salaryDetailsInFinanceProject,
                     eq(salaryDetailsInFinanceProject.empId, staffMasterInFinanceProject.id)
                 )

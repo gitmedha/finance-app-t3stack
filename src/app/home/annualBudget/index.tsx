@@ -50,7 +50,7 @@ const AnnualBudget = ({ financialYear }: { financialYear :string}) => {
                     {maricsList.map((item) => (
                         <PendingCard
                             key={item.title}
-                            count={item.title == "Budget Planned" ? totalBudgetSum ? Math.round(Number(totalBudgetSum)) : 0 : item.title == "Financial Year" ? financialYear : item.count}
+                            count={item.title == "Budget Planned" ? totalBudgetSum ? Math.round(Number(totalBudgetSum)).toLocaleString('hi-IN') : 0 : item.title == "Financial Year" ? financialYear : item.count}
                             title={item.title}
                             addOn={item.addOn}
                         />

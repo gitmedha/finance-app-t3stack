@@ -1,5 +1,6 @@
-import { and, count, desc, eq, ilike } from "drizzle-orm";
+import { and, count, desc, eq, ilike} from "drizzle-orm";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import {
   //   createTRPCRouter,
   protectedProcedure,
@@ -189,7 +190,18 @@ export const addDepartment = protectedProcedure
     try {
       // Format data for insertion
       const {parentId,...formattedInput} =input;
-
+      // check is the name present and the department code presnet 
+      const departmentCode = await ctx.db
+      .select()
+      .from(departmentMaster)
+      .where(eq(departmentMaster.deptCode, input.deptCode),)
+      if(departmentCode && departmentCode.length>0)
+      {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Department code already present",
+        });
+      }
       // Insert new department member into the database
       const result = await ctx.db
         .insert(departmentMaster)
@@ -207,8 +219,14 @@ export const addDepartment = protectedProcedure
         createdHirarchey:createdHirarchey ? createdHirarchey[0]:null
       };
     } catch (error) {
+      
       console.error("Error adding department:", error);
-      throw new Error("Failed to add department. Please try again.");
+      // throw new Error(`Failed to add department. Please try again., ${JSON.stringify(error)}`);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to add department: ${error}`,
+      });
     }
   });
 
@@ -236,7 +254,10 @@ export const editDepartment = protectedProcedure
         });
 
       if (!existingDepartment) {
-        throw new Error("Department not found");
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Department not found"
+        });
       }
 
       // Update departmet details
@@ -308,7 +329,11 @@ export const editDepartment = protectedProcedure
       };
     } catch (error) {
       console.error("Error updating department:", error);
-      throw new Error("Failed to update department. Please try again.");
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to add department: ${error}`,
+      });
     }
   });
 

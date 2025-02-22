@@ -120,7 +120,7 @@ export default function Staff() {
         <div className="mb-1 flex items-center justify-between px-1 gap-2">
           <div className="flex items-center justify-start space-x-2">
             <span className="font-semibold">
-              Count: {result?.staffs.length ? result?.staffs.length : 0 }
+              Count: {result?.totalCount }
             </span>
             <div className="w-[200px]">
               <SearchInput

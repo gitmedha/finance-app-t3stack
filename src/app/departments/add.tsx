@@ -8,6 +8,8 @@ import Modal from "../_components/Modal";
 import { BiPlus } from "react-icons/bi";
 import { api } from "~/trpc/react";
 import Select from "react-select";
+import { toast } from "react-toastify";
+import { TRPCClientError } from "@trpc/client";
 
 interface SelectItemDto {
   value: string;
@@ -69,8 +71,35 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
       refetch()
       reset();
       setIsModalOpen(false);
+      toast.success('Successfully Created', {
+        position: "bottom-left",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } catch (error) {
-      console.error("Error adding staff:", error);
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (error instanceof TRPCClientError) {
+        errorMessage = error.message; // Extract proper tRPC error message
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage, {
+        position: "bottom-left",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
 
@@ -145,6 +174,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
               <Controller
                 name="type"
                 control={control}
+                rules={{ required: "Type is required" }}
                 render={({ field }) => (
                   <Select
                     {...field}
@@ -172,6 +202,7 @@ const AddDepartment: React.FC<AddDepartmentProps> = ({ refetch }) => {
               </label>
               <Controller
                 name="departmentData"
+                rules={{ required: "Select ParentDepartment" }}
                 control={control}
                 render={({ field }) => (
                   <Select

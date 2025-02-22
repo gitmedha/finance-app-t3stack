@@ -1,4 +1,5 @@
-import { and, count, desc, eq, ilike,aliasedTable } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { and, count, desc, eq, ilike,aliasedTable,or } from "drizzle-orm";
 import { z } from "zod";
 import {
   //   createTRPCRouter,
@@ -192,7 +193,18 @@ export const addStaff = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
+      const employeId = await ctx.db
+      .select()
+      .from(staffMaster)
+      .where(or(eq(staffMaster.empNo,input.empNo),eq(staffMaster.email,input.email)))
       // Format data for insertion
+      if(employeId?.length>0)
+      {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Employee ID or Employee Email already Present",
+        });
+      }
       const formattedInput = {
         ...input,
         department: input.departmentId,
@@ -216,7 +228,11 @@ export const addStaff = protectedProcedure
       };
     } catch (error) {
       console.error("Error adding staff:", error);
-      throw new Error("Failed to add staff. Please try again.");
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to add department: ${error}`,
+      });
     }
   });
 
@@ -243,7 +259,6 @@ export const editStaff = protectedProcedure
   .mutation(async ({ ctx, input }) => {
     try {
       const { id, updatedBy, updatedAt, natureOfEmployment,...fieldsToUpdate } = input;
-      console.log(natureOfEmployment)
       // Check if the staff member exists
       const existingStaff =
         await ctx.db.query.staffMasterInFinanceProject.findFirst({
@@ -251,7 +266,10 @@ export const editStaff = protectedProcedure
         });
 
       if (!existingStaff) {
-        throw new Error("Staff member not found");
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Employee not present",
+        });
       }
 
       // Update staff member details
@@ -269,11 +287,15 @@ export const editStaff = protectedProcedure
       return {
         success: true,
         message: "Staff member updated successfully",
-        staff: updatedStaff[0], // Return the updated staff record
+        staff: updatedStaff[0], 
       };
     } catch (error) {
       console.error("Error updating staff:", error);
-      throw new Error("Failed to update staff. Please try again.");
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to add department: ${error}`,
+      });
     }
   });
 

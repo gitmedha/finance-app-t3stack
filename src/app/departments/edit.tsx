@@ -85,7 +85,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
         theme: "light",
       });
     } catch (error) {
-      console.error("Error adding staff:", error);
+      console.error("Error editing staff:", error);
       let errorMessage = "Something went wrong. Please try again.";
 
       if (error instanceof TRPCClientError) {

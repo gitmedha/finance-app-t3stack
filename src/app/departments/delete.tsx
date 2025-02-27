@@ -39,7 +39,7 @@ const DeleteDepartment: React.FC<ItemDetailProps> = ({ item, refetch }) => {
 
       <Modal
         title="Delete Department"
-        description="Are you sure you want to delete this departmet?"
+        description="Are you sure you want to delete this department?"
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         className={""}

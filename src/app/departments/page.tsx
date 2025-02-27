@@ -15,6 +15,7 @@ import type {
 } from "./department";
 import AddDepartment from "./add";
 import moment from "moment";
+import ActivateDepartment from "./activate";
 
 const cols = ["Name", "Code", "Type", "Status", "Created At", "Actions"];
 
@@ -158,10 +159,14 @@ export default function DepartmentReport() {
                       <td className="p-2">
                         {moment(item.createdAt).format("DD-MM-YYYY")}
                       </td>
-                      <td className="space-x-2 p-1.5">
-                        <EditDepartments item={item} refetch={refetch} />
-                        <DeleteDepartment item={item} refetch={refetch} />
-                      </td>
+                      {
+                        item.isactive ? <td className="space-x-2 p-1.5">
+                          <EditDepartments item={item} refetch={refetch} />
+                          <DeleteDepartment item={item} refetch={refetch} />
+                        </td>:
+                          <td><ActivateDepartment item={item} refetch={refetch} /></td>
+                      }
+                      
                     </tr>
                   ))}
                 </tbody>

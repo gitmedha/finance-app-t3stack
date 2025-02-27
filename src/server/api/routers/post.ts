@@ -2,7 +2,7 @@ import { createTRPCRouter } from "~/server/api/trpc";
 import { login } from "../controller/user";
 import { addDonor, editDonor } from "../controller/donor";
 import { addStaff, editStaff } from "../controller/staff";
-import { addDepartment, editDepartment } from "../controller/department";
+import { addDepartment, editDepartment, reactivateDepartment } from "../controller/department";
 import { addCostCenter, editCostCenter } from "../controller/costCenters";
 import {
   addStaffSalaryDetails,
@@ -29,4 +29,5 @@ export const postRouter = createTRPCRouter({
   savePersonalBudgetDetails,
   updatePersonalBudgetDetails,
   saveTravelBudgetDetails,
+  reactivateDepartment,
 });

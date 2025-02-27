@@ -395,3 +395,48 @@ export const deleteDepartment = protectedProcedure
       throw new Error("Failed to delete department. Please try again.");
     }
   });
+export const reactivateDepartment = protectedProcedure
+  .input(
+    z.object({
+      id: z.number().min(1, "Department ID is required"),
+      updatedBy: z.number().min(1, "Invalid updater ID"),
+      updatedAt: z.string(),
+    })
+  )
+  .mutation(async({ctx,input})=>{
+    try{
+      const departmentPresent = await ctx.db.select()
+      .from(departmentMaster)
+      .where(eq(departmentMaster.id,input.id))
+      if(departmentPresent.length < 1)
+      {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Department not found"
+        });
+      }
+      const activatedDepartment = await ctx.db.update(departmentMaster)
+      .set({
+        isactive:true,
+        updatedAt:input.updatedAt,
+        updatedBy:input.updatedBy
+      })
+        .where(eq(departmentMaster.id, input.id))
+      if(!activatedDepartment)
+      {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Error while updating the Department"
+        });
+      }
+
+      return activatedDepartment
+    } catch (error){
+      console.error("Error updating department:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to activate department: ${error}`,
+      });
+    }
+  })

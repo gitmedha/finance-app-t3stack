@@ -1,5 +1,6 @@
-import { and, count, desc, eq, ilike } from "drizzle-orm";
+import { and, count, desc, eq, ilike,or} from "drizzle-orm";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import {
   //   createTRPCRouter,
   protectedProcedure,
@@ -189,7 +190,18 @@ export const addDepartment = protectedProcedure
     try {
       // Format data for insertion
       const {parentId,...formattedInput} =input;
-
+      // check is the name present and the department code presnet 
+      const departmentCode = await ctx.db
+      .select()
+      .from(departmentMaster)
+      .where(or(eq(departmentMaster.deptCode, input.deptCode),eq(departmentMaster.departmentname,input.departmentname)))
+      if(departmentCode && departmentCode.length>0)
+      {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Department code or Department name already present",
+        });
+      }
       // Insert new department member into the database
       const result = await ctx.db
         .insert(departmentMaster)
@@ -207,8 +219,14 @@ export const addDepartment = protectedProcedure
         createdHirarchey:createdHirarchey ? createdHirarchey[0]:null
       };
     } catch (error) {
+      
       console.error("Error adding department:", error);
-      throw new Error("Failed to add department. Please try again.");
+      // throw new Error(`Failed to add department. Please try again., ${JSON.stringify(error)}`);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to add department: ${error}`,
+      });
     }
   });
 
@@ -236,7 +254,10 @@ export const editDepartment = protectedProcedure
         });
 
       if (!existingDepartment) {
-        throw new Error("Department not found");
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Department not found"
+        });
       }
 
       // Update departmet details
@@ -308,7 +329,11 @@ export const editDepartment = protectedProcedure
       };
     } catch (error) {
       console.error("Error updating department:", error);
-      throw new Error("Failed to update department. Please try again.");
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to add department: ${error}`,
+      });
     }
   });
 
@@ -370,3 +395,48 @@ export const deleteDepartment = protectedProcedure
       throw new Error("Failed to delete department. Please try again.");
     }
   });
+export const reactivateDepartment = protectedProcedure
+  .input(
+    z.object({
+      id: z.number().min(1, "Department ID is required"),
+      updatedBy: z.number().min(1, "Invalid updater ID"),
+      updatedAt: z.string(),
+    })
+  )
+  .mutation(async({ctx,input})=>{
+    try{
+      const departmentPresent = await ctx.db.select()
+      .from(departmentMaster)
+      .where(eq(departmentMaster.id,input.id))
+      if(departmentPresent.length < 1)
+      {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Department not found"
+        });
+      }
+      const activatedDepartment = await ctx.db.update(departmentMaster)
+      .set({
+        isactive:true,
+        updatedAt:input.updatedAt,
+        updatedBy:input.updatedBy
+      })
+        .where(eq(departmentMaster.id, input.id))
+      if(!activatedDepartment)
+      {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Error while updating the Department"
+        });
+      }
+
+      return activatedDepartment
+    } catch (error){
+      console.error("Error updating department:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to activate department: ${error}`,
+      });
+    }
+  })

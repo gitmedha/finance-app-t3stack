@@ -7,6 +7,7 @@ import Select from "react-select";
 import {  type ISelectItem } from "../../common/types/genericField";
 import useStaff from "../store/staffStore";
 import { toast } from "react-toastify"
+import { TRPCClientError } from "@trpc/client";
 interface ItemDetailProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   refetchStaffs: () => void;
@@ -76,7 +77,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const { data: statesData } = api.get.getAllStates.useQuery();
   const { data: locationsData = [], refetch } =api.get.getAllLocations.useQuery({stateName: stateName?.label,});
   const{data:levelsData=[]} = api.get.getLevels.useQuery()
-  const { data: suDeptData = [], refetch: subDeptRefetch } = api.get.getSubDepartments.useQuery({ deptId: Number(departmentId?.value) })
+  const { data: suDeptData = [], refetch: subDeptRefetch } = api.get.getSubDepartments.useQuery(departmentId?{ deptId: Number(departmentId?.value) }:{deptId:undefined})
 
   const onSubmit: SubmitHandler<StaffFormData> = async (data) => {
     try {
@@ -107,9 +108,17 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       // // reset(submissionData);
     } catch (error) {
       console.error("Error adding staff:", error);
-      toast.warn('Error While Saving ', {
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (error instanceof TRPCClientError) {
+        errorMessage = error.message; // Extract proper tRPC error message
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage, {
         position: "bottom-left",
-        autoClose: 1000,
+        autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: false,
         pauseOnHover: true,
@@ -209,6 +218,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           <Controller
             name="stateData"
             control={control}
+            rules={{ required: "State is required" }}
             render={({ field }) => (
               <Select
                 onChange={field.onChange}
@@ -231,6 +241,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           <Controller
             name="locationData"
             control={control}
+            rules={{ required: "Location is required" }}
             render={({ field }) => (
               <Select
                 onChange={field.onChange}
@@ -257,6 +268,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           <Controller
             name="departmenData"
             control={control}
+            rules={{ required: "Department is required" }}
             render={({ field }) => (
               <Select
                 onChange={field.onChange}
@@ -326,6 +338,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           <Controller
             name="natureOfEmployment"
             control={control}
+            rules={{ required: "Employee type is required" }}
             render={({ field }) => (
               <Select
                 onChange={field.onChange}

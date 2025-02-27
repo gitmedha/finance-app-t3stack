@@ -13,6 +13,7 @@ import { api } from "~/trpc/react";
 import type { GetStaffsResponse, StaffItem } from "./staff";
 import { useSession } from "next-auth/react";
 import ViewStaff from "./view";
+import ActivateStaff from "./activate";
 
 
 
@@ -120,7 +121,7 @@ export default function Staff() {
         <div className="mb-1 flex items-center justify-between px-1 gap-2">
           <div className="flex items-center justify-start space-x-2">
             <span className="font-semibold">
-              Count: {result?.staffs.length ? result?.staffs.length : 0 }
+              Count: {result?.totalCount }
             </span>
             <div className="w-[200px]">
               <SearchInput
@@ -219,18 +220,21 @@ export default function Staff() {
                             {item.isactive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        <td className="space-x-2 p-1  w-[120px] ">
+                        {item.isactive ? <td className="space-x-2 p-1  w-[120px] ">
                           <ViewStaff item={item} refetch={refetch} />
-                            {
-                              userData.data?.user.role === 1 && <EditStaff item={item} refetch={refetch} />
-                            }
-                            {
-                              userData.data?.user.role === 1 && <DeleteStaff item={item} refetchStaffs={refetch} />
-                            }
-                            
-                            
-                            
-                          </td>
+                          {
+                            userData.data?.user.role === 1 && <EditStaff item={item} refetch={refetch} />
+                          }
+                          {
+                            userData.data?.user.role === 1 && <DeleteStaff item={item} refetchStaffs={refetch} />
+                          }                        
+                        </td>
+                        :
+                          <td><ActivateStaff item={item} refetchStaffs={refetch} /></td>
+
+
+                        }
+                        
                       </tr>
                     ))}
                   </tbody>

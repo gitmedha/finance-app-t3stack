@@ -9,6 +9,8 @@ import { MdEdit } from "react-icons/md";
 import { api } from "~/trpc/react";
 import Select from "react-select";
 import { type Department } from "./department";
+import { toast } from "react-toastify";
+import { TRPCClientError } from "@trpc/client";
 
 interface ItemDetailProps {
   item: Department;
@@ -72,8 +74,36 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
       await apiContext.get.getAllDepartments.invalidate();
       reset();
       setIsModalOpen(false);
+      toast.success('Successfully Created', {
+        position: "bottom-left",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } catch (error) {
-      console.error("Error adding staff:", error);
+      console.error("Error editing staff:", error);
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (error instanceof TRPCClientError) {
+        errorMessage = error.message; // Extract proper tRPC error message
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage, {
+        position: "bottom-left",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     }
   };
   return (
@@ -119,6 +149,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
               <input
                 className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
                 placeholder="Enter Code"
+                disabled={true}
                 type="number"
                 {...register("deptCode", {
                   required: "Department Code is required",
@@ -141,6 +172,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
               <Controller
                 name="typeData"
                 control={control}
+                rules={{ required: "Type is required" }}
                 render={({ field }) => (
                   <Select
                     {...field}
@@ -172,6 +204,7 @@ const EditDepartments: React.FC<ItemDetailProps> = ({ item, refetch }) => {
               <Controller
                 name="departmentData"
                 control={control}
+                rules={{ required: "Select ParentDepartment" }}
                 render={({ field }) => (
                   <Select
                     onChange={field.onChange}

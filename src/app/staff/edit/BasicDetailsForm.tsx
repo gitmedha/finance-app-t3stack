@@ -7,6 +7,7 @@ import Select from "react-select";
 import { type StaffItem } from "../staff";
 import useStaff from "../store/staffStore";
 import {toast} from "react-toastify"
+import { TRPCClientError } from "@trpc/client";
 
 interface ItemDetailProps {
   item: StaffItem;
@@ -108,9 +109,17 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       // setIsModalOpen(false);
     } catch (error) {
       console.error("Error adding staff:", error);
-      toast.warn('Error While Editing ', {
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (error instanceof TRPCClientError) {
+        errorMessage = error.message; 
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage, {
         position: "bottom-left",
-        autoClose: 1000,
+        autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: false,
         pauseOnHover: true,
@@ -156,6 +165,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           <div>
             <label className="text-sm">Employee Number</label>
             <input
+            disabled
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="Enter employee number"
               {...register("empNo", {

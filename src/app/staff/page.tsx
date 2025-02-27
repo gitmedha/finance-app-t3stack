@@ -13,6 +13,7 @@ import { api } from "~/trpc/react";
 import type { GetStaffsResponse, StaffItem } from "./staff";
 import { useSession } from "next-auth/react";
 import ViewStaff from "./view";
+import ActivateStaff from "./activate";
 
 
 
@@ -219,18 +220,21 @@ export default function Staff() {
                             {item.isactive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        <td className="space-x-2 p-1  w-[120px] ">
+                        {item.isactive ? <td className="space-x-2 p-1  w-[120px] ">
                           <ViewStaff item={item} refetch={refetch} />
-                            {
-                              userData.data?.user.role === 1 && <EditStaff item={item} refetch={refetch} />
-                            }
-                            {
-                              userData.data?.user.role === 1 && <DeleteStaff item={item} refetchStaffs={refetch} />
-                            }
-                            
-                            
-                            
-                          </td>
+                          {
+                            userData.data?.user.role === 1 && <EditStaff item={item} refetch={refetch} />
+                          }
+                          {
+                            userData.data?.user.role === 1 && <DeleteStaff item={item} refetchStaffs={refetch} />
+                          }                        
+                        </td>
+                        :
+                          <td><ActivateStaff item={item} refetchStaffs={refetch} /></td>
+
+
+                        }
+                        
                       </tr>
                     ))}
                   </tbody>

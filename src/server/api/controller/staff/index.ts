@@ -40,7 +40,7 @@ export const getStaffs = protectedProcedure
       department === 0 ? undefined : eq(staffMaster.department, department);
     const subdepartmentCondition = 
       subdepartment == 0 ? undefined:eq(staffMaster.subDeptid,subdepartment)
-    const statusCondition = eq(staffMaster.isactive, status === "Active");
+    const statusCondition = status ?  eq(staffMaster.isactive, status === "Active"):undefined;
     const designationCondition = designation
       ? eq(staffMaster.designation, designation)
       : undefined;
@@ -231,7 +231,7 @@ export const addStaff = protectedProcedure
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        message: `Failed to add department: ${error}`,
+        message: `Failed to add staff: ${error}`,
       });
     }
   });
@@ -294,7 +294,7 @@ export const editStaff = protectedProcedure
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        message: `Failed to add department: ${error}`,
+        message: `Failed to edit staff: ${error}`,
       });
     }
   });
@@ -315,7 +315,9 @@ export const getDesignation = protectedProcedure.query(async ({ ctx }) => {
 export const deleteStaff = protectedProcedure
   .input(
     z.object({
-      id: z.number().min(1, "Staff ID is required"), // Staff ID to locate the record
+      id: z.number().min(1, "Staff ID is required"),
+      updatedAt: z.string(),
+      updatedBy: z.number().min(1, "Invalid updater ID"), // Staff ID to locate the record
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -329,7 +331,10 @@ export const deleteStaff = protectedProcedure
         });
 
       if (!existingStaff) {
-        throw new Error("Staff member not found");
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Staff member not found",
+        });
       }
 
       // Update staff member details
@@ -349,7 +354,11 @@ export const deleteStaff = protectedProcedure
       };
     } catch (error) {
       console.error("Error deleting staff:", error);
-      throw new Error("Failed to delete staff. Please try again.");
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to delete staff: ${error}`,
+      });
     }
   });
 
@@ -373,3 +382,54 @@ export const getLevels = protectedProcedure.query(async ({ ctx}) => {
   return levelsData.length > 0 ? levelsData : undefined;
 });
 
+export const activateStaff = protectedProcedure
+  .input(
+    z.object({
+      id: z.number().min(1, "Staff ID is required"),
+      updatedAt:z.string() ,
+      updatedBy: z.number().min(1, "Invalid updater ID"),// Staff ID to locate the record
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    try {
+      const { id } = input;
+
+      // Check if the staff member exists
+      const existingStaff =
+        await ctx.db.query.staffMasterInFinanceProject.findFirst({
+          where: eq(staffMaster.id, id),
+        });
+
+      if (!existingStaff) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Staff member not found",
+        });
+      }
+
+      // Update staff member details
+      const updatedStaff = await ctx.db
+        .update(staffMaster)
+        .set({
+          isactive: true,
+          updatedAt:input.updatedAt,
+          updatedBy:input.updatedBy
+        })
+        .where(eq(staffMaster.id, id))
+        .returning(); // Correct usage of eq()
+      // .returning("*");
+
+      return {
+        success: true,
+        message: "Staff member activated successfully",
+        staff: updatedStaff[0], // Return the updated staff record
+      };
+    } catch (error) {
+      console.error("Error activating staff:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        message: `Failed to activating staff: ${error}`,
+      });
+    }
+  });

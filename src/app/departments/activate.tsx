@@ -27,6 +27,16 @@ const ActivateDepartment: React.FC<ItemDetailProps> = ({ item, refetch }) => {
             });
             refetch();
             setIsModalOpen(false);
+            toast.success('Successfully Activated Department', {
+                position: "bottom-left",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
         } catch (error) {
             console.error("Error activate department:", error);
             let errorMessage = "Something went wrong. Please try again.";

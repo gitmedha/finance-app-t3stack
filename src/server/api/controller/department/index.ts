@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike} from "drizzle-orm";
+import { and, count, desc, eq, ilike,or} from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import {
@@ -194,12 +194,12 @@ export const addDepartment = protectedProcedure
       const departmentCode = await ctx.db
       .select()
       .from(departmentMaster)
-      .where(eq(departmentMaster.deptCode, input.deptCode),)
+      .where(or(eq(departmentMaster.deptCode, input.deptCode),eq(departmentMaster.departmentname,input.departmentname)))
       if(departmentCode && departmentCode.length>0)
       {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Department code already present",
+          message: "Department code or Department name already present",
         });
       }
       // Insert new department member into the database

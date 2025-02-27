@@ -26,7 +26,7 @@ const DeleteStaff: React.FC<ItemDetailProps> = ({ item, refetchStaffs }) => {
        })
       refetchStaffs();
       setIsModalOpen(false);
-      toast.success('Successfully Activated Staff', {
+      toast.success('Successfully deleted Staff', {
         position: "bottom-left",
         autoClose: 1000,
         hideProgressBar: false,
@@ -37,7 +37,7 @@ const DeleteStaff: React.FC<ItemDetailProps> = ({ item, refetchStaffs }) => {
         theme: "light",
       });
     } catch (error) {
-      console.error("Error adding staff:", error);
+      console.error("Error deleting staff:", error);
       let errorMessage = "Something went wrong. Please try again.";
 
       if (error instanceof TRPCClientError) {

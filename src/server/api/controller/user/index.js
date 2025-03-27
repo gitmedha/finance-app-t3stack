@@ -14,7 +14,7 @@ export const login = publicProcedure
     )
     .mutation(async ({ input, ctx }) => {
         // Find user in the database by username
-        console.log(input)
+        // console.log(input)
         let user = await ctx.db.query.userMasterInFinanceProject.findFirst({
             where: (fields, operators) =>
                 operators.eq(fields.email, input.email),

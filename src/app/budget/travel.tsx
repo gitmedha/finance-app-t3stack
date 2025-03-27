@@ -345,7 +345,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
       const janIn = document.getElementById(id + "Jan") as HTMLInputElement;
       const febIn = document.getElementById(id + "Feb") as HTMLInputElement;
       const marIn = document.getElementById(id + "Mar") as HTMLInputElement;
-      if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn && qty1In && qty2In && qty3In && qty4In) {
+      if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn && qty1In && qty2In && qty3In && qty4In && rate1In && rate2In && rate3In && rate4In) {
         aprIn.disabled = disable;
         rate1In.disabled = disable;
         rate2In.disabled = disable;
@@ -366,9 +366,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({ section, categoryId, budget
         qty2In.disabled = disable;
         qty3In.disabled = disable;
         qty4In.disabled = disable;
-      } else {
-        console.error(`Input element with ID  not found.`);
-      }
+      } 
     })
   }
   const updateTotalQtyVals = (which: string, difference: number) => {

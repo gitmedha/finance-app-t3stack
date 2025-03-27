@@ -54,6 +54,7 @@ const subProgramActivites: subProgramActivitesSchema[] = [
   { map: 12, name: "Industry Engagement" },
   { map: 13, name: "TCPO Workshop" },
   { map: 14, name: "DSE Faculty workshop" },
+  {map:15,name:"IT Subcriptions"},
   { map: 0, name: "All" }
 ]
 
@@ -559,7 +560,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                 </button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Content
-                className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[280px]"
+                className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[250px]"
               >
                 {subProgramActivites.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
                   <DropdownMenu.Item

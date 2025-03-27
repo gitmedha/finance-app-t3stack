@@ -1976,7 +1976,7 @@ export const saveTravelBudgetDetails = protectedProcedure
     .mutation(async ({ ctx, input }) => {
         try {
             // Extract data from input
-            const { deptId, budgetId, catId, subDeptId, data } = input;
+            const { deptId, budgetId, catId, subDeptId, travel_typeid,data } = input;
             // Map data to include shared fields and default values
 
             const recordsToInsert = []
@@ -1995,7 +1995,7 @@ export const saveTravelBudgetDetails = protectedProcedure
                         and(...baseConditions))
                 if (!existingRecord || existingRecord.length == 0) {
                     recordsToInsert.push({
-                        travel_typeid: input.travel_typeid,
+                        travelTypeid: travel_typeid,
                         budgetid: budgetId,
                         catid: catId,
                         subDeptid: input.subDeptId,

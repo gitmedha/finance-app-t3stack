@@ -89,6 +89,7 @@ const Budget: React.FC = () => {
   const { data} = api.get.getCats.useQuery();
   return (
     <div className=" overflow-hidden ">
+      {/* {JSON.stringify(userData)} */}
       <BudgetFilterForm filters={filters} handleSelect={handleSelect} budgetId={budgetId} setBugetId={setBudgetId} status={status} setStatus={setStatus}/>
       {
         isLoading && <div>loading</div>

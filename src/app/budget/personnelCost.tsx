@@ -273,6 +273,22 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           setTotalQty(totalQtyAfterBudgetDetails)
         }
         else if (personnelCostData.levelStats) {
+          let aprOSum = 0
+          let mayOSum = 0
+          let junOSum = 0
+          let julOSum = 0
+          let augOSum = 0
+          let sepOSum = 0
+          let octOSum = 0
+          let novOSum = 0
+          let decOSum = 0
+          let janOSum = 0
+          let febOSum = 0
+          let marOSum = 0
+          let q1OSum = 0
+          let q2OSum = 0
+          let q3OSum = 0
+          let q4OSum = 0
           setSaveBtnState("save")
           const totalQtyAfterStaffCount: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0 ,totalFY:0}
           personnelCostData.subCategories.forEach((sub) => {
@@ -286,40 +302,98 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             const pwgPldSum = levelData?.pgwPldSum ? Number(levelData?.pgwPldSum) : 0;
             const bonusSum = levelData?.bonusSum ? Number(levelData?.bonusSum) : 0;
             const gratuitySum = levelData?.gratuitySum ? Number(levelData?.gratuitySum) : 0;
-            initialData[sub.subCategoryId] = {
-              Count: employeeCount,
-              Qty1: employeeCount,
-              Qty2: employeeCount,
-              Qty3: employeeCount,
-              Qty4: employeeCount,
-              Apr: salarySum + epfSum + insuranceSum,
-              May: salarySum + epfSum + pwgPldSum,
-              Jun: salarySum + epfSum,
-              Jul: salarySum + epfSum,
-              Aug: salarySum + epfSum + pwgPldSum,
-              Sep: salarySum + epfSum,
-              Oct: salarySum + epfSum,
-              Nov: salarySum + epfSum + pwgPldSum,
-              Dec: salarySum + epfSum,
-              Jan: salarySum + epfSum + bonusSum,
-              Feb: salarySum + epfSum + gratuitySum,
-              Mar: salarySum + epfSum,
-              budgetDetailsId: 0, // Default or placeholder value
-            };
-            intialAvgQty[sub.subCategoryId] = {
-              Apr: employeeCount!=0 ? (salarySum + epfSum + insuranceSum) / employeeCount : 0,
-              May: employeeCount != 0 ?(salarySum + epfSum + pwgPldSum) / employeeCount:0,
-              Jun: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
-              Jul: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
-              Aug: employeeCount != 0 ?(salarySum + epfSum + pwgPldSum) / employeeCount:0,
-              Sep: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
-              Oct: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
-              Nov: employeeCount != 0 ?(salarySum + epfSum + pwgPldSum) / employeeCount:0,
-              Dec: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
-              Jan: employeeCount != 0 ?(salarySum + epfSum + bonusSum) / employeeCount:0,
-              Feb: employeeCount != 0 ?(salarySum + epfSum + gratuitySum) / employeeCount:0,
-              Mar: employeeCount != 0 ?(salarySum + epfSum) / employeeCount:0,
+            if(sub.subCategoryId <= 14)
+            {
+              q1OSum+=Number(employeeCount)
+              q2OSum+=Number(employeeCount)
+              q3OSum+=Number(employeeCount)
+              q4OSum+=Number(employeeCount)
+              aprOSum+=epfSum + insuranceSum
+              mayOSum+=epfSum + pwgPldSum
+              junOSum+=epfSum
+              julOSum+=epfSum
+              augOSum+=epfSum + pwgPldSum
+              sepOSum+=epfSum
+              octOSum+=epfSum
+              novOSum+=epfSum + pwgPldSum
+              decOSum+=epfSum
+              janOSum+=epfSum + bonusSum
+              febOSum+=epfSum + gratuitySum
+              marOSum+=epfSum
+
+              initialData[sub.subCategoryId] = {
+                Count: employeeCount,
+                Qty1: employeeCount,
+                Qty2: employeeCount,
+                Qty3: employeeCount,
+                Qty4: employeeCount,
+                Apr: salarySum ,
+                May: salarySum ,
+                Jun: salarySum ,
+                Jul: salarySum ,
+                Aug: salarySum ,
+                Sep: salarySum ,
+                Oct: salarySum ,
+                Nov: salarySum ,
+                Dec: salarySum ,
+                Jan: salarySum ,
+                Feb: salarySum ,
+                Mar: salarySum ,
+                budgetDetailsId: 0, // Default or placeholder value
+              };
+              intialAvgQty[sub.subCategoryId] = {
+                Apr: employeeCount!=0 ? (salarySum ) / employeeCount : 0,
+                May: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Jun: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Jul: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Aug: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Sep: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Oct: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Nov: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Dec: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Jan: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Feb: employeeCount != 0 ?(salarySum) / employeeCount:0,
+                Mar: employeeCount != 0 ?(salarySum) / employeeCount:0,
+              }
+            }else
+            {
+              initialData[sub.subCategoryId] = {
+                Count: employeeCount,
+                Qty1: q1OSum,
+                Qty2: q2OSum,
+                Qty3: q3OSum,
+                Qty4: q4OSum,
+                Apr:  aprOSum,
+                May:  mayOSum,
+                Jun:  junOSum,
+                Jul:  julOSum,
+                Aug:  augOSum,
+                Sep:  sepOSum,
+                Oct:  octOSum,
+                Nov:  novOSum,
+                Dec:  decOSum,
+                Jan:  janOSum,
+                Feb:  febOSum,
+                Mar:  marOSum,
+                budgetDetailsId: 0, // Default or placeholder value
+              };
+              intialAvgQty[sub.subCategoryId] = {
+                Apr: employeeCount!=0 ? (aprOSum) / q1OSum : 0,
+                May: employeeCount != 0 ?( mayOSum) / q1OSum:0,
+                Jun: employeeCount != 0 ?( junOSum) / q1OSum:0,
+                Jul: employeeCount != 0 ?( julOSum) / employeeCount:0,
+                Aug: employeeCount != 0 ?( augOSum) / employeeCount:0,
+                Sep: employeeCount != 0 ?( sepOSum) / employeeCount:0,
+                Oct: employeeCount != 0 ?( octOSum) / employeeCount:0,
+                Nov: employeeCount != 0 ?( novOSum) / employeeCount:0,
+                Dec: employeeCount != 0 ?( decOSum) / employeeCount:0,
+                Jan: employeeCount != 0 ?( janOSum) / employeeCount:0,
+                Feb: employeeCount != 0 ?( febOSum) / employeeCount:0,
+                Mar: employeeCount != 0 ?( marOSum) / employeeCount:0,
+              }
             }
+            
+            
             totalQtyAfterStaffCount.totalFY += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + bonusSum + salarySum + epfSum + gratuitySum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ1 += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ2 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
@@ -407,7 +481,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               })
               return updatedData
             })
-            console.log("Budget created successfully:", data);
+            // console.log("Budget created successfully:", data);
           },
           onError: (error) => {
             setSaveBtnState("save")
@@ -647,11 +721,29 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             <thead>
               <tr className="bg-gray-200 text-left text-sm  text-gray-600">
                 <th className="border p-2 capitalize">Level</th>
-                {months.map((month) => (
-                  <th key={month} className="border p-2 capitalize">
-                    {month.toLowerCase()}
-                  </th>
-                ))}
+                {months.map((month) =>{
+                  if(month == "Qty1")
+                    return <th key={month} className="border p-2 capitalize">
+                  # Q1
+                </th>
+                else if(month == "Qty2")
+                  return <th key={month} className="border p-2 capitalize">
+                  # Q2
+                </th>
+                else if(month == "Qty3")
+                  return <th key={month} className="border p-2 capitalize">
+                  # Q3
+                </th>
+                else if(month == "Qty4")
+                  return <th key={month} className="border p-2 capitalize">
+                  # Q4
+                </th>
+                else
+                  return <th key={month} className="border p-2 capitalize">
+                  {month.toLowerCase()}
+                </th>
+                } 
+                )}
               </tr>
             </thead>
             <tbody>

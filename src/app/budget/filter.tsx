@@ -249,7 +249,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           
         </div>
         {
-          budgetId != 0 && <div className='flex justify-end items-center space-x-2'>
+          budgetId != 0 && filters.subdepartmentId!= 0 &&<div className='flex justify-end items-center space-x-2'>
             {
               !budgetId && userData.data?.user.role == 2 && <Button
                 type="button"

@@ -555,7 +555,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
             <DropdownMenu.Root >
               <DropdownMenu.Trigger asChild>
                 <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
-                  <span className='capitalize'>{filter?.name.toLowerCase()} </span>
+                  <span className='capitalize'>{filter?.name} </span>
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
@@ -568,7 +568,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                     className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm capitalize"
                     onSelect={() => handleSelect(val)}
                   >
-                    {val.name.toLowerCase()}
+                    {val.name}
                   </DropdownMenu.Item>
                 ))}
               </DropdownMenu.Content>

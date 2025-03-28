@@ -517,7 +517,7 @@ export const getPersonalCatDetials = protectedProcedure
             // make a call for staff count
             const levelStatsBaseCondition = [
                 // isNotNull(salaryDetailsInFinanceProject.salary),
-                eq(staffMasterInFinanceProject.isactive,true)
+                eq(staffMasterInFinanceProject.isactive, true)
             ]
             if (input.deptId != 0)
                 levelStatsBaseCondition.push(eq(staffMasterInFinanceProject.department, input.deptId))
@@ -699,10 +699,9 @@ export const getProgramActivities = protectedProcedure
                     .where(and(...baseConditions));
             }
             const activityTotalCondition = [
-                eq(budgetDetailsInFinanceProject.catid,input.catId)
+                eq(budgetDetailsInFinanceProject.catid, input.catId)
             ]
-            if(input.deptId == 0)
-            {
+            if (input.deptId == 0) {
                 const budgetMasterIds = await ctx.db
                     .select({
                         id: budgetMasterInFinanceProject.id,
@@ -712,20 +711,20 @@ export const getProgramActivities = protectedProcedure
                 const budgetIds = budgetMasterIds.map((record) => record.id);
                 activityTotalCondition.push(inArray(budgetDetailsInFinanceProject.budgetid, budgetIds))
             }
-            else{
-                activityTotalCondition.push(eq(budgetDetailsInFinanceProject.deptid,input.deptId))
+            else {
+                activityTotalCondition.push(eq(budgetDetailsInFinanceProject.deptid, input.deptId))
             }
-            if(input.subDeptId != 0)
-                activityTotalCondition.push(eq(budgetDetailsInFinanceProject.subDeptid,input.subDeptId))
+            if (input.subDeptId != 0)
+                activityTotalCondition.push(eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId))
             const activityTotals = await ctx.db.select({
                 q1: sql`SUM(${budgetDetailsInFinanceProject.q1})`.as("q1"),
                 q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
                 q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
                 q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
-                activityId:budgetDetailsInFinanceProject.activity
+                activityId: budgetDetailsInFinanceProject.activity
             }).from(budgetDetailsInFinanceProject)
-            .where(and(...activityTotalCondition))
-            .groupBy(budgetDetailsInFinanceProject.activity)
+                .where(and(...activityTotalCondition))
+                .groupBy(budgetDetailsInFinanceProject.activity)
             return {
                 subCategories, budgetId: input.budgetId, result, subDeptId: input.subDeptId, activityTotals
             };
@@ -861,10 +860,10 @@ export const getTravelCatDetials = protectedProcedure
                         rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
                         rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
                         rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
-                        qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
-                        qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
-                        qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
-                        qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+                        qty1: sql`AVG(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
+                        qty2: sql`AVG(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
+                        qty3: sql`AVG(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
+                        qty4: sql`AVG(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
                         total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
                         id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
                     })
@@ -1976,7 +1975,7 @@ export const saveTravelBudgetDetails = protectedProcedure
     .mutation(async ({ ctx, input }) => {
         try {
             // Extract data from input
-            const { deptId, budgetId, catId, subDeptId, travel_typeid,data } = input;
+            const { deptId, budgetId, catId, subDeptId, travel_typeid, data } = input;
             // Map data to include shared fields and default values
 
             const recordsToInsert = []

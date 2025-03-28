@@ -552,9 +552,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           updateTotalQtyVals("totalQ1", aprDiff)
           updateTotalQtyVals("totalQ1", mayDiff)
           updateTotalQtyVals("totalQ1", jubDiff)
-          subCategoryData.Apr = qty * avgQty[subCategoryId].Apr;
-          subCategoryData.May = qty * avgQty[subCategoryId].May;
-          subCategoryData.Jun = qty * avgQty[subCategoryId].Jun;
+          subCategoryData.Apr = Math.ceil(qty * avgQty[subCategoryId].Apr);
+          subCategoryData.May = Math.ceil(qty * avgQty[subCategoryId].May);
+          subCategoryData.Jun = Math.ceil(qty * avgQty[subCategoryId].Jun);
         }
         if (month === "Qty2") {
           const julDiff = qty * avgQty[subCategoryId].Jul - Number(subCategoryData.Jul)
@@ -563,9 +563,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           updateTotalQtyVals("totalQ2", julDiff)
           updateTotalQtyVals("totalQ2", augDiff)
           updateTotalQtyVals("totalQ2", sepDiff)
-          subCategoryData.Jul = qty * avgQty[subCategoryId].Jul;
-          subCategoryData.Aug = qty * avgQty[subCategoryId].Aug;
-          subCategoryData.Sep = qty * avgQty[subCategoryId].Sep;
+          subCategoryData.Jul = Math.ceil(qty * avgQty[subCategoryId].Jul);
+          subCategoryData.Aug = Math.ceil(qty * avgQty[subCategoryId].Aug);
+          subCategoryData.Sep = Math.ceil(qty * avgQty[subCategoryId].Sep);
         }
         if (month === "Qty3") {
           const julDiff = qty * avgQty[subCategoryId].Oct - Number(subCategoryData.Oct)
@@ -574,9 +574,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           updateTotalQtyVals("totalQ3", julDiff)
           updateTotalQtyVals("totalQ3", augDiff)
           updateTotalQtyVals("totalQ3", sepDiff)
-          subCategoryData.Oct = qty * avgQty[subCategoryId].Oct;
-          subCategoryData.Nov = qty * avgQty[subCategoryId].Nov;
-          subCategoryData.Dec = qty * avgQty[subCategoryId].Dec;
+          subCategoryData.Oct = Math.ceil(qty * avgQty[subCategoryId].Oct);
+          subCategoryData.Nov = Math.ceil(qty * avgQty[subCategoryId].Nov);
+          subCategoryData.Dec = Math.ceil(qty * avgQty[subCategoryId].Dec);
         }
         if (month === "Qty4") {
           const julDiff = qty * avgQty[subCategoryId].Jan - Number(subCategoryData.Jan)
@@ -585,9 +585,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
           updateTotalQtyVals("totalQ4", julDiff)
           updateTotalQtyVals("totalQ4", augDiff)
           updateTotalQtyVals("totalQ4", sepDiff)
-          subCategoryData.Jan = qty * avgQty[subCategoryId].Jan;
-          subCategoryData.Feb = qty * avgQty[subCategoryId].Feb;
-          subCategoryData.Mar = qty * avgQty[subCategoryId].Mar;
+          subCategoryData.Jan = Math.ceil(qty * avgQty[subCategoryId].Jan);
+          subCategoryData.Feb = Math.ceil(qty * avgQty[subCategoryId].Feb);
+          subCategoryData.Mar = Math.ceil(qty * avgQty[subCategoryId].Mar);
         }
         subCategoryData.Count = qty;
       }

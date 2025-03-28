@@ -248,20 +248,20 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         subCategoryData.Amount1 = (Number(subCategoryData.Rate1) * Number(value)).toFixed(2)
       }
       else if (month === "Rate2") {
-        subCategoryData.Amount1 = (Number(subCategoryData.Qty2) * Number(value)).toFixed(2)
+        subCategoryData.Amount2 = (Number(subCategoryData.Qty2) * Number(value)).toFixed(2)
       }
       else if (month === "Qty2") {
-        subCategoryData.Amount1 = (Number(subCategoryData.Rate2) * Number(value)).toFixed(2)
+        subCategoryData.Amount2 = (Number(subCategoryData.Rate2) * Number(value)).toFixed(2)
       } else if (month === "Rate3") {
-        subCategoryData.Amount1 = (Number(subCategoryData.Qty3) * Number(value)).toFixed(2)
+        subCategoryData.Amount3 = (Number(subCategoryData.Qty3) * Number(value)).toFixed(2)
       }
       else if (month === "Qty3") {
-        subCategoryData.Amount1 = (Number(subCategoryData.Rate3) * Number(value)).toFixed(2)
+        subCategoryData.Amount3 = (Number(subCategoryData.Rate3) * Number(value)).toFixed(2)
       } else if (month === "Rate4") {
-        subCategoryData.Amount1 = (Number(subCategoryData.Qty4) * Number(value)).toFixed(2)
+        subCategoryData.Amount4 = (Number(subCategoryData.Qty4) * Number(value)).toFixed(2)
       }
       else if (month === "Qt4") {
-        subCategoryData.Amount1 = (Number(subCategoryData.Rate4) * Number(value)).toFixed(2)
+        subCategoryData.Amount4 = (Number(subCategoryData.Rate4) * Number(value)).toFixed(2)
       }
       subCategoryData[month] = value;
       updatedData[subCategoryId] = subCategoryData;

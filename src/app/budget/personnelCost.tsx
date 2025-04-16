@@ -67,16 +67,16 @@ const months = [
   "Mar",
 ];
 
-const bandLevelMapping: { [key: string]: string } = {
-    "I": "Assistant",
-    "II": "Associate",
-    "III": "Manager",
-    "IV": "Senior Manager",
-    "V": "AVP",
-    "VI": "VP",
-    "VII": "CXO/Director",
-    "Others - Interns, Volunteers, PTCs": "N/A",
-    "Staff Benefits": "N/A"
+const bandLevelMapping: Record<string, string> = {
+  "I": "Assistant",
+  "II": "Associate",
+  "III": "Manager",
+  "IV": "Senior Manager",
+  "V": "AVP",
+  "VI": "VP",
+  "VII": "CXO/Director",
+  "Others - Interns, Volunteers, PTCs": "N/A",
+  "Staff Benefits": "N/A"
 };
 
 
@@ -769,7 +769,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                     <td className="border p-2 font-medium capitalize">
                        {["I", "II", "III", "IV", "V", "VI", "VII"].includes(sub.subCategoryName)
                           ? `${bandLevelMapping[sub.subCategoryName]} - ${sub.subCategoryName.toUpperCase()}`
-                          : `${sub.subCategoryName.toUpperCase()} - ${bandLevelMapping[sub.subCategoryName] || 'N/A'}`}                    
+                          : `${sub.subCategoryName.toUpperCase()} - ${bandLevelMapping[sub.subCategoryName] ?? 'default'}`}                    
                     </td>
                     {months.map((month, idx) => (
                       <td key={month} className="border p-2">

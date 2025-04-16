@@ -67,6 +67,19 @@ const months = [
   "Mar",
 ];
 
+const bandLevelMapping: { [key: string]: string } = {
+    "I": "Assistant",
+    "II": "Associate",
+    "III": "Manager",
+    "IV": "Senior Manager",
+    "V": "AVP",
+    "VI": "VP",
+    "VII": "CXO/Director",
+    "Others - Interns, Volunteers, PTCs": "N/A",
+    "Staff Benefits": "N/A"
+};
+
+
 const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId, subdepartmentId, financialYear }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
@@ -689,6 +702,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   return (
   
     <div className="my-6 rounded-md bg-white shadow-lg">
+      
       <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500"
         open={sectionOpen == "PERSONNEL"}
         onClick={(e) => {
@@ -751,7 +765,12 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                 ?.sort((a, b) => a.subCategoryId - b.subCategoryId)
                 .map((sub) => (
                   <tr key={sub.subCategoryId} className="text-sm transition hover:bg-gray-100">
-                    <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toLowerCase()}</td>
+                    {/* <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toUpperCase()}</td> */}
+                    <td className="border p-2 font-medium capitalize">
+                       {["I", "II", "III", "IV", "V", "VI", "VII"].includes(sub.subCategoryName)
+                          ? `${bandLevelMapping[sub.subCategoryName]} - ${sub.subCategoryName.toUpperCase()}`
+                          : `${sub.subCategoryName.toUpperCase()} - ${bandLevelMapping[sub.subCategoryName] || 'N/A'}`}                    
+                    </td>
                     {months.map((month, idx) => (
                       <td key={month} className="border p-2">
                         <input
@@ -836,6 +855,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         }
         
       </details>
+      
     </div>
   );
 };

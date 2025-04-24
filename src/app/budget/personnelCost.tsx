@@ -321,18 +321,18 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
               q2OSum+=Number(employeeCount)
               q3OSum+=Number(employeeCount)
               q4OSum+=Number(employeeCount)
-              aprOSum+=epfSum + insuranceSum
-              mayOSum+=epfSum + pwgPldSum
+              aprOSum+=epfSum + pwgPldSum/4
+              mayOSum+=epfSum + insuranceSum
               junOSum+=epfSum
-              julOSum+=epfSum
-              augOSum+=epfSum + pwgPldSum
+              julOSum+=epfSum + pwgPldSum/4
+              augOSum+=epfSum 
               sepOSum+=epfSum
-              octOSum+=epfSum
-              novOSum+=epfSum + pwgPldSum
+              octOSum+=epfSum + pwgPldSum/4
+              novOSum+=epfSum 
               decOSum+=epfSum
-              janOSum+=epfSum + bonusSum
-              febOSum+=epfSum + gratuitySum
-              marOSum+=epfSum
+              janOSum+=epfSum + bonusSum +pwgPldSum/4
+              febOSum+=epfSum 
+              marOSum+=epfSum + gratuitySum
 
               initialData[sub.subCategoryId] = {
                 Count: employeeCount,

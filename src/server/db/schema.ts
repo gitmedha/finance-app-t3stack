@@ -386,6 +386,7 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
 	level: integer("level"),
 	email: varchar("email", { length: 255 }),
 	subDeptid: integer("sub_deptid"),
+	project: varchar("project", { length: 255 }),
 },
 (table) => {
 	return {

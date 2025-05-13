@@ -8,6 +8,7 @@ import { type StaffItem } from "../staff";
 import useStaff from "../store/staffStore";
 import {toast} from "react-toastify"
 import { TRPCClientError } from "@trpc/client";
+import { type ISelectItem } from "~/app/common/types/genericField";
 
 interface ItemDetailProps {
   item: StaffItem;
@@ -74,6 +75,10 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       enabled:!!departmentId
     });
 
+  // Filter out inactive departments and subdepartments
+  const departmentDataFiltered = departmentData?.filter(dept => (dept as ISelectItem & { isactive?: boolean }).isactive !== false) ?? [];
+  const subDepartsmentDataFiltered = subDepartsmentData.filter(subDept => (subDept as ISelectItem & { isactive?: boolean }).isactive !== false);
+
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
     try {
       const submissionData = {
@@ -82,6 +87,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         empNo: data.empNo,
         designation: data.designation,
         natureOfEmployment: data.typeData?.value.toString(),
+        project: data.project,
         department: Number(data.departmentData?.value),
         stateId: data.statesData?.label.toString(),
         locationId: data.locationData?.label.toString(),
@@ -275,8 +281,24 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         </div>
       </div>
 
-
       <div className="flex gap-2">
+        <div className="w-1/2">
+          {/* Project Field */}
+          <div>
+            <label className="text-sm">Project</label>
+            <input
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              placeholder="Enter project name"
+              {...register("project")}
+            />
+            {errors.project && (
+              <span className="text-xs text-red-500">
+                {errors.project.message}
+              </span>
+            )}
+          </div>
+        </div>
+        
         <div className="w-1/2">
           <label className="text-sm">Department</label>
           <Controller
@@ -286,7 +308,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
               <Select
                 onChange={field.onChange}
                 defaultValue={item.departmentData}
-                options={departmentData}
+                options={departmentDataFiltered}
                 placeholder="Select a Department"
                 isClearable
                 aria-invalid={!!errors.department}
@@ -299,7 +321,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             </span>
           )}
         </div>
-
+      </div>
+      
+      <div className="flex gap-2">
         {/* Level Dropdown */}
         <div className="w-1/2">
           <label className="text-sm">
@@ -338,7 +362,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
               <Select
                 onChange={field.onChange}
                 defaultValue={item.subDeptData}
-                options={subDepartsmentData}
+                options={subDepartsmentDataFiltered}
                 placeholder="Select a Sub Department"
                 isClearable
                 aria-invalid={!!errors.subDepartment}

@@ -29,6 +29,7 @@ interface StaffFormData {
   designation: string;
   isactive: boolean;
   natureOfEmployment: ISelectItem;
+  project: string;
   createdBy: number;
   createdAt: string; 
 }
@@ -78,6 +79,10 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const { data: locationsData = [], refetch } =api.get.getAllLocations.useQuery({stateName: stateName?.label,});
   const{data:levelsData=[]} = api.get.getLevels.useQuery()
   const { data: suDeptData = [], refetch: subDeptRefetch } = api.get.getSubDepartments.useQuery(departmentId?{ deptId: Number(departmentId?.value) }:{deptId:undefined})
+  
+  // Filter out inactive departments and subdepartments
+  const departmentDataFiltered = departmentData?.filter(dept => dept.isactive !== false) ?? [];
+  const suDeptDataFiltered = suDeptData.filter(subDept => subDept.isactive !== false);
 
   const onSubmit: SubmitHandler<StaffFormData> = async (data) => {
     try {
@@ -272,7 +277,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             render={({ field }) => (
               <Select
                 onChange={field.onChange}
-                options={departmentData}
+                options={departmentDataFiltered}
                 placeholder="Select a Department"
                 isClearable
                 aria-invalid={!!errors.departmenData}
@@ -296,7 +301,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             render={({ field }) => (
               <Select
                 onChange={field.onChange}
-                options={suDeptData}
+                options={suDeptDataFiltered}
                 placeholder="Select a Sub Department"
                 isClearable
                 aria-invalid={!!errors.subDepartmentData}
@@ -330,6 +335,24 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             </span>
           )}
         </div>
+        {/* Project Field */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            Project
+          </label>
+          <input
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="Enter project name"
+            {...register("project")}
+          />
+          {errors.project && (
+            <span className="text-xs text-red-500">
+              {errors.project.message}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex gap-2">
         {/* Emp Type */}
         <div className="w-1/2">
           <label className="text-sm">
@@ -355,14 +378,6 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             </span>
           )}
         </div>
-        {/* <div className="w-1/2">
-          <label className="text-sm">Emp Type</label>
-          <input
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-            placeholder="Enter employment type"
-            {...register("natureOfEmployment")}
-          />
-        </div> */}
       </div>
 
       <Flex gap="3" mt="4" justify="end">

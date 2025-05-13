@@ -68,6 +68,7 @@ export const getStaffs = protectedProcedure
         location: staffMaster.locationId,
         locationId: staffMaster.locationId,
         designation: staffMaster.designation,
+        project: staffMaster.project,
         salaryDetailsId: salaryMaster.id,
         salary: salaryMaster.salary,
         insurance: salaryMaster.insurance,
@@ -163,7 +164,6 @@ export const getStaffs = protectedProcedure
         subDeptData
       });
     }
-
     return {
       staffs: updatedStaffs,
       totalCount,
@@ -181,14 +181,15 @@ export const addStaff = protectedProcedure
       departmentId: z.number().min(1, "Department is required"),
       designation: z.string().min(1, "Designation is required"),
       isactive: z.boolean(),
-      email:z.string().email(),
-      level:z.number(),
+      email: z.string().email(),
+      level: z.number(),
+      project: z.string().optional(),
       natureOfEmployment: z.string().optional(),
       notes: z.string().optional().nullable(),
       description: z.string().optional().nullable(),
       createdBy: z.number().min(1, "Invalid creator ID"),
       createdAt: z.string(),
-      subDeptId:z.number().optional()
+      subDeptId: z.number().optional()
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -239,7 +240,7 @@ export const addStaff = protectedProcedure
 export const editStaff = protectedProcedure
   .input(
     z.object({
-      id: z.number().min(1, "Staff ID is required"), // Staff ID to locate the record
+      id: z.number().min(1, "Staff ID is required"),
       name: z.string().optional(),
       empNo: z.string().optional(),
       stateId: z.string().optional(),
@@ -250,7 +251,8 @@ export const editStaff = protectedProcedure
       natureOfEmployment: z.string().optional(),
       notes: z.string().optional().nullable(),
       description: z.string().optional().nullable(),
-      level:z.number().optional(),
+      level: z.number().optional(),
+      project: z.string().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
       subDeptid: z.number().optional()

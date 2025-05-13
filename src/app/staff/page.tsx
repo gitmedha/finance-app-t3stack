@@ -22,6 +22,7 @@ const cols = [
   "Emp ID",
   "Type",
   "Designation",
+  // "Project",
   "Department",
   "SubDepartment",
   "Level",
@@ -204,6 +205,7 @@ export default function Staff() {
                         <td className="p-2 ">{item.empNo}</td>
                         <td className="p-2 ">{item.nature_of_employment}</td>
                         <td className="p-2 ">{item.designation}</td>
+                        {/* <td className="p-2 ">{item.project}</td> */}
                         <td className="p-2 ">{item.departmentname}</td>
                         <td className="p-2 ">{item.subDeptData?.label}</td>
                         <td className="p-2 ">{item.levelData?.label}</td>

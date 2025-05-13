@@ -31,7 +31,8 @@ interface StaffItem {
     location: string | null;
     locationId: string | null;
     designation: string | null;
-    level:number|null
+    level:number|null;
+    project: string | null;
   }): unknown;
   id: number;
   name: string;
@@ -54,6 +55,7 @@ interface StaffItem {
   stateId?: string;
   locationId?: string;
   program?: string;
+  project?: string;
   departmentData?: ISelectItem;
   subDeptData?:ISelectItem;
   statesData?: ISelectItem;

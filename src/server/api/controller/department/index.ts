@@ -121,6 +121,7 @@ export const getHeadDepartments = protectedProcedure.query(async ({ ctx }) => {
     .select({
       id: departmentMaster.id,
       name: departmentMaster.departmentname,
+      isactive: departmentMaster.isactive
     })
     .from(departmentMaster)
     .where(eq(departmentMaster.type,"Department"))
@@ -130,6 +131,7 @@ export const getHeadDepartments = protectedProcedure.query(async ({ ctx }) => {
     return {
       value: department.id,
       label: department.name,
+      isactive: department.isactive
     };
   });
 });
@@ -149,6 +151,8 @@ export const getSubDepartments = protectedProcedure
       .select({
         id: departmentMaster.id,
         name: departmentMaster.departmentname,
+        isactive: departmentMaster.isactive,
+        hierarchyActive: departmentHierarchyInFinanceProject.isactive
       })
       .from(departmentMaster)
       .leftJoin(departmentHierarchyInFinanceProject,eq(departmentHierarchyInFinanceProject.deptId,departmentMaster.id))
@@ -158,6 +162,7 @@ export const getSubDepartments = protectedProcedure
       return {
         value: sub.id,
         label: sub.name,
+        isactive: sub.isactive && (sub.hierarchyActive ?? true)
       }
     })
   })

@@ -169,8 +169,17 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         </div>
       </div>
 
-
       <div className="flex gap-2">
+        <div className="w-1/2">
+          <label className="text-sm">Project</label>
+          <input
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="Enter project name"
+            disabled={true}
+            {...register("project")}
+          />
+        </div>
+
         <div className="w-1/2">
           <label className="text-sm">Department</label>
           <Controller
@@ -194,7 +203,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             </span>
           )}
         </div>
+      </div>
 
+      <div className="flex gap-2">
         {/* Level Dropdown */}
         <div className="w-1/2">
           <label className="text-sm">

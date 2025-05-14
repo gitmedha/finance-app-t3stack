@@ -349,9 +349,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             </span>
           )}
         </div>
-      </div>
-      
-      <div>
+        
         {/* Sub department */}
         <div className="w-1/2">
           <label className="text-sm">Sub Department</label>

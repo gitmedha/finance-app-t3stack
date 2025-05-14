@@ -232,34 +232,34 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             </span>
           )}
         </div>
+        
+        {/* Sub department */}
+        <div className="w-1/2">
+          <label className="text-sm">Sub Department</label>
+          <Controller
+            name="subDeptData"
+            control={control}
+            disabled={true}
+            render={({ field }) => (
+              <Select
+                onChange={field.onChange}
+                isDisabled={true}
+                defaultValue={item.subDeptData}
+                placeholder="Select a Sub Department"
+                isClearable
+                aria-invalid={!!errors.subDepartment}
+              />
+            )}
+          />
+          {errors.subDepartment && (
+            <span className="text-xs text-red-500">
+              {errors.subDepartment.message}
+            </span>
+          )}
+        </div>
       </div>
       
-      {/* Sub department */}
-      <div className="w-full" >
-        <label className="text-sm">Sub Department</label>
-        <Controller
-          name="subDeptData"
-          control={control}
-          
-          disabled={true}
-          render={({ field }) => (
-            <Select
-              onChange={field.onChange}
-              isDisabled={true}
-              defaultValue={item.subDeptData}
-              placeholder="Select a Sub Department"
-              isClearable
-              aria-invalid={!!errors.subDepartment}
-            />
-          )}
-        />
-        {errors.subDepartment && (
-          <span className="text-xs text-red-500">
-            {errors.subDepartment.message}
-          </span>
-        )}
-      </div>
-
+      {/* Notes Field */}
       {/* <Flex gap="3" mt="4" justify="end">
         
       </Flex> */}

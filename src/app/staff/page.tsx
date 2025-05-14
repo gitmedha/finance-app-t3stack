@@ -22,7 +22,7 @@ const cols = [
   "Emp ID",
   "Type",
   "Designation",
-  // "Project",
+  "Project",
   "Department",
   "SubDepartment",
   "Level",
@@ -170,24 +170,25 @@ export default function Staff() {
         ) : (
           result?.staffs && (
               <div className="w-full overflow-x-auto">
-                <table className="w-full table-fixed border-collapse border border-gray-200">
+                <table className="min-w-[1200px] w-full table-fixed border-collapse border border-gray-200">
                   <thead>
                     <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
                       {cols?.map((col, key) => {
                         // Define width mapping based on key index
                         const widthMapping: Record<number, string> = {
-                          0: "w-[100px]",
-                          9: "w-[100px]",
-                          1: "w-[80px]",
-                          2: "w-[80px]",
-                          10: "w-[80px]",
-                          3: "w-[140px]",
-                          4: "w-[140px]",
-                          5: "w-[140px]",
-                          7: "w-[140px]",
-                          11: "w-[140px]",
-                          6: "w-[120px]",
-                          8: "w-[120px]",
+                          0: "w-[100px]", // Name
+                          1: "w-[80px]",  // Emp ID
+                          2: "w-[80px]",  // Type
+                          3: "w-[120px]", // Designation
+                          4: "w-[120px]", // Project (New)
+                          5: "w-[120px]", // Department
+                          6: "w-[140px]", // SubDepartment
+                          7: "w-[100px]", // Level
+                          8: "w-[100px]", // State
+                          9: "w-[100px]", // Location
+                          10: "w-[90px]", // Joining
+                          11: "w-[80px]", // Status
+                          12: "w-[120px]", // Actions
                         };
 
                         return (
@@ -205,7 +206,7 @@ export default function Staff() {
                         <td className="p-2 ">{item.empNo}</td>
                         <td className="p-2 ">{item.nature_of_employment}</td>
                         <td className="p-2 ">{item.designation}</td>
-                        {/* <td className="p-2 ">{item.project}</td> */}
+                        <td className="p-2 ">{item.project}</td>
                         <td className="p-2 ">{item.departmentname}</td>
                         <td className="p-2 ">{item.subDeptData?.label}</td>
                         <td className="p-2 ">{item.levelData?.label}</td>

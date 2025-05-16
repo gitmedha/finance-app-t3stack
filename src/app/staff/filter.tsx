@@ -1,4 +1,3 @@
-
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
 import type { StaffFilterFormProps } from "./staff";
@@ -25,6 +24,11 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   },{
     enabled:userData.data?.user.role !=3
   })
+  
+  // Filter out inactive departments and subdepartments
+  const departmentDataFiltered = data?.filter(dept => dept.isactive !== false) ?? [];
+  const subDeptsDataFiltered = subDeptsData?.filter(subDept => subDept.isactive !== false) ?? [];
+  
   useEffect(() => {
     if (userData.data?.user.departmentId && userData.data?.user.departmentName)
       handleSelect("department", { value: userData.data?.user.departmentId, label: userData.data?.user.departmentName })
@@ -89,7 +93,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
               >
                 All
               </DropdownMenu.Item>
-              {data?.map((dep) => (
+              {departmentDataFiltered?.map((dep) => (
                 <DropdownMenu.Item
                   key={dep?.value}
                   className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
@@ -125,7 +129,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
                   All
                 </DropdownMenu.Item>
               
-              {subDeptsData?.map((dep) => (
+              {subDeptsDataFiltered?.map((dep) => (
                 <DropdownMenu.Item
                   key={dep?.value}
                   className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"

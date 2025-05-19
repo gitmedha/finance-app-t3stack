@@ -122,6 +122,7 @@ export const getStaffs = protectedProcedure
         and(
           searchCondition,
           departmentCondition,
+          subdepartmentCondition,
           statusCondition,
           designationCondition,
         ),

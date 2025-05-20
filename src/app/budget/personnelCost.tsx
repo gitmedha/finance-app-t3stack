@@ -699,6 +699,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       setSaveBtnState("edit")
     }
   };
+  console.log(tableData,"tableData");
+  console.log(personnelCostData,"personnelCostData");
   return (
   
     <div className="my-6 rounded-md bg-white shadow-lg">
@@ -737,20 +739,20 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                 <th className="border p-2 capitalize">Level</th>
                 {months.map((month) =>{
                   if(month == "Qty1")
-                    return <th key={month} className="border p-2 capitalize">
-                  # Q1
+                    return <th key={month} className="border p-2 capitalize" style={{ minWidth: "80px" }}>
+                    #Qty1
                 </th>
                 else if(month == "Qty2")
-                  return <th key={month} className="border p-2 capitalize">
-                  # Q2
+                  return <th key={month} className="border p-2 capitalize" style={{ minWidth: "80px" }}>
+                  #Qty2
                 </th>
                 else if(month == "Qty3")
-                  return <th key={month} className="border p-2 capitalize">
-                  # Q3
+                  return <th key={month} className="border p-2 capitalize" style={{ minWidth: "80px" }}>
+                  #Qty3
                 </th>
                 else if(month == "Qty4")
-                  return <th key={month} className="border p-2 capitalize">
-                  # Q4
+                  return <th key={month} className="border p-2 capitalize" style={{ minWidth: "80px" }}>
+                  #Qty4
                 </th>
                 else
                   return <th key={month} className="border p-2 capitalize">
@@ -775,7 +777,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                       <td key={month} className="border p-2">
                         <input
                           type={idx % 4 === 0 ? "number" : "text"}
-                          className="w-full rounded border p-1"
+                          className={`w-full rounded border p-1`}
                           disabled={true}
                           // disabled={(idx % 4 !== 0 )|| (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
                           value={tableData[sub.subCategoryId]?.[month] ?? ""}
@@ -788,6 +790,26 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
                     ))}
                   </tr>
                 ))}
+                {/* Total Row */}
+                <tr className="text-sm transition bg-gray-100">
+                  <td className="border p-2 font-medium capitalize">TOTAL</td>
+                  {months.map((month) => {
+                    // Calculate the sum for each column
+                    const sum = personnelCostData?.subCategories
+                      ?.reduce((total, sub) => {
+                        const value = tableData[sub.subCategoryId]?.[month];
+                        return total + (isNaN(Number(value)) ? 0 : Number(value));
+                      }, 0);
+                    
+                    return (
+                      <td key={month} className="border p-2">
+                        <div className="w-full rounded border p-1">
+                          {sum?.toLocaleString('hi-IN') ?? "0"}
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
             </tbody>
           </table>
         </div>

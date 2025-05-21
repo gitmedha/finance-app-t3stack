@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { getDesignation, getLevels, getStaffs } from "../controller/staff";
+import { getDesignation, getLevels, getStaffs, getStaffLevels } from "../controller/staff";
 import { getDonors } from "../controller/donor";
 import { getCostCenters, getAllCostCenters } from "../controller/costCenters";
 import { getDepartments, getAllDepartments, getHeadDepartments, getSubDepartments } from "../controller/department";
@@ -23,6 +23,7 @@ export const getRouter = createTRPCRouter({
   getCatsBudgetDetails,
   getLevelStaffCount,
   getLevels,
+  getStaffLevels,
   getTotalBudgetSum,
   getQuarterBudgetSum,
   getPersonalCatDetials,

@@ -543,8 +543,22 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
             programDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
-              <div className="flex items-center space-x-2">
-                <p className="text-md font-medium">FY: {(totalQty.totalFY).toLocaleString('hi-IN')} | Q1: {(totalQty.totalQ1).toLocaleString('hi-IN')} | Q2: {(totalQty.totalQ2).toLocaleString('hi-IN')} | Q3: {(totalQty.totalQ3).toLocaleString('hi-IN')} | Q4: {(totalQty.totalQ4).toLocaleString('hi-IN')}</p>
+              <div className="flex gap-2">
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <span className="font-medium text-sm">Q1:</span> {(totalQty.totalQ1).toLocaleString('hi-IN')}
+                </div>
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <span className="font-medium text-sm">Q2:</span> {(totalQty.totalQ2).toLocaleString('hi-IN')}
+                </div>
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <span className="font-medium text-sm">Q3:</span> {(totalQty.totalQ3).toLocaleString('hi-IN')}
+                </div>
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <span className="font-medium text-sm">Q4:</span> {(totalQty.totalQ4).toLocaleString('hi-IN')}
+                </div>
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <span className="font-medium text-sm">FY:</span> {(totalQty.totalFY).toLocaleString('hi-IN')}
+                </div>
                 <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
               </div>
           }

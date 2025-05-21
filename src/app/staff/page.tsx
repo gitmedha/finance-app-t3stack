@@ -43,9 +43,9 @@ export default function Staff() {
     department: userData.data?.user.departmentId ? userData.data?.user.departmentId: 0,
     departmentname: userData.data?.user.departmentName ? userData.data?.user.departmentName : "",
     status: "Active",
-    designation: "",
-    subdepartment:userData.data?.user.subDepartmentId ?? 0,
-    subdepartmentname:userData.data?.user.subDepartmentName?? "",
+    level: 0,
+    subdepartment: userData.data?.user.subDepartmentId ?? 0,
+    subdepartmentname: userData.data?.user.subDepartmentName ?? "",
   });
 
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
@@ -59,6 +59,12 @@ export default function Staff() {
     };
     void fetchData();
   }, [refetch, currentPage, filters, limit, searchTerm]);
+
+  useEffect(() => {
+    if (data) {
+      console.log("Frontend received data:", data);
+    }
+  }, [data]);
 
   const result = data as GetStaffsResponse | undefined;
 
@@ -98,10 +104,10 @@ export default function Staff() {
         ...prev,
         [name]: (value as any)?.value, // Using 'any' with optional chaining
       }));
-    } else if (name === "designation") {
+    } else if (name === "level") {
       setFilters((prev) => ({
         ...prev,
-        [name]: (value as any)?.designation, // Using 'any' with optional chaining
+        [name]: (value as any)?.value, // Using 'any' with optional chaining
       }));
     }
   };

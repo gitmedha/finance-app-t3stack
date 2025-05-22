@@ -103,9 +103,10 @@ interface FilterOptions {
   department: number | string;
   departmentname: string;
   status: string;
-  designation: string;
-  subdepartment: number|string
-  subdepartmentname: string
+  // designation: string;  // Commented out: no longer using designation filter
+  level: number;           // Changed from string to number to match backend type
+  subdepartment: number|string;
+  subdepartmentname: string;
 }
 
 interface StaffFilterFormProps {

@@ -25,12 +25,12 @@ export const getStaffs = protectedProcedure
       searchTerm: z.string().optional().default(""), 
       department: z.number().optional().default(0), 
       status: z.string().optional().default("Active"), 
-      designation: z.string().optional().default(""), 
+      level: z.number().optional().default(0),
       subdepartment:z.number().optional().default(0),
     }),
   )
   .query(async ({ ctx, input }) => {
-    const { page, limit, searchTerm, status, department, designation ,subdepartment} = input;
+    const { page, limit, searchTerm, status, department, level, subdepartment} = input;
     const offset = (page - 1) * limit;
     // Apply the search condition only if searchTerm is not an empty string
     const searchCondition = searchTerm
@@ -41,9 +41,9 @@ export const getStaffs = protectedProcedure
     const subdepartmentCondition = 
       subdepartment == 0 ? undefined:eq(staffMaster.subDeptid,subdepartment)
     const statusCondition = status ?  eq(staffMaster.isactive, status === "Active"):undefined;
-    const designationCondition = designation
-      ? eq(staffMaster.designation, designation)
-      : undefined;
+    const levelCondition = level === 0
+      ? undefined
+      : eq(staffMaster.level, level);
 
     const staffs = await ctx.db
       .select({
@@ -106,7 +106,7 @@ export const getStaffs = protectedProcedure
           searchCondition,
           departmentCondition,
           statusCondition,
-          designationCondition,
+          levelCondition,
           subdepartmentCondition,
         ),
       )
@@ -124,7 +124,7 @@ export const getStaffs = protectedProcedure
           departmentCondition,
           subdepartmentCondition,
           statusCondition,
-          designationCondition,
+          levelCondition,
         ),
       );
 
@@ -436,3 +436,49 @@ export const activateStaff = protectedProcedure
       });
     }
   });
+
+export const getStaffLevels = protectedProcedure.query(async ({ ctx }) => {
+  const levels = await ctx.db
+    .select({
+      level: staffMaster.level,
+      categoryname: categoryMasterInFinanceProject.categoryname,
+    })
+    .from(staffMaster)
+    .innerJoin(
+      categoryMasterInFinanceProject,
+      eq(staffMaster.level, categoryMasterInFinanceProject.id)
+    )
+    .groupBy(staffMaster.level, categoryMasterInFinanceProject.categoryname); // Group by level to get unique values
+  
+  console.log(levels,'levels')
+  // Format the results to match the expected structure
+  const formattedLevels = levels.map(level => ({
+    value: level.level,
+    label: level.categoryname,
+  }));
+
+  // Create a mapping of Roman numerals to their numeric values for sorting
+  const romanOrder: Record<string, number> = {
+    'I': 1,
+    'II': 2,
+    'III': 3,
+    'IV': 4,
+    'V': 5,
+    'VI': 6,
+    'VII': 7,
+    'VIII': 8,
+    'IX': 9,
+    'X': 10
+  };
+
+  // Sort the levels based on Roman numeral order
+  const sortedLevels = formattedLevels.sort((a, b) => {
+    const orderA = romanOrder[a.label] ?? 999;
+    const orderB = romanOrder[b.label] ?? 999;
+    return orderA - orderB;
+  });
+
+  return {
+    levels: sortedLevels,
+  };
+});

@@ -89,6 +89,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession()
   const { data: personnelCostData, isLoading: personnelCostDataLodaing } = api.get.getPersonalCatDetials.useQuery(
+   
     {
     subdeptId:subdepartmentId,
     budgetId,
@@ -100,6 +101,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
     refetchOnWindowFocus:false,
     staleTime: 0, 
   },)
+  console.log(personnelCostData,"personnelCostData");
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = []
     setInputStates(disable)
@@ -408,6 +410,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             
             
             totalQtyAfterStaffCount.totalFY += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum + salarySum + epfSum + bonusSum + salarySum + epfSum + gratuitySum + salarySum + epfSum
+            console.log(totalQtyAfterStaffCount,'totalQtyAfterStaffCount');
             totalQtyAfterStaffCount.totalQ1 += salarySum + epfSum + insuranceSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ2 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum
             totalQtyAfterStaffCount.totalQ3 += salarySum + epfSum + salarySum + epfSum + pwgPldSum + salarySum + epfSum

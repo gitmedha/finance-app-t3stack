@@ -381,6 +381,8 @@ export const getPersonalCatDetials = protectedProcedure
     )
     .query(async ({ ctx, input }) => {
         try {
+                    console.log(input,'input');
+
             // get sub categories
             const subCategories = await ctx.db
                 .select({
@@ -403,6 +405,7 @@ export const getPersonalCatDetials = protectedProcedure
             ];
             const budgetMasterbaseCondition = [
                 eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
+                eq(budgetMasterInFinanceProject.isactive, true)
             ]
             if (input.budgetId != 0)
                 baseConditions.push(eq(budgetDetailsInFinanceProject.budgetid, input.budgetId),)
@@ -468,7 +471,9 @@ export const getPersonalCatDetials = protectedProcedure
                     .where(and(...budgetMasterbaseCondition));
                 const budgetIds = budgetMasterIds.map((record) => record.id);
                 const budgetRetrivalConditions = [
-                    ...baseConditions, inArray(budgetDetailsInFinanceProject.budgetid, budgetIds)
+                    ...baseConditions, 
+                    inArray(budgetDetailsInFinanceProject.budgetid, budgetIds),
+                    eq(budgetDetailsInFinanceProject.isactive, true)
                 ]
                 result = await ctx.db
                     .select({

@@ -73,7 +73,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       console.error("Error adding staff:", err);
     },
   });
-
+// data
   const { data: departmentData } = api.get.getHeadDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
   const { data: locationsData = [], refetch } =api.get.getAllLocations.useQuery({stateName: stateName?.label,});

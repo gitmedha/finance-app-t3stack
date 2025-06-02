@@ -46,7 +46,9 @@ interface totalschema {
   totalQ4: number
 }
 type avgQtySchema = Record<string, qtySchema>
-
+interface PersonnelCostProps {
+    onTotalsChange?: (totals: { totalQ1: number; totalQ2: number; totalQ3: number; totalQ4: number; totalFY: number }) => void;
+}
 
 const months = [
   "Qty1",
@@ -80,7 +82,7 @@ const bandLevelMapping: Record<string, string> = {
 };
 
 
-const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId, subdepartmentId, financialYear }) => {
+const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, deptId, budgetId, status, sectionOpen, setSectionOpen, travelCatId, subdepartmentId, financialYear,onTotalsChange }) => {
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
   const [totalQty, setTotalQty] = useState<totalschema>({
     totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0
@@ -702,8 +704,15 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       setSaveBtnState("edit")
     }
   };
-  console.log(tableData,"tableData");
-  console.log(personnelCostData,"personnelCostData");
+
+
+ // right after your setTotalQty(totalQtyAfterSomething)
+useEffect(() => {
+  if (onTotalsChange) {
+    onTotalsChange(totalQty);
+  }
+}, [ totalQty ]);
+
   return (
   
     <div className="my-6 rounded-md bg-white shadow-lg">
@@ -713,7 +722,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
         onClick={(e) => {
           e.preventDefault()
         }}>
-        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
+        <summary className="flex cursor-pointer items-center justify-between gap-32  rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
           onClick={(e) => {
             e.preventDefault()
             if (sectionOpen == "PERSONNEL")
@@ -721,31 +730,32 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
             else
               setSectionOpen("PERSONNEL")
           }}>
-          <h1 className="capitalize font-medium">{section.toLowerCase()}</h1>
+          <h1 className="capitalize w-1/6 font-medium">{section.toLowerCase()}</h1>
           {
             personnelCostDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
-              <div className="flex items-center space-x-2">
-                <div className="flex gap-2">
-                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+              <div className="flex gap-20 w-5/6 items-center">
+                <div className="flex gap-20 w-6/7  items-center">
+                  <div className="bg-primary/5 px-3 py-1 rounded-md  border border-primary/20 w-1/6">
                     <span className="font-medium text-sm">Q1:</span> {(totalQty.totalQ1).toLocaleString('hi-IN')}
                   </div>
-                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20  w-1/6 ">
                     <span className="font-medium text-sm">Q2:</span> {(totalQty.totalQ2).toLocaleString('hi-IN')}
                   </div>
-                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                     <span className="font-medium text-sm">Q3:</span> {(totalQty.totalQ3).toLocaleString('hi-IN')}
                   </div>
-                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                     <span className="font-medium text-sm">Q4:</span> {(totalQty.totalQ4).toLocaleString('hi-IN')}
                   </div>
-                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                  <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                     <span className="font-medium text-sm">FY:</span> {(totalQty.totalFY).toLocaleString('hi-IN')}
                   </div>
                 </div>
-                <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+                <span className="text-lg font-bold  transition-transform group-open:rotate-90">→</span>
               </div>
+
           }
         </summary>     
 
@@ -898,6 +908,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({ section, categoryId, dept
       </details>
       
     </div>
+    
   );
 };
 

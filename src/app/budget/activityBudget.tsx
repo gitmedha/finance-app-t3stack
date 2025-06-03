@@ -530,7 +530,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
           e.preventDefault()
         }}
       >
-        <summary className="flex cursor-pointer items-center justify-between rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
+        <summary className="flex cursor-pointer items-center justify-between gap-32  rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
           onClick={(e) => {
             e.preventDefault()
             if (sectionOpen == "Program Activities")
@@ -538,32 +538,33 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
             else
               setSectionOpen("Program Activities")
           }}>
-          <h1 className=" capitalize text-md font-medium">{section.toLowerCase()}</h1>
+          <h1 className="w-1/6 capitalize text-md font-medium">{section.toLowerCase()}</h1>
           {
             programDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
-              <div className="flex gap-2">
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+              <div className="flex gap-20 w-5/6 items-center">  
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                   <span className="font-medium text-sm">Q1:</span> {(totalQty.totalQ1).toLocaleString('hi-IN')}
                 </div>
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                   <span className="font-medium text-sm">Q2:</span> {(totalQty.totalQ2).toLocaleString('hi-IN')}
                 </div>
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                   <span className="font-medium text-sm">Q3:</span> {(totalQty.totalQ3).toLocaleString('hi-IN')}
                 </div>
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                   <span className="font-medium text-sm">Q4:</span> {(totalQty.totalQ4).toLocaleString('hi-IN')}
                 </div>
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20">
+                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                   <span className="font-medium text-sm">FY:</span> {(totalQty.totalFY).toLocaleString('hi-IN')}
                 </div>
-                <span className="text-lg font-bold transition-transform group-open:rotate-90">→</span>
+                {/* <div className='flex items-center justify-end'> */}
+                <span className="text-lg font-bold   transition-transform group-open:rotate-90">→</span>
+                {/* </div> */}
               </div>
           }
         </summary>
-
         <div className='flex gap-2 items-center'>
           <div className='w-72 mt-3 '>
             <DropdownMenu.Root >

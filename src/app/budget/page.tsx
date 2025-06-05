@@ -205,7 +205,7 @@ const Budget: React.FC = () => {
           <div className="flex items-center gap-20 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm">
             {/* 1st column: “BUDGET CATEGORY” */}
             <div className="flex w-1/6 items-center">
-            <div className="">BUDGET CATEGORY</div>
+            <div className="">Budget Category</div>
             </div>
             {/* 2nd–6th columns: Q1, Q2, Q3, Q4, FY */}
             <div className="flex justify-start gap-4 w-5/6">
@@ -213,7 +213,7 @@ const Budget: React.FC = () => {
             <div className="w-1/6 text-center">Q2</div>
             <div className="w-1/6 text-center">Q3</div>
             <div className="w-1/6 text-center">Q4</div>
-            <div className="w-1/6 mx-8 text-center">FY</div>
+            <div className="w-1/6 mx-8 text-center">Total</div>
             </div>
           </div>
           {/* Render budget category sections */}

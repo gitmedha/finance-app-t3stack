@@ -77,18 +77,23 @@ const months = [
   "Apr",
   "May",
   "Jun",
+  "Q1",
   "Qty2",
   "Jul",
   "Aug",
   "Sep",
+  "Q2",
   "Qty3",
   "Oct",
   "Nov",
   "Dec",
+  "Q3",
   "Qty4",
   "Jan",
   "Feb",
   "Mar",
+  "Q4",
+  "Total",
 ];
 
 const bandLevelMapping: Record<string, string> = {
@@ -263,18 +268,23 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
             Apr: "0",
             May: "0",
             Jun: "0",
+            Q1: "0",
             Qty2: 0,
             Jul: "0",
             Aug: "0",
             Sep: "0",
+            Q2: "0",
             Qty3: 0,
             Oct: "0",
             Nov: "0",
             Dec: "0",
+            Q3: "0",
             Qty4: 0,
             Jan: "0",
             Feb: "0",
             Mar: "0",
+            Q4: "0",
+            Total: "0",
             budgetDetailsId: 0,
           };
           intialAvgQty[sub.subCategoryId] = {
@@ -309,15 +319,35 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               Apr: item.april ? Number(item.april) : "0",
               May: item.may ? Number(item.may) : "0",
               Jun: item.june ? Number(item.june) : "0",
+              Q1: (
+                Number(item.april || "0") +
+                Number(item.may || "0") +
+                Number(item.june || "0")
+              ).toString(),
               Jul: item.july ? Number(item.july) : "0",
               Aug: item.august ? Number(item.august) : "0",
               Sep: item.september ? Number(item.september) : "0",
+              Q2: (
+                Number(item.july || "0") +
+                Number(item.august || "0") +
+                Number(item.september || "0")
+              ).toString(),
               Oct: item.october ? Number(item.october) : "0",
               Nov: item.november ? Number(item.november) : "0",
               Dec: item.december ? Number(item.december) : "0",
+              Q3: (
+                Number(item.october || "0") +
+                Number(item.november || "0") +
+                Number(item.december || "0")
+              ).toString(),
               Jan: item.january ? Number(item.january) : "0",
               Feb: item.february ? Number(item.february) : "0",
               Mar: item.march ? Number(item.march) : "0",
+              Q4: (
+                Number(item.january || "0") +
+                Number(item.february || "0") +
+                Number(item.march || "0")
+              ).toString(),
               Qty1: item.qty1 ? Number(item.qty1) : 0,
               Qty2: item.qty2 ? Number(item.qty2) : 0,
               Qty3: item.qty3 ? Number(item.qty3) : 0,
@@ -416,19 +446,18 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               q2OSum += Number(employeeCount);
               q3OSum += Number(employeeCount);
               q4OSum += Number(employeeCount);
-              aprOSum += epfSum + pwgPldSum / 4;
-              mayOSum += epfSum + insuranceSum;
+              aprOSum += epfSum;
+              mayOSum += epfSum + pwgPldSum / 4;
               junOSum += epfSum;
-              julOSum += epfSum + pwgPldSum / 4;
-              augOSum += epfSum;
+              julOSum += epfSum;
+              augOSum += epfSum + pwgPldSum / 4;
               sepOSum += epfSum;
-              octOSum += epfSum + pwgPldSum / 4;
+              octOSum += epfSum;
               novOSum += epfSum;
-              decOSum += epfSum;
+              decOSum += epfSum + pwgPldSum / 4;
               janOSum += epfSum + bonusSum + pwgPldSum / 4;
-              febOSum += epfSum;
-              marOSum += epfSum + gratuitySum;
-
+              febOSum += epfSum + gratuitySum;
+              marOSum += epfSum;
               initialData[sub.subCategoryId] = {
                 Count: employeeCount,
                 Qty1: employeeCount,
@@ -438,15 +467,20 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                 Apr: salarySum,
                 May: salarySum,
                 Jun: salarySum,
+                Q1: salarySum * 3, // Total of Apr, May, Jun
                 Jul: salarySum,
                 Aug: salarySum,
                 Sep: salarySum,
+                Q2: salarySum * 3, // Total of Jul, Aug, Sep
                 Oct: salarySum,
                 Nov: salarySum,
                 Dec: salarySum,
+                Q3: salarySum * 3, // Total of Oct, Nov, Dec
                 Jan: salarySum,
                 Feb: salarySum,
                 Mar: salarySum,
+                Q4: salarySum * 3, // Total of Jan, Feb, Mar
+                Total: salarySum * 12, // Total for the year
                 budgetDetailsId: 0, // Default or placeholder value
               };
               intialAvgQty[sub.subCategoryId] = {
@@ -473,15 +507,32 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                 Apr: aprOSum,
                 May: mayOSum,
                 Jun: junOSum,
+                Q1: aprOSum + mayOSum + junOSum,
                 Jul: julOSum,
                 Aug: augOSum,
                 Sep: sepOSum,
+                Q2: julOSum + augOSum + sepOSum,
                 Oct: octOSum,
                 Nov: novOSum,
                 Dec: decOSum,
+                Q3: octOSum + novOSum + decOSum,
                 Jan: janOSum,
                 Feb: febOSum,
                 Mar: marOSum,
+                Q4: janOSum + febOSum + marOSum,
+                Total:
+                  aprOSum +
+                  mayOSum +
+                  junOSum +
+                  julOSum +
+                  augOSum +
+                  sepOSum +
+                  octOSum +
+                  novOSum +
+                  decOSum +
+                  janOSum +
+                  febOSum +
+                  marOSum,
                 budgetDetailsId: 0, // Default or placeholder value
               };
               intialAvgQty[sub.subCategoryId] = {
@@ -503,42 +554,52 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
             totalQtyAfterStaffCount.totalFY +=
               salarySum +
               epfSum +
-              insuranceSum +
+
               salarySum +
               epfSum +
-              pwgPldSum +
+              pwgPldSum / 4 +
+
               salarySum +
               epfSum +
+
               salarySum +
               epfSum +
+
               salarySum +
               epfSum +
-              pwgPldSum +
+              pwgPldSum / 4 +
+
               salarySum +
               epfSum +
+
               salarySum +
               epfSum +
+
               salarySum +
               epfSum +
-              pwgPldSum +
+
               salarySum +
               epfSum +
+              pwgPldSum / 4 +
+
               salarySum +
               epfSum +
               bonusSum +
+              pwgPldSum / 4 +
+
               salarySum +
               epfSum +
               gratuitySum +
+
               salarySum +
               epfSum;
             console.log(totalQtyAfterStaffCount, "totalQtyAfterStaffCount");
             totalQtyAfterStaffCount.totalQ1 +=
               salarySum +
               epfSum +
-              insuranceSum +
               salarySum +
               epfSum +
-              pwgPldSum +
+              pwgPldSum / 4 +
               salarySum +
               epfSum;
             totalQtyAfterStaffCount.totalQ2 +=
@@ -546,7 +607,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               epfSum +
               salarySum +
               epfSum +
-              pwgPldSum +
+              pwgPldSum / 4 +
               salarySum +
               epfSum;
             totalQtyAfterStaffCount.totalQ3 +=
@@ -554,13 +615,14 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               epfSum +
               salarySum +
               epfSum +
-              pwgPldSum +
+              pwgPldSum / 4 +
               salarySum +
               epfSum;
             totalQtyAfterStaffCount.totalQ4 +=
               salarySum +
               epfSum +
               bonusSum +
+              pwgPldSum / 4 +
               salarySum +
               epfSum +
               gratuitySum +
@@ -689,25 +751,90 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       const updatedData = { ...prev };
       const subCategoryData = updatedData[subCategoryId];
       if (!subCategoryData || !avgQty[subCategoryId]) return updatedData;
-
       if (month == "Apr" || month == "May" || month == "Jun") {
         console.log(Number(value));
         console.log(Number(subCategoryData[month]));
         const diff = Number(value) - Number(subCategoryData[month]);
         updateTotalQtyVals("totalQ1", diff);
+
+        // Update Q1 total for this subcategory
+        const apr = Number(subCategoryData.Apr ?? "0");
+        const may = Number(subCategoryData.May ?? "0");
+        const jun = Number(subCategoryData.Jun ?? "0");
+
+        // Update the value being changed
+        if (month === "Apr") {
+          subCategoryData.Q1 = (Number(value) + may + jun).toString();
+        } else if (month === "May") {
+          subCategoryData.Q1 = (apr + Number(value) + jun).toString();
+        } else if (month === "Jun") {
+          subCategoryData.Q1 = (apr + may + Number(value)).toString();
+        }
       }
       if (month == "Jul" || month == "Aug" || month == "Sep") {
         const diff = Number(value) - Number(subCategoryData[month]);
         console.log(diff);
         updateTotalQtyVals("totalQ2", diff);
+
+        // Update Q2 total for this subcategory
+        const jul = Number(subCategoryData.Jul ?? "0");
+        const aug = Number(subCategoryData.Aug ?? "0");
+        const sep = Number(subCategoryData.Sep ?? "0");
+
+        // Update the value being changed
+        if (month === "Jul") {
+          subCategoryData.Q2 = (Number(value) + aug + sep).toString();
+        } 
+        else if (month === "Aug") {
+          subCategoryData.Q2 = (jul + Number(value) + sep).toString();
+        } else if (month === "Sep") {
+          subCategoryData.Q2 = (jul + aug + Number(value)).toString();
+        } 
+        else if (month === "Aug") {
+          subCategoryData.Q2 = (jul + Number(value) + sep).toString();
+        } else if (month === "Sep") {
+          subCategoryData.Q2 = (jul + aug + Number(value)).toString();
+        } else if (month === "Aug") {
+          subCategoryData.Q2 = (jul + Number(value) + sep).toString();
+        } else if (month === "Sep") {
+          subCategoryData.Q2 = (jul + aug + Number(value)).toString();
+        }
       }
       if (month == "Oct" || month == "Nov" || month == "Dec") {
         const diff = Number(value) - Number(subCategoryData[month]);
         updateTotalQtyVals("totalQ3", diff);
+
+        // Update Q3 total for this subcategory
+        const oct = Number(subCategoryData.Oct ?? "0");
+        const nov = Number(subCategoryData.Nov ?? "0");
+        const dec = Number(subCategoryData.Dec ?? "0");
+
+        // Update the value being changed
+        if (month === "Oct") {
+          subCategoryData.Q3 = (Number(value) + nov + dec).toString();
+        } else if (month === "Nov") {
+          subCategoryData.Q3 = (oct + Number(value) + dec).toString();
+        } else if (month === "Dec") {
+          subCategoryData.Q3 = (oct + nov + Number(value)).toString();
+        }
       }
       if (month == "Jan" || month == "Feb" || month == "Mar") {
         const diff = Number(value) - Number(subCategoryData[month]);
         updateTotalQtyVals("totalQ4", diff);
+
+        // Update Q4 total for this subcategory
+        const jan = Number(subCategoryData.Jan ?? "0");
+        const feb = Number(subCategoryData.Feb ?? "0");
+        const mar = Number(subCategoryData.Mar ?? "0");
+
+        // Update the value being changed
+        if (month === "Jan") {
+          subCategoryData.Q4 = (Number(value) + feb + mar).toString();
+        } else if (month === "Feb") {
+          subCategoryData.Q4 = (jan + Number(value) + mar).toString();
+        } else if (month === "Mar") {
+          subCategoryData.Q4 = (jan + feb + Number(value)).toString();
+        }
       }
       if (
         month === "Qty1" ||
@@ -730,6 +857,13 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
           subCategoryData.Apr = Math.ceil(qty * avgQty[subCategoryId].Apr);
           subCategoryData.May = Math.ceil(qty * avgQty[subCategoryId].May);
           subCategoryData.Jun = Math.ceil(qty * avgQty[subCategoryId].Jun);
+
+          // Update Q1 value based on the new Apr, May, Jun values
+          const q1Value =
+            Number(subCategoryData.Apr) +
+            Number(subCategoryData.May) +
+            Number(subCategoryData.Jun);
+          subCategoryData.Q1 = q1Value.toString();
         }
         if (month === "Qty2") {
           const julDiff =
@@ -925,7 +1059,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                   {totalQty.totalQ4.toLocaleString("hi-IN")}
                 </div>
                 <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
-                  <span className="text-sm font-medium">FY:</span>{" "}
+                  <span className="text-sm font-medium">Total:</span>{" "}
                   {totalQty.totalFY.toLocaleString("hi-IN")}
                 </div>
               </div>
@@ -984,7 +1118,29 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                         #Qty4
                       </th>
                     );
-                  else
+                  else if (
+                    month == "Q1" ||
+                    month == "Q2" ||
+                    month == "Q3" ||
+                    month == "Q4"
+                  ) {
+                    const quarterMap = {
+                      Q1: "q1 total",
+                      Q2: "q2 total",
+                      Q3: "q3 total",
+                      Q4: "q4 total",
+                      Total: "Total",
+                    };
+                    return (
+                      <th
+                        key={month}
+                        className="border bg-blue-50 p-2 font-medium capitalize"
+                        style={{ minWidth: "90px" }}
+                      >
+                        {quarterMap[month]}
+                      </th>
+                    );
+                  } else
                     return (
                       <th key={month} className="border p-2 capitalize">
                         {month.toLowerCase()}
@@ -1009,27 +1165,29 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                         ? `${bandLevelMapping[sub.subCategoryName]} - ${sub.subCategoryName.toUpperCase()}`
                         : `${sub.subCategoryName.toUpperCase()} - ${bandLevelMapping[sub.subCategoryName] ?? "default"}`}
                     </td>
-                    {months.map((month, idx) => (
-                      <td key={month} className="border p-2">
-                        <input
-                          type={idx % 4 === 0 ? "number" : "text"}
-                          className={`w-full rounded border p-1`}
-                          disabled={true}
-                          // disabled={(idx % 4 !== 0 )|| (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                          id={sub.subCategoryId + month}
-                          onChange={(e) =>
-                            handleInputChange(
-                              sub.subCategoryId,
-                              month,
-                              e.target.value,
-                            )
-                          }
-                        />
-                      </td>
-                    ))}
+                    {months.map((month, idx) => {
+                      return (
+                        <td key={month} className="border p-2">
+                          <input
+                            type={idx % 4 === 0 ? "number" : "text"}
+                            className={`w-full rounded border p-1`}
+                            disabled={true}
+                            // disabled={(idx % 4 !== 0 )|| (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                            value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                            id={sub.subCategoryId + month}
+                            onChange={(e) =>
+                              handleInputChange(
+                                sub.subCategoryId,
+                                month,
+                                e.target.value,
+                              )
+                            }
+                          />
+                        </td>
+                      );
+                    })}
                   </tr>
-                ))}{" "}
+                ))}
               {/* Total Row */}
               <tr className="bg-gray-100 text-sm transition">
                 <td className="border p-2 font-medium capitalize">TOTAL</td>
@@ -1054,6 +1212,22 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                     },
                     0,
                   );
+                  // Special rendering for quarterly columns (Q1, Q2, Q3, Q4) in the total row
+                  if (
+                    month === "Q1" ||
+                    month === "Q2" ||
+                    month === "Q3" ||
+                    month === "Q4" ||
+                    month === "Total"
+                  ) {
+                    return (
+                      <td key={month} className="border bg-blue-50 p-2">
+                        <div className="w-full rounded border bg-blue-50 p-1 font-medium text-blue-700">
+                          {sum?.toLocaleString("hi-IN") ?? "0"}
+                        </div>
+                      </td>
+                    );
+                  }
 
                   return (
                     <td key={month} className="border p-2">

@@ -554,43 +554,32 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
             totalQtyAfterStaffCount.totalFY +=
               salarySum +
               epfSum +
-
               salarySum +
               epfSum +
               pwgPldSum / 4 +
-
               salarySum +
               epfSum +
-
               salarySum +
               epfSum +
-
               salarySum +
               epfSum +
               pwgPldSum / 4 +
-
               salarySum +
               epfSum +
-
               salarySum +
               epfSum +
-
               salarySum +
               epfSum +
-
               salarySum +
               epfSum +
               pwgPldSum / 4 +
-
               salarySum +
               epfSum +
               bonusSum +
               pwgPldSum / 4 +
-
               salarySum +
               epfSum +
               gratuitySum +
-
               salarySum +
               epfSum;
             console.log(totalQtyAfterStaffCount, "totalQtyAfterStaffCount");
@@ -784,13 +773,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
         // Update the value being changed
         if (month === "Jul") {
           subCategoryData.Q2 = (Number(value) + aug + sep).toString();
-        } 
-        else if (month === "Aug") {
+        } else if (month === "Aug") {
           subCategoryData.Q2 = (jul + Number(value) + sep).toString();
         } else if (month === "Sep") {
           subCategoryData.Q2 = (jul + aug + Number(value)).toString();
-        } 
-        else if (month === "Aug") {
+        } else if (month === "Aug") {
           subCategoryData.Q2 = (jul + Number(value) + sep).toString();
         } else if (month === "Sep") {
           subCategoryData.Q2 = (jul + aug + Number(value)).toString();
@@ -1166,11 +1153,21 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                         : `${sub.subCategoryName.toUpperCase()} - ${bandLevelMapping[sub.subCategoryName] ?? "default"}`}
                     </td>
                     {months.map((month, idx) => {
+                      const isTotalCol =
+                        month === "Q1" ||
+                        month === "Q2" ||
+                        month === "Q3" ||
+                        month === "Q4" ||
+                        month === "Total";
                       return (
                         <td key={month} className="border p-2">
                           <input
                             type={idx % 4 === 0 ? "number" : "text"}
-                            className={`w-full rounded border p-1`}
+                            className={`w-full rounded border p-1 ${
+                              isTotalCol
+                                ? "bg-blue-50 font-medium text-blue-700"
+                                : ""
+                            }`}
                             disabled={true}
                             // disabled={(idx % 4 !== 0 )|| (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
                             value={tableData[sub.subCategoryId]?.[month] ?? ""}

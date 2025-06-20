@@ -40,22 +40,25 @@ interface LevelData {
 type TableData = Record<string, LevelData>;
 
 const subProgramActivites: subProgramActivitesSchema[] = [
-  { map: 1, name: "Certificate Event" },
-  { map: 2, name: "Faculty Workshop" },
-  { map: 3, name: "Alumni Engagement" },
-  { map: 4, name: "AI and Placement Drive" },
-  { map: 5, name: "ITI Diagnostic" },
-  { map: 6, name: "Divisional workshop" },
-  { map: 7, name: "Divisional Industry workshop" },
-  { map: 8, name: "MSDF Event" },
-  { map: 9, name: "DSE Shoshin" },
-  { map: 10, name: "Poly-Enrollment Drive" },
-  { map: 11, name: "Poly-Placement12rive" },
-  { map: 12, name: "Industry Engagement" },
-  { map: 13, name: "TCPO Workshop" },
-  { map: 14, name: "DSE Faculty workshop" },
-  {map:15,name:"IT Subcriptions"},
-  { map: 0, name: "All" }
+  { map: 0, name: "All" },
+  { map: 18, name: "Shoshin Part 2" },
+  { map: 1, name: "Svapoorna XIth Teacher Manual" },
+  { map: 2, name: "Printing of DRG Manual" },
+  { map: 3, name: "SRG Workshop" },
+  { map: 4, name: "Career Awareness Workshop" },
+  { map: 5, name: "Shiksham Sammelan" },
+  { map: 6, name: "Faculty Advancement BootCamp" },
+  { map: 7, name: "FAB Refresher Training " },
+  { map: 8, name: "TPO Training" },
+  { map: 9, name: "Placement Drive" },
+  { map: 10, name: "Digital Awareness Campaign" },
+  { map: 11, name: "Employability Skills Curriculum" },
+  { map: 12, name: "CPD Workshops" },
+  { map: 13, name: "RTC" },
+  { map: 14, name: "State Team Meets" },
+  {map:15,name:"State Level Promotion Print Material"},
+  {map:16,name:"digital promotional video"},
+  {map:17,name:"Printing of Pathways to Employment Report"},
 ]
 
 const months = [
@@ -95,10 +98,11 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
   const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
   const [tableData, setTableData] = useState<TableData>({});
 
+  console.log(budgetId, categoryId, deptId, subdepartmentId, financialYear,  'budgetId ,categoryId, deptId, subdepartmentId, financialYear');
   // api calls
   const { data: programData, isLoading: programDataLodaing } = api.get.getProgramActivities.useQuery({
     budgetId,
-    catId: categoryId,
+    catId: categoryId,  
     deptId: Number(deptId),
     activity: (filter?.map)?.toString(),
     subDeptId: subdepartmentId,
@@ -106,6 +110,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
   }, {
     staleTime: 0
   })
+console.log((filter?.map)?.toString(),'activity');
+  console.log(programData,'programData');
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   // useEffect hooks
@@ -681,7 +687,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, bu
                     disabled={isSaveDisabled()}
                     onClick={() => handleUpdate()}
                   >
-                    Save
+                    Edit
                   </Button>}
                 {saveBtnState == "save" && <Button
                   type="button"

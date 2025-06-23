@@ -23,7 +23,7 @@ export const categoryMasterInFinanceProject = financeProject.table("category_mas
 });
 
 export const costCenterInFinanceProject = financeProject.table("cost_center", {
-	id: integer("id").primaryKey().notNull(),
+	id: serial("id").primaryKey().notNull().default(sql`DEFAULT`),
 	name: text("name").notNull(),
 	type: text("type").notNull(),
 	parentId: integer("parent_id").notNull(),
@@ -257,6 +257,21 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
 	subDeptid: integer("sub_deptid"),
 });
 
+export const programActivitiesInFinanceProject = financeProject.table("program_activities", {
+	id: serial("id").primaryKey().notNull(),
+	name: varchar("name", { length: 255 }).notNull(),
+	description: text("description"),
+	departmentId: integer("department_id").references(() => departmentMasterInFinanceProject.id),
+	subDepartmentId: integer("sub_department_id").references(() => departmentMasterInFinanceProject.id),
+	financialYear: varchar("financial_year", { length: 10 }),
+	isActive: boolean("is_active").default(true),
+	budgetid: integer("budgetid").references(() => budgetMasterInFinanceProject.id),
+	createdBy: integer("created_by").references(() => staffMasterInFinanceProject.id),
+	createdAt: timestamp("created_at", { mode: 'string' }).notNull(),
+	updatedBy: integer("updated_by").references(() => staffMasterInFinanceProject.id),
+	updatedAt: timestamp("updated_at", { mode: 'string' }),
+});
+
 export const departmentHierarchyInFinanceProject = financeProject.table("department_hierarchy", {
 	id: serial("id").primaryKey().notNull(),
 	deptId: integer("dept_id").notNull(),
@@ -334,18 +349,4 @@ export const userMasterInFinanceProject = financeProject.table("user_master", {
 	updatedBy: integer("updated_by"),
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
 	phonenumber: bigint("phonenumber", { mode: "number" }),
-});
-
-export const programActivitiesInFinanceProject = financeProject.table("program_activities", {
-	id: serial("id").primaryKey().notNull(),
-	name: varchar("name", { length: 255 }).notNull(),
-	description: text("description"),
-	departmentId: integer("department_id").references(() => departmentMasterInFinanceProject.id),
-	subDepartmentId: integer("sub_department_id").references(() => departmentMasterInFinanceProject.id),
-	financialYear: varchar("financial_year", { length: 10 }),
-	isActive: boolean("is_active").default(true),
-	createdBy: integer("created_by").references(() => userMasterInFinanceProject.id),
-	createdAt: timestamp("created_at", { mode: 'string' }).notNull(),
-	updatedBy: integer("updated_by").references(() => userMasterInFinanceProject.id),
-	updatedAt: timestamp("updated_at", { mode: 'string' }),
 });

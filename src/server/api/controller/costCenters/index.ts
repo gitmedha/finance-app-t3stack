@@ -1,4 +1,4 @@
-import { and, count, eq, ilike, desc } from "drizzle-orm";
+import { and, count, eq, ilike, desc, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   //   createTRPCRouter,
@@ -110,13 +110,15 @@ export const addCostCenter = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      // Format data for insertion
+      // Format data for insertion and exclude the id property since it should be auto-generated
       const formattedInput = {
         ...input,
+        id: sql`DEFAULT`, // Tell Drizzle to use the database's DEFAULT value (usually auto-increment)
       };
 
       // Insert new Cost Center into the database
-      const result = await ctx.db.insert(costCenter).values(formattedInput);
+      const result = await ctx.db.insert(costCenter).values(formattedInput).returning();
+      
       return {
         success: true,
         message: "Cost Center added successfully",

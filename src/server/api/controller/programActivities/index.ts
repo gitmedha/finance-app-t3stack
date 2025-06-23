@@ -66,7 +66,7 @@ export const addProgramActivities = protectedProcedure
       console.error("Error adding program activity:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to add program activity: ${error}`,
+        message: `Failed to add program activity: ${String(error)}`,
       });
     }
   });
@@ -129,7 +129,7 @@ export const getProgramActivity = protectedProcedure
       console.error("Error fetching program activities:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to fetch program activities: ${error}`,
+        message: `Failed to fetch program activities: ${String(error)}`,
       });
     }
   });
@@ -228,7 +228,7 @@ export const updateProgramActivity = protectedProcedure
       console.error("Error updating program activity:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to update program activity: ${error}`,
+        message: `Failed to update program activity: ${String(error)}`,
       });
     }
   });
@@ -274,7 +274,7 @@ export const deleteProgramActivity = protectedProcedure
       console.error("Error deleting program activity:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to delete program activity: ${error}`,
+        message: `Failed to delete program activity: ${String(error)}`,
       });
     }
   });
@@ -327,7 +327,7 @@ export const deleteProgramActivity = protectedProcedure
       console.error("Error reactivating program activity:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to reactivate program activity: ${error}`,
+        message: `Failed to reactivate program activity: ${String(error)}`,
       });
     }
   });

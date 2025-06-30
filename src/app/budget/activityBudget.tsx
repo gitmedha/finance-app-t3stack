@@ -1,12 +1,12 @@
 "use client";
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Button } from '@radix-ui/themes';
-import { useSession } from 'next-auth/react';
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Button } from "@radix-ui/themes";
+import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 // import { BiComment } from "react-icons/bi";
-import { RiArrowDropDownLine } from 'react-icons/ri';
-import { api } from '~/trpc/react';
-import { toast } from 'react-toastify';
+import { RiArrowDropDownLine } from "react-icons/ri";
+import { api } from "~/trpc/react";
+import { toast } from "react-toastify";
 import Marquee from "react-fast-marquee";
 
 interface ActivityBudgetProps {
@@ -14,52 +14,46 @@ interface ActivityBudgetProps {
   categoryId: number;
   budgetId: number;
   deptId: string;
-  status: string | undefined
-  sectionOpen: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS"
-  setSectionOpen: (val: null | "PERSONNEL" | "Program Activities" | "Travel" | "PROGRAM OFFICE" | "CAPITAL COST" | "OVERHEADS") => void
-  subdepartmentId: number
-  financialYear: string
+  status: string | undefined;
+  sectionOpen:
+    | null
+    | "PERSONNEL"
+    | "Program Activities"
+    | "Travel"
+    | "PROGRAM OFFICE"
+    | "CAPITAL COST"
+    | "OVERHEADS";
+  setSectionOpen: (
+    val:
+      | null
+      | "PERSONNEL"
+      | "Program Activities"
+      | "Travel"
+      | "PROGRAM OFFICE"
+      | "CAPITAL COST"
+      | "OVERHEADS",
+  ) => void;
+  subdepartmentId: number;
+  financialYear: string;
 }
 interface totalschema {
-  totalFY: number
-  totalQ1: number
-  totalQ2: number
-  totalQ3: number
-  totalQ4: number
+  totalFY: number;
+  totalQ1: number;
+  totalQ2: number;
+  totalQ3: number;
+  totalQ4: number;
 }
 interface subProgramActivitesSchema {
-  map: number
-  name: string
+  map: number;
+  name: string;
 }
 interface LevelData {
-  budgetDetailsId: number
+  budgetDetailsId: number;
   Count: string | number;
   [month: string]: string | number;
 }
 
 type TableData = Record<string, LevelData>;
-
-const subProgramActivites: subProgramActivitesSchema[] = [
-  { map: 0, name: "All" },
-  { map: 18, name: "Shoshin Part 2" },
-  { map: 1, name: "Svapoorna XIth Teacher Manual" },
-  { map: 2, name: "Printing of DRG Manual" },
-  { map: 3, name: "SRG Workshop" },
-  { map: 4, name: "Career Awareness Workshop" },
-  { map: 5, name: "Shiksham Sammelan" },
-  { map: 6, name: "Faculty Advancement BootCamp" },
-  { map: 7, name: "FAB Refresher Training " },
-  { map: 8, name: "TPO Training" },
-  { map: 9, name: "Placement Drive" },
-  { map: 10, name: "Digital Awareness Campaign" },
-  { map: 11, name: "Employability Skills Curriculum" },
-  { map: 12, name: "CPD Workshops" },
-  { map: 13, name: "RTC" },
-  { map: 14, name: "State Team Meets" },
-  {map:15,name:"State Level Promotion Print Material"},
-  {map:16,name:"digital promotional video"},
-  {map:17,name:"Printing of Pathways to Employment Report"},
-]
 
 const months = [
   "Qty1",
@@ -88,39 +82,105 @@ const months = [
   "Mar",
 ];
 
-const ActivityBudget: React.FC<ActivityBudgetProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId, financialYear }) => {
-  const userData = useSession()
-  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
-  const [inputStates, setInputStates] = useState<boolean>(true)
+const ActivityBudget: React.FC<ActivityBudgetProps> = ({
+  section,
+  categoryId,
+  budgetId,
+  deptId,
+  status,
+  sectionOpen,
+  setSectionOpen,
+  subdepartmentId,
+  financialYear,
+}) => {
+  const userData = useSession();
+  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">(
+    "loading",
+  );
+  const [inputStates, setInputStates] = useState<boolean>(true);
   const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0, totalFY: 0
-  })
-  const [filter, setFilter] = useState(subProgramActivites.sort((a, b) => a.name.localeCompare(b.name))[0])
+    totalQ1: 0,
+    totalQ2: 0,
+    totalQ3: 0,
+    totalQ4: 0,
+    totalFY: 0,
+  });
+  const [subProgramActivites, setSubProgramActivites] = useState<
+    subProgramActivitesSchema[]
+  >([{ map: 0, name: "All" }]);
+  const [filter, setFilter] = useState<subProgramActivitesSchema>({
+    map: 0,
+    name: "All",
+  });
   const [tableData, setTableData] = useState<TableData>({});
 
-  console.log(budgetId, categoryId, deptId, subdepartmentId, financialYear,  'budgetId ,categoryId, deptId, subdepartmentId, financialYear');
-  // api calls
-  const { data: programData, isLoading: programDataLodaing } = api.get.getProgramActivities.useQuery({
+  // Fetch program activities by department based on user role
+  const { data: programActivitiesByDept } =
+    api.get.getProgramActivitiesByDepartment.useQuery(
+      {
+        departmentId: Number(deptId),
+        subDepartmentId: subdepartmentId ?? undefined,
+        budgetid: budgetId,
+      },
+      {
+        staleTime: 0,
+      },
+    );
+  useEffect(() => {
+    if (programActivitiesByDept) {
+      setSubProgramActivites([
+        { map: 0, name: "All" },
+        ...programActivitiesByDept.map((item) => ({
+          map: item.value,
+          name: item.label,
+        })),
+      ]);
+    }
+  }, [programActivitiesByDept]);
+  console.log(
     budgetId,
-    catId: categoryId,  
-    deptId: Number(deptId),
-    activity: (filter?.map)?.toString(),
-    subDeptId: subdepartmentId,
-    financialYear
-  }, {
-    staleTime: 0
-  })
-console.log((filter?.map)?.toString(),'activity');
-  console.log(programData,'programData');
+    categoryId,
+    deptId,
+    subdepartmentId,
+    financialYear,
+    "budgetId ,categoryId, deptId, subdepartmentId, financialYear",
+  );
+  // api calls
+  const { data: programData, isLoading: programDataLodaing } =
+    api.get.getProgramActivities.useQuery(
+      {
+        budgetId,
+        catId: categoryId,
+        deptId: Number(deptId),
+        activity: filter?.map?.toString(),
+        subDeptId: subdepartmentId,
+        financialYear,
+      },
+      {
+        staleTime: 0,
+      },
+    );
+  console.log(programData, "programData");
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
+  // useEffect to update program activities dropdown
+
   // useEffect hooks
   useEffect(() => {
-    if (programData?.budgetId == budgetId && programData.subDeptId == subdepartmentId) {
+    if (
+      programData?.budgetId == budgetId &&
+      programData.subDeptId == subdepartmentId
+    ) {
       const initialData: TableData = {};
       if (programData?.subCategories) {
-        const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0, totalFY: 0 }
-        setTotalQty(totalQtyAfterBudgetDetails)
+        const totalQtyAfterBudgetDetails: totalschema = {
+          totalQ1: 0,
+          totalQ2: 0,
+          totalQ3: 0,
+          totalQ4: 0,
+          totalFY: 0,
+        };
+        setTotalQty(totalQtyAfterBudgetDetails);
         programData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
             Count: "",
@@ -148,13 +208,22 @@ console.log((filter?.map)?.toString(),'activity');
             Jan: "0",
             Feb: "0",
             Mar: "0",
-            budgetDetailsId: 0
+            budgetDetailsId: 0,
           };
         });
         setTableData(initialData);
-        if (programData.result.length > 0 && programData.subCategories.length > 0) {
-          setSaveBtnState("edit")
-          const totalQtyAfterBudgetDetails: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0, totalFY: 0 }
+        if (
+          programData.result.length > 0 &&
+          programData.subCategories.length > 0
+        ) {
+          setSaveBtnState("edit");
+          const totalQtyAfterBudgetDetails: totalschema = {
+            totalQ1: 0,
+            totalQ2: 0,
+            totalQ3: 0,
+            totalQ4: 0,
+            totalFY: 0,
+          };
           programData.result.forEach((item) => {
             initialData[item.subcategoryId] = {
               Count: item.total ? Number(item.total) : 0,
@@ -182,35 +251,50 @@ console.log((filter?.map)?.toString(),'activity');
               Qty4: item.qty4 ? Number(Number(item.qty4)) : "0",
               Rate4: item.rate4 ? Number(item.rate4) : "0",
               Amount4: item.amount4 ? Number(item.amount4) : "0",
-              budgetDetailsId: item.id ? Number(Number(item.id)) : 0
+              budgetDetailsId: item.id ? Number(Number(item.id)) : 0,
             };
-            totalQtyAfterBudgetDetails.totalFY += Number(item.january) + Number(item.february) + Number(item.march) + Number(item.april) + Number(item.may) + Number(item.june) + Number(item.july) + Number(item.august) + Number(item.september) + Number(item.october) + Number(item.november) + Number(item.december)
-            totalQtyAfterBudgetDetails.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june)
-            totalQtyAfterBudgetDetails.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september)
-            totalQtyAfterBudgetDetails.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december)
-            totalQtyAfterBudgetDetails.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march)
+            totalQtyAfterBudgetDetails.totalFY +=
+              Number(item.january) +
+              Number(item.february) +
+              Number(item.march) +
+              Number(item.april) +
+              Number(item.may) +
+              Number(item.june) +
+              Number(item.july) +
+              Number(item.august) +
+              Number(item.september) +
+              Number(item.october) +
+              Number(item.november) +
+              Number(item.december);
+            totalQtyAfterBudgetDetails.totalQ1 +=
+              Number(item.april) + Number(item.may) + Number(item.june);
+            totalQtyAfterBudgetDetails.totalQ2 +=
+              Number(item.july) + Number(item.august) + Number(item.september);
+            totalQtyAfterBudgetDetails.totalQ3 +=
+              Number(item.october) +
+              Number(item.november) +
+              Number(item.december);
+            totalQtyAfterBudgetDetails.totalQ4 +=
+              Number(item.january) + Number(item.february) + Number(item.march);
           });
           setTableData(initialData);
-          setTotalQty(totalQtyAfterBudgetDetails)
+          setTotalQty(totalQtyAfterBudgetDetails);
+        } else {
+          setSaveBtnState("save");
         }
-        else {
-          setSaveBtnState("save")
-        }
-
-
       }
     }
-  }, [programData])
+  }, [programData]);
   useEffect(() => {
-    handelnputDisable(true)
-  }, [filter])
+    handelnputDisable(true);
+  }, [filter]);
 
   // Other fuctions
   const handelnputDisable = (disable: boolean) => {
-    const subcategoryIds = []
-    setInputStates(disable)
+    const subcategoryIds = [];
+    setInputStates(disable);
     for (const [subcategoryId] of Object.entries(tableData)) {
-      subcategoryIds.push(subcategoryId)
+      subcategoryIds.push(subcategoryId);
     }
     subcategoryIds.forEach((id) => {
       const rate1In = document.getElementById(id + "Rate1") as HTMLInputElement;
@@ -233,7 +317,28 @@ console.log((filter?.map)?.toString(),'activity');
       const janIn = document.getElementById(id + "Jan") as HTMLInputElement;
       const febIn = document.getElementById(id + "Feb") as HTMLInputElement;
       const marIn = document.getElementById(id + "Mar") as HTMLInputElement;
-      if (aprIn && mayIn && junIn && julIn && augIn && sepIn && octIn && novIn && decIn && janIn && febIn && marIn && rate1In && rate2In && rate3In && rate4In && qty1In && qty2In && qty3In && qty4In) {
+      if (
+        aprIn &&
+        mayIn &&
+        junIn &&
+        julIn &&
+        augIn &&
+        sepIn &&
+        octIn &&
+        novIn &&
+        decIn &&
+        janIn &&
+        febIn &&
+        marIn &&
+        rate1In &&
+        rate2In &&
+        rate3In &&
+        rate4In &&
+        qty1In &&
+        qty2In &&
+        qty3In &&
+        qty4In
+      ) {
         aprIn.disabled = disable;
         mayIn.disabled = disable;
         junIn.disabled = disable;
@@ -259,16 +364,16 @@ console.log((filter?.map)?.toString(),'activity');
       //   console.error(`Input element with ID  not found.`);
       //   console.log(aprIn, rate1In, rate2In, rate3In, qty1In, qty2In)
       // }
-    })
-  }
+    });
+  };
   const handleSelect = (val: subProgramActivitesSchema) => {
-    setFilter(val)
-  }
+    setFilter(val);
+  };
   const updateTotalQtyVals = (which: string, difference: number) => {
     setTotalQty((prev) => {
       const updatedTotal = { ...prev };
       updatedTotal[which as keyof typeof prev] += difference;
-      updatedTotal["totalFY" as keyof typeof prev] += difference
+      updatedTotal["totalFY" as keyof typeof prev] += difference;
       return updatedTotal;
     });
   };
@@ -282,7 +387,7 @@ console.log((filter?.map)?.toString(),'activity');
   const handleInputChange = (
     subCategoryId: number,
     month: string,
-    value: string
+    value: string,
   ) => {
     setTableData((prev) => {
       const updatedData = { ...prev };
@@ -291,43 +396,54 @@ console.log((filter?.map)?.toString(),'activity');
 
       if (month == "Apr" || month == "May" || month == "Jun") {
         const diff = Number(value) - Number(subCategoryData[month]);
-        updateTotalQtyVals("totalQ1", diff)
+        updateTotalQtyVals("totalQ1", diff);
       }
       if (month == "Jul" || month == "Aug" || month == "Sep") {
         const diff = Number(value) - Number(subCategoryData[month]);
-        updateTotalQtyVals("totalQ2", diff)
+        updateTotalQtyVals("totalQ2", diff);
       }
       if (month == "Oct" || month == "Nov" || month == "Dec") {
         const diff = Number(value) - Number(subCategoryData[month]);
-        updateTotalQtyVals("totalQ3", diff)
+        updateTotalQtyVals("totalQ3", diff);
       }
       if (month == "Jan" || month == "Feb" || month == "Mar") {
         const diff = Number(value) - Number(subCategoryData[month]);
-        updateTotalQtyVals("totalQ4", diff)
+        updateTotalQtyVals("totalQ4", diff);
       }
 
       // Calculate Amount Updates
       if (month === "Rate1") {
-        subCategoryData.Amount1 = (Number(subCategoryData.Qty1) * Number(value)).toFixed(2)
-      }
-      else if (month === "Qty1") {
-        subCategoryData.Amount1 = (Number(subCategoryData.Rate1) * Number(value)).toFixed(2)
-      }
-      else if (month === "Rate2") {
-        subCategoryData.Amount2 = (Number(subCategoryData.Qty2) * Number(value)).toFixed(2)
-      }
-      else if (month === "Qty2") {
-        subCategoryData.Amount2 = (Number(subCategoryData.Rate2) * Number(value)).toFixed(2)
+        subCategoryData.Amount1 = (
+          Number(subCategoryData.Qty1) * Number(value)
+        ).toFixed(2);
+      } else if (month === "Qty1") {
+        subCategoryData.Amount1 = (
+          Number(subCategoryData.Rate1) * Number(value)
+        ).toFixed(2);
+      } else if (month === "Rate2") {
+        subCategoryData.Amount2 = (
+          Number(subCategoryData.Qty2) * Number(value)
+        ).toFixed(2);
+      } else if (month === "Qty2") {
+        subCategoryData.Amount2 = (
+          Number(subCategoryData.Rate2) * Number(value)
+        ).toFixed(2);
       } else if (month === "Rate3") {
-        subCategoryData.Amount3 = (Number(subCategoryData.Qty3) * Number(value)).toFixed(2)
-      }
-      else if (month === "Qty3") {
-        subCategoryData.Amount3 = (Number(subCategoryData.Rate3) * Number(value)).toFixed(2)
+        subCategoryData.Amount3 = (
+          Number(subCategoryData.Qty3) * Number(value)
+        ).toFixed(2);
+      } else if (month === "Qty3") {
+        subCategoryData.Amount3 = (
+          Number(subCategoryData.Rate3) * Number(value)
+        ).toFixed(2);
       } else if (month === "Rate4") {
-        subCategoryData.Amount4 = (Number(subCategoryData.Qty4) * Number(value)).toFixed(2)
-      }
-      else if (month === "Qt4") {
-        subCategoryData.Amount3 = (Number(subCategoryData.Rate4) * Number(value)).toFixed(2)
+        subCategoryData.Amount4 = (
+          Number(subCategoryData.Qty4) * Number(value)
+        ).toFixed(2);
+      } else if (month === "Qt4") {
+        subCategoryData.Amount3 = (
+          Number(subCategoryData.Rate4) * Number(value)
+        ).toFixed(2);
       }
 
       subCategoryData[month] = value;
@@ -337,47 +453,49 @@ console.log((filter?.map)?.toString(),'activity');
     });
   };
   const handleSave = async () => {
-    setSaveBtnState("loading")
-    const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
-      budgetid: budgetId,
-      catid: categoryId,
-      subcategoryId: parseInt(subCategoryId, 10),
-      // need to be removed
-      unit: 1,
-      rate: "1",
-      total: "1",
-      currency: "INR",
-      notes: "",
-      description: "",
-      april: (data.Apr ?? "").toString(),
-      may: (data.May ?? "").toString(),
-      june: (data.Jun ?? "").toString(),
-      july: (data.Jul ?? "").toString(),
-      august: (data.Aug ?? "").toString(),
-      september: (data.Sep ?? "").toString(),
-      october: (data.Oct ?? "").toString(),
-      november: (data.Nov ?? "").toString(),
-      december: (data.Dec ?? "").toString(),
-      january: (data.Jan ?? "").toString(),
-      february: (data.Feb ?? "").toString(),
-      march: (data.Mar ?? "").toString(),
-      activity: (filter?.map ?? "").toString(),
-      deptId: Number(deptId),
-      createdBy: userData.data?.user.id ?? 1,
-      createdAt: new Date().toISOString(),
-      rate1: (data.Rate1 ?? "").toString(),
-      rate2: (data.Rate2 ?? "").toString(),
-      rate3: (data.Rate3 ?? "").toString(),
-      rate4: (data.Rate4 ?? "").toString(),
-      amount1: ((data.Amount1 ?? "").toString()),
-      amount2: ((data.Amount2 ?? "").toString()),
-      amount3: ((data.Amount3 ?? "").toString()),
-      amount4: ((data.Amount4 ?? "").toString()),
-      qty1: Number(data.Qty1),
-      qty2: Number(data.Qty2),
-      qty3: Number(data.Qty3),
-      qty4: Number(data.Qty4)
-    }));
+    setSaveBtnState("loading");
+    const budgetDetails = Object.entries(tableData).map(
+      ([subCategoryId, data]) => ({
+        budgetid: budgetId,
+        catid: categoryId,
+        subcategoryId: parseInt(subCategoryId, 10),
+        // need to be removed
+        unit: 1,
+        rate: "1",
+        total: "1",
+        currency: "INR",
+        notes: "",
+        description: "",
+        april: (data.Apr ?? "").toString(),
+        may: (data.May ?? "").toString(),
+        june: (data.Jun ?? "").toString(),
+        july: (data.Jul ?? "").toString(),
+        august: (data.Aug ?? "").toString(),
+        september: (data.Sep ?? "").toString(),
+        october: (data.Oct ?? "").toString(),
+        november: (data.Nov ?? "").toString(),
+        december: (data.Dec ?? "").toString(),
+        january: (data.Jan ?? "").toString(),
+        february: (data.Feb ?? "").toString(),
+        march: (data.Mar ?? "").toString(),
+        activity: (filter?.map ?? "").toString(),
+        deptId: Number(deptId),
+        createdBy: userData.data?.user.id ?? 1,
+        createdAt: new Date().toISOString(),
+        rate1: (data.Rate1 ?? "").toString(),
+        rate2: (data.Rate2 ?? "").toString(),
+        rate3: (data.Rate3 ?? "").toString(),
+        rate4: (data.Rate4 ?? "").toString(),
+        amount1: (data.Amount1 ?? "").toString(),
+        amount2: (data.Amount2 ?? "").toString(),
+        amount3: (data.Amount3 ?? "").toString(),
+        amount4: (data.Amount4 ?? "").toString(),
+        qty1: Number(data.Qty1),
+        qty2: Number(data.Qty2),
+        qty3: Number(data.Qty3),
+        qty4: Number(data.Qty4),
+      }),
+    );
 
     try {
       createBudgetDetails.mutate(
@@ -386,11 +504,11 @@ console.log((filter?.map)?.toString(),'activity');
           budgetId: budgetId,
           catId: categoryId,
           data: budgetDetails,
-          subDeptId: subdepartmentId
+          subDeptId: subdepartmentId,
         },
         {
           onSuccess: (data) => {
-            toast.success('Successfully Saved', {
+            toast.success("Successfully Saved", {
               position: "bottom-center",
               autoClose: 1000,
               hideProgressBar: false,
@@ -400,33 +518,33 @@ console.log((filter?.map)?.toString(),'activity');
               progress: undefined,
               theme: "light",
             });
-            handelnputDisable(true)
-            setSaveBtnState("edit")
+            handelnputDisable(true);
+            setSaveBtnState("edit");
             setTableData((prev) => {
-              const updatedData = { ...prev }
+              const updatedData = { ...prev };
               data.data.map((item) => {
-                const subCategoryData = updatedData[item.subcategoryId]
+                const subCategoryData = updatedData[item.subcategoryId];
                 if (subCategoryData) {
                   updatedData[item.subcategoryId] = {
                     ...subCategoryData,
                     budgetDetailsId: item.budgetDetailsId,
                   };
                 }
-              })
-              return updatedData
-            })
+              });
+              return updatedData;
+            });
             console.log("Budget created successfully:", data);
           },
           onError: (error) => {
-            setSaveBtnState("save")
-            throw new Error(JSON.stringify(error))
+            setSaveBtnState("save");
+            throw new Error(JSON.stringify(error));
             console.error("Error creating budget:", error);
           },
-        }
+        },
       );
     } catch (error) {
       console.error("Failed to save budget details:", error);
-      toast.warn('Error While saving ', {
+      toast.warn("Error While saving ", {
         position: "bottom-center",
         autoClose: 1000,
         hideProgressBar: false,
@@ -440,46 +558,48 @@ console.log((filter?.map)?.toString(),'activity');
   };
 
   const handleUpdate = async () => {
-    setSaveBtnState("loading")
-    const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
-      budgetDetailsId: data.budgetDetailsId,
-      catid: categoryId,
-      subcategoryId: parseInt(subCategoryId, 10),
-      // need to be removed
-      unit: 1,
-      rate: "1",
-      total: "1",
-      currency: "INR",
-      notes: "",
-      description: "",
-      april: (data.Apr ?? "").toString(),
-      may: (data.May ?? "").toString(),
-      june: (data.Jun ?? "").toString(),
-      july: (data.Jul ?? "").toString(),
-      august: (data.Aug ?? "").toString(),
-      september: (data.Sep ?? "").toString(),
-      october: (data.Oct ?? "").toString(),
-      november: (data.Nov ?? "").toString(),
-      december: (data.Dec ?? "").toString(),
-      january: (data.Jan ?? "").toString(),
-      february: (data.Feb ?? "").toString(),
-      march: (data.Mar ?? "").toString(),
-      activity: (filter?.map ?? "").toString(),
-      updatedBy: userData.data?.user.id ?? 1,
-      updatedAt: new Date().toISOString(),
-      rate1: (data.Rate1 ?? "").toString(),
-      rate2: (data.Rate2 ?? "").toString(),
-      rate3: (data.Rate3 ?? "").toString(),
-      rate4: (data.Rate4 ?? "").toString(),
-      amount1: ((data.Amount1 ?? "").toString()),
-      amount2: ((data.Amount2 ?? "").toString()),
-      amount3: ((data.Amount3 ?? "").toString()),
-      amount4: ((data.Amount4 ?? "").toString()),
-      qty1: Number(data.Qty1),
-      qty2: Number(data.Qty2),
-      qty3: Number(data.Qty3),
-      qty4: Number(data.Qty4)
-    }));
+    setSaveBtnState("loading");
+    const budgetDetails = Object.entries(tableData).map(
+      ([subCategoryId, data]) => ({
+        budgetDetailsId: data.budgetDetailsId,
+        catid: categoryId,
+        subcategoryId: parseInt(subCategoryId, 10),
+        // need to be removed
+        unit: 1,
+        rate: "1",
+        total: "1",
+        currency: "INR",
+        notes: "",
+        description: "",
+        april: (data.Apr ?? "").toString(),
+        may: (data.May ?? "").toString(),
+        june: (data.Jun ?? "").toString(),
+        july: (data.Jul ?? "").toString(),
+        august: (data.Aug ?? "").toString(),
+        september: (data.Sep ?? "").toString(),
+        october: (data.Oct ?? "").toString(),
+        november: (data.Nov ?? "").toString(),
+        december: (data.Dec ?? "").toString(),
+        january: (data.Jan ?? "").toString(),
+        february: (data.Feb ?? "").toString(),
+        march: (data.Mar ?? "").toString(),
+        activity: (filter?.map ?? "").toString(),
+        updatedBy: userData.data?.user.id ?? 1,
+        updatedAt: new Date().toISOString(),
+        rate1: (data.Rate1 ?? "").toString(),
+        rate2: (data.Rate2 ?? "").toString(),
+        rate3: (data.Rate3 ?? "").toString(),
+        rate4: (data.Rate4 ?? "").toString(),
+        amount1: (data.Amount1 ?? "").toString(),
+        amount2: (data.Amount2 ?? "").toString(),
+        amount3: (data.Amount3 ?? "").toString(),
+        amount4: (data.Amount4 ?? "").toString(),
+        qty1: Number(data.Qty1),
+        qty2: Number(data.Qty2),
+        qty3: Number(data.Qty3),
+        qty4: Number(data.Qty4),
+      }),
+    );
     try {
       updateBudgetDetails.mutate(
         {
@@ -490,7 +610,7 @@ console.log((filter?.map)?.toString(),'activity');
         },
         {
           onSuccess: (data) => {
-            toast.success('Successfully Saved', {
+            toast.success("Successfully Saved", {
               position: "bottom-center",
               autoClose: 1000,
               hideProgressBar: false,
@@ -500,17 +620,17 @@ console.log((filter?.map)?.toString(),'activity');
               progress: undefined,
               theme: "light",
             });
-            handelnputDisable(true)
+            handelnputDisable(true);
             console.log("Budget updated successfully:", data);
           },
           onError: (error) => {
-            throw new Error(JSON.stringify(error))
+            throw new Error(JSON.stringify(error));
             console.error("Error updating budget:", error);
           },
-        }
+        },
       );
     } catch (error) {
-      toast.warn('Error While saving ', {
+      toast.warn("Error While saving ", {
         position: "bottom-center",
         autoClose: 1000,
         hideProgressBar: false,
@@ -522,7 +642,7 @@ console.log((filter?.map)?.toString(),'activity');
       });
       console.error("Failed to update budget details:", error);
     } finally {
-      setSaveBtnState("edit")
+      setSaveBtnState("edit");
     }
   };
   return (
@@ -533,108 +653,148 @@ console.log((filter?.map)?.toString(),'activity');
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
         open={sectionOpen == "Program Activities"}
         onClick={(e) => {
-          e.preventDefault()
+          e.preventDefault();
         }}
       >
-        <summary className="flex cursor-pointer items-center justify-between gap-32  rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
+        <summary
+          className="flex cursor-pointer items-center justify-between gap-32 rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
           onClick={(e) => {
-            e.preventDefault()
-            if (sectionOpen == "Program Activities")
-              setSectionOpen(null)
-            else
-              setSectionOpen("Program Activities")
-          }}>
-          <h1 className="w-1/6 capitalize text-md font-medium">{section.toLowerCase()}</h1>
-          {
-            programDataLodaing ? <div className="flex items-center space-x-2">
+            e.preventDefault();
+            if (sectionOpen == "Program Activities") setSectionOpen(null);
+            else setSectionOpen("Program Activities");
+          }}
+        >
+          <h1 className="text-md w-1/6 font-medium capitalize">
+            {section.toLowerCase()}
+          </h1>
+          {programDataLodaing ? (
+            <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
-            </div> :
-              <div className="flex gap-20 w-5/6 items-center">  
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
-                  <span className="font-medium text-sm">Q1:</span> {(totalQty.totalQ1).toLocaleString('hi-IN')}
-                </div>
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
-                  <span className="font-medium text-sm">Q2:</span> {(totalQty.totalQ2).toLocaleString('hi-IN')}
-                </div>
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
-                  <span className="font-medium text-sm">Q3:</span> {(totalQty.totalQ3).toLocaleString('hi-IN')}
-                </div>
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
-                  <span className="font-medium text-sm">Q4:</span> {(totalQty.totalQ4).toLocaleString('hi-IN')}
-                </div>
-                <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
-                  <span className="font-medium text-sm">FY:</span> {(totalQty.totalFY).toLocaleString('hi-IN')}
-                </div>
-                {/* <div className='flex items-center justify-end'> */}
-                <span className="text-lg font-bold   transition-transform group-open:rotate-90">→</span>
-                {/* </div> */}
+            </div>
+          ) : (
+            <div className="flex w-5/6 items-center gap-20">
+              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
+                <span className="text-sm font-medium">Q1:</span>{" "}
+                {totalQty.totalQ1.toLocaleString("hi-IN")}
               </div>
-          }
+              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
+                <span className="text-sm font-medium">Q2:</span>{" "}
+                {totalQty.totalQ2.toLocaleString("hi-IN")}
+              </div>
+              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
+                <span className="text-sm font-medium">Q3:</span>{" "}
+                {totalQty.totalQ3.toLocaleString("hi-IN")}
+              </div>
+              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
+                <span className="text-sm font-medium">Q4:</span>{" "}
+                {totalQty.totalQ4.toLocaleString("hi-IN")}
+              </div>
+              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
+                <span className="text-sm font-medium">FY:</span>{" "}
+                {totalQty.totalFY.toLocaleString("hi-IN")}
+              </div>
+              {/* <div className='flex items-center justify-end'> */}
+              <span className="text-lg font-bold transition-transform group-open:rotate-90">
+                →
+              </span>
+              {/* </div> */}
+            </div>
+          )}
         </summary>
-        <div className='flex gap-2 items-center'>
-          <div className='w-72 mt-3 '>
-            <DropdownMenu.Root >
+        <div className="flex items-center gap-2">
+          <div className="mt-3 w-72">
+            <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
-                <button className="cursor-pointer  py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center w-full">
-                  <span className='capitalize'>{filter?.name} </span>
+                <button className="flex w-full cursor-pointer items-center justify-between rounded-lg border py-1 pl-2 text-left text-sm font-normal text-gray-500">
+                  <span className="capitalize">{filter?.name} </span>
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
-              <DropdownMenu.Content
-                className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[250px]"
-              >
-                {subProgramActivites.sort((a, b) => a.name.localeCompare(b.name)).map((val, ind) => (
-                  <DropdownMenu.Item
-                    key={ind}
-                    className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer text-sm capitalize"
-                    onSelect={() => handleSelect(val)}
-                  >
-                    {val.name}
-                  </DropdownMenu.Item>
-                ))}
+              <DropdownMenu.Content className="max-h-56 !w-[250px] overflow-y-scroll rounded-lg bg-white p-2 shadow-lg">
+                {subProgramActivites
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((val, ind) => (
+                    <DropdownMenu.Item
+                      key={ind}
+                      className="cursor-pointer rounded p-2 text-sm capitalize hover:bg-gray-100 focus:ring-0"
+                      onSelect={() => handleSelect(val)}
+                    >
+                      {val.name}
+                    </DropdownMenu.Item>
+                  ))}
               </DropdownMenu.Content>
             </DropdownMenu.Root>
           </div>
-          <Marquee className='flex flex-col w-full items-end pr-10 font-medium gap-1 '>
-            {
-              subProgramActivites.map((pa) => {
-                if (pa.name == "All")
-                  return
-                const activityData = programData?.activityTotals.find((activity) =>
-                  Number(activity.activityId) == pa.map
-                )
-                return <span key={pa.map} className='mr-2 text-medium'>
-                  <span className='text-green-800 font-semibold'> {pa.name}</span> | FY : {activityData ? (Number(activityData?.q1) + Number(activityData?.q2) + Number(activityData?.q3) + Number(activityData?.q4)).toLocaleString('hi-IN') : "NA"} | Q1 : {activityData ? Number(activityData?.q1).toLocaleString('hi-IN') : "NA"} | Q2: {activityData ? Number(activityData?.q2).toLocaleString('hi-IN') : "NA"} | Q3 : {activityData ? Number(activityData?.q3).toLocaleString('hi-IN') : "NA"} | Q4: {activityData ? Number(activityData?.q4).toLocaleString('hi-IN') : "NA"}
+          <Marquee className="flex w-full flex-col items-end gap-1 pr-10 font-medium">
+            {subProgramActivites.map((pa) => {
+              if (pa.name == "All") return null;
+              const activityData = programData?.activityTotals.find(
+                (activity) => Number(activity.activityId) == pa.map,
+              );
+              return (
+                <span key={pa.map} className="text-medium mr-2">
+                  <span className="font-semibold text-green-800">
+                    {" "}
+                    {pa.name}
+                  </span>{" "}
+                  | FY :{" "}
+                  {activityData
+                    ? (
+                        Number(activityData?.q1) +
+                        Number(activityData?.q2) +
+                        Number(activityData?.q3) +
+                        Number(activityData?.q4)
+                      ).toLocaleString("hi-IN")
+                    : "NA"}{" "}
+                  | Q1 :{" "}
+                  {activityData
+                    ? Number(activityData?.q1).toLocaleString("hi-IN")
+                    : "NA"}{" "}
+                  | Q2:{" "}
+                  {activityData
+                    ? Number(activityData?.q2).toLocaleString("hi-IN")
+                    : "NA"}{" "}
+                  | Q3 :{" "}
+                  {activityData
+                    ? Number(activityData?.q3).toLocaleString("hi-IN")
+                    : "NA"}{" "}
+                  | Q4:{" "}
+                  {activityData
+                    ? Number(activityData?.q4).toLocaleString("hi-IN")
+                    : "NA"}
                 </span>
-
-              })
-            }
+              );
+            })}
           </Marquee>
-
         </div>
 
-        <hr className="my-2 scale-x-150 " />
+        <hr className="my-2 scale-x-150" />
 
-        <div className="bg-gray-50 overflow-scroll">
+        <div className="overflow-scroll bg-gray-50">
           {/* Table */}
           <table className="w-full table-auto border-collapse">
             <thead>
-              <tr className="bg-gray-200 text-left text-sm  text-gray-600">
-                <th className="border p-2 capitalize">{"Particular".toLowerCase()}</th>
+              <tr className="bg-gray-200 text-left text-sm text-gray-600">
+                <th className="border p-2 capitalize">
+                  {"Particular".toLowerCase()}
+                </th>
                 {months.map((month) => (
-                  <th key={month} className="border p-2 capitalize">{month.toLowerCase()}</th>
+                  <th key={month} className="border p-2 capitalize">
+                    {month.toLowerCase()}
+                  </th>
                 ))}
               </tr>
             </thead>
-            {
-              !programDataLodaing && <tbody>
+            {!programDataLodaing && (
+              <tbody>
                 {programData?.subCategories.map((sub) => (
                   <tr
                     key={sub.subCategoryId}
                     className="text-sm transition hover:bg-gray-100"
                   >
-
-                    <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toLowerCase()}</td>
+                    <td className="border p-2 font-medium capitalize">
+                      {sub.subCategoryName.toLowerCase()}
+                    </td>
                     {months.map((month, key) => (
                       <td key={month} className="border p-2">
                         <input
@@ -660,74 +820,81 @@ console.log((filter?.map)?.toString(),'activity');
                   </tr>
                 ))}
               </tbody>
-            }
-
+            )}
           </table>
         </div>
-        {
-          filter?.map != 0 && subdepartmentId != 0 && deptId != "0" && ((userData.data?.user.role == 1 && status != "draft") || (userData.data?.user.role != 1 && status == "draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
-            {
-              !inputStates && <div>
-                {
-                  saveBtnState == "loading" && <Button
-                    type="button"
-                    className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
-                    variant="soft"
-                  // Disable the button if input is empty
-                  >
-                    Loading...
-                  </Button>
-                }
-                {
-                  saveBtnState == "edit" && <Button
-                    type="button"
-                    className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-                    variant="soft"
-                    style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-                    disabled={isSaveDisabled()}
-                    onClick={() => handleUpdate()}
-                  >
-                    Edit
-                  </Button>}
-                {saveBtnState == "save" && <Button
+        {filter?.map != 0 &&
+          subdepartmentId != 0 &&
+          deptId != "0" &&
+          ((userData.data?.user.role == 1 && status != "draft") ||
+            (userData.data?.user.role != 1 && status == "draft")) && (
+            <div className="flex flex-row-reverse gap-2 py-2 pr-4">
+              {!inputStates && (
+                <div>
+                  {saveBtnState == "loading" && (
+                    <Button
+                      type="button"
+                      className="!w-20 !cursor-not-allowed border border-black !bg-primary px-2 !text-lg !text-white"
+                      variant="soft"
+                      // Disable the button if input is empty
+                    >
+                      Loading...
+                    </Button>
+                  )}
+                  {saveBtnState == "edit" && (
+                    <Button
+                      type="button"
+                      className="!disabled:cursor-not-allowed !w-20 cursor-pointer border border-black !bg-primary px-2 !text-lg !text-white"
+                      variant="soft"
+                      style={{
+                        cursor: isSaveDisabled() ? "not-allowed" : "pointer",
+                      }}
+                      disabled={isSaveDisabled()}
+                      onClick={() => handleUpdate()}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                  {saveBtnState == "save" && (
+                    <Button
+                      type="button"
+                      className="!disabled:cursor-not-allowed !w-20 cursor-pointer border border-black !bg-primary px-2 !text-lg !text-white"
+                      variant="soft"
+                      style={{
+                        cursor: isSaveDisabled() ? "not-allowed" : "pointer",
+                      }}
+                      disabled={isSaveDisabled()}
+                      onClick={() => handleSave()}
+                    >
+                      Save
+                    </Button>
+                  )}
+                </div>
+              )}
+              {inputStates ? (
+                <Button
                   type="button"
-                  className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+                  className="!disabled:cursor-not-allowed !w-20 cursor-pointer border border-black !bg-primary px-2 !text-lg !text-white"
                   variant="soft"
-                  style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-                  disabled={isSaveDisabled()}
-                  onClick={() => handleSave()}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handelnputDisable(false)}
                 >
-                  Save
+                  Edit
                 </Button>
-                }
-              </div>
-            }
-            {inputStates ? <Button
-              type="button"
-              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-              variant="soft"
-              style={{ cursor: "pointer" }}
-              onClick={() => handelnputDisable(false)}
-            >
-              Edit
-            </Button> :
-              <Button
-                type="button"
-                className="cursor-pointer !text-primary  px-2 !w-20 !text-lg border border-primary !disabled:cursor-not-allowed"
-                variant="soft"
-                style={{ cursor: "pointer" }}
-                onClick={() => handelnputDisable(true)}
-              >
-                Cancel
-              </Button>
-            }
-
-          </div>
-        }
-
-
+              ) : (
+                <Button
+                  type="button"
+                  className="!disabled:cursor-not-allowed !w-20 cursor-pointer border border-primary px-2 !text-lg !text-primary"
+                  variant="soft"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handelnputDisable(true)}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
+          )}
       </details>
-
     </div>
   );
 };

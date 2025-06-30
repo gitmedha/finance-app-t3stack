@@ -43,6 +43,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   useEffect(()=>{
     void subDeptRefetch()
   },[subDeptRefetch,filters.department])
+  console.log("🚀 filters:", filters);
   return (
     <div className='flex gap-1'>
       <div className='w-44'>
@@ -86,7 +87,8 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
             </button>
           </DropdownMenu.Trigger>
           {
-            userData.data?.user.role == 1 && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[180px]">
+            userData.data?.user.role == 1 && 
+            <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[180px]">
               <DropdownMenu.Item
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
                 onSelect={() => handleSelect('department', { departmentname: '' })}

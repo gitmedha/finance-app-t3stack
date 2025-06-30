@@ -108,6 +108,7 @@ const Budget: React.FC = () => {
         subdepartmentName: subDeptVal.departmentname,
       }));
     } else if (name === "year" && typeof value === "string") {
+      console.log(value,'value');
       setFilters((prev) => ({
         ...prev,
         [name]: value, // Year is a string

@@ -8,6 +8,7 @@ import {  FaUser } from "react-icons/fa";
 import {  GiOfficeChair } from "react-icons/gi";
 import { HiBanknotes } from "react-icons/hi2";
 import { IoHome } from "react-icons/io5";
+import { MdOutlineCategory } from "react-icons/md";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
 import { IconButton } from "@radix-ui/themes";
@@ -33,6 +34,7 @@ const AppBar = () => {
     { menu: "Budget", path: "/budget", icon: <HiBanknotes /> },
     // { menu: "Donors", path: "/donors", icon: <FaHandHoldingHeart /> },
     { menu: "Departments", path: "/departments", icon: <GiOfficeChair /> },
+    { menu: "Program Activities", path: "/program-activities", icon: <MdOutlineCategory /> },
     // { menu: "Cost Centers", path: "/cost-centers", icon: <GiMoneyStack /> },
     // { menu: "Expenses", path: "/expenses", icon: <GiExpense /> },
     { menu: "Staff", path: "/staff", icon: <FaUser /> },
@@ -55,7 +57,7 @@ const AppBar = () => {
 
         <ul className="flex justify-start items-center space-x-6">
           {menus.map((menu) => {
-            if (session?.user.role != 1 && (menu.menu == "Home" || menu.menu == "Budget" || menu.menu == "Staff") )
+            if (session?.user.role != 1 && (menu.menu == "Home" || menu.menu == "Budget" || menu.menu == "Staff" || menu.menu == "Program Activities") )
             {
               return <li key={menu.menu}>
                 <Link

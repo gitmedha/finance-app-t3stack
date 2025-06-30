@@ -6,7 +6,7 @@ import { getDepartments, getAllDepartments, getHeadDepartments, getSubDepartment
 import { getAllLocations, getAllStates } from "../controller/geography";
 import { getBudgetMaster, getCapitalCostData, getCats, getCatsBudgetDetails, getLevelStaffCount, getOverHeadsData, getPersonalCatDetials, getProgramActivities, getProgramOfficeData, getSubCats, getSubDepts, getTravelCatDetials } from "../controller/budget";
 import { getBudgetSum, getQuarterBudgetSum, getTotalBudgetSum } from "../controller/home";
-import { getProgramActivity, getAllProgramActivities } from "../controller/programActivities";
+import { getProgramActivity, getAllProgramActivities, getProgramActivityById, getProgramActivitiesByDepartment } from "../controller/programActivities";
 
 export const getRouter = createTRPCRouter({
   getStaffs,
@@ -29,8 +29,10 @@ export const getRouter = createTRPCRouter({
   getQuarterBudgetSum,
   getPersonalCatDetials,
   getProgramActivities,
+  getProgramActivityById,
   getProgramActivity,
   getAllProgramActivities,
+  getProgramActivitiesByDepartment,
   getTravelCatDetials,
   getProgramOfficeData,
   getCapitalCostData,

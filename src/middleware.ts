@@ -33,6 +33,7 @@ export const config = {
         '/cost-centers',
         '/expenses',
         '/staff',
+        '/program-activities',
         '/login' // Include login route to apply middleware
     ],
 }

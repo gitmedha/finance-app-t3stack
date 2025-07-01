@@ -101,7 +101,10 @@ export const getDepartments = protectedProcedure
   });
 
 export const getAllDepartments = protectedProcedure.query(async ({ ctx }) => {
+  // console.log("User session:", ctx.session);
+    console.log("Request headers:", ctx);
   const departments = await ctx.db
+  
     .select({
       id: departmentMaster.id,
       name: departmentMaster.departmentname,

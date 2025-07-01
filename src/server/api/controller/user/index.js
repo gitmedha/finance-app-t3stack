@@ -23,6 +23,12 @@ export const login = publicProcedure
         if (!user) {
             return { message: "Invalid email", user, success: false };
         }
+        
+        // Make sure user.password exists before comparing
+        if (!user.password) {
+            return { message: "Invalid user credentials", user, success: false };
+        }
+        
         // Compare the hashed password with the input password
         const isPasswordValid = await bcrypt.compare(input.password, user.password);
         if (!isPasswordValid) {

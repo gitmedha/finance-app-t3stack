@@ -65,22 +65,22 @@ export const authOptions: NextAuthOptions = {
           where: eq(userMasterInFinanceProject.email, credentials.email),
         });
 
-        // Ensure password match before returning user
-        if (data && data.password === credentials.password) {
+        // Ensure password match and required fields exist before returning user
+        if (data && data.password === credentials.password && data.username) {
           const user: UserInfo = {
             id: data.id,
-            username: data.username,
+            username: data.username ?? '',  // Provide a default empty string if null
             email: data.email,
             fullName: data.fullName,
             role: data.role,
-            isactive: data.isactive,
+            isactive: data.isactive ?? true, // Provide a default value if null
             notes: data.notes,
             description: data.description,
-            createdAt: data.createdAt,
+            createdAt: data.createdAt ?? new Date().toISOString(), // Provide current date as default
             updatedAt: data.updatedAt,
             createdBy: data.createdBy,
             updatedBy: data.updatedBy,
-            phonenumber: data.phonenumber,
+            phonenumber: data.phonenumber ?? '', // Provide a default empty string if null
             departmentId:null,
             departmentName:null,
             subDepartmentId:null,

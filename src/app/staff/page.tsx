@@ -47,6 +47,7 @@ export default function Staff() {
     subdepartment: userData.data?.user.subDepartmentId ?? 0,
     subdepartmentname: userData.data?.user.subDepartmentName ?? "",
   });
+  console.log("🚀 filters:", filters);
 
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
     { page: currentPage, limit, searchTerm, ...filters },
@@ -65,6 +66,9 @@ export default function Staff() {
       console.log("Frontend received data:", data);
     }
   }, [data]);
+  useEffect(() => {
+    console.log("🚀 session:", userData);
+  }, []);
 
   const result = data as GetStaffsResponse | undefined;
 

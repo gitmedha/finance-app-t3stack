@@ -8,6 +8,7 @@
  */
 
 import { initTRPC, TRPCError } from "@trpc/server";
+import { verify } from "jsonwebtoken";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -118,9 +119,76 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  *
  * @see https://trpc.io/docs/procedures
  */
-export const protectedProcedure = t.procedure
+// export const protectedProcedure = t.procedure
+//   .use(timingMiddleware)
+//   .use(({ ctx, next }) => {
+//     // Get cookies from the request
+//     const cookies = ctx.headers?.get('cookie');
+//     if (!ctx.session || !cookies) {
+//       throw new TRPCError({ code: "UNAUTHORIZED", message: "No cookies found" });
+//     }
+    
+//     // Extract the NextAuth session token from cookies
+//     const sessionTokenMatch = cookies.match(/next-auth\.session-token=([^;]+)/);
+//     const token = sessionTokenMatch ? decodeURIComponent(sessionTokenMatch[1]) : null;
+    
+//     if (!token) {
+//       throw new TRPCError({ code: "UNAUTHORIZED", message: "No session token found" });
+//     }
+    
+//     // Make sure secret exists
+//     if (!ctx.session.secret) {
+//       throw new TRPCError({ 
+//         code: "INTERNAL_SERVER_ERROR", 
+//         message: "JWT secret not configured" 
+//       });
+//     }
+//     const secret = ctx.session.secret as string;
+
+//     try {
+//       // Verify the token using the NextAuth secret
+//       const decodedToken = verify(token, secret);
+      
+//       // Check if token contains necessary user data
+//       if (!decodedToken || typeof decodedToken !== 'object') {
+//         throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid token payload" });
+//       }
+      
+//       return next({
+//         ctx: {
+//           ...ctx,
+//           user: decodedToken,
+//           session: { ...ctx.session }
+//         },
+//       });
+//     } catch (error) {
+//       console.error("Token verification error:", error);
+//       throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid session token" });
+//     }
+//   });
+
+
+
+
+
+  export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
+  
+    
+    // Try to get token from cookie instead of auth header
+    const cookies = ctx.headers?.get('cookie');
+    // console.log("Cookies:", cookies);
+    
+    // if (cookies) {
+    //   // Extract the next-auth.session-token from cookies using RegExp.exec() instead of match()
+    //   const sessionTokenRegex = /next-auth\.session-token=([^;]+)/;
+    //   const sessionTokenMatch = sessionTokenRegex.exec(cookies);
+    //   const sessionToken = sessionTokenMatch ? sessionTokenMatch[1] : null;
+    //   console.log("Session token from cookie:", sessionToken);
+      
+      // Now you could use this token instead of looking for Authorization header
+    // }
     // if (!ctx.session || !ctx.session.user) {
     //   throw new TRPCError({ code: "UNAUTHORIZED" });
     // }

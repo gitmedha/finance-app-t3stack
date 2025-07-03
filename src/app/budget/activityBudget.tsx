@@ -56,31 +56,63 @@ interface LevelData {
 type TableData = Record<string, LevelData>;
 
 const months = [
-  "Qty1",
-  "Rate1",
-  "Amount1",
+  "Apr Qty",
+  "Apr Rate",
+  "Apr Amt",
   "Apr",
+  "May Qty",
+  "May Rate",
+  "May Amt",
   "May",
+  "Jun Qty",
+  "Jun Rate",
+  "Jun Amt",
   "Jun",
-  "Qty2",
-  "Rate2",
-  "Amount2",
+  "Jul Qty",
+  "Jul Rate",
+  "Jul Amt",
   "Jul",
+  "Aug Qty",
+  "Aug Rate",
+  "Aug Amt",
   "Aug",
+  "Sep Qty",
+  "Sep Rate",
+  "Sep Amt",
   "Sep",
-  "Qty3",
-  "Rate3",
-  "Amount3",
+  "Oct Qty",
+  "Oct Rate",
+  "Oct Amt",
   "Oct",
+  "Nov Qty",
+  "Nov Rate",
+  "Nov Amt",
   "Nov",
+  "Dec Qty",
+  "Dec Rate",
+  "Dec Amt",
   "Dec",
-  "Qty4",
-  "Rate4",
-  "Amount4",
+  "Jan Qty",
+  "Jan Rate",
+  "Jan Amt",
   "Jan",
+  "Feb Qty",
+  "Feb Rate",
+  "Feb Amt",
   "Feb",
+  "Mar Qty",
+  "Mar Rate",
+  "Mar Amt",
   "Mar",
 ];
+
+// map each month to its quarter key
+const monthToQKey: Record<string, string> = {
+    Apr: "totalQ1", May: "totalQ1", Jun: "totalQ1",
+    Jul: "totalQ2", Aug: "totalQ2", Sep: "totalQ2",
+    Oct: "totalQ3", Nov: "totalQ3", Dec: "totalQ3",
+    Jan: "totalQ4", Feb: "totalQ4", Mar: "totalQ4",
+};
 
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({
   section,
@@ -94,6 +126,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
   financialYear,
 }) => {
   const userData = useSession();
+  console.log(userData, "userData");
   const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">(
     "loading",
   );
@@ -160,7 +193,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         staleTime: 0,
       },
     );
-  console.log(programData, "programData");
   const createBudgetDetails = api.post.addBudgetDetails.useMutation();
   const updateBudgetDetails = api.post.updateBudgetDetails.useMutation();
   // useEffect to update program activities dropdown
@@ -184,29 +216,53 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         programData.subCategories.forEach((sub) => {
           initialData[sub.subCategoryId] = {
             Count: "",
-            Qty1: 0,
-            Rate1: "0",
-            Amount1: "0",
+            "Apr Qty": "0",
+            "Apr Rate": "0",
+            "Apr Amt": "0",
             Apr: "0",
+            "May Qty": "0",
+            "May Rate": "0",
+            "May Amt": "0",
             May: "0",
+            "Jun Qty": "0",
+            "Jun Rate": "0",
+            "Jun Amt": "0",
             Jun: "0",
-            Qty2: 0,
-            Rate2: "0",
-            Amount2: "0",
+            "Jul Qty": "0",
+            "Jul Rate": "0",
+            "Jul Amt": "0",
             Jul: "0",
+            "Aug Qty": "0",
+            "Aug Rate": "0",
+            "Aug Amt": "0",
             Aug: "0",
+            "Sep Qty": "0",
+            "Sep Rate": "0",
+            "Sep Amt": "0",
             Sep: "0",
-            Qty3: 0,
-            Rate3: "0",
-            Amount3: "0",
+            "Oct Qty": "0",
+            "Oct Rate": "0",
+            "Oct Amt": "0",
             Oct: "0",
+            "Nov Qty": "0",
+            "Nov Rate": "0",
+            "Nov Amt": "0",
             Nov: "0",
+            "Dec Qty": "0",
+            "Dec Rate": "0",
+            "Dec Amt": "0",
             Dec: "0",
-            Qty4: "0",
-            Rate4: "0",
-            Amount4: "0",
+            "Jan Qty": "0",
+            "Jan Rate": "0",
+            "Jan Amt": "0",
             Jan: "0",
+            "Feb Qty": "0",
+            "Feb Rate": "0",
+            "Feb Amt": "0",
             Feb: "0",
+            "Mar Qty": "0",
+            "Mar Rate": "0",
+            "Mar Amt": "0",
             Mar: "0",
             budgetDetailsId: 0,
           };
@@ -225,32 +281,84 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
             totalFY: 0,
           };
           programData.result.forEach((item) => {
+            // Get the monthly values
+            const aprValue = item.april ? Number(item.april) : 0;
+            const mayValue = item.may ? Number(item.may) : 0;
+            const junValue = item.june ? Number(item.june) : 0;
+            const julValue = item.july ? Number(item.july) : 0;
+            const augValue = item.august ? Number(item.august) : 0;
+            const sepValue = item.september ? Number(item.september) : 0;
+            const octValue = item.october ? Number(item.october) : 0;
+            const novValue = item.november ? Number(item.november) : 0;
+            const decValue = item.december ? Number(item.december) : 0;
+            const janValue = item.january ? Number(item.january) : 0;
+            const febValue = item.february ? Number(item.february) : 0;
+            const marValue = item.march ? Number(item.march) : 0;
+            
+            // Set each month's total, and also set default qty/rate/amt values
             initialData[item.subcategoryId] = {
               Count: item.total ? Number(item.total) : 0,
-              Apr: item.april ? Number(item.april) : "0",
-              May: item.may ? Number(item.may) : "0",
-              Jun: item.june ? Number(item.june) : "0",
-              Jul: item.july ? Number(item.july) : "0",
-              Aug: item.august ? Number(item.august) : "0",
-              Sep: item.september ? Number(item.september) : "0",
-              Oct: item.october ? Number(item.october) : "0",
-              Nov: item.november ? Number(item.november) : "0",
-              Dec: item.december ? Number(item.december) : "0",
-              Jan: item.january ? Number(item.january) : "0",
-              Feb: item.february ? Number(item.february) : "0",
-              Mar: item.march ? Number(item.march) : "0",
-              Qty1: item.qty1 ? Number(Number(item.qty1)) : "0",
-              Rate1: item.rate1 ? Number(item.rate1) : "0",
-              Amount1: item.amount1 ? Number(item.amount1) : "0",
-              Qty2: item.qty2 ? Number(item.qty2) : "0",
-              Rate2: item.rate2 ? Number(item.rate2) : "0",
-              Amount2: item.amount2 ? Number(item.amount2) : "0",
-              Qty3: item.qty3 ? Number(Number(item.qty3)) : "0",
-              Rate3: item.rate3 ? Number(item.rate3) : "0",
-              Amount3: item.amount3 ? Number(item.amount3) : "0",
-              Qty4: item.qty4 ? Number(Number(item.qty4)) : "0",
-              Rate4: item.rate4 ? Number(item.rate4) : "0",
-              Amount4: item.amount4 ? Number(item.amount4) : "0",
+              // April
+              "Apr Qty": item.aprQty ? Number(item.aprQty) : 0,
+              "Apr Rate": item.aprRate ? Number(item.aprRate) : 0,
+              "Apr Amt": item.aprAmt ? Number(item.aprAmt) : 0,
+              Apr: aprValue.toString(),
+              // May
+              "May Qty": item.mayQty ? Number(item.mayQty) : 0,
+              "May Rate": item.mayRate ? Number(item.mayRate) : 0,
+              "May Amt": item.mayAmt ? Number(item.mayAmt) : 0,
+              May: mayValue.toString(),
+              // June
+              "Jun Qty": item.junQty ? Number(item.junQty) : 0,
+              "Jun Rate": item.junRate ? Number(item.junRate) : 0,
+              "Jun Amt": item.junAmt ? Number(item.junAmt) : 0,
+              Jun: junValue.toString(),
+              // July
+              "Jul Qty": item.julQty ? Number(item.julQty) : 0,
+              "Jul Rate": item.julRate ? Number(item.julRate) : 0,
+              "Jul Amt": item.julAmt ? Number(item.julAmt) : 0,
+              Jul: julValue.toString(),
+              // August
+              "Aug Qty": item.augQty ? Number(item.augQty) : 0,
+              "Aug Rate": item.augRate ? Number(item.augRate) : 0,
+              "Aug Amt": item.augAmt ? Number(item.augAmt) : 0,
+              Aug: augValue.toString(),
+              // September
+              "Sep Qty": item.sepQty ? Number(item.sepQty) : 0,
+              "Sep Rate": item.sepRate ? Number(item.sepRate) : 0,
+              "Sep Amt": item.sepAmt ? Number(item.sepAmt) : 0,
+              Sep: sepValue.toString(),
+              // October
+              "Oct Qty": item.octQty ? Number(item.octQty) : 0,
+              "Oct Rate": item.octRate ? Number(item.octRate) : 0,
+              "Oct Amt": item.octAmt ? Number(item.octAmt) : 0,
+              Oct: octValue.toString(),
+              // November
+              "Nov Qty": item.novQty ? Number(item.novQty) : 0,
+              "Nov Rate": item.novRate ? Number(item.novRate) : 0,
+              "Nov Amt": item.novAmt ? Number(item.novAmt) : 0,
+              Nov: novValue.toString(),
+              // December
+              "Dec Qty": item.decQty ? Number(item.decQty) : 0,
+              "Dec Rate": item.decRate ? Number(item.decRate) : 0,
+              "Dec Amt": item.decAmt ? Number(item.decAmt) : 0,
+              Dec: decValue.toString(),
+              // January
+              "Jan Qty": item.janQty ? Number(item.janQty) : 0,
+              "Jan Rate": item.janRate ? Number(item.janRate) : 0,
+              "Jan Amt": item.janAmt ? Number(item.janAmt) : 0,
+              Jan: janValue.toString(),
+              // February
+              "Feb Qty": item.febQty ? Number(item.febQty) : 0,
+              "Feb Rate": item.febRate ? Number(item.febRate) : 0,
+              "Feb Amt": item.febAmt ? Number(item.febAmt) : 0,
+              Feb: febValue.toString(),
+              // March
+              "Mar Qty": item.marQty ? Number(item.marQty) : 0,
+              "Mar Rate": item.marRate ? Number(item.marRate) : 0,
+              "Mar Amt": item.marAmt ? Number(item.marAmt) : 0,
+              Mar: marValue.toString(),
+              
               budgetDetailsId: item.id ? Number(Number(item.id)) : 0,
             };
             totalQtyAfterBudgetDetails.totalFY +=
@@ -305,31 +413,67 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       const qty2In = document.getElementById(id + "Qty2") as HTMLInputElement;
       const qty3In = document.getElementById(id + "Qty3") as HTMLInputElement;
       const qty4In = document.getElementById(id + "Qty4") as HTMLInputElement;
+      const aprQtyIn = document.getElementById(id + "Apr Qty") as HTMLInputElement;
+      const aprRateIn = document.getElementById(id + "Apr Rate") as HTMLInputElement;
+      const aprAmtIn = document.getElementById(id + "Apr Amt") as HTMLInputElement;
       const aprIn = document.getElementById(id + "Apr") as HTMLInputElement;
+      const mayQtyIn = document.getElementById(id + "May Qty") as HTMLInputElement;
+      const mayRateIn = document.getElementById(id + "May Rate") as HTMLInputElement;
+      const mayAmtIn = document.getElementById(id + "May Amt") as HTMLInputElement;
       const mayIn = document.getElementById(id + "May") as HTMLInputElement;
+      const junQtyIn = document.getElementById(id + "Jun Qty") as HTMLInputElement;
+      const junRateIn = document.getElementById(id + "Jun Rate") as HTMLInputElement;
+      const junAmtIn = document.getElementById(id + "Jun Amt") as HTMLInputElement;
       const junIn = document.getElementById(id + "Jun") as HTMLInputElement;
+      const julQtyIn = document.getElementById(id + "Jul Qty") as HTMLInputElement;
+      const julRateIn = document.getElementById(id + "Jul Rate") as HTMLInputElement;
+      const julAmtIn = document.getElementById(id + "Jul Amt") as HTMLInputElement;
       const julIn = document.getElementById(id + "Jul") as HTMLInputElement;
+      const augQtyIn = document.getElementById(id + "Aug Qty") as HTMLInputElement;
+      const augRateIn = document.getElementById(id + "Aug Rate") as HTMLInputElement;
+      const augAmtIn = document.getElementById(id + "Aug Amt") as HTMLInputElement;
       const augIn = document.getElementById(id + "Aug") as HTMLInputElement;
+      const sepQtyIn = document.getElementById(id + "Sep Qty") as HTMLInputElement;
+      const sepRateIn = document.getElementById(id + "Sep Rate") as HTMLInputElement;
+      const sepAmtIn = document.getElementById(id + "Sep Amt") as HTMLInputElement;
       const sepIn = document.getElementById(id + "Sep") as HTMLInputElement;
+      const octQtyIn = document.getElementById(id + "Oct Qty") as HTMLInputElement;
+      const octRateIn = document.getElementById(id + "Oct Rate") as HTMLInputElement;
+      const octAmtIn = document.getElementById(id + "Oct Amt") as HTMLInputElement;
       const octIn = document.getElementById(id + "Oct") as HTMLInputElement;
+      const novQtyIn = document.getElementById(id + "Nov Qty") as HTMLInputElement;
+      const novRateIn = document.getElementById(id + "Nov Rate") as HTMLInputElement;
+      const novAmtIn = document.getElementById(id + "Nov Amt") as HTMLInputElement;
       const novIn = document.getElementById(id + "Nov") as HTMLInputElement;
+      const decQtyIn = document.getElementById(id + "Dec Qty") as HTMLInputElement;
+      const decRateIn = document.getElementById(id + "Dec Rate") as HTMLInputElement;
+      const decAmtIn = document.getElementById(id + "Dec Amt") as HTMLInputElement;
       const decIn = document.getElementById(id + "Dec") as HTMLInputElement;
+      const janQtyIn = document.getElementById(id + "Jan Qty") as HTMLInputElement;
+      const janRateIn = document.getElementById(id + "Jan Rate") as HTMLInputElement;
+      const janAmtIn = document.getElementById(id + "Jan Amt") as HTMLInputElement;
       const janIn = document.getElementById(id + "Jan") as HTMLInputElement;
+      const febQtyIn = document.getElementById(id + "Feb Qty") as HTMLInputElement;
+      const febRateIn = document.getElementById(id + "Feb Rate") as HTMLInputElement;
+      const febAmtIn = document.getElementById(id + "Feb Amt") as HTMLInputElement;
       const febIn = document.getElementById(id + "Feb") as HTMLInputElement;
+      const marQtyIn = document.getElementById(id + "Mar Qty") as HTMLInputElement;
+      const marRateIn = document.getElementById(id + "Mar Rate") as HTMLInputElement;
+      const marAmtIn = document.getElementById(id + "Mar Amt") as HTMLInputElement; 
       const marIn = document.getElementById(id + "Mar") as HTMLInputElement;
       if (
-        aprIn &&
-        mayIn &&
-        junIn &&
-        julIn &&
-        augIn &&
-        sepIn &&
-        octIn &&
-        novIn &&
-        decIn &&
-        janIn &&
-        febIn &&
-        marIn &&
+        aprIn && aprQtyIn && aprRateIn && aprAmtIn &&
+        mayIn && mayQtyIn && mayRateIn && mayAmtIn &&
+        junIn && junQtyIn && junRateIn && junAmtIn &&
+        julIn && julQtyIn && julRateIn && julAmtIn &&
+        augIn && augQtyIn && augRateIn && augAmtIn &&
+        sepIn && sepQtyIn && sepRateIn && sepAmtIn &&
+        octIn && octQtyIn && octRateIn && octAmtIn &&
+        novIn && novQtyIn && novRateIn && novAmtIn &&
+        decIn && decQtyIn && decRateIn && decAmtIn &&
+        janIn && janQtyIn && janRateIn && janAmtIn &&
+        febIn && febQtyIn && febRateIn && febAmtIn &&
+        marIn && marQtyIn && marRateIn && marAmtIn &&
         rate1In &&
         rate2In &&
         rate3In &&
@@ -340,17 +484,53 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         qty4In
       ) {
         aprIn.disabled = disable;
+        aprQtyIn.disabled = disable;
+        aprRateIn.disabled = disable;
+        aprAmtIn.disabled = disable;
         mayIn.disabled = disable;
-        junIn.disabled = disable;
-        octIn.disabled = disable;
-        novIn.disabled = disable;
-        decIn.disabled = disable;
+        mayQtyIn.disabled = disable;
+        mayRateIn.disabled = disable;
+        mayAmtIn.disabled = disable;
+        junIn.disabled = disable; 
+        junQtyIn.disabled = disable;
+        junRateIn.disabled = disable;
+        junAmtIn.disabled = disable;
         julIn.disabled = disable;
+        julQtyIn.disabled = disable;
+        julRateIn.disabled = disable;
+        julAmtIn.disabled = disable;
         augIn.disabled = disable;
+        augQtyIn.disabled = disable;
+        augRateIn.disabled = disable;
+        augAmtIn.disabled = disable;
         sepIn.disabled = disable;
+        sepQtyIn.disabled = disable;
+        sepRateIn.disabled = disable;
+        sepAmtIn.disabled = disable;
+        octIn.disabled = disable; 
+        octQtyIn.disabled = disable;
+        octRateIn.disabled = disable;
+        octAmtIn.disabled = disable;
+        novIn.disabled = disable;
+        novQtyIn.disabled = disable;
+        novRateIn.disabled = disable;
+        novAmtIn.disabled = disable;
+        decIn.disabled = disable;
+        decQtyIn.disabled = disable;
+        decRateIn.disabled = disable;
+        decAmtIn.disabled = disable;
         janIn.disabled = disable;
+        janQtyIn.disabled = disable;
+        janRateIn.disabled = disable;
+        janAmtIn.disabled = disable;
         febIn.disabled = disable;
+        febQtyIn.disabled = disable;
+        febRateIn.disabled = disable;
+        febAmtIn.disabled = disable;  
         marIn.disabled = disable;
+        marQtyIn.disabled = disable;
+        marRateIn.disabled = disable;
+        marAmtIn.disabled = disable;
         rate1In.disabled = disable;
         rate2In.disabled = disable;
         rate3In.disabled = disable;
@@ -378,82 +558,76 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
     });
   };
   const isSaveDisabled = () => {
+    // Only check the actual month fields that matter for saving (Apr, May, Jun, etc.)
+    const mainMonths = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
     return Object.values(tableData).some((subData) => {
-      return months.some((month) => {
+      return mainMonths.some((month) => {
         return !subData[month]?.toString().trim();
       });
     });
   };
+
+  // Function to determine if a field is read-only (month names or Amt fields)
+  const isReadOnlyField = (month: string) => {
+    // Check if it's a month name only (Apr, May, etc.) or ends with "Amt"
+    return !month.includes(" ") || month.endsWith(" Amt");
+  };
+
   const handleInputChange = (
     subCategoryId: number,
     month: string,
-    value: string,
+    value: string
   ) => {
-    setTableData((prev) => {
-      const updatedData = { ...prev };
-      const subCategoryData = updatedData[subCategoryId];
-      if (!subCategoryData) return prev;
+    // Skip if trying to edit a read-only field directly
+    if (isReadOnlyField(month)) {
+      return;
+    }
+    
+    setTableData((prev: TableData) => {
+      const updated = { ...prev };
+      const row = updated[subCategoryId];
+      if (!row) return prev;
 
-      if (month == "Apr" || month == "May" || month == "Jun") {
-        const diff = Number(value) - Number(subCategoryData[month]);
-        updateTotalQtyVals("totalQ1", diff);
-      }
-      if (month == "Jul" || month == "Aug" || month == "Sep") {
-        const diff = Number(value) - Number(subCategoryData[month]);
-        updateTotalQtyVals("totalQ2", diff);
-      }
-      if (month == "Oct" || month == "Nov" || month == "Dec") {
-        const diff = Number(value) - Number(subCategoryData[month]);
-        updateTotalQtyVals("totalQ3", diff);
-      }
-      if (month == "Jan" || month == "Feb" || month == "Mar") {
-        const diff = Number(value) - Number(subCategoryData[month]);
-        updateTotalQtyVals("totalQ4", diff);
+      // 1) If it's a bare month name, adjust that quarter's total.
+      const qKey = monthToQKey[month];
+      if (qKey) {
+        const oldVal = Number(row[month] ?? 0);
+        const newVal = Number(value);
+        updateTotalQtyVals(qKey, newVal - oldVal);
       }
 
-      // Calculate Amount Updates
-      if (month === "Rate1") {
-        subCategoryData.Amount1 = (
-          Number(subCategoryData.Qty1) * Number(value)
-        ).toFixed(2);
-      } else if (month === "Qty1") {
-        subCategoryData.Amount1 = (
-          Number(subCategoryData.Rate1) * Number(value)
-        ).toFixed(2);
-      } else if (month === "Rate2") {
-        subCategoryData.Amount2 = (
-          Number(subCategoryData.Qty2) * Number(value)
-        ).toFixed(2);
-      } else if (month === "Qty2") {
-        subCategoryData.Amount2 = (
-          Number(subCategoryData.Rate2) * Number(value)
-        ).toFixed(2);
-      } else if (month === "Rate3") {
-        subCategoryData.Amount3 = (
-          Number(subCategoryData.Qty3) * Number(value)
-        ).toFixed(2);
-      } else if (month === "Qty3") {
-        subCategoryData.Amount3 = (
-          Number(subCategoryData.Rate3) * Number(value)
-        ).toFixed(2);
-      } else if (month === "Rate4") {
-        subCategoryData.Amount4 = (
-          Number(subCategoryData.Qty4) * Number(value)
-        ).toFixed(2);
-      } else if (month === "Qt4") {
-        subCategoryData.Amount3 = (
-          Number(subCategoryData.Rate4) * Number(value)
-        ).toFixed(2);
+      // 2) If it's "XXX Qty" or "XXX Rate", recalc "XXX Amt" and update the base month value
+      if (month.includes(" ")) {
+        const [m, field] = month.split(" ");        // e.g. ["Apr","Qty"]
+        if (field === "Qty" || field === "Rate") {
+          const qtyKey = `${m} Qty`;
+          const rateKey = `${m} Rate`;
+          const amtKey = `${m} Amt`;
+
+          // pick the new qty or rate, and the old companion value
+          const qty  = field === "Qty"  ? Number(value) : Number(row[qtyKey]  ?? 0);
+          const rate = field === "Rate" ? Number(value) : Number(row[rateKey] ?? 0);
+
+          const calculatedAmount = (qty * rate).toFixed(2);
+          row[amtKey] = calculatedAmount;
+          
+          // Also update the bare month value with the calculated amount
+          if (m) {
+            row[m] = calculatedAmount;
+          }
+        }
       }
 
-      subCategoryData[month] = value;
-      updatedData[subCategoryId] = subCategoryData;
-
-      return updatedData;
+      // 3) finally store the newly typed‐in value
+      row[month] = value;
+      updated[subCategoryId] = row;
+      return updated;
     });
   };
+
   const handleSave = async () => {
     setSaveBtnState("loading");
+    console.log(tableData, "tableData");
     const budgetDetails = Object.entries(tableData).map(
       ([subCategoryId, data]) => ({
         budgetid: budgetId,
@@ -465,7 +639,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         total: "1",
         currency: "INR",
         notes: "",
-        description: "",
+        description: "", 
+        // Monthly totals (required fields)
         april: (data.Apr ?? "").toString(),
         may: (data.May ?? "").toString(),
         june: (data.Jun ?? "").toString(),
@@ -478,26 +653,65 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         january: (data.Jan ?? "").toString(),
         february: (data.Feb ?? "").toString(),
         march: (data.Mar ?? "").toString(),
+        
+         // Monthly qty/rate/amt values
+         aprQty: Number(data["Apr Qty"] ?? 1),
+         aprRate: Number(data["Apr Rate"] ?? 0),
+         aprAmt: Number(data["Apr Amt"] ?? 0),
+         
+         mayQty: Number(data["May Qty"] ?? 1),
+         mayRate: Number(data["May Rate"] ?? 0),
+         mayAmt: Number(data["May Amt"] ?? 0),
+         
+         junQty: Number(data["Jun Qty"] ?? 1),
+         junRate: Number(data["Jun Rate"] ?? 0),
+         junAmt: Number(data["Jun Amt"] ?? 0),
+         
+         julQty: Number(data["Jul Qty"] ?? 1),
+         julRate: Number(data["Jul Rate"] ?? 0),
+         julAmt: Number(data["Jul Amt"] ?? 0),
+         
+         augQty: Number(data["Aug Qty"] ?? 1),
+         augRate: Number(data["Aug Rate"] ?? 0),
+         augAmt: Number(data["Aug Amt"] ?? 0),
+         
+         sepQty: Number(data["Sep Qty"] ?? 1),
+         sepRate: Number(data["Sep Rate"] ?? 0),
+         sepAmt: Number(data["Sep Amt"] ?? 0),
+         
+         octQty: Number(data["Oct Qty"] ?? 1),
+         octRate: Number(data["Oct Rate"] ?? 0),
+         octAmt: Number(data["Oct Amt"] ?? 0),
+         
+         novQty: Number(data["Nov Qty"] ?? 1),
+         novRate: Number(data["Nov Rate"] ?? 0),
+         novAmt: Number(data["Nov Amt"] ?? 0),
+         
+         decQty: Number(data["Dec Qty"] ?? 1),
+         decRate: Number(data["Dec Rate"] ?? 0),
+         decAmt: Number(data["Dec Amt"] ?? 0),
+         
+         janQty: Number(data["Jan Qty"] ?? 1),
+         janRate: Number(data["Jan Rate"] ?? 0),
+         janAmt: Number(data["Jan Amt"] ?? 0),
+         
+         febQty: Number(data["Feb Qty"] ?? 1),
+         febRate: Number(data["Feb Rate"] ?? 0),
+         febAmt: Number(data["Feb Amt"] ?? 0),
+         
+         marQty: Number(data["Mar Qty"] ?? 1),
+         marRate: Number(data["Mar Rate"] ?? 0),
+         marAmt: Number(data["Mar Amt"] ?? 0),
+        
         activity: (filter?.map ?? "").toString(),
         deptId: Number(deptId),
         createdBy: userData.data?.user.id ?? 1,
         createdAt: new Date().toISOString(),
-        rate1: (data.Rate1 ?? "").toString(),
-        rate2: (data.Rate2 ?? "").toString(),
-        rate3: (data.Rate3 ?? "").toString(),
-        rate4: (data.Rate4 ?? "").toString(),
-        amount1: (data.Amount1 ?? "").toString(),
-        amount2: (data.Amount2 ?? "").toString(),
-        amount3: (data.Amount3 ?? "").toString(),
-        amount4: (data.Amount4 ?? "").toString(),
-        qty1: Number(data.Qty1),
-        qty2: Number(data.Qty2),
-        qty3: Number(data.Qty3),
-        qty4: Number(data.Qty4),
       }),
     );
 
     try {
+      console.log(budgetDetails, "savebudgetDetails");
       createBudgetDetails.mutate(
         {
           deptId: Number(deptId),
@@ -571,6 +785,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         currency: "INR",
         notes: "",
         description: "",
+        // Monthly totals (required fields)
         april: (data.Apr ?? "").toString(),
         may: (data.May ?? "").toString(),
         june: (data.Jun ?? "").toString(),
@@ -583,21 +798,59 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         january: (data.Jan ?? "").toString(),
         february: (data.Feb ?? "").toString(),
         march: (data.Mar ?? "").toString(),
+        
+        // Monthly qty/rate/amt values
+        aprQty: Number(data["Apr Qty"] ?? 1),
+        aprRate: Number(data["Apr Rate"] ?? 0),
+        aprAmt: Number(data["Apr Amt"] ?? 0),
+        
+        mayQty: Number(data["May Qty"] ?? 1),
+        mayRate: Number(data["May Rate"] ?? 0),
+        mayAmt: Number(data["May Amt"] ?? 0),
+        
+        junQty: Number(data["Jun Qty"] ?? 1),
+        junRate: Number(data["Jun Rate"] ?? 0),
+        junAmt: Number(data["Jun Amt"] ?? 0),
+        
+        julQty: Number(data["Jul Qty"] ?? 1),
+        julRate: Number(data["Jul Rate"] ?? 0),
+        julAmt: Number(data["Jul Amt"] ?? 0),
+        
+        augQty: Number(data["Aug Qty"] ?? 1),
+        augRate: Number(data["Aug Rate"] ?? 0),
+        augAmt: Number(data["Aug Amt"] ?? 0),
+        
+        sepQty: Number(data["Sep Qty"] ?? 1),
+        sepRate: Number(data["Sep Rate"] ?? 0),
+        sepAmt: Number(data["Sep Amt"] ?? 0),
+        
+        octQty: Number(data["Oct Qty"] ?? 1),
+        octRate: Number(data["Oct Rate"] ?? 0),
+        octAmt: Number(data["Oct Amt"] ?? 0),
+        
+        novQty: Number(data["Nov Qty"] ?? 1),
+        novRate: Number(data["Nov Rate"] ?? 0),
+        novAmt: Number(data["Nov Amt"] ?? 0),
+        
+        decQty: Number(data["Dec Qty"] ?? 1),
+        decRate: Number(data["Dec Rate"] ?? 0),
+        decAmt: Number(data["Dec Amt"] ?? 0),
+        
+        janQty: Number(data["Jan Qty"] ?? 1),
+        janRate: Number(data["Jan Rate"] ?? 0),
+        janAmt: Number(data["Jan Amt"] ?? 0),
+        
+        febQty: Number(data["Feb Qty"] ?? 1),
+        febRate: Number(data["Feb Rate"] ?? 0),
+        febAmt: Number(data["Feb Amt"] ?? 0),
+        
+        marQty: Number(data["Mar Qty"] ?? 1),
+        marRate: Number(data["Mar Rate"] ?? 0),
+        marAmt: Number(data["Mar Amt"] ?? 0),
+        
         activity: (filter?.map ?? "").toString(),
         updatedBy: userData.data?.user.id ?? 1,
         updatedAt: new Date().toISOString(),
-        rate1: (data.Rate1 ?? "").toString(),
-        rate2: (data.Rate2 ?? "").toString(),
-        rate3: (data.Rate3 ?? "").toString(),
-        rate4: (data.Rate4 ?? "").toString(),
-        amount1: (data.Amount1 ?? "").toString(),
-        amount2: (data.Amount2 ?? "").toString(),
-        amount3: (data.Amount3 ?? "").toString(),
-        amount4: (data.Amount4 ?? "").toString(),
-        qty1: Number(data.Qty1),
-        qty2: Number(data.Qty2),
-        qty3: Number(data.Qty3),
-        qty4: Number(data.Qty4),
       }),
     );
     try {
@@ -645,7 +898,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       setSaveBtnState("edit");
     }
   };
-  return (
+console.log(inputStates, "inputStates")
+return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* {JSON.stringify(tableData)} */}
       {/* <ToastContainer/> */}
@@ -796,13 +1050,10 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                       {sub.subCategoryName.toLowerCase()}
                     </td>
                     {months.map((month, key) => (
-                      <td key={month} className="border p-2">
+                      <td key={month} className="border p-2" style={{ minWidth: "100px" }}>
                         <input
-                          disabled={true}
-                          // disabled={key == 2 || key == 8 || key == 14 || key == 20 || filter?.map == 0 || (userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                          type={key % 6 == 0 ? "number" : "text"}
-                          id={sub.subCategoryId + month}
-                          className="w-full rounded border p-1"
+                          disabled={inputStates || isReadOnlyField(month)}
+                          className={`w-full rounded border p-1 ${isReadOnlyField(month) ? "bg-gray-100" : ""}`}
                           value={tableData[sub.subCategoryId]?.[month] ?? ""}
                           onChange={(e) =>
                             handleInputChange(
@@ -826,8 +1077,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         {filter?.map != 0 &&
           subdepartmentId != 0 &&
           deptId != "0" &&
-          ((userData.data?.user.role == 1 && status != "draft") ||
-            (userData.data?.user.role != 1 && status == "draft")) && (
+          ((userData.data?.user.role == 1 && status != "Draft") ||
+            (userData.data?.user.role != 1 && status == "Draft")) && (
             <div className="flex flex-row-reverse gap-2 py-2 pr-4">
               {!inputStates && (
                 <div>
@@ -852,7 +1103,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                       disabled={isSaveDisabled()}
                       onClick={() => handleUpdate()}
                     >
-                      Edit
+                      Update
                     </Button>
                   )}
                   {saveBtnState == "save" && (

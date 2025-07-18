@@ -112,7 +112,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   };
 
   return (
-    <div className=' bg-white fixed w-full  z-50'>
+    <div className='bg-white static md:fixed md:top-0 w-full z-50'>
       <div className='flex justify-between  bg-white   w-full py-5 px-2'>
         <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 items-start">
 

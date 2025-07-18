@@ -1001,7 +1001,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
-
+  console.log(personnelCostData, "personnelCostData")
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details

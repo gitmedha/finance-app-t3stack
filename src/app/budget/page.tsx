@@ -8,7 +8,7 @@ import TravelBudget from "./travel";
 import ProgramOffice from "./programOffice";
 import CapitalCost from "./capitalCost";
 import OverHeads from "./overheads";
-import type { FilterOptions } from "./budget";
+import type { FilterOptions } from "./types/budget";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
 
@@ -141,6 +141,7 @@ const Budget: React.FC = () => {
   }, [budgetRes]);
   // get all main categories
   const { data } = api.get.getCats.useQuery();
+  console.log(data,"data")
   const allQ1 =
     personnelTotals.totalQ1 +
     activityTotals.totalQ1 +
@@ -247,6 +248,7 @@ const Budget: React.FC = () => {
             sectionOpen={sectionOpen}
             subdepartmentId={filters.subdepartmentId}
             financialYear={filters.year}
+            onTotalsChange={setActivityTotals}
           />
           <TravelBudget
             section="Travel"
@@ -256,7 +258,7 @@ const Budget: React.FC = () => {
             deptId={filters.department}
             budgetId={budgetId}
             searchSubCatId={
-              data?.categories[0] ? data?.categories[0].categoryId : 1
+              data?.categories[1] ? data?.categories[1].categoryId : 1
             }
             status={status}
             setSectionOpen={setSectionOpen}

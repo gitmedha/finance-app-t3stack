@@ -1,7 +1,7 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { useEffect, useState } from 'react';
-import type { BudgetFilterFormProps } from "./budget";
+import type { BudgetFilterFormProps } from "./types/budget";
 import { Button, Flex } from '@radix-ui/themes';
 import { api } from "~/trpc/react";
 import { useSession } from 'next-auth/react';

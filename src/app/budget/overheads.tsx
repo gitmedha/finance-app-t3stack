@@ -269,189 +269,189 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       }
     })
   }
-  const handleSave = async () => {
-    setSaveBtnState("loading")
-    const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
-      budgetid: budgetId,
-      catid: categoryId,
-      subcategoryId: parseInt(subCategoryId, 10),
-      unit: 1,
-      rate: "1",
-      total: "1",
-      currency: "INR",
-      notes: "",
-      description: "",
-      april: (data.Apr ?? "").toString(),
-      may: (data.May ?? "").toString(),
-      june: (data.Jun ?? "").toString(),
-      july: (data.Jul ?? "").toString(),
-      august: (data.Aug ?? "").toString(),
-      september: (data.Sep ?? "").toString(),
-      october: (data.Oct ?? "").toString(),
-      november: (data.Nov ?? "").toString(),
-      december: (data.Dec ?? "").toString(),
-      january: (data.Jan ?? "").toString(),
-      february: (data.Feb ?? "").toString(),
-      march: (data.Mar ?? "").toString(),
-      rate1: (data.Rate1 ?? "").toString(),
-      rate2: (data.Rate2 ?? "").toString(),
-      rate3: (data.Rate3 ?? "").toString(),
-      rate4: (data.Rate4 ?? "").toString(),
-      amount1: ((data.Amount1 ?? "").toString()),
-      amount2: ((data.Amount2 ?? "").toString()),
-      amount3: ((data.Amount3 ?? "").toString()),
-      amount4: ((data.Amount4 ?? "").toString()),
-      qty1: Number(data.Qty1),
-      qty2: Number(data.Qty2),
-      qty3: Number(data.Qty3),
-      qty4: Number(data.Qty4),
-      deptId: Number(deptId),
-      createdBy: userData.data?.user.id ?? 1,
-      createdAt: new Date().toISOString(),
-    }));
+  // const handleSave = async () => {
+  //   setSaveBtnState("loading")
+  //   const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
+  //     budgetid: budgetId,
+  //     catid: categoryId,
+  //     subcategoryId: parseInt(subCategoryId, 10),
+  //     unit: 1,
+  //     rate: "1",
+  //     total: "1",
+  //     currency: "INR",
+  //     notes: "",
+  //     description: "",
+  //     april: (data.Apr ?? "").toString(),
+  //     may: (data.May ?? "").toString(),
+  //     june: (data.Jun ?? "").toString(),
+  //     july: (data.Jul ?? "").toString(),
+  //     august: (data.Aug ?? "").toString(),
+  //     september: (data.Sep ?? "").toString(),
+  //     october: (data.Oct ?? "").toString(),
+  //     november: (data.Nov ?? "").toString(),
+  //     december: (data.Dec ?? "").toString(),
+  //     january: (data.Jan ?? "").toString(),
+  //     february: (data.Feb ?? "").toString(),
+  //     march: (data.Mar ?? "").toString(),
+  //     rate1: (data.Rate1 ?? "").toString(),
+  //     rate2: (data.Rate2 ?? "").toString(),
+  //     rate3: (data.Rate3 ?? "").toString(),
+  //     rate4: (data.Rate4 ?? "").toString(),
+  //     amount1: ((data.Amount1 ?? "").toString()),
+  //     amount2: ((data.Amount2 ?? "").toString()),
+  //     amount3: ((data.Amount3 ?? "").toString()),
+  //     amount4: ((data.Amount4 ?? "").toString()),
+  //     qty1: Number(data.Qty1),
+  //     qty2: Number(data.Qty2),
+  //     qty3: Number(data.Qty3),
+  //     qty4: Number(data.Qty4),
+  //     deptId: Number(deptId),
+  //     createdBy: userData.data?.user.id ?? 1,
+  //     createdAt: new Date().toISOString(),
+  //   }));
 
-    try {
-      createBudgetDetails.mutate(
-        {
-          deptId: parseInt(deptId, 10),
-          budgetId: budgetId,
-          catId: categoryId,
-          data: budgetDetails,
-          subDeptId:subdepartmentId
-        },
-        {
-          onSuccess: (data) => {
-            toast.success('Successfully Saved', {
-              position: "bottom-center",
-              autoClose: 1000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-            });
-            setSaveBtnState("edit")
-            handelnputDisable(true)
-            setTableData((prev) => {
-              const updatedData = { ...prev }
-              data.data.map((item) => {
-                const subCategoryData = updatedData[item.subcategoryId]
-                if (subCategoryData) {
-                  updatedData[item.subcategoryId] = {
-                    ...subCategoryData,
-                    budgetDetailsId: item.budgetDetailsId,
-                  };
-                }
-              })
-              return updatedData
-            })
-            console.log("Budget created successfully:", data);
-          },
-          onError: (error) => {
-            throw new Error(JSON.stringify(error))
-            console.error("Error creating budget:", error);
-          },
-        }
-      );
-    } catch (error) {
-      toast.warn('Error While saving ', {
-        position: "bottom-center",
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      console.error("Failed to save budget details:", error);
-    }
-  };
-  const handleUpdate = async () => {
-    setSaveBtnState("loading")
-    const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
-      budgetDetailsId: data.budgetDetailsId,
-      subcategoryId: parseInt(subCategoryId, 10),
-      unit: 1,
-      rate: "1",
-      total: "1",
-      currency: "INR",
-      notes: "",
-      description: "",
-      april: (data.Apr ?? "").toString(),
-      may: (data.May ?? "").toString(),
-      june: (data.Jun ?? "").toString(),
-      july: (data.Jul ?? "").toString(),
-      august: (data.Aug ?? "").toString(),
-      september: (data.Sep ?? "").toString(),
-      october: (data.Oct ?? "").toString(),
-      november: (data.Nov ?? "").toString(),
-      december: (data.Dec ?? "").toString(),
-      january: (data.Jan ?? "").toString(),
-      february: (data.Feb ?? "").toString(),
-      march: (data.Mar ?? "").toString(),
-      updatedBy: userData.data?.user.id ?? 1,
-      updatedAt: new Date().toISOString(),
-      rate1: (data.Rate1 ?? "").toString(),
-      rate2: (data.Rate2 ?? "").toString(),
-      rate3: (data.Rate3 ?? "").toString(),
-      rate4: (data.Rate4 ?? "").toString(),
-      amount1: ((data.Amount1 ?? "").toString()),
-      amount2: ((data.Amount2 ?? "").toString()),
-      amount3: ((data.Amount3 ?? "").toString()),
-      amount4: ((data.Amount4 ?? "").toString()),
-      qty1: Number(data.Qty1),
-      qty2: Number(data.Qty2),
-      qty3: Number(data.Qty3),
-      qty4: Number(data.Qty4)
-    }));
-    try {
-      updateBudgetDetails.mutate(
-        {
-          deptId: parseInt(deptId, 10),
-          budgetId,
-          catId: categoryId,
-          data: budgetDetails,
-        },
-        {
-          onSuccess: (data) => {
-            toast.success('Successfully Saved', {
-              position: "bottom-center",
-              autoClose: 1000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-            });
-            handelnputDisable(true)
-            console.log("Budget updated successfully:", data);
-          },
-          onError: (error) => {
-            throw new Error(JSON.stringify(error))
-            console.error("Error updating budget:", error);
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Failed to update budget details:", error);
-      toast.warn('Error While saving ', {
-        position: "bottom-center",
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-    }
-    finally {
-      setSaveBtnState("edit")
-    }
-  };
+  //   try {
+  //     createBudgetDetails.mutate(
+  //       {
+  //         deptId: parseInt(deptId, 10),
+  //         budgetId: budgetId,
+  //         catId: categoryId,
+  //         data: budgetDetails,
+  //         subDeptId:subdepartmentId
+  //       },
+  //       {
+  //         onSuccess: (data) => {
+  //           toast.success('Successfully Saved', {
+  //             position: "bottom-center",
+  //             autoClose: 1000,
+  //             hideProgressBar: false,
+  //             closeOnClick: false,
+  //             pauseOnHover: true,
+  //             draggable: true,
+  //             progress: undefined,
+  //             theme: "light",
+  //           });
+  //           setSaveBtnState("edit")
+  //           handelnputDisable(true)
+  //           setTableData((prev) => {
+  //             const updatedData = { ...prev }
+  //             data.data.map((item) => {
+  //               const subCategoryData = updatedData[item.subcategoryId]
+  //               if (subCategoryData) {
+  //                 updatedData[item.subcategoryId] = {
+  //                   ...subCategoryData,
+  //                   budgetDetailsId: item.budgetDetailsId,
+  //                 };
+  //               }
+  //             })
+  //             return updatedData
+  //           })
+  //           console.log("Budget created successfully:", data);
+  //         },
+  //         onError: (error) => {
+  //           throw new Error(JSON.stringify(error))
+  //           console.error("Error creating budget:", error);
+  //         },
+  //       }
+  //     );
+  //   } catch (error) {
+  //     toast.warn('Error While saving ', {
+  //       position: "bottom-center",
+  //       autoClose: 1000,
+  //       hideProgressBar: false,
+  //       closeOnClick: false,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //       theme: "light",
+  //     });
+  //     console.error("Failed to save budget details:", error);
+  //   }
+  // };
+  // const handleUpdate = async () => {
+  //   setSaveBtnState("loading")
+  //   const budgetDetails = Object.entries(tableData).map(([subCategoryId, data]) => ({
+  //     budgetDetailsId: data.budgetDetailsId,
+  //     subcategoryId: parseInt(subCategoryId, 10),
+  //     unit: 1,
+  //     rate: "1",
+  //     total: "1",
+  //     currency: "INR",
+  //     notes: "",
+  //     description: "",
+  //     april: (data.Apr ?? "").toString(),
+  //     may: (data.May ?? "").toString(),
+  //     june: (data.Jun ?? "").toString(),
+  //     july: (data.Jul ?? "").toString(),
+  //     august: (data.Aug ?? "").toString(),
+  //     september: (data.Sep ?? "").toString(),
+  //     october: (data.Oct ?? "").toString(),
+  //     november: (data.Nov ?? "").toString(),
+  //     december: (data.Dec ?? "").toString(),
+  //     january: (data.Jan ?? "").toString(),
+  //     february: (data.Feb ?? "").toString(),
+  //     march: (data.Mar ?? "").toString(),
+  //     updatedBy: userData.data?.user.id ?? 1,
+  //     updatedAt: new Date().toISOString(),
+  //     rate1: (data.Rate1 ?? "").toString(),
+  //     rate2: (data.Rate2 ?? "").toString(),
+  //     rate3: (data.Rate3 ?? "").toString(),
+  //     rate4: (data.Rate4 ?? "").toString(),
+  //     amount1: ((data.Amount1 ?? "").toString()),
+  //     amount2: ((data.Amount2 ?? "").toString()),
+  //     amount3: ((data.Amount3 ?? "").toString()),
+  //     amount4: ((data.Amount4 ?? "").toString()),
+  //     qty1: Number(data.Qty1),
+  //     qty2: Number(data.Qty2),
+  //     qty3: Number(data.Qty3),
+  //     qty4: Number(data.Qty4)
+  //   }));
+  //   try {
+  //     updateBudgetDetails.mutate(
+  //       {
+  //         deptId: parseInt(deptId, 10),
+  //         budgetId,
+  //         catId: categoryId,
+  //         data: budgetDetails,
+  //       },
+  //       {
+  //         onSuccess: (data) => {
+  //           toast.success('Successfully Saved', {
+  //             position: "bottom-center",
+  //             autoClose: 1000,
+  //             hideProgressBar: false,
+  //             closeOnClick: false,
+  //             pauseOnHover: true,
+  //             draggable: true,
+  //             progress: undefined,
+  //             theme: "light",
+  //           });
+  //           handelnputDisable(true)
+  //           console.log("Budget updated successfully:", data);
+  //         },
+  //         onError: (error) => {
+  //           throw new Error(JSON.stringify(error))
+  //           console.error("Error updating budget:", error);
+  //         },
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.error("Failed to update budget details:", error);
+  //     toast.warn('Error While saving ', {
+  //       position: "bottom-center",
+  //       autoClose: 1000,
+  //       hideProgressBar: false,
+  //       closeOnClick: false,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //       theme: "light",
+  //     });
+  //   }
+  //   finally {
+  //     setSaveBtnState("edit")
+  //   }
+  // };
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* <ToastContainer /> */}
@@ -558,7 +558,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
                     variant="soft"
                     style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
                     disabled={isSaveDisabled()}
-                    onClick={() => handleUpdate()}
+                    // onClick={() => handleUpdate()}
                   >
                     Edit
                   </Button>}
@@ -568,7 +568,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
                   variant="soft"
                   style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
                   disabled={isSaveDisabled()}
-                  onClick={() => handleSave()}
+                  // onClick={() => handleSave()}
                 >
                   Save
                 </Button>

@@ -71,14 +71,17 @@ export default function DepartmentReport() {
   };
 
   return (
-    <div className="h-full mt-20">
+    <div className="mt-20 h-full">
       <div className="mt-8 flex justify-center">
-        <div className="container mt-6 min-h-[400px] rounded bg-white p-4 shadow lg:mt-0">
-          <div className="mb-1 flex items-center justify-between px-2">
-            <div className="flex items-center justify-start space-x-2">
+        <div className="sm:(max-w-screen-sm mx-auto) + md:(max-w-screen-md) + lg:(max-w-screen-lg mt-0) mx-auto mt-6 min-h-[400px] w-full max-w-full rounded bg-white p-4 shadow">
+          {/* search, filter and add department button */}
+          <div className="mb-1 flex w-full flex-col space-y-4 bg-white px-2 py-2 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
+            {/* search and filter */}
+            <div className="flex flex-col items-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
               <span className="font-semibold">
                 Count: {result?.departments ? result.totalCount : ""}
               </span>
+              {/* search */}
               <div className="w-[200px]">
                 <SearchInput
                   placeholder="Search departments"
@@ -86,13 +89,15 @@ export default function DepartmentReport() {
                   onChange={handleSearch}
                 />
               </div>
+              {/* filter */}
               <DepartmentFilterForm
                 filters={filters}
                 handleSelect={handleSelect}
               />
             </div>
 
-            <div className="flex items-center justify-end space-x-2">
+            {/* pagination and add department button */}
+            <div className="flex items-center justify-center md:justify-end space-x-2">
               {result?.departments && (
                 <ReactPaginationStyle
                   total={result?.totalCount}
@@ -124,12 +129,12 @@ export default function DepartmentReport() {
             </div>
           ) : (
             result?.departments && (
-              <table className="min-w-full table-auto border-collapse p-2">
+              <table className="min-w-full table-auto border-collapse">
                 <thead>
                   <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
                     {cols?.map((col) => {
                       return (
-                        <th key={col} className="p-2">
+                        <th key={col} className={`p-2 ${col === "Code" || col === "Created At" ? "hidden md:table-cell" : ""}`}>
                           {col}
                         </th>
                       );
@@ -143,11 +148,11 @@ export default function DepartmentReport() {
                       className="border-b text-sm transition-colors hover:bg-gray-100"
                     >
                       <td className="p-2">{item.departmentname}</td>
-                      <td className="p-2">{item.deptCode}</td>
+                      <td className="hidden p-2 md:table-cell">{item.deptCode}</td>
                       <td className="p-2">{item.type}</td>
                       <td className="p-2">
                         <span
-                          className={`rounded-lg px-2 py-1 text-sm ${
+                          className={` rounded-lg px-2 py-1 text-sm ${
                             item.isactive
                               ? "bg-green-100 text-green-700"
                               : "bg-red-100 text-red-700"
@@ -156,17 +161,19 @@ export default function DepartmentReport() {
                           {item.isactive ? "Active" : "InActive"}
                         </span>
                       </td>
-                      <td className="p-2">
+                      <td className="p-2 hidden md:table-cell">
                         {moment(item.createdAt).format("DD-MM-YYYY")}
                       </td>
-                      {
-                        item.isactive ? <td className="space-x-2 p-1.5">
+                      {item.isactive ? (
+                        <td className="space-x-2 p-1.5">
                           <EditDepartments item={item} refetch={refetch} />
                           <DeleteDepartment item={item} refetch={refetch} />
-                        </td>:
-                          <td><ActivateDepartment item={item} refetch={refetch} /></td>
-                      }
-                      
+                        </td>
+                      ) : (
+                        <td>
+                          <ActivateDepartment item={item} refetch={refetch} />
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

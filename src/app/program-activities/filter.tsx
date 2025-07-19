@@ -146,7 +146,7 @@ export default function ProgramActivityFilterForm({
   const FIXED_WIDTH_PX = 220;
 
   return (
-    <div className="flex w-full flex-col gap-2 md:flex-row md:gap-2">
+    <div className="flex w-full md:w-52 flex-col gap-2 md:flex-row md:gap-2">
       {dropdowns.map(
         ({
           key,

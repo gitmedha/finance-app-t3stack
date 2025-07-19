@@ -45,37 +45,10 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   },[subDeptRefetch,filters.department])
   console.log("🚀 filters:", filters);
   return (
-    <div className='flex gap-1'>
-      <div className='w-44'>
-        {/* <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
-            <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
-              <span>
-                {filters.departmentname || 'Select Department'}
-              </span>
+    <div className='w-full flex flex-col gap-1 md:flex-row'>
 
-              <RiArrowDropDownLine size={30} />
-            </button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[220px]">
-            <DropdownMenu.Item
-              className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-              onSelect={() => handleSelect('department', { departmentname: '' })}
-            >
-              All
-            </DropdownMenu.Item>
-            {data?.departments.map((dep) => (
-              <DropdownMenu.Item
-                key={dep?.id}
-                className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                onSelect={() => handleSelect('department', dep)}
-              >
-                {dep.departmentname}
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Content>
-        </DropdownMenu.Root> */}
-        
+      {/* department dropdown */}
+      <div className='w-full md:w-40 flex flex-col gap-1'>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
@@ -111,10 +84,10 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
       </div>
 
       {/* sub departments here */}
-      <div className='w-76'>
+      <div className='w-full md:w-52 flex flex-col gap-1'>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
-            <button color="gray" className='cursor-pointer !w-[320px] py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
+            <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
               <span>
                 {filters.subdepartmentname || 'Select Sub Dept'}
               </span>
@@ -123,7 +96,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
             </button>
           </DropdownMenu.Trigger>
           {
-            (userData.data?.user.role == 2 || userData.data?.user.role == 1) && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[320px]">
+            (userData.data?.user.role == 2 || userData.data?.user.role == 1) && <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[180px]">
                <DropdownMenu.Item
                   className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
                   onSelect={() => handleSelect('subdepartment', { subdepartmentname: '' })}
@@ -147,7 +120,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
       </div>
 
       {/* Level dropdown */}
-      <div className='w-44'>
+      <div className='w-full md:w-52 flex flex-col gap-1'>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
@@ -177,41 +150,8 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </div>
-
-      {/* Commented out designation dropdown 
-      <div className='w-44'>
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
-            <button color="gray" className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>
-              <span>
-                {filters.designation || 'Select Designation'}
-              </span>
-
-              <RiArrowDropDownLine size={30} />
-            </button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[180px]">
-            <DropdownMenu.Item
-              className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-              onSelect={() => handleSelect('designation', { designation: '' })}
-            >
-              All
-            </DropdownMenu.Item>
-            {designations?.designations.map((d, i) => (
-              <DropdownMenu.Item
-                key={i || d?.designation}
-                className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                onSelect={() => handleSelect('designation', d)}
-              >
-                {d.designation}
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </div>
-      */}
-
-      <div className='w-44'>
+{/* status dropdown */}
+      <div className='w-full md:w-52 flex flex-col gap-1'>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger className="w-full" asChild>
             <button color='gray' className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center '>

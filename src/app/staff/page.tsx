@@ -15,8 +15,6 @@ import { useSession } from "next-auth/react";
 import ViewStaff from "./view";
 import ActivateStaff from "./activate";
 
-
-
 const cols = [
   "Name",
   "Emp ID",
@@ -34,14 +32,18 @@ const cols = [
 ];
 
 export default function Staff() {
-  const userData = useSession()
+  const userData = useSession();
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearch] = useState("");
 
   const [filters, setFilters] = useState({
-    department: userData.data?.user.departmentId ? userData.data?.user.departmentId: 0,
-    departmentname: userData.data?.user.departmentName ? userData.data?.user.departmentName : "",
+    department: userData.data?.user.departmentId
+      ? userData.data?.user.departmentId
+      : 0,
+    departmentname: userData.data?.user.departmentName
+      ? userData.data?.user.departmentName
+      : "",
     status: "Active",
     level: 0,
     subdepartment: userData.data?.user.subDepartmentId ?? 0,
@@ -94,16 +96,13 @@ export default function Staff() {
         [name]: (value as any)?.value ?? 0, // Using 'any' with optional chaining
         departmentname: (value as any)?.label, // Using 'any' with optional chaining
       }));
-    }
-    else if (name == "subdepartment")
-    {
+    } else if (name == "subdepartment") {
       setFilters((prev) => ({
         ...prev,
         [name]: (value as any)?.value ?? 0, // Using 'any' with optional chaining
         subdepartmentname: (value as any)?.label, // Using 'any' with optional chaining
       }));
-    } 
-    else if (name === "status") {
+    } else if (name === "status") {
       setFilters((prev) => ({
         ...prev,
         [name]: (value as any)?.value, // Using 'any' with optional chaining
@@ -127,24 +126,25 @@ export default function Staff() {
   };
 
   return (
-    <div className="mt-20 flex justify-center ">
-      <div className="container mt-6 min-h-[400px] rounded bg-white py-4 px-3 shadow lg:mt-0  min-w-full ">
-        <div className="mb-1 flex items-center justify-between px-1 gap-2">
-          <div className="flex items-center justify-start space-x-2">
-            <span className="font-semibold">
-              Count: {result?.totalCount }
-            </span>
-            <div className="w-[200px]">
+    <div className="mt-20 flex justify-center">
+      <div className="container mt-6 min-h-[400px] min-w-full rounded bg-white px-3 py-4 shadow lg:mt-0">
+        <div className="mb-1 flex w-full flex-col space-y-4 bg-white px-2 py-2 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
+          <div className="flex flex-col items-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+            {/* count */}
+            <span className="font-semibold">Count: {result?.totalCount}</span>
+            {/* search */}
+            <div className="w-[180px]">
               <SearchInput
                 placeholder="Search Staff"
                 className="p-2"
                 onChange={handleSearch}
               />
             </div>
+            {/* filter */}
             <StaffFilterForm handleSelect={handleSelect} filters={filters} />
           </div>
-
-          <div className="flex items-center justify-end space-x-2">
+          {/* pagination and add staff button */}
+          <div className="flex items-center justify-center space-x-2 md:justify-end">
             {result?.staffs && (
               <ReactPaginationStyle
                 total={result?.totalCount}
@@ -159,10 +159,7 @@ export default function Staff() {
               selectedLimit={limit}
               onLimitChange={handleLimitChange}
             />
-            {
-              userData.data?.user.role == 1 && <AddStaff refetch={refetch} />
-            }
-            
+            {userData.data?.user.role == 1 && <AddStaff refetch={refetch} />}
           </div>
         </div>
 
@@ -179,30 +176,62 @@ export default function Staff() {
           </div>
         ) : (
           result?.staffs && (
-              <div className="w-full overflow-x-auto">
-                <table className="min-w-[1200px] w-full table-fixed border-collapse border border-gray-200">
+            <>
+              {/* 1. Mobile view: show cards only on <640px */}
+              <div className="sm:hidden">
+                {result?.staffs.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between border-b p-4"
+                  >
+                    <div>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {item.designation}
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <ViewStaff item={item} refetch={refetch} />
+                      {userData.data?.user.role === 1 && (
+                        <>
+                          <EditStaff item={item} refetch={refetch} />
+                          <DeleteStaff item={item} refetchStaffs={refetch} />
+                        </>
+                      )}
+                      {!item.isactive && (
+                        <ActivateStaff item={item} refetchStaffs={refetch} />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 2. Tablet+ view: show full table on ≥640px */}
+              <div className="hidden w-full overflow-x-auto sm:block">
+                <table className="w-full min-w-[1200px] table-fixed border border-gray-200">
                   <thead>
                     <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
                       {cols?.map((col, key) => {
-                        // Define width mapping based on key index
                         const widthMapping: Record<number, string> = {
-                          0: "w-[100px]", // Name
-                          1: "w-[80px]",  // Emp ID
-                          2: "w-[80px]",  // Type
-                          3: "w-[120px]", // Designation
-                          4: "w-[120px]", // Project (New)
-                          5: "w-[120px]", // Department
-                          6: "w-[140px]", // SubDepartment
-                          7: "w-[100px]", // Level
-                          8: "w-[100px]", // State
-                          9: "w-[100px]", // Location
-                          10: "w-[90px]", // Joining
-                          11: "w-[80px]", // Status
-                          12: "w-[120px]", // Actions
+                          0: "w-[100px]",
+                          1: "w-[80px]",
+                          2: "w-[80px]",
+                          3: "w-[120px]",
+                          4: "w-[120px]",
+                          5: "w-[120px]",
+                          6: "w-[140px]",
+                          7: "w-[100px]",
+                          8: "w-[100px]",
+                          9: "w-[100px]",
+                          10: "w-[90px]",
+                          11: "w-[80px]",
+                          12: "w-[120px]",
                         };
-
                         return (
-                          <th key={col} className={`p-2 ${widthMapping[key] ?? ""}`}>
+                          <th
+                            key={col}
+                            className={`p-2 ${widthMapping[key] ?? ""}`}
+                          >
                             {col.toLowerCase()}
                           </th>
                         );
@@ -211,50 +240,61 @@ export default function Staff() {
                   </thead>
                   <tbody>
                     {result?.staffs.map((item: StaffItem) => (
-                      <tr key={item?.id} className="border-b text-sm transition-colors hover:bg-gray-100">
-                        <td className="p-2 ">{item.name}</td>
-                        <td className="p-2 ">{item.empNo}</td>
-                        <td className="p-2 ">{item.nature_of_employment}</td>
-                        <td className="p-2 ">{item.designation}</td>
-                        <td className="p-2 ">{item.project}</td>
-                        <td className="p-2 ">{item.departmentname}</td>
-                        <td className="p-2 ">{item.subDeptData?.label}</td>
-                        <td className="p-2 ">{item.levelData?.label}</td>
-                        <td className="p-2 ">{item.state}</td>
-                        <td className="p-2 ">{item.location}</td>
-                        <td className="p-2 ">
+                      <tr
+                        key={item.id}
+                        className="border-b text-sm transition-colors hover:bg-gray-100"
+                      >
+                        <td className="p-2">{item.name}</td>
+                        <td className="p-2">{item.empNo}</td>
+                        <td className="p-2">{item.nature_of_employment}</td>
+                        <td className="p-2">{item.designation}</td>
+                        <td className="p-2">{item.project}</td>
+                        <td className="p-2">{item.departmentname}</td>
+                        <td className="p-2">{item.subDeptData?.label}</td>
+                        <td className="p-2">{item.levelData?.label}</td>
+                        <td className="p-2">{item.state}</td>
+                        <td className="p-2">{item.location}</td>
+                        <td className="p-2">
                           {moment(item.createdAt).format("DD/MM/YYYY")}
                         </td>
-                        <td className="">
+                        <td className="p-2">
                           <span
-                            className={`rounded-lg px-2 py-1 text-sm ${item.isactive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                              }`}
+                            className={`rounded-lg px-2 py-1 text-sm ${
+                              item.isactive
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
                           >
                             {item.isactive ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        {item.isactive ? <td className="space-x-2 p-1  w-[120px] ">
-                          <ViewStaff item={item} refetch={refetch} />
-                          {
-                            userData.data?.user.role === 1 && <EditStaff item={item} refetch={refetch} />
-                          }
-                          {
-                            userData.data?.user.role === 1 && <DeleteStaff item={item} refetchStaffs={refetch} />
-                          }                        
+                        <td className="w-[120px] space-x-2 p-1">
+                          {item.isactive ? (
+                            <>
+                              <ViewStaff item={item} refetch={refetch} />
+                              {userData.data?.user.role === 1 && (
+                                <EditStaff item={item} refetch={refetch} />
+                              )}
+                              {userData.data?.user.role === 1 && (
+                                <DeleteStaff
+                                  item={item}
+                                  refetchStaffs={refetch}
+                                />
+                              )}
+                            </>
+                          ) : (
+                            <ActivateStaff
+                              item={item}
+                              refetchStaffs={refetch}
+                            />
+                          )}
                         </td>
-                        :
-                          <td><ActivateStaff item={item} refetchStaffs={refetch} /></td>
-
-
-                        }
-                        
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
-
+            </>
           )
         )}
       </div>

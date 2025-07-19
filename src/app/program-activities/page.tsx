@@ -144,7 +144,7 @@ export default function ProgramActivities() {
             />
           </div>
 
-          <div className="flex w-full flex-col items-center justify-center space-y-2 md:flex-row md:items-center md:justify-end md:space-x-2 md:space-y-0 md:px-0">
+          <div className="flex items-center justify-center md:justify-end space-x-2">
             {result?.activities && (
               <ReactPaginationStyle
                 total={result?.totalCount}

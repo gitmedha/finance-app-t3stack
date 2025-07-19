@@ -471,12 +471,12 @@ const userData = useSession()
             else
               setSectionOpen("PROGRAM OFFICE")
           }}>
-          <h1 className=" w-1/6 capitalize font-medium">{section.toLowerCase()}</h1>
+          <h1 className="text-md w-full text-center font-medium capitalize md:w-1/6 md:text-left">{section.toLowerCase()}</h1>
           {
             programOfficeDataLodaing ? <div className="flex items-center space-x-2">
               <p className="text-sm">Loading.....</p>
             </div> :
-              <div className="flex gap-20 w-5/6">
+              <div className="hidden md:flex gap-20 w-5/6">
                 <div className="bg-primary/5 px-3 py-1 rounded-md border border-primary/20 w-1/6">
                   <span className="font-medium text-sm">Q1:</span> {(totalQty.totalQ1).toLocaleString('hi-IN')}
                 </div>

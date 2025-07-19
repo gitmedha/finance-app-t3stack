@@ -195,8 +195,8 @@ const Budget: React.FC = () => {
       {isLoading && <div>loading</div>}
 
       {budgetId != null && !isLoading && (
-        <div className="m-2 mt-24">
-          <div className="mt-20 p-2 text-right font-black text-green-900">
+        <div className="m-2  md:mt-24">
+          <div className="mt-0 md:mt-20 p-2 text-right font-black text-green-900">
             {status == "submitted" && <p>{status.toUpperCase()}</p>}
             {status == "draft" && userData.data?.user.role == 1 && (
               <p className="text-red-900">{status.toUpperCase()}</p>
@@ -204,7 +204,7 @@ const Budget: React.FC = () => {
             {status == "approved" && <p>{status.toUpperCase()}</p>}
           </div>{" "}
           {/* Header row */}
-          <div className="flex items-center gap-20 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm">
+          <div className="hidden md:flex items-center gap-20 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm">
             {/* 1st column: “BUDGET CATEGORY” */}
             <div className="flex w-1/6 items-center">
             <div className="">Budget Category</div>
@@ -306,7 +306,7 @@ const Budget: React.FC = () => {
             financialYear={filters.year}
           />{" "}
           {/* Footer row */}{" "}
-          <div className="flex items-center gap-36 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm">
+          <div className="hidden md:flex items-center gap-36 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm">
             <div className="flex w-1/6 items-center">
               <div className="">TOTAL</div>
             </div>

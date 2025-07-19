@@ -7,7 +7,13 @@ import ReactPaginationStyle from "~/app/_components/pagination/pagination";
 import ProgramActivityFilterForm from "./filter";
 import AddName from "./add";
 import { api } from "~/trpc/react";
-import type { GetProgramActivitiesResponse, ProgramActivityItem, FilterName, Option, FilterValues } from "./program-activity";
+import type {
+  GetProgramActivitiesResponse,
+  ProgramActivityItem,
+  FilterName,
+  Option,
+  FilterValues,
+} from "./program-activity";
 import { useSession } from "next-auth/react";
 import ActivateProgramActivity from "./activate";
 import EditProgramActivity from "./edit";
@@ -19,7 +25,7 @@ const cols = [
   "SubDepartment",
   "Created At",
   "Status",
-  // "Budget",  
+  // "Budget",
   "Actions",
 ];
 
@@ -50,14 +56,14 @@ export default function ProgramActivities() {
 
   // Fix: Only pass known properties to useQuery as per the type error.
   const { data, isLoading, refetch } = api.get.getProgramActivity.useQuery(
-    { 
-      page: currentPage, 
-      limit, 
+    {
+      page: currentPage,
+      limit,
       searchTerm,
-      departmentId: filters.department, 
+      departmentId: filters.department,
       subDepartmentId: filters.subdepartment,
       status: filters.status,
-      financialYear: filters.financialYear
+      financialYear: filters.financialYear,
     },
     // { enabled: false },
   );
@@ -67,13 +73,19 @@ export default function ProgramActivities() {
       await refetch();
     };
     void fetchData();
-  }, [refetch, currentPage, limit, searchTerm, filters.department, filters.subdepartment, filters.status, filters.financialYear]);
-
- 
+  }, [
+    refetch,
+    currentPage,
+    limit,
+    searchTerm,
+    filters.department,
+    filters.subdepartment,
+    filters.status,
+    filters.financialYear,
+  ]);
 
   // Cast to unknown first to avoid type error
   const result = data as GetProgramActivitiesResponse | undefined;
-
 
   // const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const debounceTimer = setTimeout(() => {
@@ -87,26 +99,23 @@ export default function ProgramActivities() {
   //     clearTimeout(debounceTimer);
   //   };
   // };
-  
+
   const handleSelect = (name: FilterName, opt: Option) => {
-    setFilters(prev => {
+    setFilters((prev) => {
       // Base update: set the field itself
       const updates: Partial<typeof prev> = {
         [name]: opt.value,
       };
-  
+
       if (name === "department") {
         updates.departmentname = opt.label;
       } else if (name === "subdepartment") {
         updates.subdepartmentname = opt.label;
       }
-  
+
       return { ...prev, ...updates };
     });
   };
-  
-
-
 
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected + 1);
@@ -115,15 +124,13 @@ export default function ProgramActivities() {
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
   };
-  console.log(result?.activities,'result');
+  console.log(result?.activities, "result");
   return (
-    <div className="mt-20 flex justify-center ">
-      <div className="container mt-6 min-h-[400px] rounded bg-white py-4 px-3 shadow lg:mt-0  min-w-full ">
-        <div className="mb-1 flex items-center justify-between px-1 gap-2">
-          <div className="flex items-center justify-start space-x-2">
-            <span className="font-semibold">
-              Count: {result?.totalCount }
-            </span>
+    <div className="mt-20 flex justify-center">
+      <div className="container mt-6 min-h-[400px] min-w-full rounded bg-white px-3 py-4 shadow lg:mt-0">
+        <div className="mb-1 flex w-full flex-col items-center space-y-4 px-1 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
+          <div className="flex w-full flex-col items-center justify-center space-y-2 md:flex-row md:items-center md:justify-start md:space-x-2 md:space-y-0">
+            <span className="font-semibold">Count: {result?.totalCount}</span>
             <div className="w-[200px]">
               <SearchInput
                 placeholder="Search Program Activity"
@@ -131,10 +138,13 @@ export default function ProgramActivities() {
                 // onChange={handleSearch}
               />
             </div>
-            <ProgramActivityFilterForm handleSelect={handleSelect} filters={filters} />
+            <ProgramActivityFilterForm
+              handleSelect={handleSelect}
+              filters={filters}
+            />
           </div>
 
-          <div className="flex items-center justify-end space-x-2">
+          <div className="flex items-center justify-center md:justify-end space-x-2">
             {result?.activities && (
               <ReactPaginationStyle
                 total={result?.totalCount}
@@ -149,10 +159,7 @@ export default function ProgramActivities() {
               selectedLimit={limit}
               onLimitChange={handleLimitChange}
             />
-            {
-              <AddName refetch={refetch} />
-            }
-            
+            {<AddName refetch={refetch} />}
           </div>
         </div>
 
@@ -169,71 +176,75 @@ export default function ProgramActivities() {
           </div>
         ) : (
           result?.activities && (
-              <div className="w-full overflow-x-auto">
-                <table className="min-w-[1200px] w-full table-fixed border-collapse border border-gray-200">
-                  <thead>
-                    <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                      {cols?.map((col, key) => {
-                        // Define width mapping based on key index
-                        const widthMapping: Record<number, string> = {
-                          0: "w-[200px]", // Name
-                          1: "w-[150px]", // Department
-                          2: "w-[150px]", // SubDepartment
-                          3: "w-[100px]", // Created At
-                          4: "w-[100px]", // Status
-                          5: "w-[120px]", // Actions
-                          // 3: "w-[120px]", // Budget
-
-                        };
-
-                        return (
-                          <th key={col} className={`p-2 ${widthMapping[key] ?? ""}`}>
-                            {col.toLowerCase()}
-                          </th>
-                        );
-                      })}
+            <div className="w-full overflow-x-auto">
+              <table className="w-full min-w-full table-auto border-collapse border border-gray-200">
+                <thead>
+                  <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
+                    <th className="whitespace-nowrap p-2">Name</th>
+                    <th className="hidden whitespace-nowrap p-2 sm:table-cell">
+                      Department
+                    </th>
+                    <th className="hidden whitespace-nowrap p-2 sm:table-cell">
+                      SubDepartment
+                    </th>
+                    <th className="whitespace-nowrap p-2">Created At</th>
+                    <th className="whitespace-nowrap p-2">Status</th>
+                    <th className="hidden whitespace-nowrap p-2 sm:table-cell">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result?.activities.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="border-b text-sm transition-colors hover:bg-gray-100"
+                    >
+                      <td className="whitespace-nowrap p-2">{item.name}</td>
+                      <td className="hidden whitespace-nowrap p-2 sm:table-cell">
+                        {item.departmentData?.label}
+                      </td>
+                      <td className="hidden whitespace-nowrap p-2 sm:table-cell">
+                        {item.subDepartmentData?.label}
+                      </td>
+                      <td className="whitespace-nowrap p-2">
+                        {moment(item.createdAt).format("DD-MM-YYYY")}
+                      </td>
+                      <td className="whitespace-nowrap p-2">
+                        <span
+                          className={`rounded-lg px-2 py-1 text-sm ${
+                            item.isActive
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {item.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td className="hidden whitespace-nowrap p-2 sm:table-cell">
+                        {item.isActive ? (
+                          <div className="flex space-x-2">
+                            <EditProgramActivity
+                              item={item}
+                              refetch={refetch}
+                            />
+                            <DeleteProgramActivity
+                              item={item}
+                              refetchProgramActivities={refetch}
+                            />
+                          </div>
+                        ) : (
+                          <ActivateProgramActivity
+                            item={item}
+                            refetchProgramActivities={refetch}
+                          />
+                        )}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {result?.activities.map((item: ProgramActivityItem) => (
-                      <tr key={item?.id} className="border-b text-sm transition-colors hover:bg-gray-100">
-                        <td className="p-2 ">{item.name}</td>
-                        <td className="p-2 ">{item.departmentData?.label}</td>
-                        <td className="p-2 ">{item.subDepartmentData?.label}</td>
-                        {/* <td className="p-2 ">{item.budgetData?.label}</td> */}
-                        <td className="p-2 ">{moment(item.createdAt).format("DD-MM-YYYY")}</td>
-                        
-                        <td className="">
-                          <span
-                            className={`rounded-lg px-2 py-1 text-sm ${item.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                              }`}
-                          >
-                            {item.isActive ? "Active" : "Inactive"}
-                          </span>
-                        </td>
-                        {item.isActive ? 
-                        <td className="space-x-2 p-1  w-[120px] ">
-                          {
-                            userData.data && <EditProgramActivity item={item} refetch={refetch} />
-                          }
-                          {
-                            userData.data && <DeleteProgramActivity item={item} refetchProgramActivities={refetch} />
-                          }                        
-                        </td>
-                        :
-                          <td><ActivateProgramActivity item={item} refetchProgramActivities={refetch} /></td> 
-                         
-
-
-                        }
-                        
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )
         )}
       </div>

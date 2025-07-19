@@ -1001,7 +1001,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
-  console.log(personnelCostData, "personnelCostData")
+  console.log(personnelCostData, "personnelCostData");
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -1019,7 +1019,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
             else setSectionOpen("PERSONNEL");
           }}
         >
-          <h1 className="w-1/6 font-medium capitalize">
+          <h1 className="text-md w-full text-center font-medium capitalize md:w-1/6 md:text-left">
             {section.toLowerCase()}
           </h1>
           {personnelCostDataLodaing ? (
@@ -1027,8 +1027,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               <p className="text-sm">Loading.....</p>
             </div>
           ) : (
-            <div className="flex w-5/6 items-center gap-20">
-              <div className="w-6/7 flex items-center gap-20">
+            <div className="hidden md:flex w-5/6 items-center gap-20">
+              <div className="w-6/7 hidden items-center gap-20 md:flex">
                 <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
                   <span className="text-sm font-medium">Q1:</span>{" "}
                   {totalQty.totalQ1.toLocaleString("hi-IN")}

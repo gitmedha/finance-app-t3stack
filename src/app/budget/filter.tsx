@@ -87,34 +87,6 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             handleSelect("subdepartment", { id: 0, departmentname:"All" })
   },[filters.department])
 
-  // useEffect(() => {
-  //   if (!userData.data?.user.departmentId && !userData.data?.user.departmentName)
-  //   {
-  //     if (data?.departments?.length) {
-  //       const sortedDepartments = [...data.departments].sort((a, b) =>
-  //         a.departmentname.localeCompare(b.departmentname)
-  //       );
-  //       if (sortedDepartments[0]) {
-  //         handleSelect("department", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].departmentname })
-  //       }
-  //     }
-  //   }
-
-  // }, [data]);
-  
-  // useEffect(()=>{
-  //   if (!userData.data?.user.subDepartmentId && !userData.data?.user.subDepartmentName) {
-  //     if (subdepartmentData?.subdepartments?.length) {
-  //       const sortedDepartments = [...subdepartmentData.subdepartments].sort((a, b) =>
-  //         a.name.localeCompare(b.name)
-  //       );
-  //       if (sortedDepartments[0]) {
-  //         handleSelect("subdepartment", { id: sortedDepartments[0].id, departmentname: sortedDepartments[0].name })
-  //       }
-  //     }
-  //   }
-  // }, [subdepartmentData])
-
   // creating the budget
   const createBudgetMutation = api.post.createBudget.useMutation();
   const handelCreateBudget = () => {
@@ -140,12 +112,12 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
   };
 
   return (
-    <div className=' bg-white fixed w-full  z-50'>
+    <div className='bg-white static md:fixed md:top-14 w-full z-50'>
       <div className='flex justify-between  bg-white   w-full py-5 px-2'>
-        <div className="flex justify-start items-center space-x-4">
+      <div className='w-full flex flex-col gap-1 md:flex-row'>
 
           {/* Year Dropdown */}
-          <div className="w-56 flex flex-col gap-1">
+          <div className="w-full md:w-56 flex flex-col gap-1">
             <label htmlFor="year-dropdown" className="text-md font-medium text-gray-700">
               Select Year :
             </label>
@@ -172,7 +144,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
             </DropdownMenu.Root>
           </div>
           {/* Department */}
-          <div className="w-56 flex flex-col gap-1">
+          <div className="w-full md:w-56 flex flex-col gap-1">
             <label htmlFor="department-dropdown" className="text-md font-medium text-gray-700">
               Select Department :
             </label>
@@ -210,13 +182,13 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
 
           </div>
           {/* Sub department dropdown */}
-          <div className="w-66 flex flex-col gap-1">
+          <div className="w-full md:w-56 flex flex-col gap-1">
             <label htmlFor="sub-department-dropdown" className="text-md font-medium text-gray-700">
               Select Sub Department :
             </label>
           <DropdownMenu.Root >
             <DropdownMenu.Trigger asChild>
-                <button className="cursor-pointer !w-[352px] py-1 border-2 border-green-700 rounded-lg text-left text-gray-500 text-md pl-2 font-normal flex justify-between items-center">
+                <button className="cursor-pointer  py-1 border-2 border-green-700 rounded-lg text-left text-gray-500 text-md pl-2 font-normal flex justify-between items-center">
                 <span>{filters.subdepartmentName}</span>
                 <RiArrowDropDownLine size={30} />
               </button>

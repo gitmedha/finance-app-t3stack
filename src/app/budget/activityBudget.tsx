@@ -21,7 +21,7 @@ import {
 import {
   monthToQKey,
   months,
-  headerMonth,  
+  headerMonth,
   monthFields,
   mainMonths,
   getBaseStructure,
@@ -135,13 +135,13 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         totalFY: 0,
       };
       // 2️⃣ If result exists, fill values + update totals
-        if (
-          programData?.result &&
-          Array.isArray(programData.result) &&
-          programData.result.length > 0
-        ) {
-          (programData.result as ProgramDataItem[]).forEach((item) => {
-            initialData[item.subcategoryId] = mapItemToBaseStructure(item);
+      if (
+        programData?.result &&
+        Array.isArray(programData.result) &&
+        programData.result.length > 0
+      ) {
+        (programData.result as ProgramDataItem[]).forEach((item) => {
+          initialData[item.subcategoryId] = mapItemToBaseStructure(item);
           totalQtyAfterBudgetDetails.totalFY +=
             Number(item.january) +
             Number(item.february) +
@@ -220,11 +220,14 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
     return Object.values(tableData).some((subData) => {
       return months.some((month) => {
         const value = subData?.[month as keyof LevelData];
-        return value === undefined || value === null || value.toString().trim() === "";
+        return (
+          value === undefined ||
+          value === null ||
+          value.toString().trim() === ""
+        );
       });
     });
   };
-  
 
   // Function to determine if a field is read-only (month names or Amt fields)
   const isReadOnlyField = (month: string) => {
@@ -249,21 +252,17 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
 
       const isNumericInput = !isNaN(Number(value.trim()));
       const parsedValue = isNumericInput ? Number(value.trim()) : 0;
-      
 
       // 1️⃣ If plain month field (e.g. "jul"), update quarter total
       if (!field) {
         const oldVal = Number(row?.[key] ?? 0);
-        const quarter =
-          monthToQuarter[key] ?? "";
+        const quarter = monthToQuarter[key] ?? "";
         if (quarter !== undefined) {
           updateTotalQtyVals(quarter, parsedValue - oldVal);
         }
-          
 
         row[key] = parsedValue;
       }
-
 
       // 2️⃣ If qty or rate is updated
       if (field === "qty" || field === "rate") {
@@ -271,8 +270,14 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         const rateKey = `${key} rate`;
         const amtKey = `${key} amount`;
 
-        const qty = field === "qty" ? parsedValue : Number(row?.[qtyKey as keyof LevelData] ?? 0);
-        const rate = field === "rate" ? parsedValue : Number(row?.[rateKey as keyof LevelData] ?? 0);
+        const qty =
+          field === "qty"
+            ? parsedValue
+            : Number(row?.[qtyKey as keyof LevelData] ?? 0);
+        const rate =
+          field === "rate"
+            ? parsedValue
+            : Number(row?.[rateKey as keyof LevelData] ?? 0);
         const amount = Number((qty * rate).toFixed(2));
 
         row[qtyKey as keyof LevelData] = qty;
@@ -292,7 +297,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       return updatedData;
     });
   };
-  
+
   const handleSave = async () => {
     setSaveBtnState("loading");
     const budgetDetails = Object.entries(tableData).map(
@@ -305,7 +310,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
           deptId,
           subdepartmentId,
           userData.data?.user.id ?? 1,
-          filter.map
+          filter.map,
         ),
     );
     await handleCreateBudget({
@@ -332,9 +337,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
           filter?.map ?? 0,
         ),
     );
-console.log(updatedBudgetDetails,'updatedBudgetDetails')
+    console.log(updatedBudgetDetails, "updatedBudgetDetails");
     await handleUpdateBudget({
-      payload: updatedBudgetDetails  as BudgetDetailsUpdate[],
+      payload: updatedBudgetDetails as BudgetDetailsUpdate[],
       updateBudgetDetails,
       handelnputDisable,
       setSaveBtnState,
@@ -346,8 +351,8 @@ console.log(updatedBudgetDetails,'updatedBudgetDetails')
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
- console.log(tableData, "activityBudget tableData")
- console.log(programData, " activityBudget programData")
+  console.log(tableData, "activityBudget tableData");
+  console.log(programData, " activityBudget programData");
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -365,7 +370,7 @@ console.log(updatedBudgetDetails,'updatedBudgetDetails')
             else setSectionOpen("Program Activities");
           }}
         >
-          <h1 className="text-md w-1/6 font-medium capitalize">
+          <h1 className="text-md w-full text-center font-medium capitalize md:w-1/6 md:text-left">
             {section.toLowerCase()}
           </h1>
           {programDataLodaing ? (
@@ -373,7 +378,7 @@ console.log(updatedBudgetDetails,'updatedBudgetDetails')
               <p className="text-sm">Loading.....</p>
             </div>
           ) : (
-            <div className="flex w-5/6 items-center gap-20">
+            <div className="hidden w-5/6 items-center gap-20 md:flex">
               <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
                 <span className="text-sm font-medium">Q1:</span>{" "}
                 {totalQty.totalQ1.toLocaleString("hi-IN")}
@@ -524,7 +529,11 @@ console.log(updatedBudgetDetails,'updatedBudgetDetails')
                         <input
                           disabled={inputStates || isReadOnlyField(month)}
                           className={`w-full rounded border p-1 ${isReadOnlyField(month) ? "bg-gray-100" : ""}`}
-                          value={tableData[sub.subCategoryId]?.[month as keyof LevelData] ?? ""}
+                          value={
+                            tableData[sub.subCategoryId]?.[
+                              month as keyof LevelData
+                            ] ?? ""
+                          }
                           onChange={(e) =>
                             handleInputChange(
                               sub.subCategoryId,

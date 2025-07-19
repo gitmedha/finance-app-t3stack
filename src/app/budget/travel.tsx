@@ -287,8 +287,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
       // 1️⃣ If plain month field (e.g. "jul"), update quarter total
       if (!field) {
         const oldVal = Number(row[baseMonth] ?? 0);
-        const quarter =
-          monthToQuarter[baseMonth];
+        const quarter = monthToQuarter[baseMonth];
         if (quarter !== undefined) {
           updateTotalQtyVals(quarter, parsedValue - oldVal);
         }
@@ -392,7 +391,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
     );
     try {
       console.log(updatedBudgetDetails, "travel updatedBudgetDetails");
-      updateBudgetDetails.mutate({
+      updateBudgetDetails.mutate(
+        {
           data: updatedBudgetDetails as UpdateTravelBudgetDetails[],
         },
         {
@@ -413,7 +413,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
     return displayColumnMap[name] ?? name;
   }
   console.log(travelData, "travel tableData");
-    return (
+  return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
@@ -430,7 +430,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
             else setSectionOpen("Travel");
           }}
         >
-          <h1 className="w-1/6 font-medium capitalize">
+          <h1 className="text-md w-full text-center font-medium capitalize md:w-1/6 md:text-left">
             {section.toLowerCase()}
           </h1>
           {travelDataLodaing ? (
@@ -438,7 +438,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
               <p className="text-sm">Loading.....</p>
             </div>
           ) : (
-            <div className="flex w-5/6 items-center gap-20">
+            <div className="hidden md:flex w-5/6 items-center gap-20">
               <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
                 <span className="text-sm font-medium">Q1:</span>{" "}
                 {totalQty.totalQ1.toLocaleString("hi-IN")}
@@ -555,7 +555,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                 {months.map((sub, idx) => (
                   <th
                     key={idx}
-                    className={`p-2 text-center  ${
+                    className={`p-2 text-center ${
                       idx % 4 === 0 || idx === 0
                         ? "border-l-4 border-gray-500"
                         : "border-l-2 border-gray-300"

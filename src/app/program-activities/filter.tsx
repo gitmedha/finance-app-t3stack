@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useRef } from "react";
@@ -22,17 +21,21 @@ export default function ProgramActivityFilterForm({
   const { data: depts = [] } = api.get.getHeadDepartments.useQuery();
   const { data: subs = [] } = api.get.getSubDepartments.useQuery(
     { deptId: filters.department ?? 0 },
-    { enabled: Boolean(filters.department) }
+    { enabled: Boolean(filters.department) },
   );
 
   // Build option arrays
   const deptOptions: Option[] = [
     { value: 0, label: "All" },
-    ...depts.filter(d => d.isactive).map(d => ({ value: d.value, label: d.label })),
+    ...depts
+      .filter((d) => d.isactive)
+      .map((d) => ({ value: d.value, label: d.label })),
   ];
   const subOptions: Option[] = [
     { value: 0, label: "All" },
-    ...subs.filter(s => s.isactive).map(s => ({ value: s.value, label: s.label })),
+    ...subs
+      .filter((s) => s.isactive)
+      .map((s) => ({ value: s.value, label: s.label })),
   ];
   const statusOptions: Option[] = [
     { value: "", label: "All" },
@@ -62,13 +65,19 @@ export default function ProgramActivityFilterForm({
   // Auto-select user’s department/sub-dept on mount
   useEffect(() => {
     if (session?.user) {
-      if (session.user.departmentId && filters.department !== session.user.departmentId) {
+      if (
+        session.user.departmentId &&
+        filters.department !== session.user.departmentId
+      ) {
         handleSelect("department", {
           value: session.user.departmentId,
           label: session.user.departmentName!,
         });
       }
-      if (session.user.subDepartmentId && filters.subdepartment !== session.user.subDepartmentId) {
+      if (
+        session.user.subDepartmentId &&
+        filters.subdepartment !== session.user.subDepartmentId
+      ) {
         handleSelect("subdepartment", {
           value: session.user.subDepartmentId,
           label: session.user.subDepartmentName!,
@@ -137,17 +146,24 @@ export default function ProgramActivityFilterForm({
   const FIXED_WIDTH_PX = 220;
 
   return (
-    <div className="flex gap-2">
+    <div className="flex w-full md:w-52 flex-col gap-2 md:flex-row md:gap-2">
       {dropdowns.map(
-        ({ key, placeholder, selected, options, disabled, show, showOptions }) =>
+        ({
+          key,
+          placeholder,
+          selected,
+          options,
+          disabled,
+          show,
+          showOptions,
+        }) =>
           show() ? (
             <div key={key}>
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
                   <button
                     disabled={disabled}
-                    style={{ width: FIXED_WIDTH_PX }}
-                    className={`flex items-center justify-between rounded-lg border px-3 py-1 h-10 text-sm ${
+                    className={`flex h-10 w-full items-center justify-between rounded-lg border px-3 py-1 text-sm md:w-[220px] ${
                       disabled ? "opacity-50" : "cursor-pointer"
                     }`}
                   >
@@ -160,14 +176,9 @@ export default function ProgramActivityFilterForm({
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
                       sideOffset={4}
-                      style={{
-                        width: FIXED_WIDTH_PX,
-                        maxHeight: 280,
-                        overflowY: "auto",
-                      }}
-                      className="rounded-lg bg-white p-1 shadow-lg"
+                      className="max-h-[280px] w-full overflow-y-auto rounded-lg bg-white p-1 shadow-lg md:w-[220px]"
                     >
-                      {options.map(opt => (
+                      {options.map((opt) => (
                         <DropdownMenu.Item
                           key={`${key}-${opt.value}`}
                           style={{ width: "100%" }}
@@ -182,9 +193,8 @@ export default function ProgramActivityFilterForm({
                 )}
               </DropdownMenu.Root>
             </div>
-          ) : null
+          ) : null,
       )}
     </div>
   );
 }
-

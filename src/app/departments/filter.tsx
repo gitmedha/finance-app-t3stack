@@ -14,7 +14,7 @@ const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({
 }) => {
   return (
     <>
-      <div className="w-56">
+      <div className="w-full md:w-56 flex flex-col gap-1">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger className="w-full" asChild>
             <button
@@ -38,7 +38,7 @@ const DepartmentFilterForm: React.FC<DepartmentFilterFormProps> = ({
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </div>
-      <div className="w-56">
+      <div className="w-full md:w-56 flex flex-col gap-1">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button

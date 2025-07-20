@@ -123,18 +123,8 @@ const AppBar = () => {
       {/* Mobile Navigation */}
       <div className="md:hidden w-full px-4 py-2">
         <div className="flex justify-between items-center">
-          {/* Logo on left */}
-          <div className="flex justify-center items-center">
-            <Image
-              src="/Medha-white-logo.svg"
-              alt="Company Logo"
-              width={40}
-              height={40}
-            />
-          </div>
-          
-          {/* Hamburger in center */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
+          {/* Hamburger on left */}
+          <div>
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-white focus:outline-none"
@@ -144,6 +134,16 @@ const AppBar = () => {
                 <RxHamburgerMenu size={24} />
               }
             </button>
+          </div>
+          
+          {/* Logo in center */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex justify-center items-center">
+            <Image
+              src="/Medha-white-logo.svg"
+              alt="Company Logo"
+              width={40}
+              height={40}
+            />
           </div>
           
           {/* User greeting and logout on right */}

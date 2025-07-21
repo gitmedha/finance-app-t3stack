@@ -312,7 +312,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       return updatedData;
     });
   };
-
+// handle save
   const handleSave = async () => {
     setSaveBtnState("loading");
     const budgetDetails = Object.entries(tableData).map(

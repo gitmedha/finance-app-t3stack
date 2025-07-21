@@ -126,7 +126,7 @@ export const budgetMasterInFinanceProject = financeProject.table("budget_master"
 	approvedBy: integer("approved_by"),
 	approvedAt: timestamp("approved_at", { withTimezone: true, mode: 'string' }),
 	departmentId: integer("department_id"),
-	status: varchar("status", { length: 50 }).default('draft'),
+	status: varchar("status", { length: 50 }).default(sql`'draft'::character varying`),
 });
 
 export const statesMasterInFinanceProject = financeProject.table("states_master", {

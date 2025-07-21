@@ -27,6 +27,7 @@ import {
   getBaseStructure,
   monthMap,
   monthToQuarter,
+  displayColumnMap,
 } from "./Constants/budgetConstants";
 import {
   handleCreateBudget,
@@ -216,17 +217,16 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       return updatedTotal;
     });
   };
+  // Only consider the purely numeric fields (qty, rate, amount, and month totals)
+  const numericMonths = months.filter((m) => !m.endsWith("notes"));
+
   const isSaveDisabled = () => {
-    return Object.values(tableData).some((subData) => {
-      return months.some((month) => {
-        const value = subData?.[month as keyof LevelData];
-        return (
-          value === undefined ||
-          value === null ||
-          value.toString().trim() === ""
-        );
-      });
-    });
+    return Object.values(tableData).some((subData) =>
+      numericMonths.some((monthKey) => {
+        const v = subData?.[monthKey as keyof LevelData];
+        return v === undefined || v === null || v.toString().trim() === "";
+      }),
+    );
   };
 
   // Function to determine if a field is read-only (month names or Amt fields)
@@ -240,6 +240,21 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
     month: string, // e.g., "apr qty", "jul", "dec amount"
     value: string,
   ) => {
+    if (month.endsWith("notes")) {
+      setTableData((prev) => {
+        const updated = { ...prev };
+        const row: LevelData = {
+          ...getBaseStructure(),
+          ...(updated[subCategoryId] ?? {}),
+        };
+
+        row[month as keyof LevelData] = value; // keep the text
+        updated[subCategoryId] = row;
+        return updated;
+      });
+      return;
+    }
+
     setTableData((prev) => {
       const updatedData = { ...prev };
       const row = updatedData[subCategoryId];
@@ -351,6 +366,11 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
+
+  function getDisplayColumn(raw: string) {
+    const key = raw.trim().toLowerCase();
+    return displayColumnMap[key] ?? raw;
+  }
   console.log(tableData, "activityBudget tableData");
   console.log(programData, " activityBudget programData");
   return (
@@ -499,13 +519,13 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                 {months.map((sub, idx) => (
                   <th
                     key={idx}
-                    className={`p-2 text-center lowercase ${
+                    className={`p-2 text-center ${
                       idx % 4 === 0 || idx === 0
                         ? "border-l-4 border-gray-500"
                         : "border-l-2 border-gray-300"
                     } `}
                   >
-                    {sub.toLowerCase()}
+                    {getDisplayColumn(sub)}
                   </th>
                 ))}
               </tr>
@@ -528,7 +548,13 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                       >
                         <input
                           disabled={inputStates || isReadOnlyField(month)}
-                          className={`w-full rounded border p-1 ${isReadOnlyField(month) ? "bg-gray-100" : ""}`}
+                          type={month.endsWith("notes") ? "text" : "number"}
+                          placeholder={
+                            month.endsWith("notes") ? "Enter notes…" : undefined
+                          }
+                          className={`w-full rounded border p-1 ${
+                            isReadOnlyField(month) ? "bg-gray-100" : ""
+                          } ${month.endsWith("notes") ? "min-w-40" : ""}`}
                           value={
                             tableData[sub.subCategoryId]?.[
                               month as keyof LevelData

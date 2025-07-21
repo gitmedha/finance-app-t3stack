@@ -182,7 +182,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
 
           </div>
           {/* Sub department dropdown */}
-          <div className="w-full md:w-56 flex flex-col gap-1">
+          <div className="w-full md:w-60 flex flex-col gap-1">
             <label htmlFor="sub-department-dropdown" className="text-md font-medium text-gray-700">
               Select Sub Department :
             </label>

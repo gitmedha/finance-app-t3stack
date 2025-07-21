@@ -84,7 +84,7 @@ export const roleMasterInFinanceProject = financeProject.table("role_master", {
 });
 
 export const salaryDetailsInFinanceProject = financeProject.table("salary_details", {
-	id: serial("id").primaryKey().notNull(),
+	id: integer("id").default(sql`nextval('finance_project.salary_details_id_seq'::regclass)`),
 	empId: integer("emp_id").notNull(),
 	salary: numeric("salary", { precision: 8, scale:  2 }).notNull(),
 	insurance: numeric("insurance", { precision: 8, scale:  2 }),
@@ -126,7 +126,7 @@ export const budgetMasterInFinanceProject = financeProject.table("budget_master"
 	approvedBy: integer("approved_by"),
 	approvedAt: timestamp("approved_at", { withTimezone: true, mode: 'string' }),
 	departmentId: integer("department_id"),
-	status: varchar("status", { length: 50 }).default("draft"),
+	status: varchar("status", { length: 50 }).default('draft'),
 });
 
 export const statesMasterInFinanceProject = financeProject.table("states_master", {

@@ -31,7 +31,8 @@ import {
   mapItemToBaseStructure,
   transformTableRowToBudgetDetail,
   transformTableRowToUpdateBudgetDetail,
-} from "./Service/budgetHelper";
+  recalculateTotals,
+  } from "./Service/budgetHelper";
 import { table } from "console";
 
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({
@@ -232,6 +233,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
     return !month.includes(" ") || month.endsWith(" amount");
   };
 
+  // Function to recalculate totals from current tableData
+  
+
   const handleInputChange = (
     subCategoryId: number,
     month: string, // e.g., "apr qty", "jul", "dec amount"
@@ -308,8 +312,14 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       updatedData[subCategoryId] = row;
       return updatedData;
     });
+    
+    // Recalculate totals after each input change
+    // setTimeout(() => {
+    //   recalculateTotals(tableData as TableData, setTotalQty);
+    // }, 0);
   };
-// handle save
+
+  // handle save
   const handleSave = async () => {
     setSaveBtnState("loading");
     const budgetDetails = Object.entries(tableData).map(
@@ -330,6 +340,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       createBudgetDetails,
       handelnputDisable,
       setSaveBtnState,
+      onSuccess: () => {
+        recalculateTotals(tableData as TableData, setTotalQty);
+      }
     });
   };
 
@@ -355,6 +368,9 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       updateBudgetDetails,
       handelnputDisable,
       setSaveBtnState,
+      onSuccess: () => {
+        recalculateTotals(tableData as TableData, setTotalQty);
+      }
     });
   };
 

@@ -7,7 +7,6 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from "~/trpc/react";
 import Marquee from "react-fast-marquee";
 import {
-  LevelData,
   totalschema,
   TravelBudgetProps,
   subTravelSchema,
@@ -47,6 +46,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
   setSectionOpen,
   subdepartmentId,
   financialYear,
+  onTotalsChange,
 }) => {
   const userData = useSession();
   const [inputStates, setInputStates] = useState<boolean>(true);
@@ -412,7 +412,11 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
   function getDisplayColumn(name: string) {
     return displayColumnMap[name] ?? name;
   }
-  console.log(travelData, "travel tableData");
+  useEffect(() => {
+    if (onTotalsChange) {
+      onTotalsChange(totalQty);
+    }
+  }, [totalQty]);
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details

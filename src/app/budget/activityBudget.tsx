@@ -3,7 +3,6 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
-// import { BiComment } from "react-icons/bi";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from "~/trpc/react";
 import Marquee from "react-fast-marquee";
@@ -13,17 +12,14 @@ import {
   subProgramActivitesSchema,
   TableData,
   ProgramDataItem,
-  BudgetDetailsPayload,
   BudgetDetailsCreate,
   BudgetDetailsUpdate,
   LevelData,
 } from "./types/budget";
 import {
-  monthToQKey,
   months,
   headerMonth,
   monthFields,
-  mainMonths,
   getBaseStructure,
   monthMap,
   monthToQuarter,
@@ -79,6 +75,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         departmentId: Number(deptId),
         subDepartmentId: subdepartmentId ?? undefined,
         budgetid: budgetId,
+        financialYear: financialYear,
       },
       {
         staleTime: 0,

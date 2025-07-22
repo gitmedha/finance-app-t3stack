@@ -1,11 +1,3 @@
-
-// export interface LevelData {
-//     budgetDetailsId: number
-//     Count: string | number;
-//     [month: string]: string | number;
-//   }
-
-
 export interface LevelData {
   budgetDetailsId: number;
   // Count: string | number;
@@ -286,5 +278,40 @@ export interface UpdateTravelBudgetDetails {
   updatedBy: number;
   updatedAt: string;
   travel_typeid: number;
+}
+
+export interface TravelBudgetProps {
+  section: string;
+  categoryId: number;
+  budgetId: number;
+  deptId: string;
+  status: string | undefined;
+  sectionOpen:
+    | null
+    | "PERSONNEL"
+    | "Program Activities"
+    | "Travel"
+    | "PROGRAM OFFICE"
+    | "CAPITAL COST"
+    | "OVERHEADS";
+  setSectionOpen: (
+    val:
+      | null
+      | "PERSONNEL"
+      | "Program Activities"
+      | "Travel"
+      | "PROGRAM OFFICE"
+      | "CAPITAL COST"
+      | "OVERHEADS",
+  ) => void;
+  subdepartmentId: number;
+  financialYear: string;
+  onTotalsChange?: (totals: {
+    totalQ1: number;
+    totalQ2: number;
+    totalQ3: number;
+    totalQ4: number;
+    totalFY: number;
+  }) => void;
 }
 

@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import type { BudgetDetailsCreate, BudgetDetailsUpdate, LevelData, ProgramDataItem } from "../types/budget";
+import type { BudgetDetailsCreate, BudgetDetailsUpdate, LevelData, ProgramDataItem, TableData, totalschema } from "../types/budget";
 import { getBaseStructure } from "../Constants/budgetConstants";
 
 
@@ -47,6 +47,7 @@ export const handleCreateBudget = async ({
   createBudgetDetails,
   handelnputDisable,
   setSaveBtnState,
+  onSuccess,
 }: {
   payload: BudgetDetailsCreate[];
   createBudgetDetails: ReturnType<
@@ -54,12 +55,16 @@ export const handleCreateBudget = async ({
   >;
   handelnputDisable: (disable: boolean) => void;
   setSaveBtnState: (state: "save" | "edit" | "loading") => void;
+  onSuccess?: () => void;
 }) => {
   try {
     const response = await createBudgetDetails.mutateAsync({
       data: payload
     });
     handleBudgetSuccess(handelnputDisable, setSaveBtnState);
+    if (onSuccess) {
+      onSuccess();
+    }
   } catch (error) {
     handleBudgetError(error);
     setSaveBtnState("save");
@@ -71,6 +76,7 @@ export const handleUpdateBudget = async ({
   updateBudgetDetails,
   handelnputDisable,
   setSaveBtnState,
+  onSuccess,
 }: {
   payload: BudgetDetailsUpdate[];
   updateBudgetDetails: ReturnType<
@@ -78,12 +84,16 @@ export const handleUpdateBudget = async ({
   >;
   handelnputDisable: (disable: boolean) => void;
   setSaveBtnState: (state: "save" | "edit" | "loading") => void;
+  onSuccess?: () => void;
 }) => {
   try {
     const response = await updateBudgetDetails.mutateAsync({
       data: payload
     });
     handleBudgetSuccess(handelnputDisable, setSaveBtnState);
+    if (onSuccess) {
+      onSuccess();
+    }
   } catch (error) {
     handleBudgetError(error);
     setSaveBtnState("edit");
@@ -329,3 +339,50 @@ export const transformTableRowToUpdateBudgetDetail = (
   updatedBy: userId,
   updatedAt: new Date().toISOString(),
 });
+
+export const recalculateTotals = (tableData: TableData, setTotalQty: (totals: totalschema) => void) => {
+  const newTotals: totalschema = {
+    totalQ1: 0,
+    totalQ2: 0,
+    totalQ3: 0,
+    totalQ4: 0,
+    totalFY: 0,
+  };
+
+  Object.values(tableData).forEach((data) => {
+    if (!data) return;
+    
+    // Q1: April, May, June (first quarter of fiscal year)
+    newTotals.totalQ1 += 
+      Number(data.april ?? 0) + 
+      Number(data.may ?? 0) + 
+      Number(data.june ?? 0);
+    
+    // Q2: July, August, September
+    newTotals.totalQ2 += 
+      Number(data.july ?? 0) + 
+      Number(data.august ?? 0) + 
+      Number(data.september ?? 0);
+    
+    // Q3: October, November, December
+    newTotals.totalQ3 += 
+      Number(data.october ?? 0) + 
+      Number(data.november ?? 0) + 
+      Number(data.december ?? 0);
+    
+    // Q4: January, February, March
+    newTotals.totalQ4 += 
+      Number(data.january ?? 0) + 
+      Number(data.february ?? 0) + 
+      Number(data.march ?? 0);
+  });
+  
+  // Set the total for fiscal year
+  newTotals.totalFY = 
+    newTotals.totalQ1 + 
+    newTotals.totalQ2 + 
+    newTotals.totalQ3 + 
+    newTotals.totalQ4;
+  
+  setTotalQty(newTotals);
+};

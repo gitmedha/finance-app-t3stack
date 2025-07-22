@@ -33,6 +33,7 @@ import {
   handleUpdateError,
   transformTableRowToUpdateBudgetDetail,
   mapItemToBaseStructure,
+  recalculateTotals,
 } from "./Service/travelHelper";
 
 const TravelBudget: React.FC<TravelBudgetProps> = ({
@@ -267,6 +268,9 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
       return updatedTotal;
     });
   };
+
+  
+  
   const handleInputChange = (
     subCategoryId: number,
     month: string, // e.g., "apr qty", "jul", "dec amount"
@@ -355,13 +359,17 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
           travel_typeid: filter?.id,
         },
         {
-          onSuccess: (data) =>
+          onSuccess: (data) => {
+            // Recalculate totals after successful save
+            recalculateTotals(tableData, setTotalQty);
+            
             handleSaveSuccess(
               data,
               setTableData,
               handelnputDisable,
               setSaveBtnState,
-            ),
+            );
+          },
           onError: (error) => {
             setSaveBtnState("save");
             throw new Error(JSON.stringify(error));
@@ -396,7 +404,12 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
           data: updatedBudgetDetails as UpdateTravelBudgetDetails[],
         },
         {
-          onSuccess: (data) => handleUpdateSuccess(data, handelnputDisable),
+          onSuccess: (data) => {
+            // Recalculate totals after successful update
+            recalculateTotals(tableData, setTotalQty);
+            
+            handleUpdateSuccess(data, handelnputDisable);
+          },
           onError: (error) => handleUpdateError(error, setSaveBtnState),
         },
       );

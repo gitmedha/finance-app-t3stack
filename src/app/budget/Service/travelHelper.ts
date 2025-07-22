@@ -1,5 +1,5 @@
 import { getBaseStructure } from "../Constants/travelConstants";
-import { LevelData, TableData, TravelDataItem } from "../types/travel";
+import { LevelData, TableData, totalschema, TravelDataItem } from "../types/travel";
 import { toast, Bounce } from "react-toastify";
 
 export const transformTableRowToBudgetDetail = (
@@ -303,3 +303,22 @@ export const mapItemToBaseStructure = (item: TravelDataItem): LevelData => ({
   march: Number(item.march),
   budgetDetailsId: Number(item.id),
 });
+export const recalculateTotals = (tableData: TableData, setTotalQty: (totals: totalschema) => void) => {
+  const newTotals: totalschema = {
+    totalQ1: 0,
+    totalQ2: 0,
+    totalQ3: 0,
+    totalQ4: 0,
+    totalFY: 0,
+  };
+  
+  Object.values(tableData).forEach((data) => {
+    newTotals.totalQ1 += Number(data.april || 0) + Number(data.may || 0) + Number(data.june || 0);
+    newTotals.totalQ2 += Number(data.july || 0) + Number(data.august || 0) + Number(data.september || 0);
+    newTotals.totalQ3 += Number(data.october || 0) + Number(data.november || 0) + Number(data.december || 0);
+    newTotals.totalQ4 += Number(data.january || 0) + Number(data.february || 0) + Number(data.march || 0);
+  });
+  
+  newTotals.totalFY = newTotals.totalQ1 + newTotals.totalQ2 + newTotals.totalQ3 + newTotals.totalQ4;
+  setTotalQty(newTotals);
+};

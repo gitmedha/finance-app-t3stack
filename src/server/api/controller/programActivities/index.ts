@@ -542,6 +542,7 @@ export const getProgramActivitiesByDepartment = protectedProcedure
       departmentId: z.number(), // Remove min(1) to allow 0 for super admin
       subDepartmentId: z.number().optional(),
       budgetid: z.number().optional(),
+      financialYear: z.string().optional(),
     }),
   )
   .query(async ({ ctx, input }) => {
@@ -568,7 +569,11 @@ export const getProgramActivitiesByDepartment = protectedProcedure
           ),
         );
       }
-
+      if (input.financialYear) {
+        filters.push(
+          eq(programActivitiesInFinanceProject.financialYear, input.financialYear),
+        );
+      }
       // Add budget filter if provided
       if (input.budgetid) {
         filters.push(

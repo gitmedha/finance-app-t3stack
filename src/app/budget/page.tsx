@@ -265,6 +265,7 @@ const Budget: React.FC = () => {
             sectionOpen={sectionOpen}
             subdepartmentId={filters.subdepartmentId}
             financialYear={filters.year}
+            onTotalsChange={setTravelTotals}
           />
           <ProgramOffice
             section="PROGRAM OFFICE"

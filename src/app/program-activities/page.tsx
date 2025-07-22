@@ -135,7 +135,7 @@ export default function ProgramActivities() {
               <SearchInput
                 placeholder="Search Program Activity"
                 className="p-2"
-                // onChange={handleSearch}
+                onChange={handleSearch}
               />
             </div>
             <ProgramActivityFilterForm

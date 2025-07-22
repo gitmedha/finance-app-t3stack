@@ -44,8 +44,15 @@ export default function EditProgramActivity({
     defaultValues: {
       name: item.name,
       description: item.description ?? "",
-      department: item.departmentData?.value ? { value: item.departmentData.value, label: item.departmentData.label } : null,
-      subDepartment: item.subDepartmentData?.value ? { value: item.subDepartmentData.value, label: item.subDepartmentData.label } : null,
+      department: item.departmentData?.value
+        ? { value: item.departmentData.value, label: item.departmentData.label }
+        : null,
+      subDepartment: item.subDepartmentData?.value
+        ? {
+            value: item.subDepartmentData.value,
+            label: item.subDepartmentData.label,
+          }
+        : null,
       financialYear: item.financialYear,
     },
   });
@@ -62,7 +69,7 @@ export default function EditProgramActivity({
   const activeDepts = depts
     .filter((d) => d.isactive)
     .map((d) => ({ value: d.value, label: d.label }));
-    console.log(activeDepts,'activeDepts');
+  console.log(activeDepts, "activeDepts");
   const activeSubs = subs
     .filter((s) => s.isactive)
     .map((s) => ({ value: s.value, label: s.label }));
@@ -117,12 +124,11 @@ export default function EditProgramActivity({
 
   // Handle form submission
   const onSubmit = (data: FormValues) => {
-    console.log(data,'data');
     if (!data.department) {
       toast.error("Please select a department", toastConfig);
       return;
     }
-    console.log(data,'data');
+
     updateActivity({
       id: item.id,
       name: data.name,
@@ -135,12 +141,11 @@ export default function EditProgramActivity({
       updatedAt: new Date().toISOString().split("T")[0] ?? "",
     });
   };
-console.log(item,'item');
-return (
+  return (
     <>
       <IconButton
         onClick={() => setIsOpen(true)}
-        className="!h-7 !w-7 !bg-primary"
+        className="!h-7 !w-7 !cursor-pointer !bg-primary"
       >
         <MdEdit size={20} />
       </IconButton>
@@ -179,7 +184,10 @@ return (
                 render={({ field }) => (
                   <Select
                     {...field}
-                    options={activeDepts.map(dept => ({ value: dept.value, label: dept.label }))}
+                    options={activeDepts.map((dept) => ({
+                      value: dept.value,
+                      label: dept.label,
+                    }))}
                     isClearable={!disableDept}
                     isDisabled={disableDept}
                     placeholder="Select Department"
@@ -196,7 +204,10 @@ return (
                 render={({ field }) => (
                   <Select
                     {...field}
-                    options={activeSubs.map(sub => ({ value: sub.value, label: sub.label }))}
+                    options={activeSubs.map((sub) => ({
+                      value: sub.value,
+                      label: sub.label,
+                    }))}
                     isClearable={!disableSub}
                     isDisabled={disableSub || !selectedDept}
                     placeholder="Select Sub Department"
@@ -215,12 +226,14 @@ return (
               control={control}
               rules={{ required: "FY is required" }}
               render={({ field: { onChange, value, ...rest } }) => (
-                <Select<{value: string, label: string}>
+                <Select<{ value: string; label: string }>
                   {...rest}
                   options={fyOptions}
                   isClearable
                   placeholder="Select FY"
-                  value={fyOptions.find(option => option.value === value) ?? null}
+                  value={
+                    fyOptions.find((option) => option.value === value) ?? null
+                  }
                   onChange={(opt) => onChange(opt?.value ?? "")}
                 />
               )}
@@ -237,6 +250,7 @@ return (
               variant="soft"
               color="gray"
               onClick={() => setIsOpen(false)}
+              type="button"
             >
               Cancel
             </Button>

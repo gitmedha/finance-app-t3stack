@@ -87,18 +87,18 @@ export default function ProgramActivities() {
   // Cast to unknown first to avoid type error
   const result = data as GetProgramActivitiesResponse | undefined;
 
-  // const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const debounceTimer = setTimeout(() => {
-  //     if (e.target.value.trim().length > 2) {
-  //       setSearch(e.target.value.trim());
-  //     } else if (e.target.value.trim().length === 0) {
-  //       setSearch("");
-  //     }
-  //   }, 1500);
-  //   return () => {
-  //     clearTimeout(debounceTimer);
-  //   };
-  // };
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const debounceTimer = setTimeout(() => {
+      if (e.target.value.trim().length > 2) {
+        setSearch(e.target.value.trim());
+      } else if (e.target.value.trim().length === 0) {
+        setSearch("");
+      }
+    }, 1500);
+    return () => {
+      clearTimeout(debounceTimer);
+    };
+  };
 
   const handleSelect = (name: FilterName, opt: Option) => {
     setFilters((prev) => {

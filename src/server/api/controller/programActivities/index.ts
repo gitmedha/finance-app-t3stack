@@ -20,6 +20,7 @@ import {
   programActivitiesInFinanceProject,
   departmentMasterInFinanceProject,
   budgetMasterInFinanceProject,
+  budgetDetailsInFinanceProject,
 } from "~/server/db/schema";
 
 const subDepartmentTable = aliasedTable(
@@ -371,6 +372,16 @@ export const deleteProgramActivity = protectedProcedure
         })
         .where(eq(programActivitiesInFinanceProject.id, input.id))
         .returning();
+
+      // Also deactivate associated budget details
+      await ctx.db
+        .update(budgetDetailsInFinanceProject)
+        .set({
+          isactive: false,
+          updatedBy: input.updatedBy,
+          updatedAt: input.updatedAt,
+        })
+        .where(eq(budgetDetailsInFinanceProject.activity, String(input.id)));
 
       return {
         success: true,

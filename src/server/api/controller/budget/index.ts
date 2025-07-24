@@ -810,6 +810,7 @@ export const getProgramActivities = protectedProcedure
       // category budgetDetails call
       const baseConditions = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
+        eq(budgetDetailsInFinanceProject.isactive, true),
       ];
       const budgetMasterbaseCondition = [
         eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
@@ -1161,6 +1162,7 @@ export const getProgramActivities = protectedProcedure
       }
       const activityTotalCondition = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
+        eq(budgetDetailsInFinanceProject.isactive, true),
       ];
       if (input.deptId == 0) {
         const budgetMasterIds = await ctx.db
@@ -1247,6 +1249,7 @@ export const getTravelCatDetials = protectedProcedure
       // category budgetDetails call
       const baseConditions = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
+        eq(budgetDetailsInFinanceProject.isactive, true),
       ];
       const budgetMasterbaseCondition = [
         eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
@@ -1639,6 +1642,7 @@ export const getTravelCatDetials = protectedProcedure
         .groupBy(staffMasterInFinanceProject.level);
       const travelTypesTotalCondition = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
+        eq(budgetDetailsInFinanceProject.isactive, true),
       ];
       if (input.deptId == 0) {
         const budgetMasterIds = await ctx.db
@@ -1718,6 +1722,7 @@ export const getProgramOfficeData = protectedProcedure
       // category budgetDetails call
       const baseConditions = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
+        eq(budgetDetailsInFinanceProject.isactive, true),
       ];
       const budgetMasterbaseCondition = [
         eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
@@ -1932,6 +1937,7 @@ export const getCapitalCostData = protectedProcedure
       // category budgetDetails call
       const baseConditions = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
+        eq(budgetDetailsInFinanceProject.isactive, true),
       ];
       const budgetMasterbaseCondition = [
         eq(budgetMasterInFinanceProject.financialYear, input.financialYear),
@@ -2146,6 +2152,7 @@ export const getOverHeadsData = protectedProcedure
       // category budgetDetails call
       const baseConditions = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
+        eq(budgetDetailsInFinanceProject.isactive, true),
       ];
       const budgetMasterbaseCondition = [
         eq(budgetMasterInFinanceProject.financialYear, input.financialYear),

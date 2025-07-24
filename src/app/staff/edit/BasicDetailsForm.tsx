@@ -50,6 +50,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const departmentId = watch("departmentData")?.value
 
   const { mutate: editStaff } = api.post.editStaff.useMutation({
+      
     async onSuccess(data) {
       await apiContext.get.getStaffs.invalidate();
       if (data.staff) {
@@ -58,6 +59,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       refetchStaffs();
     },
     onError(err) {
+      console.log(err.message, "err.message");
       console.error("Error adding staff:", err);
     },
   });
@@ -81,23 +83,24 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
     try {
+      console.log(data, "Edit data");
       const submissionData = {
         id: data.id,
         name: data.name,
         empNo: data.empNo,
-        designation: data.designation,
-        natureOfEmployment: data.typeData?.value.toString(),
-        project: data.project,
-        department: Number(data.departmentData?.value),
-        stateId: data.statesData?.label.toString(),
-        locationId: data.locationData?.label.toString(),
-        updatedBy: userData.data?.user.id ?? 1,
-        isactive: true,
+        designation: data?.designation,
+        natureOfEmployment: data?.typeData?.value?.toString() ?? undefined,
+        project: data.project ?? undefined,
+        department: Number(data?.departmentData?.value),
+        stateId: data?.statesData?.label ? data?.statesData?.label?.toString() : undefined,
+        locationId: data?.locationData?.label ? data?.locationData?.label?.toString() : undefined,
         level: Number(data.levelData?.value),
         subDeptid:Number(data.subDeptData?.value),
+        updatedBy: userData.data?.user.id ?? 1,
+        isactive: true,
         updatedAt: new Date().toISOString().split("T")[0] ?? "",
       };
-
+console.log(submissionData, "submissionData");
       editStaff(submissionData);
       reset(submissionData);
       toast.success('Successfully Edited', {

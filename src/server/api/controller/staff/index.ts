@@ -261,6 +261,7 @@ export const editStaff = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
+      console.log(input, "edit input");
       const { id, updatedBy, updatedAt, natureOfEmployment,...fieldsToUpdate } = input;
       // Check if the staff member exists
       const existingStaff =
@@ -286,7 +287,7 @@ export const editStaff = protectedProcedure
         })
         .where(eq(staffMaster.id, id))
         .returning()
-
+      console.log(updatedStaff, "updatedStaff");
       return {
         success: true,
         message: "Staff member updated successfully",

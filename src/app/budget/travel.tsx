@@ -188,7 +188,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
         (sum, stat) => sum + Number(stat.employeeCount),
         0,
       );
-
       setSelectedLevelStats({
         level: 0,
         employeeCount: totalEmployeeCount,
@@ -208,7 +207,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
     } else {
       // If we still didn't find a match, set employee count to 0
       setSelectedLevelStats({
-        level: filter?.id ?? 0,
+        level: filter?.id || 0,
         employeeCount: 0,
       });
     }
@@ -217,7 +216,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
   // Populate quantity fields when selectedLevelStats changes
   useEffect(() => {
     if (!selectedLevelStats) return;
-    if (selectedLevelStats?.level == 0) return;
+    // if (selectedLevelStats?.level == 0) return;
+    console.log(selectedLevelStats, "selectedLevelStats");
     setTableData((prevData) => {
       const updatedData = JSON.parse(JSON.stringify(prevData)) as TableData;
       console.log(updatedData, "updatedData");
@@ -230,6 +230,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
         if (!row) return;
         console.log(row, "row");
         qtyFields.forEach((qtyField) => {
+          console.log(qtyField, "qtyField");
+          console.log(selectedLevelStats.employeeCount, "selectedLevelStats.employeeCount");
           row[qtyField] = Number(selectedLevelStats.employeeCount);
         });
       });

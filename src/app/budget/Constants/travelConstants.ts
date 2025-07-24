@@ -9,7 +9,7 @@ export const subTravels: subTravelSchema[] = [
   { map: 5, id: 11, name: "AVP V" },
   { map: 6, id: 12, name: "VP VI" },
   { map: 7, id: 13, name: "CXO/Director VII" },
-  { map: 8, id: 14, name: "Others - Interns, Volunteers, PTCs VIII" },
+  // { map: 8, id: 14, name: "Others - Interns, Volunteers, PTCs VIII" },
 ];
 
 export const months = [

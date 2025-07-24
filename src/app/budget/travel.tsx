@@ -14,6 +14,7 @@ import {
   BudgetDetails,
   UpdateTravelBudgetDetails,
   TravelDataItem,
+  LevelData,
 } from "./types/travel";
 import {
   subTravels,
@@ -63,6 +64,10 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
   });
   const [tableData, setTableData] = useState<TableData>({});
   const [filter, setFilter] = useState(subTravels[0]);
+  const [selectedLevelStats, setSelectedLevelStats] = useState<{
+    level: number;
+    employeeCount: number;
+  } | null>(null);
 
   //api call
   const { data: travelData, isLoading: travelDataLodaing } =
@@ -105,7 +110,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
             totalQ4: 0,
             totalFY: 0,
           };
-          console.log(travelData.result, "travelData.result");
           (travelData.result as TravelDataItem[]).forEach((item) => {
             initialData[item.subcategoryId] = mapItemToBaseStructure(item);
             totalQtyAfterBudgetDetails.totalFY +=
@@ -170,6 +174,69 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
       }
     }
   }, [travelData]);
+
+  // Update selected level stats when filter changes or travelData updates
+  useEffect(() => {
+    if (!travelData?.levelStats) {
+      setSelectedLevelStats(null);
+      return;
+    }
+
+    if (filter?.id === 0) {
+      // When "All" is selected, sum up all employee counts
+      const totalEmployeeCount = travelData.levelStats.reduce(
+        (sum, stat) => sum + Number(stat.employeeCount),
+        0,
+      );
+
+      setSelectedLevelStats({
+        level: 0,
+        employeeCount: totalEmployeeCount,
+      });
+      return;
+    }
+    //  Direct match between filter.id and level
+    const matchingLevelStat = travelData.levelStats.find(
+      (stat) => Number(stat.level) === filter?.id,
+    );
+
+    if (matchingLevelStat) {
+      setSelectedLevelStats({
+        level: Number(matchingLevelStat.level),
+        employeeCount: matchingLevelStat.employeeCount,
+      });
+    } else {
+      // If we still didn't find a match, set employee count to 0
+      setSelectedLevelStats({
+        level: filter?.id ?? 0,
+        employeeCount: 0,
+      });
+    }
+  }, [travelData?.levelStats, filter?.id]);
+
+  // Populate quantity fields when selectedLevelStats changes
+  useEffect(() => {
+    if (!selectedLevelStats) return;
+    if (selectedLevelStats?.level == 0) return;
+    setTableData((prevData) => {
+      const updatedData = JSON.parse(JSON.stringify(prevData)) as TableData;
+      console.log(updatedData, "updatedData");
+      // Get all qty field names
+      const qtyFields = months.filter((month) => month.endsWith("qty"));
+      console.log(qtyFields, "qtyFields");
+      // Update all rows
+      Object.keys(updatedData).forEach((subCategoryId) => {
+        const row = updatedData[subCategoryId];
+        if (!row) return;
+        console.log(row, "row");
+        qtyFields.forEach((qtyField) => {
+          row[qtyField] = Number(selectedLevelStats.employeeCount);
+        });
+      });
+
+      return updatedData;
+    });
+  }, [selectedLevelStats]);
 
   useEffect(() => {
     handelnputDisable(true);
@@ -269,8 +336,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
     });
   };
 
-  
-  
   const handleInputChange = (
     subCategoryId: number,
     month: string, // e.g., "apr qty", "jul", "dec amount"
@@ -362,7 +427,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
           onSuccess: (data) => {
             // Recalculate totals after successful save
             recalculateTotals(tableData, setTotalQty);
-            
+
             handleSaveSuccess(
               data,
               setTableData,
@@ -407,7 +472,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
           onSuccess: (data) => {
             // Recalculate totals after successful update
             recalculateTotals(tableData, setTotalQty);
-            
+
             handleUpdateSuccess(data, handelnputDisable);
           },
           onError: (error) => handleUpdateError(error, setSaveBtnState),
@@ -430,6 +495,9 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
+
+  console.log(travelData, "travelData");
+  console.log(selectedLevelStats, "selectedLevelStats");
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -455,7 +523,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
               <p className="text-sm">Loading.....</p>
             </div>
           ) : (
-            <div className="hidden md:flex w-5/6 items-center gap-20">
+            <div className="hidden w-5/6 items-center gap-20 md:flex">
               <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
                 <span className="text-sm font-medium">Q1:</span>{" "}
                 {totalQty.totalQ1.toLocaleString("hi-IN")}

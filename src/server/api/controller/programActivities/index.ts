@@ -439,6 +439,12 @@ export const reactivateProgramActivity = protectedProcedure
         });
       }
 
+      // Reactivate all related budget details
+      await ctx.db
+        .update(budgetDetailsInFinanceProject)
+        .set({ isactive: true })
+        .where(eq(budgetDetailsInFinanceProject.activity, String(input.id)));
+
       return {
         success: true,
         message: "Program activity reactivated successfully",

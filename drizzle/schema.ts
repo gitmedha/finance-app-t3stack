@@ -84,7 +84,7 @@ export const roleMasterInFinanceProject = financeProject.table("role_master", {
 });
 
 export const salaryDetailsInFinanceProject = financeProject.table("salary_details", {
-	id: integer("id").default(sql`nextval('finance_project.salary_details_id_seq'::regclass)`),
+	id: integer("id").default(sql`nextval('finance_project.salary_details_id_seq')`).primaryKey().notNull(),
 	empId: integer("emp_id").notNull(),
 	salary: numeric("salary", { precision: 8, scale:  2 }).notNull(),
 	insurance: numeric("insurance", { precision: 8, scale:  2 }),
@@ -397,4 +397,16 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
 	octNotes: text("oct_notes"),
 	novNotes: text("nov_notes"),
 	decNotes: text("dec_notes"),
+	aprTrips: integer("apr_trips"),
+	mayTrips: integer("may_trips"),
+	junTrips: integer("jun_trips"),
+	julTrips: integer("jul_trips"),
+	augTrips: integer("aug_trips"),
+	sepTrips: integer("sep_trips"),
+	octTrips: integer("oct_trips"),
+	novTrips: integer("nov_trips"),
+	decTrips: integer("dec_trips"),
+	janTrips: integer("jan_trips"),
+	febTrips: integer("feb_trips"),
+	marTrips: integer("mar_trips"),
 });

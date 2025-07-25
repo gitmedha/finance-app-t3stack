@@ -207,7 +207,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
     } else {
       // If we still didn't find a match, set employee count to 0
       setSelectedLevelStats({
-        level: filter?.id || 0,
+        level: filter?.id ?? 0,
         employeeCount: 0,
       });
     }
@@ -216,26 +216,23 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
   // Populate quantity fields when selectedLevelStats changes
   useEffect(() => {
     if (!selectedLevelStats) return;
-    // if (selectedLevelStats?.level == 0) return;
-    console.log(selectedLevelStats, "selectedLevelStats");
     setTableData((prevData) => {
       const updatedData = JSON.parse(JSON.stringify(prevData)) as TableData;
-      console.log(updatedData, "updatedData");
-      // Get all qty field names
       const qtyFields = months.filter((month) => month.endsWith("qty"));
-      console.log(qtyFields, "qtyFields");
-      // Update all rows
       Object.keys(updatedData).forEach((subCategoryId) => {
         const row = updatedData[subCategoryId];
         if (!row) return;
-        console.log(row, "row");
         qtyFields.forEach((qtyField) => {
-          console.log(qtyField, "qtyField");
-          console.log(selectedLevelStats.employeeCount, "selectedLevelStats.employeeCount");
-          row[qtyField] = Number(selectedLevelStats.employeeCount);
+          if (
+            row[qtyField] === undefined ||
+            row[qtyField] === null ||
+            // row[qtyField] === "" ||
+            row[qtyField] === 0
+          ) {
+            row[qtyField] = Number(selectedLevelStats.employeeCount);
+          }
         });
       });
-
       return updatedData;
     });
   }, [selectedLevelStats]);
@@ -366,16 +363,20 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
       }
 
       // 2️⃣ If qty or rate is updated
-      if (field === "qty" || field === "rate") {
+      if (field === "qty" || field === "rate" || field === "trips") {
         const qtyKey = `${baseMonth} qty`;
+        const tripsKey = `${baseMonth} trips`;
         const rateKey = `${baseMonth} rate`;
         const amtKey = `${baseMonth} amount`;
 
         const qty = field === "qty" ? parsedValue : Number(row[qtyKey] ?? 0);
+        const trips =
+          field === "trips" ? parsedValue : Number(row[tripsKey] ?? 0);
         const rate = field === "rate" ? parsedValue : Number(row[rateKey] ?? 0);
-        const amount = Number((qty * rate).toFixed(2));
+        const amount = Number((qty * rate * trips).toFixed(2));
 
         row[qtyKey] = qty;
+        row[tripsKey] = trips;
         row[rateKey] = rate;
         row[amtKey] = amount;
         row[monthMap[baseMonth] ?? baseMonth] = amount; // Used for total calculation
@@ -415,7 +416,6 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
     );
 
     try {
-      console.log(budgetDetails, "Travel budgetDetails");
       createBudgetDetails.mutate(
         {
           deptId: Number(deptId),
@@ -677,7 +677,12 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                               type={key % 6 == 0 ? "number" : "text"}
                               className={`w-full rounded border p-1 ${isReadOnlyField(month) ? "bg-gray-100" : ""}`}
                               value={
-                                tableData[sub.subCategoryId]?.[month] ?? ""
+                                Number.isNaN(
+                                  tableData[sub.subCategoryId]?.[month],
+                                )
+                                  ? ""
+                                  : (tableData[sub.subCategoryId]?.[month] ??
+                                    "")
                               }
                               onChange={(e) =>
                                 handleInputChange(

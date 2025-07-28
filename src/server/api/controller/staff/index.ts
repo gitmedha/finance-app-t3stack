@@ -348,12 +348,19 @@ export const deleteStaff = protectedProcedure
           isactive: false,
         })
         .where(eq(staffMaster.id, id))
-        .returning(); // Correct usage of eq()
-      // .returning("*");
+        .returning();
+
+      // Also update salary details to set isactive to false
+      await ctx.db
+        .update(salaryMaster)
+        .set({
+          isactive: false,
+        })
+        .where(eq(salaryMaster.empId, id));
 
       return {
         success: true,
-        message: "Staff member deleted successfully",
+        message: "Staff member and associated salary details deleted successfully",
         staff: updatedStaff[0], // Return the updated staff record
       };
     } catch (error) {
@@ -420,12 +427,19 @@ export const activateStaff = protectedProcedure
           updatedBy:input.updatedBy
         })
         .where(eq(staffMaster.id, id))
-        .returning(); // Correct usage of eq()
-      // .returning("*");
+        .returning();
+
+      // Also update salary details to set isactive to true
+      await ctx.db
+        .update(salaryMaster)
+        .set({
+          isactive: true,
+        })  
+        .where(eq(salaryMaster.empId, id));
 
       return {
         success: true,
-        message: "Staff member activated successfully",
+        message: "Staff member and associated salary details activated successfully",
         staff: updatedStaff[0], // Return the updated staff record
       };
     } catch (error) {

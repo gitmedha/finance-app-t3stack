@@ -130,7 +130,13 @@ export const getStaffs = protectedProcedure
 
     const totalCount = totalCountResult[0]?.count ?? 0;
 
-    const updatedStaffs = [];
+    const updatedStaffs: Array<typeof staffs[0] & {
+      statesData: { value: string | null; label: string | null };
+      locationData: { value: string | null; label: string | null };
+      departmentData: { value: number | null; label: string | null };
+      levelData: { value: number | null; label: string | null };
+      subDeptData: { value: number | null; label: string | null };
+    }> = [];
 
     for (const staff of staffs) {
       const statesData = {
@@ -190,7 +196,7 @@ export const addStaff = protectedProcedure
       description: z.string().optional().nullable(),
       createdBy: z.number().min(1, "Invalid creator ID"),
       createdAt: z.string(),
-      subDeptId: z.number().optional()
+      subDeptId: z.number().optional().nullable()
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -256,7 +262,7 @@ export const editStaff = protectedProcedure
       project: z.string().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
-      subDeptid: z.number().optional()
+      subDeptid: z.number().optional().nullable()
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -348,12 +354,19 @@ export const deleteStaff = protectedProcedure
           isactive: false,
         })
         .where(eq(staffMaster.id, id))
-        .returning(); // Correct usage of eq()
-      // .returning("*");
+        .returning();
+
+      // Also update salary details to set isactive to false
+      await ctx.db
+        .update(salaryMaster)
+        .set({
+          isactive: false,
+        })
+        .where(eq(salaryMaster.empId, id));
 
       return {
         success: true,
-        message: "Staff member deleted successfully",
+        message: "Staff member and associated salary details deleted successfully",
         staff: updatedStaff[0], // Return the updated staff record
       };
     } catch (error) {
@@ -420,12 +433,19 @@ export const activateStaff = protectedProcedure
           updatedBy:input.updatedBy
         })
         .where(eq(staffMaster.id, id))
-        .returning(); // Correct usage of eq()
-      // .returning("*");
+        .returning();
+
+      // Also update salary details to set isactive to true
+      await ctx.db
+        .update(salaryMaster)
+        .set({
+          isactive: true,
+        })  
+        .where(eq(salaryMaster.empId, id));
 
       return {
         success: true,
-        message: "Staff member activated successfully",
+        message: "Staff member and associated salary details activated successfully",
         staff: updatedStaff[0], // Return the updated staff record
       };
     } catch (error) {

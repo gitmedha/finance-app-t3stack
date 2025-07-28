@@ -130,7 +130,13 @@ export const getStaffs = protectedProcedure
 
     const totalCount = totalCountResult[0]?.count ?? 0;
 
-    const updatedStaffs = [];
+    const updatedStaffs: Array<typeof staffs[0] & {
+      statesData: { value: string | null; label: string | null };
+      locationData: { value: string | null; label: string | null };
+      departmentData: { value: number | null; label: string | null };
+      levelData: { value: number | null; label: string | null };
+      subDeptData: { value: number | null; label: string | null };
+    }> = [];
 
     for (const staff of staffs) {
       const statesData = {
@@ -190,7 +196,7 @@ export const addStaff = protectedProcedure
       description: z.string().optional().nullable(),
       createdBy: z.number().min(1, "Invalid creator ID"),
       createdAt: z.string(),
-      subDeptId: z.number().optional()
+      subDeptId: z.number().optional().nullable()
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -256,7 +262,7 @@ export const editStaff = protectedProcedure
       project: z.string().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
-      subDeptid: z.number().optional()
+      subDeptid: z.number().optional().nullable()
     }),
   )
   .mutation(async ({ ctx, input }) => {

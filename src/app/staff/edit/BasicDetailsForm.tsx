@@ -95,7 +95,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         stateId: data?.statesData?.label ? data?.statesData?.label?.toString() : undefined,
         locationId: data?.locationData?.label ? data?.locationData?.label?.toString() : undefined,
         level: Number(data.levelData?.value),
-        subDeptid:Number(data.subDeptData?.value),
+        subDeptid: data.subDeptData?.value ? Number(data.subDeptData.value) : null,
         updatedBy: userData.data?.user.id ?? 1,
         isactive: true,
         updatedAt: new Date().toISOString().split("T")[0] ?? "",

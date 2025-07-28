@@ -96,7 +96,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         locationId: data.locationData.label.toString(),
         departmentId: Number(data.departmenData.value),
         level:Number(data.levelData.value),
-        subDeptId: Number(data.subDepartmentData.value)
+        subDeptId: data.subDepartmentData?.value ? Number(data.subDepartmentData.value) : null
       };
       setActiveStaffDetails(submissionData);
       addStaff(submissionData);
@@ -180,7 +180,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             Email <span className="text-red-400">*</span>
           </label>
           <input
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
             placeholder="Enter staff email"
             {...register("email", { required: "Email required is required" })}
           />

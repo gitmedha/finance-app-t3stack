@@ -8,7 +8,7 @@ import {
   addStaffSalaryDetails,
   editStaffSalaryDetails,
 } from "../controller/salaryDetails";
-import { addBudgetDetails, createBudget, savePersonalBudgetDetails, saveTravelBudgetDetails, updateBudgetDetails, updatePersonalBudgetDetails, updateStatusBudgetDetails, updateTravelBudgetDetails } from "../controller/budget";
+import { addBudgetDetails, addProgramOfficeBudgetDetails, createBudget, savePersonalBudgetDetails, saveTravelBudgetDetails, updateBudgetDetails,  updatePersonalBudgetDetails, updateProgramOfficeBudgetDetails, updateStatusBudgetDetails, updateTravelBudgetDetails } from "../controller/budget";
 import { addProgramActivities, reactivateProgramActivity, updateProgramActivity } from "../controller/programActivities";
 
 export const postRouter = createTRPCRouter({
@@ -25,8 +25,10 @@ export const postRouter = createTRPCRouter({
   editStaffSalaryDetails,
   createBudget,
   updateBudgetDetails,
+  updateProgramOfficeBudgetDetails,
   updateTravelBudgetDetails,
   addBudgetDetails,
+  addProgramOfficeBudgetDetails,
   updateStatusBudgetDetails,
   savePersonalBudgetDetails,
   updatePersonalBudgetDetails,

@@ -315,7 +315,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
               <div
                 key={label}
-                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 text-center"
+                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center lg:flex-row lg:justify-center lg:gap-1"
               >
                 <span className="text-sm font-medium">{label}:</span>{" "}
                 {(label === "Total"

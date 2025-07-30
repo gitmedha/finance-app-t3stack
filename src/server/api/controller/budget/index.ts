@@ -539,6 +539,232 @@ export const addBudgetDetails = protectedProcedure
     }
   });
 
+  export const addCapitalCostBudgetDetails = protectedProcedure
+  .input(z.object({
+      data: z.array(
+        z.object({
+          budgetid: z.number(),
+          catid: z.number(),
+          subcategoryId: z.number(),
+          unit: z.number(),
+          rate: z.string(),
+          total: z.string(),
+          currency: z.string(),
+          notes: z.string().optional(),
+          description: z.string().optional(),
+          aprQty: z.number().optional(),
+          aprRate: z.number().optional(),
+          aprAmt: z.number().optional(),
+          aprNotes: z.string().optional(),
+          april: z.number(),
+          mayQty: z.number().optional(),
+          mayRate: z.number().optional(),
+          mayAmt: z.number().optional(),
+          may: z.number(),
+          mayNotes: z.string().optional(),
+          junQty: z.number().optional(),
+          junRate: z.number().optional(),
+          junAmt: z.number().optional(),
+          june: z.number(),
+          junNotes: z.string().optional(),
+          julQty: z.number().optional(),
+          julRate: z.number().optional(),
+          julAmt: z.number().optional(),
+          july: z.number(),
+          julNotes: z.string().optional(),
+          augQty: z.number().optional(),
+          augRate: z.number().optional(),
+          augAmt: z.number().optional(),
+          august: z.number(),
+          augNotes: z.string().optional(),
+          sepQty: z.number().optional(),
+          sepRate: z.number().optional(),
+          sepAmt: z.number().optional(),
+          september: z.number(),
+          sepNotes: z.string().optional(),
+          octQty: z.number().optional(),
+          octRate: z.number().optional(),
+          octAmt: z.number().optional(),
+          october: z.number(),
+          octNotes: z.string().optional(),
+          novQty: z.number().optional(),
+          novRate: z.number().optional(),
+          novAmt: z.number().optional(),
+          november: z.number(),
+          novNotes: z.string().optional(),
+          decQty: z.number().optional(),
+          decRate: z.number().optional(),
+          decAmt: z.number().optional(),
+          december: z.number(),
+          decNotes: z.string().optional(),
+          janQty: z.number().optional(),
+          janRate: z.number().optional(),
+          janAmt: z.number().optional(),
+          january: z.number(),
+          janNotes: z.string().optional(),
+          febQty: z.number().optional(),
+          febRate: z.number().optional(),
+          febAmt: z.number().optional(),
+          february: z.number(),
+          febNotes: z.string().optional(),
+          marQty: z.number().optional(),
+          marRate: z.number().optional(),
+          marAmt: z.number().optional(),
+          march: z.number(),
+          marNotes: z.string().optional(),
+          deptId: z.number(),
+          subDeptId: z.number(),
+          createdBy: z.number(),
+          createdAt: z.string()
+        }),
+      ),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      
+      try {
+          console.log(input, "addBudgetDetails input");
+        // Extract data from input
+        const { data } = input;
+        // Map data to include shared fields and default values
+        console.log(data, "addBudgetDetails data");
+        const recordsToInsert = [];
+        for (const item of data) {
+          const baseConditions = [
+            eq(budgetDetailsInFinanceProject.budgetid, item.budgetid),
+            eq(budgetDetailsInFinanceProject.catid, item.catid),
+            eq(budgetDetailsInFinanceProject.subcategoryId, item.subcategoryId),
+            eq(budgetDetailsInFinanceProject.subDeptid, item.subDeptId),
+          ];
+  
+          const existingRecord = await ctx.db
+            .select()
+            .from(budgetDetailsInFinanceProject)
+            .where(and(...baseConditions));
+          if (!existingRecord || existingRecord.length == 0) {
+            recordsToInsert.push({
+              budgetid: item.budgetid,
+              catid: item.catid,
+              subDeptid: item.subDeptId,
+              deptid: item.deptId,
+              subcategoryId: item.subcategoryId,
+              unit: item.unit,
+              rate: item.rate,
+              total: item.total,
+              currency: item.currency,
+              notes: item.notes ?? null,
+              description: item.description ?? null,
+              aprQty: item.aprQty ?? 0,
+              aprRate: item.aprRate !== undefined ? String(item.aprRate) : "0",
+              aprAmt: item.aprAmt !== undefined ? String(item.aprAmt) : "0",
+              april: item.april !== undefined ? String(item.april) : "0",
+              aprNotes: item.aprNotes ?? null,
+              mayQty: item.mayQty ?? 0,
+              mayRate: item.mayRate !== undefined ? String(item.mayRate) : "0",
+              mayAmt: item.mayAmt !== undefined ? String(item.mayAmt) : "0",
+              may: item.may !== undefined ? String(item.may) : "0",
+              mayNotes: item.mayNotes ?? null,
+              junQty: item.junQty ?? 0,
+              junRate: item.junRate !== undefined ? String(item.junRate) : "0",
+              junAmt: item.junAmt !== undefined ? String(item.junAmt) : "0",
+              june: item.june !== undefined ? String(item.june) : "0",
+              junNotes: item.junNotes ?? null,
+              julQty: item.julQty ?? 0,
+              julRate: item.julRate !== undefined ? String(item.julRate) : "0",
+              julAmt: item.julAmt !== undefined ? String(item.julAmt) : "0",
+              july: item.july !== undefined ? String(item.july) : "0",
+              julNotes: item.julNotes ?? null,
+              augQty: item.augQty ?? 0,
+              augRate: item.augRate !== undefined ? String(item.augRate) : "0",
+              augAmt: item.augAmt !== undefined ? String(item.augAmt) : "0",
+              august: item.august !== undefined ? String(item.august) : "0",
+              augNotes: item.augNotes ?? null,
+              sepQty: item.sepQty ?? 0,
+              sepRate: item.sepRate !== undefined ? String(item.sepRate) : "0",
+              sepAmt: item.sepAmt !== undefined ? String(item.sepAmt) : "0",
+              september:
+                item.september !== undefined ? String(item.september) : "0",
+              sepNotes: item.sepNotes ?? null,
+              octQty: item.octQty ?? 0,
+              octRate: item.octRate !== undefined ? String(item.octRate) : "0",
+              octAmt: item.octAmt !== undefined ? String(item.octAmt) : "0",
+              october: item.october !== undefined ? String(item.october) : "0",
+              octNotes: item.octNotes ?? null,
+              novQty: item.novQty ?? 0,
+              novRate: item.novRate !== undefined ? String(item.novRate) : "0",
+              novAmt: item.novAmt !== undefined ? String(item.novAmt) : "0",
+              november: item.november !== undefined ? String(item.november) : "0",
+              novNotes: item.novNotes ?? null,
+              decQty: item.decQty ?? 0,
+              decRate: item.decRate !== undefined ? String(item.decRate) : "0",
+              decAmt: item.decAmt !== undefined ? String(item.decAmt) : "0",
+              december: item.december !== undefined ? String(item.december) : "0",
+              decNotes: item.decNotes ?? null,
+              janQty: item.janQty ?? 0,
+              janRate: item.janRate !== undefined ? String(item.janRate) : "0",
+              janAmt: item.janAmt !== undefined ? String(item.janAmt) : "0",
+              january: item.january !== undefined ? String(item.january) : "0",
+              janNotes: item.janNotes ?? null,
+              febQty: item.febQty ?? 0,
+              febRate: item.febRate !== undefined ? String(item.febRate) : "0",
+              febAmt: item.febAmt !== undefined ? String(item.febAmt) : "0",
+              february: item.february !== undefined ? String(item.february) : "0",
+              febNotes: item.febNotes ?? null,
+              marQty: item.marQty ?? 0,
+              marRate: item.marRate !== undefined ? String(item.marRate) : "0",
+              marAmt: item.marAmt !== undefined ? String(item.marAmt) : "0",
+              march: item.march !== undefined ? String(item.march) : "0",
+              marNotes: item.marNotes ?? null,
+              isactive: true,
+              createdBy: item.createdBy,
+              createdAt: item.createdAt,
+              updatedAt: null,
+              updatedBy: null,
+              q1: (
+                (item.april ?? 0) +
+                (item.may ?? 0) +
+                (item.june ?? 0)
+              ).toString(),
+              q2: (
+                (item.july ?? 0) +
+                (item.august ?? 0) +
+                (item.september ?? 0)
+              ).toString(),
+              q3: (
+                (item.october ?? 0) +
+                (item.november ?? 0) +
+                (item.december ?? 0)
+              ).toString(),
+              q4: (
+                (item.january ?? 0) +
+                (item.february ?? 0) +
+                (item.march ?? 0)
+              ).toString()
+            });
+          }
+        }
+        // Insert data using Drizzle
+        const insertedRecords = await ctx.db
+          .insert(budgetDetailsInFinanceProject)
+          .values(recordsToInsert)
+          .returning();
+  
+        const response = insertedRecords.map((record) => ({
+          budgetDetailsId: record.id,
+          subcategoryId: record.subcategoryId,
+          categoryId: record.catid,
+        }));
+  
+        return {
+          success: true,
+          message: "Budget details added successfully",
+          data: response,
+        };
+      } catch (error) {
+        console.error("Error in adding budget details:", error);
+        throw new Error("Failed to add budget details. Please try again.");
+      }
+    });
+
 export const getBudgetMaster = protectedProcedure
   .input(
     z.object({
@@ -3036,6 +3262,208 @@ export const updateBudgetDetails = protectedProcedure
         throw new Error("Failed to update budget details. Please try again.");
       }
     }); 
+
+    export const updateCapitalCostBudgetDetails = protectedProcedure
+    .input(
+        z.object({
+          data: z.array(
+            z.object({
+              budgetDetailsId: z.number(),
+              budgetid: z.number(),
+              catid: z.number(),
+              subDeptId: z.number(),
+              subcategoryId: z.number(),
+              unit: z.number(),
+              rate: z.string(),
+              total: z.string(),
+              currency: z.string(),
+              notes: z.string().optional(),
+              description: z.string().optional(),
+              aprQty: z.number().optional(),
+              aprRate: z.number().optional(),
+              aprAmt: z.number().optional(),
+              april: z.number(),
+              aprNotes: z.string().optional(),
+              mayQty: z.number().optional(),
+              mayRate: z.number().optional(),
+              mayAmt: z.number().optional(),
+              may: z.number(),
+              mayNotes: z.string().optional(),
+              junQty: z.number().optional(),
+              junRate: z.number().optional(),
+              junAmt: z.number().optional(),
+              june: z.number(),
+              junNotes: z.string().optional(),
+              julQty: z.number().optional(),
+              julRate: z.number().optional(),
+              julAmt: z.number().optional(),
+              july: z.number(),
+              julNotes: z.string().optional(),
+              augQty: z.number().optional(),
+              augRate: z.number().optional(),
+              augAmt: z.number().optional(),
+              august: z.number(),
+              augNotes: z.string().optional(),
+              sepQty: z.number().optional(),
+              sepRate: z.number().optional(),
+              sepAmt: z.number().optional(),
+              september: z.number(),
+              sepNotes: z.string().optional(),
+              octQty: z.number().optional(),
+              octRate: z.number().optional(),
+              octAmt: z.number().optional(),
+              october: z.number(),
+              octNotes: z.string().optional(),
+              novQty: z.number().optional(),
+              novRate: z.number().optional(),
+              novAmt: z.number().optional(),
+              november: z.number(),
+              novNotes: z.string().optional(),
+              decQty: z.number().optional(),
+              decRate: z.number().optional(),
+              decAmt: z.number().optional(),
+              december: z.number(),
+              decNotes: z.string().optional(),
+              janQty: z.number().optional(),
+              janRate: z.number().optional(),
+              janAmt: z.number().optional(),
+              january: z.number(),
+              janNotes: z.string().optional(),
+              febQty: z.number().optional(),
+              febRate: z.number().optional(),
+              febAmt: z.number().optional(),
+              february: z.number(),
+              febNotes: z.string().optional(),
+              marQty: z.number().optional(),
+              marRate: z.number().optional(),
+              marAmt: z.number().optional(),
+              march: z.number(),
+              marNotes: z.string().optional(),
+              deptId: z.number(),
+              updatedBy: z.number(),
+              updatedAt: z.string(),
+            }),
+          ),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        try {
+          console.log(input, "updateProgramOfficeBudgetDetails input");
+          const { data } = input;
+    
+          // Perform updates for each budget detail record
+          for (const item of data) {
+            const updates = {
+                budgetid: item.budgetid,
+                catid: item.catid,
+                sub_deptid: item.subDeptId,
+                deptid: item.deptId,
+                subcategoryId: item.subcategoryId,
+                unit: item.unit,
+                rate: item.rate,
+                total: item.total,
+                currency: item.currency,
+                notes: item.notes ?? null,
+                description: item.description ?? null,
+                aprQty: item.aprQty ?? 0,
+                aprRate: item.aprRate !== undefined ? String(item.aprRate) : "0",
+                aprAmt: item.aprAmt !== undefined ? String(item.aprAmt) : "0",
+                april: item.april !== undefined ? String(item.april) : "0",
+                aprNotes: item.aprNotes ?? null,
+                mayQty: item.mayQty ?? 0,
+                mayRate: item.mayRate !== undefined ? String(item.mayRate) : "0",
+                mayAmt: item.mayAmt !== undefined ? String(item.mayAmt) : "0",
+                may: item.may !== undefined ? String(item.may) : "0",
+                mayNotes: item.mayNotes ?? null,
+                junQty: item.junQty ?? 0,
+                junRate: item.junRate !== undefined ? String(item.junRate) : "0",
+                junAmt: item.junAmt !== undefined ? String(item.junAmt) : "0",
+                june: item.june !== undefined ? String(item.june) : "0",
+                junNotes: item.junNotes ?? null,
+                julQty: item.julQty ?? 0,
+                julRate: item.julRate !== undefined ? String(item.julRate) : "0",
+                julAmt: item.julAmt !== undefined ? String(item.julAmt) : "0",
+                july: item.july !== undefined ? String(item.july) : "0",
+                julNotes: item.julNotes ?? null,
+                augQty: item.augQty ?? 0,
+                augRate: item.augRate !== undefined ? String(item.augRate) : "0",
+                augAmt: item.augAmt !== undefined ? String(item.augAmt) : "0",
+                august: item.august !== undefined ? String(item.august) : "0",
+                augNotes: item.augNotes ?? null,
+                sepQty: item.sepQty ?? 0,
+                sepRate: item.sepRate !== undefined ? String(item.sepRate) : "0",
+                sepAmt: item.sepAmt !== undefined ? String(item.sepAmt) : "0",
+                september:
+                  item.september !== undefined ? String(item.september) : "0",
+                sepNotes: item.sepNotes ?? null,
+                octQty: item.octQty ?? 0,
+                octRate: item.octRate !== undefined ? String(item.octRate) : "0",
+                octAmt: item.octAmt !== undefined ? String(item.octAmt) : "0",
+                october: item.october !== undefined ? String(item.october) : "0",
+                octNotes: item.octNotes ?? null,
+                novQty: item.novQty ?? 0,
+                novRate: item.novRate !== undefined ? String(item.novRate) : "0",
+                novAmt: item.novAmt !== undefined ? String(item.novAmt) : "0",
+                november: item.november !== undefined ? String(item.november) : "0",
+                novNotes: item.novNotes ?? null,
+                decQty: item.decQty ?? 0,
+                decRate: item.decRate !== undefined ? String(item.decRate) : "0",
+                decAmt: item.decAmt !== undefined ? String(item.decAmt) : "0",
+                december: item.december !== undefined ? String(item.december) : "0",
+                decNotes: item.decNotes ?? null,
+                janQty: item.janQty ?? 0,
+                janRate: item.janRate !== undefined ? String(item.janRate) : "0",
+                janAmt: item.janAmt !== undefined ? String(item.janAmt) : "0",
+                january: item.january !== undefined ? String(item.january) : "0",
+                janNotes: item.janNotes ?? null,
+                febQty: item.febQty ?? 0,
+                febRate: item.febRate !== undefined ? String(item.febRate) : "0",
+                febAmt: item.febAmt !== undefined ? String(item.febAmt) : "0",
+                february: item.february !== undefined ? String(item.february) : "0",
+                febNotes: item.febNotes ?? null,
+                marQty: item.marQty ?? 0,
+                marRate: item.marRate !== undefined ? String(item.marRate) : "0",
+                marAmt: item.marAmt !== undefined ? String(item.marAmt) : "0",
+                march: item.march !== undefined ? String(item.march) : "0",
+                marNotes: item.marNotes ?? null,
+                isactive: true,
+                updatedBy: item.updatedBy,
+                updatedAt: item.updatedAt,
+                q1: (
+                  (item.april ?? 0) +
+                  (item.may ?? 0) +
+                  (item.june ?? 0)
+                ).toString(),
+                q2: (
+                  (item.july ?? 0) +
+                  (item.august ?? 0) +
+                  (item.september ?? 0)
+                ).toString(),
+                q3: (
+                  (item.october ?? 0) +
+                  (item.november ?? 0) +
+                  (item.december ?? 0)
+                ).toString(),
+                q4: (
+                  (item.january ?? 0) +
+                  (item.february ?? 0) +
+                  (item.march ?? 0)
+                ).toString(),
+            };
+    
+            // Update record in the database
+            await ctx.db
+              .update(budgetDetailsInFinanceProject)
+              .set(updates)
+              .where(eq(budgetDetailsInFinanceProject.id, item.budgetDetailsId));
+          }
+    
+          return { success: true, message: "Budget details updated successfully" };
+        } catch (error) {
+          console.error("Error in updating budget details:", error);
+          throw new Error("Failed to update budget details. Please try again.");
+        }
+      }); 
 // i am just updating the status without checking do we have all subcategory and activiy data
 export const updateStatusBudgetDetails = protectedProcedure
   .input(

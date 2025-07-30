@@ -396,49 +396,42 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         }}
       >
         <summary
-          className="flex cursor-pointer items-center justify-between gap-32 rounded-md border border-primary bg-primary/10 p-2 text-primary outline-none"
+          className="flex justify-center items-center grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
           onClick={(e) => {
             e.preventDefault();
-            if (sectionOpen == "Program Activities") setSectionOpen(null);
-            else setSectionOpen("Program Activities");
+            setSectionOpen(sectionOpen === "Program Activities" ? null : "Program Activities");
           }}
         >
-          <h1 className="text-md w-full text-center font-medium capitalize md:w-1/6 md:text-left">
-            {section.toLowerCase()}
-          </h1>
-          {programDataLodaing ? (
-            <div className="flex items-center space-x-2">
-              <p className="text-sm">Loading.....</p>
-            </div>
-          ) : (
-            <div className="hidden w-5/6 items-center gap-20 md:flex">
-              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
-                <span className="text-sm font-medium">Q1:</span>{" "}
-                {totalQty.totalQ1.toLocaleString("hi-IN")}
+          {[
+            // 1) Section title in col 1
+            <h1 key="section" className="text-md   capitalize ">
+              {section.toLowerCase()}
+            </h1>,
+
+            // 2–6) Q1–Q4 + Total in cols 2–6
+            ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
+              <div
+                key={label}
+                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 text-center"
+              >
+                <span className="text-sm font-medium">{label}:</span>{" "}
+                {(label === "Total"
+                  ? totalQty.totalFY
+                  : totalQty[`total${label}` as keyof typeof totalQty]
+                ).toLocaleString("hi-IN")}
               </div>
-              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
-                <span className="text-sm font-medium">Q2:</span>{" "}
-                {totalQty.totalQ2.toLocaleString("hi-IN")}
-              </div>
-              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
-                <span className="text-sm font-medium">Q3:</span>{" "}
-                {totalQty.totalQ3.toLocaleString("hi-IN")}
-              </div>
-              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
-                <span className="text-sm font-medium">Q4:</span>{" "}
-                {totalQty.totalQ4.toLocaleString("hi-IN")}
-              </div>
-              <div className="w-1/6 rounded-md border border-primary/20 bg-primary/5 px-3 py-1">
-                <span className="text-sm font-medium">FY:</span>{" "}
-                {totalQty.totalFY.toLocaleString("hi-IN")}
-              </div>
-              {/* <div className='flex items-center justify-end'> */}
-              <span className="text-lg font-bold transition-transform group-open:rotate-90">
-                →
-              </span>
-              {/* </div> */}
-            </div>
-          )}
+            )),
+
+            // 7) Arrow in col 7
+            <span
+              key="arrow"
+              // className="text-lg font-bold transition-transform group-open:rotate-90"
+              className="self-center justify-self-end text-lg font-bold transition-transform group-open:rotate-90"
+
+            >
+              →
+            </span>,
+          ]}
         </summary>
         <div className="flex items-center gap-2">
           <div className="mt-3 w-72">

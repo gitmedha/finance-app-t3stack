@@ -108,7 +108,7 @@ const Budget: React.FC = () => {
         subdepartmentName: subDeptVal.departmentname,
       }));
     } else if (name === "year" && typeof value === "string") {
-      console.log(value,'value');
+      console.log(value, "value");
       setFilters((prev) => ({
         ...prev,
         [name]: value, // Year is a string
@@ -141,7 +141,7 @@ const Budget: React.FC = () => {
   }, [budgetRes]);
   // get all main categories
   const { data } = api.get.getCats.useQuery();
-  console.log(data,"data")
+  console.log(data, "data");
   const allQ1 =
     personnelTotals.totalQ1 +
     activityTotals.totalQ1 +
@@ -195,8 +195,8 @@ const Budget: React.FC = () => {
       {isLoading && <div>loading</div>}
 
       {budgetId != null && !isLoading && (
-        <div className="m-2  md:mt-24">
-          <div className="mt-0 md:mt-20 p-2 text-right font-black text-green-900">
+        <div className="m-2 md:mt-24">
+          <div className="mt-0 p-2 text-right font-black text-green-900 md:mt-20">
             {status == "submitted" && <p>{status.toUpperCase()}</p>}
             {status == "draft" && userData.data?.user.role == 1 && (
               <p className="text-red-900">{status.toUpperCase()}</p>
@@ -204,19 +204,17 @@ const Budget: React.FC = () => {
             {status == "approved" && <p>{status.toUpperCase()}</p>}
           </div>{" "}
           {/* Header row */}
-          <div className="hidden md:flex items-center gap-20 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm">
-            {/* 1st column: “BUDGET CATEGORY” */}
-            <div className="flex w-1/6 items-center">
-            <div className="">Budget Category</div>
-            </div>
-            {/* 2nd–6th columns: Q1, Q2, Q3, Q4, FY */}
-            <div className="flex justify-start gap-4 w-5/6">
-            <div className="w-1/6 text-center">Q1</div>
-            <div className="w-1/6 text-center">Q2</div>
-            <div className="w-1/6 text-center">Q3</div>
-            <div className="w-1/6 text-center">Q4</div>
-            <div className="w-1/6 mx-8 text-center">Total</div>
-            </div>
+          <div className="hidden grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm md:grid">
+            {/* column 1 */}
+            <div className="px-3">Budget Category</div>
+
+            {/* columns 2–6 */}
+            {["Q1", "Q2", "Q3", "Q4", "Total"].map((hdr) => (
+              <div key={hdr} className="text-center">
+                {hdr}
+              </div>
+            ))}
+            <div className="col-span-1"></div>
           </div>
           {/* Render budget category sections */}
           <PersonnelCost
@@ -308,18 +306,18 @@ const Budget: React.FC = () => {
             subdepartmentId={filters.subdepartmentId}
             financialYear={filters.year}
           />{" "}
-          {/* Footer row */}{" "}
-          <div className="hidden md:flex items-center gap-36 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm">
-            <div className="flex w-1/6 items-center">
-              <div className="">TOTAL</div>
-            </div>
-            <div className="flex w-5/6 justify-start gap-8">
-              <div className="w-1/6">{allQ1.toLocaleString("hi-IN")}</div>
-              <div className="w-1/6">{allQ2.toLocaleString("hi-IN")}</div>
-              <div className="w-1/6">{allQ3.toLocaleString("hi-IN")}</div>
-              <div className="w-1/6">{allQ4.toLocaleString("hi-IN")}</div>
-              <div className="w-1/6">{allFY.toLocaleString("hi-IN")}</div>
-            </div>
+          {/* Footer row */}
+          <div className="hidden grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm md:grid">
+            {/* col 1 */}
+            <div className="px-3">TOTAL</div>
+
+            {/* cols 2–6 via map */}
+            {([allQ1, allQ2, allQ3, allQ4, allFY] as const).map((val, idx) => (
+              <div key={idx} className="text-center">
+                {val.toLocaleString("hi-IN")}
+              </div>
+            ))}
+            <div className="col-span-1"></div>
           </div>
         </div>
       )}

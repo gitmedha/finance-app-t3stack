@@ -279,6 +279,7 @@ const Budget: React.FC = () => {
             setSectionOpen={setSectionOpen}
             subdepartmentId={filters.subdepartmentId}
             financialYear={filters.year}
+            onTotalsChange={setProgramOfficeTotals}
           />
           <CapitalCost
             section="CAPITAL COST"
@@ -292,6 +293,7 @@ const Budget: React.FC = () => {
             setSectionOpen={setSectionOpen}
             subdepartmentId={filters.subdepartmentId}
             financialYear={filters.year}
+            onTotalsChange={setCapitalTotals}
           />
           <OverHeads
             section="OVERHEADS"

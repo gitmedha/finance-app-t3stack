@@ -1012,7 +1012,8 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
         }}
       >
         <summary
-          className="flex justify-center items-center grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,minmax(0,1fr))_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          // style={{ gridAutoRows: "minmax(60px, auto)" }}
           onClick={(e) => {
             e.preventDefault();
             setSectionOpen(sectionOpen === "PERSONNEL" ? null : "PERSONNEL");
@@ -1028,13 +1029,16 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
             ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
               <div
                 key={label}
-                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center lg:flex-row lg:justify-center lg:gap-1"
+                className="hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center xl:flex-row xl:justify-center xl:gap-1 w-full text-center"
+                // style={{ minHeight: "50px" }}
               >
                 <span className="text-sm font-medium">{label}:</span>{" "}
-                {(label === "Total"
-                  ? totalQty.totalFY
-                  : totalQty[`total${label}` as keyof typeof totalQty]
-                ).toLocaleString("hi-IN")}
+                <span className="overflow-hidden text-ellipsis">
+                  {(label === "Total"
+                    ? totalQty.totalFY
+                    : totalQty[`total${label}` as keyof typeof totalQty]
+                  ).toLocaleString("hi-IN")}
+                </span>
               </div>
             )),
 

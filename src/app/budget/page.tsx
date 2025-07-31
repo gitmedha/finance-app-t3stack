@@ -204,13 +204,13 @@ const Budget: React.FC = () => {
             {status == "approved" && <p>{status.toUpperCase()}</p>}
           </div>{" "}
           {/* Header row */}
-          <div className="hidden grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm md:grid">
+          <div className="hidden grid-cols-[1.1fr_repeat(5,minmax(0,1fr))_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm md:grid">
             {/* column 1 */}
-            <div className="px-3">Budget Category</div>
+            <div className="">Budget Category</div>
 
             {/* columns 2–6 */}
             {["Q1", "Q2", "Q3", "Q4", "Total"].map((hdr) => (
-              <div key={hdr} className="text-center">
+              <div key={hdr} className="text-center w-full overflow-hidden text-ellipsis">
                 {hdr}
               </div>
             ))}
@@ -307,13 +307,13 @@ const Budget: React.FC = () => {
             financialYear={filters.year}
           />{" "}
           {/* Footer row */}
-          <div className="hidden grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm md:grid">
+          <div className="hidden grid-cols-[1.1fr_repeat(5,minmax(0,1fr))_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm md:grid">
             {/* col 1 */}
             <div className="px-3">TOTAL</div>
 
             {/* cols 2–6 via map */}
             {([allQ1, allQ2, allQ3, allQ4, allFY] as const).map((val, idx) => (
-              <div key={idx} className="text-center">
+              <div key={idx} className="text-center overflow-hidden text-ellipsis">
                 {val.toLocaleString("hi-IN")}
               </div>
             ))}

@@ -510,7 +510,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
         }}
       >
         <summary
-          className="flex justify-center items-center grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
           onClick={(e) => {
             e.preventDefault();
             setSectionOpen(sectionOpen === "Travel" ? null : "Travel");
@@ -523,7 +523,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
             </h1>,
 
             // 2–6) Q1–Q4 + Total in cols 2–6
-            ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
+            ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (  
               <div
                 key={label}
                 className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center lg:flex-row lg:justify-center lg:gap-1"

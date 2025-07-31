@@ -77,7 +77,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
             Qty2: 0,
             Rate2: "0",
             Amount2: "0",
-            Qty3: 0,
+            Qty3: 0,  
             Rate3: "0",
             Amount3: "0",
             Qty4: "0",
@@ -201,7 +201,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
       } else if (month === "Rate4") {
         subCategoryData.Amount4 = (Number(subCategoryData.Qty4) * Number(value)).toFixed(2)
       }
-      else if (month === "Qt4") {
+      else if (month === "Qty4") {
         subCategoryData.Amount4 = (Number(subCategoryData.Rate4) * Number(value)).toFixed(2)
       }
       subCategoryData[month] = value;
@@ -463,7 +463,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
         }}
       >
         <summary
-          className="flex justify-center items-center grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
           onClick={(e) => {
             e.preventDefault();
             setSectionOpen(sectionOpen === "OVERHEADS" ? null : "OVERHEADS");
@@ -529,7 +529,7 @@ const OverHeads: React.FC<OverHeadsProps> = ({ section, categoryId, budgetId, de
                           id={sub.subCategoryId + month}
                           disabled={true}
                           className="w-full rounded border p-1"
-                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                          defaultValue="0"
                           onChange={(e) =>
                             handleInputChange(sub.subCategoryId, month, e.target.value)
                           }

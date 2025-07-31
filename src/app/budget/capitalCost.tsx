@@ -299,7 +299,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         }}>
         
         <summary
-          className="flex justify-center items-center grid-cols-[1.1fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
           onClick={(e) => {
             e.preventDefault();
             setSectionOpen(sectionOpen === "CAPITAL COST" ? null : "CAPITAL COST");

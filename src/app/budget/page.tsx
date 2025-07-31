@@ -305,6 +305,7 @@ const Budget: React.FC = () => {
             setSectionOpen={setSectionOpen}
             subdepartmentId={filters.subdepartmentId}
             financialYear={filters.year}
+            onTotalsChange={setOverheadsTotals}
           />{" "}
           {/* Footer row */}
           <div className="hidden grid-cols-[1.1fr_repeat(5,minmax(0,1fr))_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm md:grid">

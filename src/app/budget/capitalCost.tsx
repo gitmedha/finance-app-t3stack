@@ -2,8 +2,16 @@ import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
-import { transformTableRowToBudgetDetail, transformTableRowToUpdateBudgetDetail, handleCreateBudget, handleUpdateBudget,recalculateTotals,mapItemToBaseStructure } from "./Service/capitalCostHelper";
-import {TableData,
+import {
+  transformTableRowToBudgetDetail,
+  transformTableRowToUpdateBudgetDetail,
+  handleCreateBudget,
+  handleUpdateBudget,
+  recalculateTotals,
+  mapItemToBaseStructure,
+} from "./Service/capitalCostHelper";
+import {
+  TableData,
   totalschema,
   BudgetDetailsCreate,
   BudgetDetailsUpdate,
@@ -11,35 +19,70 @@ import {TableData,
   LevelData,
   CapitalCostDataItem,
 } from "./types/capitalCost";
-import { displayColumnMap,getBaseStructure, headerMonth,  monthMap, months, monthFields, monthToQuarter } from "./Constants/capitalCostConstants";
+import {
+  displayColumnMap,
+  getBaseStructure,
+  headerMonth,
+  monthMap,
+  months,
+  monthFields,
+  monthToQuarter,
+} from "./Constants/capitalCostConstants";
 
-
-
-
-const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId, deptId, status, sectionOpen, setSectionOpen, subdepartmentId, financialYear,onTotalsChange }) => {
-  const userData = useSession()
-  const[inputStates,setInputStates] = useState<boolean>(true)
-  const [saveBtnState,setSaveBtnState] = useState<"loading"|"edit"|"save">("loading")
+const CapitalCost: React.FC<CapitalCostProps> = ({
+  section,
+  categoryId,
+  budgetId,
+  deptId,
+  status,
+  sectionOpen,
+  setSectionOpen,
+  subdepartmentId,
+  financialYear,
+  onTotalsChange,
+}) => {
+  const userData = useSession();
+  const [inputStates, setInputStates] = useState<boolean>(true);
+  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">(
+    "loading",
+  );
 
   const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0
-  })
+    totalQ1: 0,
+    totalQ2: 0,
+    totalQ3: 0,
+    totalQ4: 0,
+    totalFY: 0,
+  });
   const [tableData, setTableData] = useState<TableData>({});
-
-  // api calls
-  const { data: capitalCostData, isLoading: capitalCostDataLodaing } = api.get.getCapitalCostData.useQuery({
+  console.log(
     budgetId,
-    catId: categoryId,
-    deptId: Number(deptId),
-    subDeptId: subdepartmentId,
-    financialYear:financialYear
-  }, {
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-  })
-  const createBudgetDetails = api.post.addCapitalCostBudgetDetails.useMutation();
-  const updateBudgetDetails = api.post.updateCapitalCostBudgetDetails.useMutation();
+    categoryId,
+    deptId,
+    subdepartmentId,
+    financialYear,
+    "budgetId",
+  );
+  // api calls
+  const { data: capitalCostData, isLoading: capitalCostDataLodaing } =
+    api.get.getCapitalCostData.useQuery(
+      {
+        budgetId,
+        catId: categoryId,
+        deptId: Number(deptId),
+        subDeptId: subdepartmentId,
+        financialYear: financialYear,
+      },
+      {
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        staleTime: 0,
+      },
+    );
+  const createBudgetDetails =
+    api.post.addCapitalCostBudgetDetails.useMutation();
+  const updateBudgetDetails =
+    api.post.updateCapitalCostBudgetDetails.useMutation();
 
   // useEffect hooks
   useEffect(() => {
@@ -69,33 +112,38 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         Array.isArray(capitalCostData.result) &&
         capitalCostData.result.length > 0
       ) {
-        (capitalCostData.result as CapitalCostDataItem[]).forEach((item, index) => {
-          initialData[item.subcategoryId] = mapItemToBaseStructure(item);
-          totalQtyAfterBudgetDetails.totalFY +=
-            Number(item.january) +
-            Number(item.february) +
-            Number(item.march) +
-            Number(item.april) +
-            Number(item.may) +
-            Number(item.june) +
-            Number(item.july) +
-            Number(item.august) +
-            Number(item.september) +
-            Number(item.october) +
-            Number(item.november) +
-            Number(item.december);
-          totalQtyAfterBudgetDetails.totalQ1 +=
-            Number(item.april) + Number(item.may) + Number(item.june);
-          totalQtyAfterBudgetDetails.totalQ2 +=
-            Number(item.july) + Number(item.august) + Number(item.september);
-          totalQtyAfterBudgetDetails.totalQ3 +=
-            Number(item.october) +
-            Number(item.november) +
-            Number(item.december);
-          totalQtyAfterBudgetDetails.totalQ4 +=
-            Number(item.january) + Number(item.february) + Number(item.march);
-        });
-        console.log('🔍 DEBUG: Final Q1 total:', totalQtyAfterBudgetDetails.totalQ1);
+        (capitalCostData.result as CapitalCostDataItem[]).forEach(
+          (item, index) => {
+            initialData[item.subcategoryId] = mapItemToBaseStructure(item);
+            totalQtyAfterBudgetDetails.totalFY +=
+              Number(item.january) +
+              Number(item.february) +
+              Number(item.march) +
+              Number(item.april) +
+              Number(item.may) +
+              Number(item.june) +
+              Number(item.july) +
+              Number(item.august) +
+              Number(item.september) +
+              Number(item.october) +
+              Number(item.november) +
+              Number(item.december);
+            totalQtyAfterBudgetDetails.totalQ1 +=
+              Number(item.april) + Number(item.may) + Number(item.june);
+            totalQtyAfterBudgetDetails.totalQ2 +=
+              Number(item.july) + Number(item.august) + Number(item.september);
+            totalQtyAfterBudgetDetails.totalQ3 +=
+              Number(item.october) +
+              Number(item.november) +
+              Number(item.december);
+            totalQtyAfterBudgetDetails.totalQ4 +=
+              Number(item.january) + Number(item.february) + Number(item.march);
+          },
+        );
+        console.log(
+          "🔍 DEBUG: Final Q1 total:",
+          totalQtyAfterBudgetDetails.totalQ1,
+        );
         setSaveBtnState("edit");
       } else {
         setSaveBtnState("save");
@@ -221,7 +269,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     setTotalQty((prev) => {
       const updatedTotal = { ...prev };
       updatedTotal[which as keyof typeof prev] += difference;
-      updatedTotal["totalFY" as keyof typeof prev]+=difference
+      updatedTotal["totalFY" as keyof typeof prev] += difference;
       return updatedTotal;
     });
   };
@@ -241,7 +289,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
     );
     await handleCreateBudget({
       payload: budgetDetails as BudgetDetailsCreate[],
-     createBudgetDetails,
+      createBudgetDetails,
       handelnputDisable,
       setSaveBtnState,
       onSuccess: () => {
@@ -271,12 +319,12 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       handelnputDisable,
       setSaveBtnState,
       onSuccess: () => {
-         recalculateTotals(tableData, setTotalQty);
+        recalculateTotals(tableData, setTotalQty);
       },
     });
   };
-   // Function to determine if a field is read-only (month names or Amt fields)
-   const isReadOnlyField = (month: string) => {
+  // Function to determine if a field is read-only (month names or Amt fields)
+  const isReadOnlyField = (month: string) => {
     // Check if it's a month name only (Apr, May, etc.) or ends with "Amt"
     return !month.includes(" ") || month.endsWith(" amount");
   };
@@ -290,24 +338,28 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
- 
 
   return (
-    <div className="my-6 rounded-md bg-white shadow-lg" >
-      <details className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow" open={sectionOpen == "CAPITAL COST"} 
-        onClick={(e) =>{e.preventDefault() 
-        }}>
-        
+    <div className="my-6 rounded-md bg-white shadow-lg">
+      <details
+        className="group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow"
+        open={sectionOpen == "CAPITAL COST"}
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+      >
         <summary
-          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          className="flex grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center justify-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:cursor-pointer hover:border-primary/40 hover:shadow-sm md:grid"
           onClick={(e) => {
             e.preventDefault();
-            setSectionOpen(sectionOpen === "CAPITAL COST" ? null : "CAPITAL COST");
+            setSectionOpen(
+              sectionOpen === "CAPITAL COST" ? null : "CAPITAL COST",
+            );
           }}
         >
           {[
             // 1) Section title in col 1
-            <h1 key="section" className="text-md   capitalize ">
+            <h1 key="section" className="text-md capitalize">
               {section.toLowerCase()}
             </h1>,
 
@@ -315,7 +367,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
             ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
               <div
                 key={label}
-                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center lg:flex-row lg:justify-center lg:gap-1"
+                className="flex hidden flex-col items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1 md:flex lg:flex-row lg:justify-center lg:gap-1"
               >
                 <span className="text-sm font-medium">{label}:</span>{" "}
                 {(label === "Total"
@@ -330,7 +382,6 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
               key="arrow"
               // className="text-lg font-bold transition-transform group-open:rotate-90"
               className="self-center justify-self-end text-lg font-bold transition-transform group-open:rotate-90"
-
             >
               →
             </span>,
@@ -338,9 +389,9 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
         </summary>
 
         <hr className="my-2 scale-x-150" />
-        <div className="bg-gray-50 overflow-scroll">
+        <div className="overflow-scroll bg-gray-50">
           <table className="w-full table-auto border-collapse">
-          <thead>
+            <thead>
               <tr className="bg-gray-200 text-left text-sm text-gray-600">
                 <th rowSpan={2} className="border p-2 capitalize">
                   {"Particular".toLowerCase()}
@@ -371,111 +422,118 @@ const CapitalCost: React.FC<CapitalCostProps> = ({ section, categoryId, budgetId
                 ))}
               </tr>
             </thead>
-            {
-              !capitalCostDataLodaing && 
+            {!capitalCostDataLodaing && (
               <tbody>
-              {capitalCostData?.subCategories.map((sub) => (
-                <tr
-                  key={sub.subCategoryId}
-                  className="text-sm transition hover:bg-gray-100"
-                >
-                  <td className="border p-2 font-medium capitalize">
-                    {sub.subCategoryName.toLowerCase()}
-                  </td>
-                  {months.map((month, key) => (
-                    <td
-                      key={month}
-                      className="border p-2"
-                      style={{ minWidth: "100px" }}
-                    >
-                      <input
-                        type={key % 6 == 0 ? "number" : "text"}
-                        className={`w-full rounded border p-1 ${
-                          isReadOnlyField(month) ? "bg-gray-100" : ""
-                        } ${month.endsWith("notes") ? "min-w-40" : ""}`}
-                        value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                        id={sub.subCategoryId + month}
-                        // disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                        disabled={inputStates || isReadOnlyField(month)}
-                        onChange={(e) =>
-                          handleInputChange(
-                            sub.subCategoryId,
-                            month,
-                            e.target.value,
-                          )
-                        }
-                      />
+                {capitalCostData?.subCategories.map((sub) => (
+                  <tr
+                    key={sub.subCategoryId}
+                    className="text-sm transition hover:bg-gray-100"
+                  >
+                    <td className="border p-2 font-medium capitalize">
+                      {sub.subCategoryName.toLowerCase()}
                     </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-            }
-            
+                    {months.map((month, key) => (
+                      <td
+                        key={month}
+                        className="border p-2"
+                        style={{ minWidth: "100px" }}
+                      >
+                        <input
+                          type={key % 6 == 0 ? "number" : "text"}
+                          className={`w-full rounded border p-1 ${
+                            isReadOnlyField(month) ? "bg-gray-100" : ""
+                          } ${month.endsWith("notes") ? "min-w-40" : ""}`}
+                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                          id={sub.subCategoryId + month}
+                          // disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
+                          disabled={inputStates || isReadOnlyField(month)}
+                          onChange={(e) =>
+                            handleInputChange(
+                              sub.subCategoryId,
+                              month,
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
-          {
-          subdepartmentId != 0 && deptId != "0" &&((userData.data?.user.role == 1 && status != "Draft") || (userData.data?.user.role != 1 && status == "Draft")) && <div className="py-2 pr-4 flex flex-row-reverse gap-2">
-            {
-              !inputStates && <div> {
-                saveBtnState == "loading"  && <Button
+        {subdepartmentId != 0 &&
+          deptId != "0" &&
+          ((userData.data?.user.role == 1 && status != "Draft") ||
+            (userData.data?.user.role != 1 && status == "Draft")) && (
+            <div className="flex flex-row-reverse gap-2 py-2 pr-4">
+              {!inputStates && (
+                <div>
+                  {" "}
+                  {saveBtnState == "loading" && (
+                    <Button
+                      type="button"
+                      className="!w-20 !cursor-not-allowed border border-black !bg-primary px-2 !text-lg !text-white"
+                      variant="soft"
+                    >
+                      Loading...
+                    </Button>
+                  )}
+                  {saveBtnState == "edit" && (
+                    <Button
+                      type="button"
+                      className="!disabled:cursor-not-allowed !w-20 cursor-pointer border border-black !bg-primary px-2 !text-lg !text-white"
+                      variant="soft"
+                      style={{
+                        cursor: isSaveDisabled() ? "not-allowed" : "pointer",
+                      }}
+                      disabled={isSaveDisabled()}
+                      onClick={() => handleUpdate()}
+                    >
+                      Update
+                    </Button>
+                  )}
+                  {saveBtnState == "save" && (
+                    <Button
+                      type="button"
+                      className="!disabled:cursor-not-allowed !w-20 cursor-pointer border border-black !bg-primary px-2 !text-lg !text-white"
+                      variant="soft"
+                      style={{
+                        cursor: isSaveDisabled() ? "not-allowed" : "pointer",
+                      }}
+                      disabled={isSaveDisabled()}
+                      onClick={() => handleSave()}
+                    >
+                      Save
+                    </Button>
+                  )}
+                </div>
+              )}
+              {inputStates ? (
+                <Button
                   type="button"
-                  className=" !text-white !bg-primary px-2 !w-20 !text-lg border border-black !cursor-not-allowed"
+                  className="!disabled:cursor-not-allowed !w-20 cursor-pointer border border-black !bg-primary px-2 !text-lg !text-white"
                   variant="soft"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handelnputDisable(false)}
                 >
-                  Loading...
+                  Edit
                 </Button>
-              }
-                {
-                  saveBtnState == "edit"  && <Button
-                    type="button"
-                    className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-                    variant="soft"
-                    style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-                    disabled={isSaveDisabled()}
-                    onClick={() => handleUpdate()}
-                  >
-                    Update
-                  </Button>}
-
-                {saveBtnState == "save"  && <Button
+              ) : (
+                <Button
                   type="button"
-                  className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
+                  className="!disabled:cursor-not-allowed !w-20 cursor-pointer border border-primary px-2 !text-lg !text-primary"
                   variant="soft"
-                  style={{ cursor: isSaveDisabled() ? "not-allowed" : "pointer" }}
-                  disabled={isSaveDisabled()}
-                  onClick={() => handleSave()}
+                  style={{ cursor: "pointer" }}
+                  // disabled={isSaveDisabled()}
+                  onClick={() => handelnputDisable(true)}
                 >
-                  Save
+                  Cancel
                 </Button>
-
-                }
-              </div>
-            }
-            {inputStates ? <Button
-              type="button"
-              className="cursor-pointer !text-white !bg-primary px-2 !w-20 !text-lg border border-black !disabled:cursor-not-allowed"
-              variant="soft"
-              style={{ cursor: "pointer" }}
-              onClick={() => handelnputDisable(false)}
-            >
-              Edit
-            </Button> :
-              <Button
-                type="button"
-                className="cursor-pointer !text-primary  px-2 !w-20 !text-lg border border-primary !disabled:cursor-not-allowed"
-                variant="soft"
-                style={{ cursor: "pointer" }}
-                // disabled={isSaveDisabled()}
-                onClick={() => handelnputDisable(true)}
-              >
-                Cancel
-              </Button>
-            }
-
-          </div>
-          }
-        
+              )}
+            </div>
+          )}
       </details>
     </div>
   );

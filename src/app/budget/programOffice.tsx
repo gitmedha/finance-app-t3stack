@@ -72,8 +72,10 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
         staleTime: 0,
       },
     );
-  const createBudgetDetails = api.post.addProgramOfficeBudgetDetails.useMutation();
-  const updateBudgetDetails = api.post.updateProgramOfficeBudgetDetails.useMutation();
+  const createBudgetDetails =
+    api.post.addProgramOfficeBudgetDetails.useMutation();
+  const updateBudgetDetails =
+    api.post.updateProgramOfficeBudgetDetails.useMutation();
 
   // Useffect hook
   useEffect(() => {
@@ -103,33 +105,38 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
         Array.isArray(programOfficeData.result) &&
         programOfficeData.result.length > 0
       ) {
-        (programOfficeData.result as ProgramDataItem[]).forEach((item, index) => {
-          initialData[item.subcategoryId] = mapItemToBaseStructure(item);
-          totalQtyAfterBudgetDetails.totalFY +=
-            Number(item.january) +
-            Number(item.february) +
-            Number(item.march) +
-            Number(item.april) +
-            Number(item.may) +
-            Number(item.june) +
-            Number(item.july) +
-            Number(item.august) +
-            Number(item.september) +
-            Number(item.october) +
-            Number(item.november) +
-            Number(item.december);
-          totalQtyAfterBudgetDetails.totalQ1 +=
-            Number(item.april) + Number(item.may) + Number(item.june);
-          totalQtyAfterBudgetDetails.totalQ2 +=
-            Number(item.july) + Number(item.august) + Number(item.september);
-          totalQtyAfterBudgetDetails.totalQ3 +=
-            Number(item.october) +
-            Number(item.november) +
-            Number(item.december);
-          totalQtyAfterBudgetDetails.totalQ4 +=
-            Number(item.january) + Number(item.february) + Number(item.march);
-        });
-        console.log('🔍 DEBUG: Final Q1 total:', totalQtyAfterBudgetDetails.totalQ1);
+        (programOfficeData.result as ProgramDataItem[]).forEach(
+          (item, index) => {
+            initialData[item.subcategoryId] = mapItemToBaseStructure(item);
+            totalQtyAfterBudgetDetails.totalFY +=
+              Number(item.january) +
+              Number(item.february) +
+              Number(item.march) +
+              Number(item.april) +
+              Number(item.may) +
+              Number(item.june) +
+              Number(item.july) +
+              Number(item.august) +
+              Number(item.september) +
+              Number(item.october) +
+              Number(item.november) +
+              Number(item.december);
+            totalQtyAfterBudgetDetails.totalQ1 +=
+              Number(item.april) + Number(item.may) + Number(item.june);
+            totalQtyAfterBudgetDetails.totalQ2 +=
+              Number(item.july) + Number(item.august) + Number(item.september);
+            totalQtyAfterBudgetDetails.totalQ3 +=
+              Number(item.october) +
+              Number(item.november) +
+              Number(item.december);
+            totalQtyAfterBudgetDetails.totalQ4 +=
+              Number(item.january) + Number(item.february) + Number(item.march);
+          },
+        );
+        console.log(
+          "🔍 DEBUG: Final Q1 total:",
+          totalQtyAfterBudgetDetails.totalQ1,
+        );
         setSaveBtnState("edit");
       } else {
         setSaveBtnState("save");
@@ -274,7 +281,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
     );
     await handleCreateBudget({
       payload: budgetDetails as BudgetDetailsCreate[],
-     createBudgetDetails,
+      createBudgetDetails,
       handelnputDisable,
       setSaveBtnState,
       onSuccess: () => {
@@ -308,8 +315,8 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       },
     });
   };
-   // Function to determine if a field is read-only (month names or Amt fields)
-   const isReadOnlyField = (month: string) => {
+  // Function to determine if a field is read-only (month names or Amt fields)
+  const isReadOnlyField = (month: string) => {
     // Check if it's a month name only (Apr, May, etc.) or ends with "Amt"
     return !month.includes(" ") || month.endsWith(" amount");
   };
@@ -338,16 +345,18 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
           e.preventDefault();
         }}
       >
-       <summary
-          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+        <summary
+          className="flex grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center justify-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:cursor-pointer hover:border-primary/40 hover:shadow-sm md:grid"
           onClick={(e) => {
             e.preventDefault();
-            setSectionOpen(sectionOpen === "PROGRAM OFFICE" ? null : "PROGRAM OFFICE");
+            setSectionOpen(
+              sectionOpen === "PROGRAM OFFICE" ? null : "PROGRAM OFFICE",
+            );
           }}
         >
           {[
             // 1) Section title in col 1
-            <h1 key="section" className="text-md   capitalize ">
+            <h1 key="section" className="text-md capitalize">
               {section.toLowerCase()}
             </h1>,
 
@@ -355,7 +364,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
             ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
               <div
                 key={label}
-                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center lg:flex-row lg:justify-center lg:gap-1"
+                className="flex hidden flex-col items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1 md:flex lg:flex-row lg:justify-center lg:gap-1"
               >
                 <span className="text-sm font-medium">{label}:</span>{" "}
                 {(label === "Total"
@@ -370,7 +379,6 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
               key="arrow"
               // className="text-lg font-bold transition-transform group-open:rotate-90"
               className="self-center justify-self-end text-lg font-bold transition-transform group-open:rotate-90"
-
             >
               →
             </span>,
@@ -381,85 +389,89 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
 
         <div className="overflow-scroll bg-gray-50">
           {/* Table */}
-          <table className="w-full table-auto border-collapse">
-            <thead>
-              <tr className="bg-gray-200 text-left text-sm text-gray-600">
-                <th rowSpan={2} className="border p-2 capitalize">
-                  {"Particular".toLowerCase()}
-                </th>
-                {headerMonth?.map((month, idx) => (
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto border-collapse">
+              <thead>
+                <tr className="bg-gray-200 text-left text-sm text-gray-600">
                   <th
-                    key={month}
-                    colSpan={4}
-                    className={`border border-b-2 border-gray-400 p-2 text-center capitalize ${"border-l-4 border-gray-500"} `}
+                    rowSpan={2}
+                    className="sticky left-0 z-20 border bg-gray-200 p-2 capitalize"
                   >
-                    {month}
+                    {"Particular".toLowerCase()}
                   </th>
-                ))}
-              </tr>
-              {/* second row: the sub-columns for each month */}
-              <tr className="bg-gray-200 text-sm text-gray-600">
-                {months.map((sub, idx) => (
-                  <th
-                    key={idx}
-                    className={`p-2 text-center ${
-                      idx % 4 === 0 || idx === 0
-                        ? "border-l-4 border-gray-500"
-                        : "border-l-2 border-gray-300"
-                    } `}
-                  >
-                    {getDisplayColumn(sub)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            {!programOfficeDataLodaing && (
-              <tbody>
-                {programOfficeData?.subCategories.map((sub) => (
-                  <tr
-                    key={sub.subCategoryId}
-                    className="text-sm transition hover:bg-gray-100"
-                  >
-                    <td className="border p-2 font-medium capitalize">
-                      {sub.subCategoryName.toLowerCase()}
-                    </td>
-                    {months.map((month, key) => (
-                      <td
-                        key={month}
-                        className="border p-2"
-                        style={{ minWidth: "100px" }}
-                      >
-                        <input
-                          type={key % 6 == 0 ? "number" : "text"}
-                          className={`w-full rounded border p-1 ${
-                            isReadOnlyField(month) ? "bg-gray-100" : ""
-                          } ${month.endsWith("notes") ? "min-w-40" : ""}`}
-                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                          id={sub.subCategoryId + month}
-                          // disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                          disabled={inputStates || isReadOnlyField(month)}
-                          onChange={(e) =>
-                            handleInputChange(
-                              sub.subCategoryId,
-                              month,
-                              e.target.value,
-                            )
-                          }
-                        />
+                  {headerMonth?.map((month) => (
+                    <th
+                      key={month}
+                      colSpan={4}
+                      className="border border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
+                    >
+                      {month}
+                    </th>
+                  ))}
+                </tr>
+                <tr className="bg-gray-200 text-sm text-gray-600">
+                  {months.map((sub, idx) => (
+                    <th
+                      key={idx}
+                      className={`p-2 text-center ${
+                        idx % 4 === 0
+                          ? "border-l-4 border-gray-500"
+                          : "border-l-2 border-gray-300"
+                      }`}
+                    >
+                      {getDisplayColumn(sub)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              {!programOfficeDataLodaing && (
+                <tbody>
+                  {programOfficeData?.subCategories.map((sub) => (
+                    <tr
+                      key={sub.subCategoryId}
+                      className="text-sm transition hover:bg-gray-100"
+                    >
+                      <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
+                        {sub.subCategoryName.toLowerCase()}
                       </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            )}
-          </table>
+                      {months.map((month, key) => (
+                        <td
+                          key={month}
+                          className="border p-2"
+                          style={{ minWidth: "100px" }}
+                        >
+                          <input
+                            type={key % 6 === 0 ? "number" : "text"}
+                            className={`w-full rounded border p-1 ${
+                              isReadOnlyField(month) ? "bg-gray-100" : ""
+                            } ${month.endsWith("notes") ? "min-w-40" : ""}`}
+                            value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                            id={sub.subCategoryId + month}
+                            disabled={inputStates || isReadOnlyField(month)}
+                            onChange={(e) =>
+                              handleInputChange(
+                                sub.subCategoryId,
+                                month,
+                                e.target.value,
+                              )
+                            }
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+          </div>
         </div>
 
         {subdepartmentId != 0 &&
           deptId != "0" &&
           ((userData.data?.user.role == 1 && status != "Draft") ||
             (userData.data?.user.role != 1 && status == "Draft")) && (
-            <div className="flex flex-row-reverse gap-2 py-2 pr-4"> 
+            <div className="flex flex-row-reverse gap-2 py-2 pr-4">
               {!inputStates && (
                 <div>
                   {saveBtnState == "loading" && (

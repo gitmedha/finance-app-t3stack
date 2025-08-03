@@ -130,6 +130,7 @@ export default function ProgramActivities() {
       <div className="container mt-6 min-h-[400px] min-w-full rounded bg-white px-3 py-4 shadow lg:mt-0">
         <div className="mb-1 flex w-full flex-col items-center space-y-4 px-1 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
           <div className="flex w-full flex-col items-center justify-center space-y-2 md:flex-row md:items-center md:justify-start md:space-x-2 md:space-y-0">
+            <div className="flex items-center space-x-2">
             <span className="font-semibold">Count: {result?.totalCount}</span>
             <div className="w-[200px]">
               <SearchInput
@@ -137,6 +138,7 @@ export default function ProgramActivities() {
                 className="p-2"
                 onChange={handleSearch}
               />
+            </div>
             </div>
             <ProgramActivityFilterForm
               handleSelect={handleSelect}

@@ -78,6 +78,7 @@ export default function DepartmentReport() {
           <div className="mb-1 flex w-full flex-col space-y-4 bg-white px-2 py-2 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
             {/* search and filter */}
             <div className="flex flex-col items-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+              <div className="flex items-center space-x-2">
               <span className="font-semibold">
                 Count: {result?.departments ? result.totalCount : ""}
               </span>
@@ -88,6 +89,7 @@ export default function DepartmentReport() {
                   className="p-2"
                   onChange={handleSearch}
                 />
+              </div>
               </div>
               {/* filter */}
               <DepartmentFilterForm

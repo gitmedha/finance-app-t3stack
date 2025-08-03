@@ -2723,7 +2723,7 @@ export const getCapitalCostData = protectedProcedure
       }
       let result;
       // Execute the query with all conditions
-      if (input.activity == "0") {
+      if (input?.activity == "0") {
         result = await ctx.db
           .select({
             subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
@@ -2831,6 +2831,7 @@ export const getCapitalCostData = protectedProcedure
             aprQty: sql`SUM(${budgetDetailsInFinanceProject.aprQty})`.as("aprQty"),
             aprRate: sql`SUM(${budgetDetailsInFinanceProject.aprRate})`.as("aprRate"),
             aprAmt: sql`SUM(${budgetDetailsInFinanceProject.aprAmt})`.as("aprAmt"),
+
             mayQty: sql`SUM(${budgetDetailsInFinanceProject.mayQty})`.as("mayQty"),
             mayRate: sql`SUM(${budgetDetailsInFinanceProject.mayRate})`.as("mayRate"),
             mayAmt: sql`SUM(${budgetDetailsInFinanceProject.mayAmt})`.as("mayAmt"),
@@ -3059,26 +3060,42 @@ export const getOverHeadsData = protectedProcedure
             q2: sql`SUM(${budgetDetailsInFinanceProject.q2})`.as("q2"),
             q3: sql`SUM(${budgetDetailsInFinanceProject.q3})`.as("q3"),
             q4: sql`SUM(${budgetDetailsInFinanceProject.q4})`.as("q4"),
-            amount1: sql`SUM(${budgetDetailsInFinanceProject.amount1})`.as(
-              "amount1",
-            ),
-            amount2: sql`SUM(${budgetDetailsInFinanceProject.amount2})`.as(
-              "amount2",
-            ),
-            amount3: sql`SUM(${budgetDetailsInFinanceProject.amount3})`.as(
-              "amount3",
-            ),
-            amount4: sql`SUM(${budgetDetailsInFinanceProject.amount4})`.as(
-              "amount4",
-            ),
-            rate1: sql`SUM(${budgetDetailsInFinanceProject.rate1})`.as("rate1"),
-            rate2: sql`SUM(${budgetDetailsInFinanceProject.rate2})`.as("rate2"),
-            rate3: sql`SUM(${budgetDetailsInFinanceProject.rate3})`.as("rate3"),
-            rate4: sql`SUM(${budgetDetailsInFinanceProject.rate4})`.as("rate4"),
-            qty1: sql`SUM(${budgetDetailsInFinanceProject.qty1})`.as("qty1"),
-            qty2: sql`SUM(${budgetDetailsInFinanceProject.qty2})`.as("qty2"),
-            qty3: sql`SUM(${budgetDetailsInFinanceProject.qty3})`.as("qty3"),
-            qty4: sql`SUM(${budgetDetailsInFinanceProject.qty4})`.as("qty4"),
+            aprQty: sql`SUM(${budgetDetailsInFinanceProject.aprQty})`.as("aprQty"),
+            aprRate: sql`SUM(${budgetDetailsInFinanceProject.aprRate})`.as("aprRate"),
+            aprAmt: sql`SUM(${budgetDetailsInFinanceProject.aprAmt})`.as("aprAmt"),
+            mayQty: sql`SUM(${budgetDetailsInFinanceProject.mayQty})`.as("mayQty"),
+            mayRate: sql`SUM(${budgetDetailsInFinanceProject.mayRate})`.as("mayRate"),
+            mayAmt: sql`SUM(${budgetDetailsInFinanceProject.mayAmt})`.as("mayAmt"),
+            junQty: sql`SUM(${budgetDetailsInFinanceProject.junQty})`.as("junQty"),
+            junRate: sql`SUM(${budgetDetailsInFinanceProject.junRate})`.as("junRate"),
+            junAmt: sql`SUM(${budgetDetailsInFinanceProject.junAmt})`.as("junAmt"),
+            julQty: sql`SUM(${budgetDetailsInFinanceProject.julQty})`.as("julQty"),
+            julRate: sql`SUM(${budgetDetailsInFinanceProject.julRate})`.as("julRate"),
+            julAmt: sql`SUM(${budgetDetailsInFinanceProject.julAmt})`.as("julAmt"),
+            augQty: sql`SUM(${budgetDetailsInFinanceProject.augQty})`.as("augQty"),
+            augRate: sql`SUM(${budgetDetailsInFinanceProject.augRate})`.as("augRate"),
+            augAmt: sql`SUM(${budgetDetailsInFinanceProject.augAmt})`.as("augAmt"),
+            sepQty: sql`SUM(${budgetDetailsInFinanceProject.sepQty})`.as("sepQty"),
+            sepRate: sql`SUM(${budgetDetailsInFinanceProject.sepRate})`.as("sepRate"),
+            sepAmt: sql`SUM(${budgetDetailsInFinanceProject.sepAmt})`.as("sepAmt"),
+            octQty: sql`SUM(${budgetDetailsInFinanceProject.octQty})`.as("octQty"),
+            octRate: sql`SUM(${budgetDetailsInFinanceProject.octRate})`.as("octRate"),
+            octAmt: sql`SUM(${budgetDetailsInFinanceProject.octAmt})`.as("octAmt"),
+            novQty: sql`SUM(${budgetDetailsInFinanceProject.novQty})`.as("novQty"),
+            novRate: sql`SUM(${budgetDetailsInFinanceProject.novRate})`.as("novRate"),
+            novAmt: sql`SUM(${budgetDetailsInFinanceProject.novAmt})`.as("novAmt"),
+            decQty: sql`SUM(${budgetDetailsInFinanceProject.decQty})`.as("decQty"),
+            decRate: sql`SUM(${budgetDetailsInFinanceProject.decRate})`.as("decRate"),
+            decAmt: sql`SUM(${budgetDetailsInFinanceProject.decAmt})`.as("decAmt"),
+            janQty: sql`SUM(${budgetDetailsInFinanceProject.janQty})`.as("janQty"),
+            janRate: sql`SUM(${budgetDetailsInFinanceProject.janRate})`.as("janRate"),
+            janAmt: sql`SUM(${budgetDetailsInFinanceProject.janAmt})`.as("janAmt"),
+            febQty: sql`SUM(${budgetDetailsInFinanceProject.febQty})`.as("febQty"),
+            febRate: sql`SUM(${budgetDetailsInFinanceProject.febRate})`.as("febRate"),
+            febAmt: sql`SUM(${budgetDetailsInFinanceProject.febAmt})`.as("febAmt"),
+            marQty: sql`SUM(${budgetDetailsInFinanceProject.marQty})`.as("marQty"),
+            marRate: sql`SUM(${budgetDetailsInFinanceProject.marRate})`.as("marRate"),
+            marAmt: sql`SUM(${budgetDetailsInFinanceProject.marAmt})`.as("marAmt"),
             total: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
             id: sql`SUM(${budgetDetailsInFinanceProject.total})`.as("total"),
           })

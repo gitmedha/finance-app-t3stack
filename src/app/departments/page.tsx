@@ -78,16 +78,18 @@ export default function DepartmentReport() {
           <div className="mb-1 flex w-full flex-col space-y-4 bg-white px-2 py-2 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
             {/* search and filter */}
             <div className="flex flex-col items-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
-              <span className="font-semibold">
-                Count: {result?.departments ? result.totalCount : ""}
-              </span>
-              {/* search */}
-              <div className="w-[200px]">
-                <SearchInput
-                  placeholder="Search departments"
-                  className="p-2"
-                  onChange={handleSearch}
-                />
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold">
+                  Count: {result?.departments ? result.totalCount : ""}
+                </span>
+                {/* search */}
+                <div className="w-[200px]">
+                  <SearchInput
+                    placeholder="Search departments"
+                    className="p-2"
+                    onChange={handleSearch}
+                  />
+                </div>
               </div>
               {/* filter */}
               <DepartmentFilterForm
@@ -97,7 +99,7 @@ export default function DepartmentReport() {
             </div>
 
             {/* pagination and add department button */}
-            <div className="flex items-center justify-center md:justify-end space-x-2">
+            <div className="flex items-center justify-center space-x-2 md:justify-end">
               {result?.departments && (
                 <ReactPaginationStyle
                   total={result?.totalCount}
@@ -129,55 +131,107 @@ export default function DepartmentReport() {
             </div>
           ) : (
             result?.departments && (
-              <table className="min-w-full table-auto border-collapse">
-                <thead>
-                  <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                    {cols?.map((col) => {
-                      return (
-                        <th key={col} className={`p-2 ${col === "Code" || col === "Created At" ? "hidden md:table-cell" : ""}`}>
-                          {col}
-                        </th>
-                      );
-                    })}
-                  </tr>
-                </thead>
-                <tbody>
+              <>
+                {/* 1. Mobile view: show cards only on <640px */}
+                <div className="sm:hidden">
                   {result?.departments.map((item: Department) => (
-                    <tr
-                      key={item?.id}
-                      className="border-b text-sm transition-colors hover:bg-gray-100"
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between border-b p-4"
                     >
-                      <td className="p-2">{item.departmentname}</td>
-                      <td className="hidden p-2 md:table-cell">{item.deptCode}</td>
-                      <td className="p-2">{item.type}</td>
-                      <td className="p-2">
-                        <span
-                          className={` rounded-lg px-2 py-1 text-sm ${
-                            item.isactive
-                              ? "bg-green-100 text-green-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {item.isactive ? "Active" : "InActive"}
-                        </span>
-                      </td>
-                      <td className="p-2 hidden md:table-cell">
-                        {moment(item.createdAt).format("DD-MM-YYYY")}
-                      </td>
-                      {item.isactive ? (
-                        <td className="space-x-2 p-1.5">
-                          <EditDepartments item={item} refetch={refetch} />
+                      <div>
+                        <p className="font-medium">{item.departmentname}</p>
+                        
+                        <p className="text-sm text-gray-600">
+                          Type: {item.type}
+                        </p>
+                        
+                        <p className="mt-1 text-xs text-gray-500">
+                          Created: {moment(item.createdAt).format("DD-MM-YYYY")}
+                        </p>
+                      </div>
+
+                      <div className="flex space-x-2">
+                        <EditDepartments item={item} refetch={refetch} />
+                        {item.isactive ? (
                           <DeleteDepartment item={item} refetch={refetch} />
-                        </td>
-                      ) : (
-                        <td>
+                        ) : (
                           <ActivateDepartment item={item} refetch={refetch} />
-                        </td>
-                      )}
-                    </tr>
+                        )}
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+
+                {/* 2. Tablet+ view: show full table on ≥640px */}
+                <div className="hidden w-full overflow-x-auto sm:block">
+                  <table className="w-full table-auto border-collapse">
+                    <thead>
+                      <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
+                        {cols?.map((col) => (
+                          <th
+                            key={col}
+                            className={`p-2 ${
+                              col === "Code" || col === "Created At"
+                                ? "hidden md:table-cell"
+                                : ""
+                            }`}
+                          >
+                            {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {result?.departments.map((item: Department) => (
+                        <tr
+                          key={item.id}
+                          className="border-b text-sm transition-colors hover:bg-gray-100"
+                        >
+                          <td className="p-2">{item.departmentname}</td>
+                          <td className="hidden p-2 md:table-cell">
+                            {item.deptCode}
+                          </td>
+                          <td className="p-2">{item.type}</td>
+                          <td className="p-2">
+                            <span
+                              className={`inline-block rounded-lg px-2 py-1 text-sm ${
+                                item.isactive
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {item.isactive ? "Active" : "Inactive"}
+                            </span>
+                          </td>
+                          <td className="hidden p-2 md:table-cell">
+                            {moment(item.createdAt).format("DD-MM-YYYY")}
+                          </td>
+                          <td className="space-x-2 p-1.5">
+                            {item.isactive ? (
+                              <>
+                                <EditDepartments
+                                  item={item}
+                                  refetch={refetch}
+                                />
+                                <DeleteDepartment
+                                  item={item}
+                                  refetch={refetch}
+                                />
+                              </>
+                            ) : (
+                              <ActivateDepartment
+                                item={item}
+                                refetch={refetch}
+                              />
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )
           )}
         </div>

@@ -130,6 +130,7 @@ export default function Staff() {
       <div className="container mt-6 min-h-[400px] min-w-full rounded bg-white px-3 py-4 shadow lg:mt-0">
         <div className="mb-1 flex w-full flex-col space-y-4 bg-white px-2 py-2 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
           <div className="flex flex-col items-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+            <div  className="flex items-center space-x-2">
             {/* count */}
             <span className="font-semibold">Count: {result?.totalCount}</span>
             {/* search */}
@@ -139,6 +140,7 @@ export default function Staff() {
                 className="p-2"
                 onChange={handleSearch}
               />
+            </div>
             </div>
             {/* filter */}
             <StaffFilterForm handleSelect={handleSelect} filters={filters} />

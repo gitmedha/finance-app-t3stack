@@ -130,13 +130,15 @@ export default function ProgramActivities() {
       <div className="container mt-6 min-h-[400px] min-w-full rounded bg-white px-3 py-4 shadow lg:mt-0">
         <div className="mb-1 flex w-full flex-col items-center space-y-4 px-1 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
           <div className="flex w-full flex-col items-center justify-center space-y-2 md:flex-row md:items-center md:justify-start md:space-x-2 md:space-y-0">
-            <span className="font-semibold">Count: {result?.totalCount}</span>
-            <div className="w-[200px]">
-              <SearchInput
-                placeholder="Search Program Activity"
-                className="p-2"
-                onChange={handleSearch}
-              />
+            <div className="flex items-center space-x-2">
+              <span className="font-semibold">Count: {result?.totalCount}</span>
+              <div className="w-[200px]">
+                <SearchInput
+                  placeholder="Search Program Activity"
+                  className="p-2"
+                  onChange={handleSearch}
+                />
+              </div>
             </div>
             <ProgramActivityFilterForm
               handleSelect={handleSelect}
@@ -144,7 +146,7 @@ export default function ProgramActivities() {
             />
           </div>
 
-          <div className="flex items-center justify-center md:justify-end space-x-2">
+          <div className="flex items-center justify-center space-x-2 md:justify-end">
             {result?.activities && (
               <ReactPaginationStyle
                 total={result?.totalCount}
@@ -176,75 +178,114 @@ export default function ProgramActivities() {
           </div>
         ) : (
           result?.activities && (
-            <div className="w-full overflow-x-auto">
-              <table className="w-full min-w-full table-auto border-collapse border border-gray-200">
-                <thead>
-                  <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
-                    <th className="whitespace-nowrap p-2">Name</th>
-                    <th className="hidden whitespace-nowrap p-2 sm:table-cell">
-                      Department
-                    </th>
-                    <th className="hidden whitespace-nowrap p-2 sm:table-cell">
-                      SubDepartment
-                    </th>
-                    <th className="whitespace-nowrap p-2">Created At</th>
-                    <th className="whitespace-nowrap p-2">Status</th>
-                    <th className="hidden whitespace-nowrap p-2 sm:table-cell">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result?.activities.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="border-b text-sm transition-colors hover:bg-gray-100"
-                    >
-                      <td className="whitespace-nowrap p-2">{item.name}</td>
-                      <td className="hidden whitespace-nowrap p-2 sm:table-cell">
-                        {item.departmentData?.label}
-                      </td>
-                      <td className="hidden whitespace-nowrap p-2 sm:table-cell">
-                        {item.subDepartmentData?.label}
-                      </td>
-                      <td className="whitespace-nowrap p-2">
-                        {moment(item.createdAt).format("DD-MM-YYYY")}
-                      </td>
-                      <td className="whitespace-nowrap p-2">
-                        <span
-                          className={`rounded-lg px-2 py-1 text-sm ${
-                            item.isActive
-                              ? "bg-green-100 text-green-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {item.isActive ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-                      <td className="hidden whitespace-nowrap p-2 sm:table-cell">
-                        {item.isActive ? (
-                          <div className="flex space-x-2">
-                            <EditProgramActivity
-                              item={item}
-                              refetch={refetch}
-                            />
-                            <DeleteProgramActivity
-                              item={item}
-                              refetchProgramActivities={refetch}
-                            />
-                          </div>
-                        ) : (
-                          <ActivateProgramActivity
+            <>
+              {/* 1. Mobile cards (<640px) */}
+              <div className="sm:hidden">
+                {result?.activities.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between border-b p-4"
+                  >
+                    <div>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-sm text-gray-600">
+                        Department: {item.departmentData?.label}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Sub-Dept: {item.subDepartmentData?.label}
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      {item.isActive ? (
+                        <>
+                          <EditProgramActivity item={item} refetch={refetch} />
+                          <DeleteProgramActivity
                             item={item}
                             refetchProgramActivities={refetch}
                           />
-                        )}
-                      </td>
+                        </>
+                      ) : (
+                        <ActivateProgramActivity
+                          item={item}
+                          refetchProgramActivities={refetch}
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 2. Table on ≥640px */}
+              <div className="hidden w-full overflow-x-auto sm:block">
+                <table className="w-full min-w-full table-auto border-collapse border border-gray-200">
+                  <thead>
+                    <tr className="bg-gray-200 text-left text-sm uppercase text-gray-600">
+                      <th className="whitespace-nowrap p-2">Name</th>
+                      <th className="hidden whitespace-nowrap p-2 sm:table-cell">
+                        Department
+                      </th>
+                      <th className="hidden whitespace-nowrap p-2 sm:table-cell">
+                        SubDepartment
+                      </th>
+                      <th className="whitespace-nowrap p-2">Created At</th>
+                      <th className="whitespace-nowrap p-2">Status</th>
+                      <th className="hidden whitespace-nowrap p-2 sm:table-cell">
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {result?.activities.map((item) => (
+                      <tr
+                        key={item.id}
+                        className="border-b text-sm transition-colors hover:bg-gray-100"
+                      >
+                        <td className="whitespace-nowrap p-2">{item.name}</td>
+                        <td className="hidden whitespace-nowrap p-2 sm:table-cell">
+                          {item.departmentData?.label}
+                        </td>
+                        <td className="hidden whitespace-nowrap p-2 sm:table-cell">
+                          {item.subDepartmentData?.label}
+                        </td>
+                        <td className="whitespace-nowrap p-2">
+                          {moment(item.createdAt).format("DD-MM-YYYY")}
+                        </td>
+                        <td className="whitespace-nowrap p-2">
+                          <span
+                            className={`rounded-lg px-2 py-1 text-sm ${
+                              item.isActive
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {item.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td className="hidden whitespace-nowrap p-2 sm:table-cell">
+                          {item.isActive ? (
+                            <div className="flex space-x-2">
+                              <EditProgramActivity
+                                item={item}
+                                refetch={refetch}
+                              />
+                              <DeleteProgramActivity
+                                item={item}
+                                refetchProgramActivities={refetch}
+                              />
+                            </div>
+                          ) : (
+                            <ActivateProgramActivity
+                              item={item}
+                              refetchProgramActivities={refetch}
+                            />
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )
         )}
       </div>

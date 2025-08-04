@@ -4,36 +4,79 @@ import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
-import { toast } from 'react-toastify';
-import { getBaseStructure, headerMonth, monthToQuarter, months, monthFields, displayColumnMap, monthMap } from "./Constants/overHeadConstants";
-import { totalschema, TableData, LevelData, BudgetDetailsCreate, BudgetDetailsUpdate, ProgramDataItem, OverHeadProps } from "./types/overHead";
-import { handleCreateBudget, handleUpdateBudget, mapItemToBaseStructure, transformTableRowToBudgetDetail, transformTableRowToUpdateBudgetDetail, recalculateTotals } from "./Service/overHeadHelper";
+import { toast } from "react-toastify";
+import {
+  getBaseStructure,
+  headerMonth,
+  monthToQuarter,
+  months,
+  monthFields,
+  displayColumnMap,
+  monthMap,
+} from "./Constants/overHeadConstants";
+import {
+  totalschema,
+  TableData,
+  LevelData,
+  BudgetDetailsCreate,
+  BudgetDetailsUpdate,
+  ProgramDataItem,
+  OverHeadProps,
+} from "./types/overHead";
+import {
+  handleCreateBudget,
+  handleUpdateBudget,
+  mapItemToBaseStructure,
+  transformTableRowToBudgetDetail,
+  transformTableRowToUpdateBudgetDetail,
+  recalculateTotals,
+} from "./Service/overHeadHelper";
 
-
-const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, deptId ,status,sectionOpen,setSectionOpen,subdepartmentId,financialYear,onTotalsChange}) => {
-  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">("loading")
-  const userData = useSession()
-  const [inputStates, setInputStates] = useState<boolean>(true)
+const OverHeads: React.FC<OverHeadProps> = ({
+  section,
+  categoryId,
+  budgetId,
+  deptId,
+  status,
+  sectionOpen,
+  setSectionOpen,
+  subdepartmentId,
+  financialYear,
+  onTotalsChange,
+}) => {
+  const [saveBtnState, setSaveBtnState] = useState<"loading" | "edit" | "save">(
+    "loading",
+  );
+  const userData = useSession();
+  const [inputStates, setInputStates] = useState<boolean>(true);
   const [totalQty, setTotalQty] = useState<totalschema>({
-    totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0,totalFY:0
-  })
+    totalQ1: 0,
+    totalQ2: 0,
+    totalQ3: 0,
+    totalQ4: 0,
+    totalFY: 0,
+  });
   const [tableData, setTableData] = useState<TableData>({});
 
   // api calls
-  const { data: overHeadData, isLoading: overHeadDataLodaing } = api.get.getOverHeadsData.useQuery({
-    budgetId,
-    catId: categoryId,
-    deptId: Number(deptId),
-    subDeptId: subdepartmentId,
-    financialYear:financialYear
-  }, {
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-  })
-  const createBudgetDetails = api.post.addOverHeadsBudgetDetails.useMutation();  
-  const updateBudgetDetails = api.post.updateOverHeadsBudgetDetails.useMutation();
-
+  const { data: overHeadData, isLoading: overHeadDataLodaing } =
+    api.get.getOverHeadsData.useQuery(
+      {
+        budgetId,
+        catId: categoryId,
+        deptId: Number(deptId),
+        subDeptId: subdepartmentId,
+        financialYear: financialYear,
+      },
+      {
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        staleTime: 0,
+      },
+    );
+  const createBudgetDetails = api.post.addOverHeadsBudgetDetails.useMutation();
+  const updateBudgetDetails =
+    api.post.updateOverHeadsBudgetDetails.useMutation();
 
   useEffect(() => {
     if (
@@ -88,7 +131,10 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
           totalQtyAfterBudgetDetails.totalQ4 +=
             Number(item.january) + Number(item.february) + Number(item.march);
         });
-        console.log('🔍 DEBUG: Final Q1 total:', totalQtyAfterBudgetDetails.totalQ1);
+        console.log(
+          "🔍 DEBUG: Final Q1 total:",
+          totalQtyAfterBudgetDetails.totalQ1,
+        );
         setSaveBtnState("edit");
       } else {
         setSaveBtnState("save");
@@ -167,7 +213,7 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
       // 1️⃣ If plain month field (e.g. "jul"), update quarter total
       if (!field) {
         const oldVal = Number(row?.[key] ?? 0);
-        const quarter = monthToQuarter[key] ?? "";    
+        const quarter = monthToQuarter[key] ?? "";
         if (quarter !== undefined) {
           updateTotalQtyVals(quarter, parsedValue - oldVal);
         }
@@ -267,8 +313,8 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
       },
     });
   };
-   // Function to determine if a field is read-only (month names or Amt fields)
-   const isReadOnlyField = (month: string) => {
+  // Function to determine if a field is read-only (month names or Amt fields)
+  const isReadOnlyField = (month: string) => {
     // Check if it's a month name only (Apr, May, etc.) or ends with "Amt"
     return !month.includes(" ") || month.endsWith(" amount");
   };
@@ -288,11 +334,11 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
         className={`group mx-auto w-full overflow-hidden rounded bg-[#F5F5F5] shadow transition-[max-height] duration-500`}
         open={sectionOpen == "OVERHEADS"}
         onClick={(e) => {
-          e.preventDefault()
+          e.preventDefault();
         }}
       >
         <summary
-          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          className="flex grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center justify-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:cursor-pointer hover:border-primary/40 hover:shadow-sm md:grid"
           onClick={(e) => {
             e.preventDefault();
             setSectionOpen(sectionOpen === "OVERHEADS" ? null : "OVERHEADS");
@@ -300,7 +346,7 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
         >
           {[
             // 1) Section title in col 1
-            <h1 key="section" className="text-md   capitalize ">
+            <h1 key="section" className="text-md capitalize">
               {section.toLowerCase()}
             </h1>,
 
@@ -308,7 +354,7 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
             ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
               <div
                 key={label}
-                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center lg:flex-row lg:justify-center lg:gap-1"
+                className="flex hidden flex-col items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1 md:flex lg:flex-row lg:justify-center lg:gap-1"
               >
                 <span className="text-sm font-medium">{label}:</span>{" "}
                 {(label === "Total"
@@ -323,7 +369,6 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
               key="arrow"
               // className="text-lg font-bold transition-transform group-open:rotate-90"
               className="self-center justify-self-end text-lg font-bold transition-transform group-open:rotate-90"
-
             >
               →
             </span>,
@@ -332,85 +377,90 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
 
         <hr className="my-2 scale-x-150" />
 
-        <div className="bg-gray-50 overflow-scroll">
-        <table className="w-full table-auto border-collapse">
-            <thead>
-              <tr className="bg-gray-200 text-left text-sm text-gray-600">
-                <th rowSpan={2} className="border p-2 capitalize">
-                  {"Particular".toLowerCase()}
-                </th>
-                {headerMonth?.map((month, idx) => (
-                  <th
-                    key={month}
-                    colSpan={4}
-                    className={`border border-b-2 border-gray-400 p-2 text-center capitalize ${"border-l-4 border-gray-500"} `}
-                  >
-                    {month}
-                  </th>
-                ))}
-              </tr>
-              {/* second row: the sub-columns for each month */}
-              <tr className="bg-gray-200 text-sm text-gray-600">
-                {months.map((sub, idx) => (
-                  <th
-                    key={idx}
-                    className={`p-2 text-center ${
-                      idx % 4 === 0 || idx === 0
-                        ? "border-l-4 border-gray-500"
-                        : "border-l-2 border-gray-300"
-                    } `}
-                  >
-                    {getDisplayColumn(sub)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            {!overHeadDataLodaing && (
-              <tbody>
-                {overHeadData?.subCategories.map((sub) => (
-                  <tr
-                    key={sub.subCategoryId}
-                    className="text-sm transition hover:bg-gray-100"
-                  >
-                    <td className="border p-2 font-medium capitalize">
-                      {sub.subCategoryName.toLowerCase()}
-                    </td>
-                    {months.map((month, key) => (
-                      <td
-                        key={month}
-                        className="border p-2"
-                        style={{ minWidth: "100px" }}
-                      >
-                        <input
-                          type={key % 6 == 0 ? "number" : "text"}
-                          className={`w-full rounded border p-1 ${
-                            isReadOnlyField(month) ? "bg-gray-100" : ""
-                          } ${month.endsWith("notes") ? "min-w-40" : ""}`}
-                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                          id={sub.subCategoryId + month}
-                          // disabled={(userData.data?.user.role == 1 && status == "draft") || (userData.data?.user.role == 2 && status != "draft")}
-                          disabled={inputStates || isReadOnlyField(month)}
-                          onChange={(e) =>
-                            handleInputChange(
-                              sub.subCategoryId,
-                              month,
-                              e.target.value,
-                            )
-                          }
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            )}
-          </table>
+        <div className="overflow-scroll bg-gray-50">
+        <div className="overflow-x-auto">
+  <table className="w-full table-auto border-collapse">
+    <thead>
+      <tr className="bg-gray-200 text-left text-sm text-gray-600">
+        <th
+          rowSpan={2}
+          className="sticky left-0 z-20 bg-gray-200 border p-2 capitalize"
+        >
+          {"Particular".toLowerCase()}
+        </th>
+        {headerMonth?.map((month) => (
+          <th
+            key={month}
+            colSpan={4}
+            className="border border-b-2 border-gray-400 p-2 text-center capitalize border-l-4 border-gray-500"
+          >
+            {month}
+          </th>
+        ))}
+      </tr>
+      {/* second row: the sub-columns for each month */}
+      <tr className="bg-gray-200 text-sm text-gray-600">
+        {months.map((sub, idx) => (
+          <th
+            key={idx}
+            className={`p-2 text-center ${
+              idx % 4 === 0 ? "border-l-4 border-gray-500" : "border-l-2 border-gray-300"
+            }`}
+          >
+            {getDisplayColumn(sub)}
+          </th>
+        ))}
+      </tr>
+    </thead>
+
+    {!overHeadDataLodaing && (
+      <tbody>
+        {overHeadData?.subCategories.map((sub) => (
+          <tr
+            key={sub.subCategoryId}
+            className="text-sm transition hover:bg-gray-100"
+          >
+            <td className="sticky left-0 z-10 bg-white border p-2 font-medium capitalize">
+              {sub.subCategoryName.toLowerCase()}
+            </td>
+
+            {months.map((month, key) => (
+              <td
+                key={month}
+                className="border p-2"
+                style={{ minWidth: "100px" }}
+              >
+                <input
+                  type={key % 6 === 0 ? "number" : "text"}
+                  className={`w-full rounded border p-1 ${
+                    isReadOnlyField(month) ? "bg-gray-100" : ""
+                  } ${month.endsWith("notes") ? "min-w-40" : ""}`}
+                  value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                  id={sub.subCategoryId + month}
+                  disabled={inputStates || isReadOnlyField(month)}
+                  onChange={(e) =>
+                    handleInputChange(
+                      sub.subCategoryId,
+                      month,
+                      e.target.value
+                    )
+                  }
+                />
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    )}
+  </table>
+</div>
+
         </div>
         {subdepartmentId != 0 &&
           deptId != "0" &&
           ((userData.data?.user.role == 1 && status != "Draft") ||
             (userData.data?.user.role != 1 && status == "Draft")) && (
-            <div className="flex flex-row-reverse gap-2 py-2 pr-4"> 
+            <div className="flex flex-row-reverse gap-2 py-2 pr-4">
               {!inputStates && (
                 <div>
                   {saveBtnState == "loading" && (
@@ -475,7 +525,6 @@ const OverHeads: React.FC<OverHeadProps> = ({ section, categoryId, budgetId, dep
               )}
             </div>
           )}
-        
       </details>
     </div>
   );

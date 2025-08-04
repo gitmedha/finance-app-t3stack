@@ -32,7 +32,7 @@ import {
   transformTableRowToBudgetDetail,
   transformTableRowToUpdateBudgetDetail,
   recalculateTotals,
-  } from "./Service/budgetHelper";
+} from "./Service/budgetHelper";
 import { table } from "console";
 
 const ActivityBudget: React.FC<ActivityBudgetProps> = ({
@@ -234,7 +234,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
   };
 
   // Function to recalculate totals from current tableData
-  
 
   const handleInputChange = (
     subCategoryId: number,
@@ -312,7 +311,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       updatedData[subCategoryId] = row;
       return updatedData;
     });
-    
+
     // Recalculate totals after each input change
     // setTimeout(() => {
     //   recalculateTotals(tableData as TableData, setTotalQty);
@@ -342,7 +341,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       setSaveBtnState,
       onSuccess: () => {
         recalculateTotals(tableData as TableData, setTotalQty);
-      }
+      },
     });
   };
 
@@ -370,7 +369,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
       setSaveBtnState,
       onSuccess: () => {
         recalculateTotals(tableData as TableData, setTotalQty);
-      }
+      },
     });
   };
 
@@ -396,15 +395,19 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         }}
       >
         <summary
-          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          className="flex grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center justify-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:cursor-pointer hover:border-primary/40 hover:shadow-sm md:grid"
           onClick={(e) => {
             e.preventDefault();
-            setSectionOpen(sectionOpen === "Program Activities" ? null : "Program Activities");
+            setSectionOpen(
+              sectionOpen === "Program Activities"
+                ? null
+                : "Program Activities",
+            );
           }}
         >
           {[
             // 1) Section title in col 1
-            <h1 key="section" className="text-md   capitalize ">
+            <h1 key="section" className="text-md capitalize">
               {section.toLowerCase()}
             </h1>,
 
@@ -412,7 +415,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
             ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
               <div
                 key={label}
-                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center lg:flex-row lg:justify-center lg:gap-1"
+                className="flex hidden flex-col items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1 md:flex lg:flex-row lg:justify-center lg:gap-1"
               >
                 <span className="text-sm font-medium">{label}:</span>{" "}
                 {(label === "Total"
@@ -427,7 +430,6 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
               key="arrow"
               // className="text-lg font-bold transition-transform group-open:rotate-90"
               className="self-center justify-self-end text-lg font-bold transition-transform group-open:rotate-90"
-
             >
               →
             </span>,
@@ -442,6 +444,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
               <DropdownMenu.Content className="max-h-56 !w-[250px] overflow-y-scroll rounded-lg bg-white p-2 shadow-lg">
                 {subProgramActivites
                   .sort((a, b) => a.name.localeCompare(b.name))
@@ -455,6 +458,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                     </DropdownMenu.Item>
                   ))}
               </DropdownMenu.Content>
+              </DropdownMenu.Portal>
             </DropdownMenu.Root>
           </div>
           <Marquee className="flex w-full flex-col items-end gap-1 pr-10 font-medium">
@@ -504,83 +508,90 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
 
         <div className="overflow-scroll bg-gray-50">
           {/* Table */}
-          <table className="w-full table-auto border-collapse">
-            <thead>
-              <tr className="bg-gray-200 text-left text-sm text-gray-600">
-                <th rowSpan={2} className="border p-2 capitalize">
-                  {"Particular".toLowerCase()}
-                </th>
-                {headerMonth?.map((month, idx) => (
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto border-collapse">
+              <thead>
+                <tr className="bg-gray-200 text-left text-sm text-gray-600">
                   <th
-                    key={month}
-                    colSpan={4}
-                    className={`border border-b-2 border-gray-400 p-2 text-center capitalize ${"border-l-4 border-gray-500"} `}
+                    rowSpan={2}
+                    className="sticky left-0 z-20 border bg-gray-200 p-2 capitalize"
                   >
-                    {month}
+                    {"Particular".toLowerCase()}
                   </th>
-                ))}
-              </tr>
-              {/* second row: the sub-columns for each month */}
-              <tr className="bg-gray-200 text-sm text-gray-600">
-                {months.map((sub, idx) => (
-                  <th
-                    key={idx}
-                    className={`p-2 text-center ${
-                      idx % 4 === 0 || idx === 0
-                        ? "border-l-4 border-gray-500"
-                        : "border-l-2 border-gray-300"
-                    } `}
-                  >
-                    {getDisplayColumn(sub)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            {!programDataLodaing && (
-              <tbody>
-                {programData?.subCategories.map((sub) => (
-                  <tr
-                    key={sub.subCategoryId}
-                    className="text-sm transition hover:bg-gray-100"
-                  >
-                    <td className="border p-2 font-medium capitalize">
-                      {sub.subCategoryName.toLowerCase()}
-                    </td>
-                    {months.map((month, key) => (
-                      <td
-                        key={month}
-                        className="border p-2"
-                        style={{ minWidth: "100px" }}
-                      >
-                        <input
-                          disabled={inputStates || isReadOnlyField(month)}
-                          type={month.endsWith("notes") ? "text" : "number"}
-                          placeholder={
-                            month.endsWith("notes") ? "Enter notes…" : undefined
-                          }
-                          className={`w-full rounded border p-1 ${
-                            isReadOnlyField(month) ? "bg-gray-100" : ""
-                          } ${month.endsWith("notes") ? "min-w-40" : ""}`}
-                          value={
-                            tableData[sub.subCategoryId]?.[
-                              month as keyof LevelData
-                            ] ?? ""
-                          }
-                          onChange={(e) =>
-                            handleInputChange(
-                              sub.subCategoryId,
-                              month,
-                              e.target.value,
-                            )
-                          }
-                        />
+                  {headerMonth?.map((month) => (
+                    <th
+                      key={month}
+                      colSpan={4}
+                      className="border border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
+                    >
+                      {month}
+                    </th>
+                  ))}
+                </tr>
+                <tr className="bg-gray-200 text-sm text-gray-600">
+                  {months.map((sub, idx) => (
+                    <th
+                      key={idx}
+                      className={`p-2 text-center ${
+                        idx % 4 === 0
+                          ? "border-l-4 border-gray-500"
+                          : "border-l-2 border-gray-300"
+                      }`}
+                    >
+                      {getDisplayColumn(sub)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              {!programDataLodaing && (
+                <tbody>
+                  {programData?.subCategories.map((sub) => (
+                    <tr
+                      key={sub.subCategoryId}
+                      className="text-sm transition hover:bg-gray-100"
+                    >
+                      <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
+                        {sub.subCategoryName.toLowerCase()}
                       </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            )}
-          </table>
+                      {months.map((month) => (
+                        <td
+                          key={month}
+                          className="border p-2"
+                          style={{ minWidth: "100px" }}
+                        >
+                          <input
+                            disabled={inputStates || isReadOnlyField(month)}
+                            type={month.endsWith("notes") ? "text" : "number"}
+                            placeholder={
+                              month.endsWith("notes")
+                                ? "Enter notes…"
+                                : undefined
+                            }
+                            className={`w-full rounded border p-1 ${
+                              isReadOnlyField(month) ? "bg-gray-100" : ""
+                            } ${month.endsWith("notes") ? "min-w-40" : ""}`}
+                            value={
+                              tableData[sub.subCategoryId]?.[
+                                month as keyof LevelData
+                              ] ?? ""
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                sub.subCategoryId,
+                                month,
+                                e.target.value,
+                              )
+                            }
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+          </div>
         </div>
         {filter?.map != 0 &&
           subdepartmentId != 0 &&

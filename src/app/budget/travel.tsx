@@ -510,7 +510,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
         }}
       >
         <summary
-          className="flex justify-center items-center grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:border-primary/40 hover:shadow-sm hover:cursor-pointer md:grid"
+          className="flex grid-cols-[1.2fr_repeat(5,1fr)_min-content] items-center justify-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:cursor-pointer hover:border-primary/40 hover:shadow-sm md:grid"
           onClick={(e) => {
             e.preventDefault();
             setSectionOpen(sectionOpen === "Travel" ? null : "Travel");
@@ -518,15 +518,15 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
         >
           {[
             // 1) Section title in col 1
-            <h1 key="section" className="text-md   capitalize ">
+            <h1 key="section" className="text-md capitalize">
               {section.toLowerCase()}
             </h1>,
 
             // 2–6) Q1–Q4 + Total in cols 2–6
-            ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (  
+            ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
               <div
                 key={label}
-                className=" hidden md:flex rounded-md border border-primary/20 bg-primary/5 px-3 py-1 flex flex-col items-center lg:flex-row lg:justify-center lg:gap-1"
+                className="flex hidden flex-col items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1 md:flex lg:flex-row lg:justify-center lg:gap-1"
               >
                 <span className="text-sm font-medium">{label}:</span>{" "}
                 {(label === "Total"
@@ -541,15 +541,14 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
               key="arrow"
               // className="text-lg font-bold transition-transform group-open:rotate-90"
               className="self-center justify-self-end text-lg font-bold transition-transform group-open:rotate-90"
-
             >
               →
             </span>,
           ]}
         </summary>
 
-        <div className="flex justify-center gap-2">
-          <div className="z-10 mt-3 w-1/4">
+        <div className="flex items-center gap-2">
+          <div className="mt-3 w-80">
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="flex w-full cursor-pointer items-center justify-between rounded-lg border py-1 pl-2 text-left text-sm font-normal text-gray-500">
@@ -557,6 +556,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
               <DropdownMenu.Content className="max-h-56 !w-[280px] overflow-y-scroll rounded-lg bg-white p-2 shadow-lg">
                 {subTravels.map((val, map) => (
                   <DropdownMenu.Item
@@ -568,6 +568,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                   </DropdownMenu.Item>
                 ))}
               </DropdownMenu.Content>
+              </DropdownMenu.Portal>
             </DropdownMenu.Root>
           </div>
           <Marquee className="mr-2 w-3/4 border">
@@ -617,84 +618,93 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
 
         <div className="overflow-scroll bg-gray-50">
           {/* Table */}
-          <table className="w-full table-auto border-collapse">
-            <thead>
-              <tr className="bg-gray-200 text-left text-sm text-gray-600">
-                <th rowSpan={2} className="border p-2 capitalize">
-                  {"Particular".toLowerCase()}
-                </th>
-                {headerMonth?.map((month, idx) => (
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto border-collapse">
+              <thead>
+                <tr className="bg-gray-200 text-left text-sm text-gray-600">
                   <th
-                    key={month}
-                    colSpan={4}
-                    className={`border border-b-2 border-gray-400 p-2 text-center capitalize ${"border-l-4 border-gray-500"} `}
+                    rowSpan={2}
+                    className="sticky left-0 z-20 border bg-gray-200 p-2 capitalize"
                   >
-                    {month}
+                    {"Particular".toLowerCase()}
                   </th>
-                ))}
-              </tr>
-              <tr className="bg-gray-200 text-sm text-gray-600">
-                {months.map((sub, idx) => (
-                  <th
-                    key={idx}
-                    className={`p-2 text-center ${
-                      idx % 4 === 0 || idx === 0
-                        ? "border-l-4 border-gray-500"
-                        : "border-l-2 border-gray-300"
-                    } `}
-                  >
-                    {getDisplayColumn(sub)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            {!travelDataLodaing && (
-              <tbody>
-                {travelData?.subCategories.map((sub) => {
-                  if (sub.subCategoryName != "Staff Benefits")
-                    return (
-                      <tr
-                        key={sub.subCategoryId}
-                        className="text-sm transition hover:bg-gray-100"
-                      >
-                        <td className="border p-2 font-medium capitalize">
-                          {getDisplayName(sub.subCategoryName)}
-                        </td>
-                        {months.map((month, key) => (
-                          <td
-                            key={month}
-                            className="border p-2"
-                            style={{ minWidth: "100px" }}
-                          >
-                            <input
-                              disabled={inputStates || isReadOnlyField(month)}
-                              id={sub.subCategoryId + month}
-                              type={key % 6 == 0 ? "number" : "text"}
-                              className={`w-full rounded border p-1 ${isReadOnlyField(month) ? "bg-gray-100" : ""}`}
-                              value={
-                                Number.isNaN(
-                                  tableData[sub.subCategoryId]?.[month],
-                                )
-                                  ? ""
-                                  : (tableData[sub.subCategoryId]?.[month] ??
-                                    "")
-                              }
-                              onChange={(e) =>
-                                handleInputChange(
-                                  sub.subCategoryId,
-                                  month,
-                                  e.target.value,
-                                )
-                              }
-                            />
+                  {headerMonth?.map((month) => (
+                    <th
+                      key={month}
+                      colSpan={4}
+                      className="border border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
+                    >
+                      {month}
+                    </th>
+                  ))}
+                </tr>
+                <tr className="bg-gray-200 text-sm text-gray-600">
+                  {months.map((sub, idx) => (
+                    <th
+                      key={idx}
+                      className={`p-2 text-center ${
+                        idx % 4 === 0
+                          ? "border-l-4 border-gray-500"
+                          : "border-l-2 border-gray-300"
+                      }`}
+                    >
+                      {getDisplayColumn(sub)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              {!travelDataLodaing && (
+                <tbody>
+                  {travelData?.subCategories.map((sub) => {
+                    if (sub.subCategoryName !== "Staff Benefits") {
+                      return (
+                        <tr
+                          key={sub.subCategoryId}
+                          className="text-sm transition hover:bg-gray-100"
+                        >
+                          <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
+                            {getDisplayName(sub.subCategoryName)}
                           </td>
-                        ))}
-                      </tr>
-                    );
-                })}
-              </tbody>
-            )}
-          </table>
+                          {months.map((month, key) => (
+                            <td
+                              key={month}
+                              className="border p-2"
+                              style={{ minWidth: "100px" }}
+                            >
+                              <input
+                                disabled={inputStates || isReadOnlyField(month)}
+                                id={sub.subCategoryId + month}
+                                type={key % 6 === 0 ? "number" : "text"}
+                                className={`w-full rounded border p-1 ${
+                                  isReadOnlyField(month) ? "bg-gray-100" : ""
+                                }`}
+                                value={
+                                  Number.isNaN(
+                                    tableData[sub.subCategoryId]?.[month],
+                                  )
+                                    ? ""
+                                    : (tableData[sub.subCategoryId]?.[month] ??
+                                      "")
+                                }
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    sub.subCategoryId,
+                                    month,
+                                    e.target.value,
+                                  )
+                                }
+                              />
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    }
+                  })}
+                </tbody>
+              )}
+            </table>
+          </div>
         </div>
         {filter?.map != 0 &&
           subdepartmentId != 0 &&

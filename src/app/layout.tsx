@@ -8,8 +8,10 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { Theme } from "@radix-ui/themes";
 import AppBar from "./_components/appBar";
 import { ContextProvider } from "~/context"; // Correct path to AuthContext
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { ToastContainer} from 'react-toastify';
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function RootLayout({
   children,
@@ -35,6 +37,17 @@ export default function RootLayout({
 
 const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { data: session } = useSession();
+  const router = useRouter();
+  useEffect(() => {
+    const handlePop = (evt: PopStateEvent) => {
+      // whenever a history “back” navigation happens
+      // sign the user out and redirect to /login
+      signOut({ callbackUrl: '/login' });
+    };
+
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, [router]);
 
   return (
     <>

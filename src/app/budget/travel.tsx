@@ -547,8 +547,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
           ]}
         </summary>
 
-        <div className="flex justify-center gap-2">
-          <div className="z-10 mt-3 w-1/4">
+        <div className="flex items-center gap-2">
+          <div className="mt-3 w-80">
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="flex w-full cursor-pointer items-center justify-between rounded-lg border py-1 pl-2 text-left text-sm font-normal text-gray-500">
@@ -556,6 +556,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
               <DropdownMenu.Content className="max-h-56 !w-[280px] overflow-y-scroll rounded-lg bg-white p-2 shadow-lg">
                 {subTravels.map((val, map) => (
                   <DropdownMenu.Item
@@ -567,6 +568,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                   </DropdownMenu.Item>
                 ))}
               </DropdownMenu.Content>
+              </DropdownMenu.Portal>
             </DropdownMenu.Root>
           </div>
           <Marquee className="mr-2 w-3/4 border">

@@ -444,6 +444,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                   <RiArrowDropDownLine size={30} />
                 </button>
               </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
               <DropdownMenu.Content className="max-h-56 !w-[250px] overflow-y-scroll rounded-lg bg-white p-2 shadow-lg">
                 {subProgramActivites
                   .sort((a, b) => a.name.localeCompare(b.name))
@@ -457,6 +458,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                     </DropdownMenu.Item>
                   ))}
               </DropdownMenu.Content>
+              </DropdownMenu.Portal>
             </DropdownMenu.Root>
           </div>
           <Marquee className="flex w-full flex-col items-end gap-1 pr-10 font-medium">

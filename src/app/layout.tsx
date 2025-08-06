@@ -42,7 +42,7 @@ const AppContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const handlePop = (evt: PopStateEvent) => {
       // whenever a history “back” navigation happens
       // sign the user out and redirect to /login
-      signOut({ callbackUrl: '/login' });
+      void signOut({ callbackUrl: '/login' });
     };
 
     window.addEventListener('popstate', handlePop);

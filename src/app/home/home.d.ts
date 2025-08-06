@@ -1,9 +1,10 @@
 interface FilterOptions {
-    department: string;
+    departmentId: string;
     departmentname: string;
     year: string;
     subdepartmentId: number
     subdepartmentName: string
+    quarter: string
 }
 type HandleSelectValue =
     | { id: string | number; departmentname: string } // For department objects

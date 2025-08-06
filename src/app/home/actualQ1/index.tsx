@@ -19,6 +19,7 @@ const ActualQ1 = ({ financialYear }: { financialYear: string }) => {
   const userData = useSession()
   const [tableData, setTableData] = useState<tableDataSchema>({})
   const { data: cat, isLoading: catsLoading } = api.get.getCats.useQuery()
+  console.log(cat, 'cat')
   const { data: q1data} = api.get.getQuarterBudgetSum.useQuery({ financialYear: financialYear, quarter: "q1",departmentId:userData.data?.user.departmentId }, { enabled: !!cat && !catsLoading })
 
   useEffect(() => {
@@ -79,10 +80,10 @@ const ActualQ1 = ({ financialYear }: { financialYear: string }) => {
               const item = tableData[k]
               return <tr key={k} className="hover:bg-gray-100 text-sm transition-colors">
                 <td className="p-1 border text-left">{item?.bHead}</td>
-                <td className="p-1 border text-center">{item?.actQ1}</td>
-                <td className="p-1 border text-center">{item?.q1bal}</td>
-                <td className="p-1 border text-center">{item?.util}</td>
-                <td className="p-1 border text-center">{item?.budget}</td>
+                {/* <td className="p-1 border text-center">{item?.actQ1}</td>
+                <td className="p-1 border text-center">{item?.q1bal}</td> */}
+                {/* <td className="p-1 border text-center">{item?.util}</td>
+                <td className="p-1 border text-center">{item?.budget}</td> */}
               </tr>
 
             })

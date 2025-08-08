@@ -4,6 +4,7 @@ import { and, eq, sql, inArray } from "drizzle-orm";
 import {
   budgetDetailsInFinanceProject,
   budgetMasterInFinanceProject,
+  staffMasterInFinanceProject,
 } from "~/server/db/schema";
 
 export const getTotalBudgetSum = protectedProcedure
@@ -142,7 +143,7 @@ export const getBudgetSum = protectedProcedure
       financialYear: z.string(),
       departmentId: z.number().optional().nullable(),
       subDeptId: z.number().optional().nullable(),
-    //   quarter: z.enum(["All", "Q1", "Q2", "Q3", "Q4"]),
+      //   quarter: z.enum(["All", "Q1", "Q2", "Q3", "Q4"]),
     }),
   )
   .query(async ({ ctx, input }) => {
@@ -199,17 +200,57 @@ export const getBudgetSum = protectedProcedure
       .groupBy(budgetDetailsInFinanceProject.catid);
     console.log(quarterBudget, "quarterBudget");
 
+    const staffConditions = [eq(staffMasterInFinanceProject.isactive, true)];
+    if (departmentId && departmentId !== 0) {
+      staffConditions.push(
+        eq(staffMasterInFinanceProject.department, departmentId),
+      );
+    }
+    if (subDeptId && subDeptId !== 0) {
+      staffConditions.push(
+        eq(staffMasterInFinanceProject.subDeptid, subDeptId),
+      );
+    }
+
+    // 2. Run a single COUNT query (no GROUP BY)
+    const employeeCount = await ctx.db
+      .select({
+        total_count: sql<number>`COUNT(${staffMasterInFinanceProject.id})`.as(
+          "total_count",
+        ),
+      })
+      .from(staffMasterInFinanceProject)
+      .where(and(...staffConditions));
+    const budgetData =
+      quarterBudget.length > 0
+        ? quarterBudget.map((q) => ({
+            catid: q.catid,
+            budget:
+              Number(q.q1Sum) +
+                Number(q.q2Sum) +
+                Number(q.q3Sum) +
+                Number(q.q4Sum) || 0,
+            q1: Number(q.q1Sum) || 0,
+            q2: Number(q.q2Sum) || 0,
+            q3: Number(q.q3Sum) || 0,
+            q4: Number(q.q4Sum) || 0,
+            employeeCount: employeeCount[0]?.total_count  ?? 0,
+          }))
+        : [
+            {
+              // default row when no data
+              catid: 0, // or null if you prefer
+              budget: 0,
+              q1: 0,
+              q2: 0,
+              q3: 0,
+              q4: 0,
+              employeeCount: employeeCount[0]?.total_count  ?? 0,
+            },
+          ];
+
     return {
-      budgetData: quarterBudget.map((q) => ({
-        catid: q.catid,
-        // catName:q.catName,
-        budget:
-          Number(q.q1Sum) + Number(q.q2Sum) + Number(q.q3Sum) + Number(q.q4Sum),
-        q1: Number(q.q1Sum),
-        q2: Number(q.q2Sum),
-        q3: Number(q.q3Sum),
-        q4: Number(q.q4Sum),
-      })),
+      budgetData,
       departmentId,
       subDeptId,
       financialYear,

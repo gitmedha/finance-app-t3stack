@@ -12,6 +12,7 @@ export interface BudgetItem {
   actual: number; // actual spent
   variance?: number; // budget – actual
   utilization?: string; // e.g. "60%"
+  employeeCount: number;
 }
 
 export interface GetBudgetSumResponse {
@@ -48,6 +49,7 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
     ) {
       return [];
     }
+    const totalEmp = budgetRes.budgetData[0]?.employeeCount ?? 0;
 
     // Map the quarter name to the field in your API response
     const quarterField: keyof (typeof budgetRes.budgetData)[0] =
@@ -80,6 +82,7 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
         actual: amount, // same here, or wire up your real actual
         variance,
         utilization,
+        employeeCount: totalEmp,
       };
     });
   }, [
@@ -96,13 +99,14 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
   if (catsLoading || budgetLoading) {
     return <div>Loading...</div>;
   }
-
+  console.log(rows, "rows");
   return (
     <div className="overflow-x-auto rounded-md bg-white shadow-lg">
       <table className="min-w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-200 text-center text-sm text-gray-600">
             <th className="p-2 text-left">Description</th>
+            <th className="p-2 font-bold">Employee Count</th>
             <th className="p-2 font-bold">Budget</th>
             <th className="p-2 font-bold">Actual</th>
             {/* hide on <640px */}
@@ -119,6 +123,9 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
               {/* Description */}
               <td className="border p-1 text-left font-medium">
                 {row.categoryName}
+              </td>
+              <td className="border p-1 text-center">
+                {row.employeeCount}
               </td>
               {/* Budget */}
               <td className="border p-1 text-center">

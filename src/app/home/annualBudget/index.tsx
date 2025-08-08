@@ -1,63 +1,74 @@
 import { useSession } from "next-auth/react";
-import {  type FC } from "react";
+import { FC } from "react";
 import { api } from "~/trpc/react";
 
-// Define types for maricsList items
 interface MetricItem {
-    count: number|string;
-    title: string;
-    name: string;
-    viewLink?: string;
-    addOn?:string
+  count: number | string;
+  title: string;
+  addOn?: string;
 }
 
-const maricsList: MetricItem[] = [
-    { count: "", title: 'Financial Year', name: 'noofweektimesheetpendingapproval' },
-    { count: 33, title: 'Budget Planned', name: 'totalnoofskills',addOn:"INR"},
-    { count: 4, title: 'Budget Actual', name: 'totalprojectsworked',addOn:"INR"},
-    { count: 40, title: 'Budget Balance', name: 'noofweektimesheetpendingsubmission',addOn:"INR"},
-    { count: 1, title: 'Budget Utilized %', name: 'noofweektimesheetpendingapproval',addOn:"%"},
-];
+const PendingCard: FC<{
+  count: number | string;
+  title: string;
+  addOn?: string;
+}> = ({ count, title, addOn }) => (
+  <div className="min-h-[70px] rounded-lg bg-white p-3 shadow-lg">
+    <p className="text-3xl font-bold text-[#fe9701]">
+      {count || 0} {addOn}
+    </p>
+    <p className="text-sm font-semibold text-primary">{title}</p>
+  </div>
+);
 
-// Define types for PendingCard props
-interface PendingCardProps {
-    count: number|string;
-    title: string;
-    addOn?:string
-}
+const AnnualBudget: FC<{ financialYear: string }> = ({ financialYear }) => {
+  const userData = useSession();
+  const { data } = api.get.getTotalBudgetSum.useQuery({
+    financialYear,
+    departmentId: userData.data?.user.departmentId,
+  });
+  console.log(data, "data");
+  // default to zero if data is still loading or absent
+  const planned = data ?? 0;
+  const actual = data ?? 0;
+  const balance = Number(planned) - Number(actual);
+  const utilizedPct =
+    Number(planned) > 0
+      ? ((Number(actual) / Number(planned)) * 100).toFixed(1) + "%"
+      : "0%";
 
-const PendingCard: FC<PendingCardProps> = ({ count, title,addOn }) => {
+  const metricsList: MetricItem[] = [
+    { title: "Financial Year", count: financialYear },
+    {
+      title: "Budget Planned",
+      count: Number(planned).toLocaleString("hi-IN"),
+      addOn: "INR",
+    },
+    {
+      title: "Budget Actual",
+      count: Number(actual).toLocaleString("hi-IN"),
+      addOn: "INR",
+    },
+    {
+      title: "Budget Balance",
+      count: Number(balance).toLocaleString("hi-IN"),
+      addOn: "INR",
+    },
+    { title: "Budget Utilized %", count: utilizedPct },
+  ];
 
-    return (
-        <div className="p-3 bg-white rounded-lg shadow-lg min-h-[70px]">
-            <div className="w-full text-left">
-                <p className="mr-2 text-3xl font-bold text-[#fe9701]">{count || 0}&nbsp;{addOn}</p>
-                <p className="text-sm font-semibold inline-flex justify-start text-primary">{title}</p>
-            </div>
-        </div>
-    );
-};
-
-
-const AnnualBudget = ({ financialYear }: { financialYear :string}) => {
-    const userData = useSession()
-    // call to get total sum 
-    const { data: totalBudgetSum } = api.get.getTotalBudgetSum.useQuery(
-        { financialYear:financialYear,departmentId:userData.data?.user.departmentId}
-    )
-    return (
-                 <div className="grid grid-cols-5 gap-4">
-                    {maricsList.map((item) => (
-                        <PendingCard
-                            key={item.title}
-                            count={item.title == "Budget Planned" ? totalBudgetSum ? Math.round(Number(totalBudgetSum)).toLocaleString('hi-IN') : 0 : item.title == "Financial Year" ? financialYear : item.count}
-                            title={item.title}
-                            addOn={item.addOn}
-                        />
-                    ))}
-                </div>
-        
-    );
+  return (
+    <div className="grid grid-cols-5 gap-4">
+      {metricsList.map((m) => (
+        <PendingCard
+          key={m.title}
+          count={m.count}
+          title={m.title}
+          addOn={m.addOn}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default AnnualBudget;

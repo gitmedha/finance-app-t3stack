@@ -196,11 +196,14 @@ export const addStaff = protectedProcedure
       description: z.string().optional().nullable(),
       createdBy: z.number().min(1, "Invalid creator ID"),
       createdAt: z.string(),
-      subDeptId: z.number().optional().nullable()
+      subDeptId: z.number().optional().nullable(),
+      dateOfJoining: z.string().optional().nullable(),
+      dateOfResigning: z.string().optional().nullable(),
     }),
   )
   .mutation(async ({ ctx, input }) => {
     try {
+      console.log(input, "addstaffinput");
       const employeId = await ctx.db
       .select()
       .from(staffMaster)
@@ -352,6 +355,7 @@ export const deleteStaff = protectedProcedure
         .update(staffMaster)
         .set({
           isactive: false,
+          dateOfResigning: new Date().toISOString().split("T")[0],
         })
         .where(eq(staffMaster.id, id))
         .returning();

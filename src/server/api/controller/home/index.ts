@@ -1,6 +1,6 @@
 import { protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
-import { and, eq, sql, inArray, lte, or, gte, isNull } from "drizzle-orm";
+import { and, eq, sql, inArray, lte, or, gte, isNull, SQLWrapper } from "drizzle-orm";
 import {
   budgetDetailsInFinanceProject,
   budgetMasterInFinanceProject,
@@ -198,7 +198,7 @@ export const getQuarterBudgetSum = protectedProcedure
     const budgetIds = bmRows.map((r) => r.id);
 
     // ─── 4. Sum up budget details for each category ──────────────────────────
-    const bdWhere: any[] = [ inArray(budgetDetailsInFinanceProject.budgetid, budgetIds) ];
+    const bdWhere: (SQLWrapper | undefined)[] = [ inArray(budgetDetailsInFinanceProject.budgetid, budgetIds) ];
     if (subDeptId && subDeptId !== 0) {
       bdWhere.push(
         eq(budgetDetailsInFinanceProject.subDeptid, subDeptId)
@@ -233,7 +233,7 @@ export const getQuarterBudgetSum = protectedProcedure
       .groupBy(budgetDetailsInFinanceProject.catid);
 
     // ─── 5. Count staff on-roll during the period ────────────────────────────
-    const stWhere: any[] = [
+    const stWhere: (SQLWrapper | undefined)[] = [
       eq(staffMasterInFinanceProject.isactive, true),
       // employed on or before periodEnd
       lte(staffMasterInFinanceProject.dateOfJoining, periodEnd),

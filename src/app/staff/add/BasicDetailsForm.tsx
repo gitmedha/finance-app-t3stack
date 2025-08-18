@@ -389,7 +389,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           </label>
           <input
             type="date"
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
             {...register("dateOfJoining", { required: "Date of joining is required" })}
           />
           {errors.dateOfJoining && (

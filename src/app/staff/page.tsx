@@ -48,6 +48,7 @@ export default function Staff() {
     level: 0,
     subdepartment: userData.data?.user.subDepartmentId ?? 0,
     subdepartmentname: userData.data?.user.subDepartmentName ?? "",
+    tbhPrefix: "" as "" | "TBH",
   });
   console.log("🚀 filters:", filters);
 
@@ -90,6 +91,8 @@ export default function Staff() {
   /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 
   const handleSelect = (name: string, value: object) => {
+    console.log("🚀 name:", name);
+    console.log("🚀 value:", value);
     if (name === "department") {
       setFilters((prev) => ({
         ...prev,
@@ -112,6 +115,11 @@ export default function Staff() {
         ...prev,
         [name]: (value as any)?.value, // Using 'any' with optional chaining
       }));
+    } else if (name === "tbhPrefix") {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: (value as any)?.value, // Using 'any' with optional chaining
+      }));
     }
   };
 
@@ -125,6 +133,16 @@ export default function Staff() {
     setLimit(newLimit);
   };
 
+  const filteredStaffs =
+  (result?.staffs ?? []).filter((s) => {
+    if (!filters.tbhPrefix) return true; // ALL
+    const dn = s.name || "";
+    return dn.slice(0, 3).toLowerCase() === "tbh"; // TBH only
+  });
+
+  console.log("🚀 filteredStaffs:", filteredStaffs);
+  console.log("🚀 result:", result);
+
   return (
     <div className="mt-20 flex justify-center">
       <div className="container mt-6 min-h-[400px] min-w-full rounded bg-white px-3 py-4 shadow lg:mt-0">
@@ -132,7 +150,7 @@ export default function Staff() {
           <div className="flex flex-col items-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
             <div  className="flex items-center space-x-2">
             {/* count */}
-            <span className="font-semibold">Count: {result?.totalCount}</span>
+            <span className="font-semibold">Count: {filteredStaffs.length}</span>
             {/* search */}
             <div className="w-[180px]">
               <SearchInput
@@ -147,9 +165,9 @@ export default function Staff() {
           </div>
           {/* pagination and add staff button */}
           <div className="flex items-center justify-center space-x-2 md:justify-end">
-            {result?.staffs && (
+            {filteredStaffs && (
               <ReactPaginationStyle
-                total={result?.totalCount}
+                total={filteredStaffs.length}
                 currentPage={currentPage}
                 handlePagination={handlePagination}
                 limit={limit}
@@ -177,11 +195,11 @@ export default function Staff() {
             </div>
           </div>
         ) : (
-          result?.staffs && (
+            filteredStaffs && (
             <>
               {/* 1. Mobile view: show cards only on <640px */}
               <div className="sm:hidden">
-                {result?.staffs.map((item) => (
+                {filteredStaffs.map((item) => (
                   <div
                     key={item.id}
                     className="flex items-center justify-between border-b p-4"
@@ -241,7 +259,7 @@ export default function Staff() {
                     </tr>
                   </thead>
                   <tbody>
-                    {result?.staffs.map((item: StaffItem) => (
+                    {filteredStaffs.map((item: StaffItem) => (
                       <tr
                         key={item.id}
                         className="border-b text-sm transition-colors hover:bg-gray-100"

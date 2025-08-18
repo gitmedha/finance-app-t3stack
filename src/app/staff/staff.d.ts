@@ -107,6 +107,7 @@ interface FilterOptions {
   level: number;           // Changed from string to number to match backend type
   subdepartment: number|string;
   subdepartmentname: string;
+  tbhPrefix: "" | "TBH";
 }
 
 interface StaffFilterFormProps {

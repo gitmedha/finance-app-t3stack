@@ -27,6 +27,14 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   // Filter out inactive departments and subdepartments
   const departmentDataFiltered = data?.filter(dept => dept.isactive !== false) ?? [];
   const subDeptsDataFiltered = subDeptsData?.filter(subDept => subDept.isactive !== false) ?? [];
+
+  const departmentDataTBHFiltered =
+    filters.tbhPrefix === "TBH"
+      ? departmentDataFiltered.filter((d) =>
+          (d?.label ?? "").slice(0, 3).toLowerCase() === "tbh",
+        )
+      : departmentDataFiltered;
+  
   
   useEffect(() => {
     if (userData.data?.user.departmentId && userData.data?.user.departmentName)
@@ -170,6 +178,32 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
                 onSelect={() => handleSelect('status', status)}
               >
                 {status.value || 'All'}
+              </DropdownMenu.Item>
+            ))}
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      </div>
+
+      {/* 🔹 NEW: ALL / TBH dropdown */}
+      <div className='w-full md:w-32 flex flex-col gap-1'>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center'>
+              <span>{filters.tbhPrefix === "TBH" ? "TBH" :  "All"}</span>
+              <RiArrowDropDownLine size={30} />
+            </button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[140px]">
+            {[
+              { label: "ALL", value: "" },
+              { label: "TBH", value: "TBH" },
+            ].map(opt => (
+              <DropdownMenu.Item
+                key={opt.label}
+                className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
+                onSelect={() => handleSelect('tbhPrefix', opt)} // 🔹 uses your existing handler
+              >
+                {opt.label}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>

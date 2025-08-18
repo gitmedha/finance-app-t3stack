@@ -8,7 +8,6 @@ import {  type ISelectItem } from "../../common/types/genericField";
 import useStaff from "../store/staffStore";
 import { toast } from "react-toastify"
 import { TRPCClientError } from "@trpc/client";
-import { date } from "drizzle-orm/mysql-core";
 interface ItemDetailProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   refetchStaffs: () => void;
@@ -100,7 +99,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         departmentId: Number(data.departmenData.value),
         level:Number(data.levelData.value),
         subDeptId: data.subDepartmentData?.value ? Number(data.subDepartmentData.value) : null,
-        dateOfJoining: new Date().toISOString().split("T")[0],
+        dateOfJoining: data.dateOfJoining,
         dateOfResigning: null
       };
       setActiveStaffDetails(submissionData);
@@ -380,6 +379,22 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           {errors.natureOfEmployment && (
             <span className="text-xs text-red-500">
               {errors.natureOfEmployment.message}
+            </span>
+          )}
+        </div>
+        {/* Date of Joining */}
+        <div className="w-1/2">
+          <label className="text-sm">
+            Date of Joining <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="date"
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            {...register("dateOfJoining", { required: "Date of joining is required" })}
+          />
+          {errors.dateOfJoining && (
+            <span className="text-xs text-red-500">
+              {errors.dateOfJoining.message}
             </span>
           )}
         </div>

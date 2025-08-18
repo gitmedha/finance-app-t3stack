@@ -31,9 +31,11 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
         financialYear: filters.year,
         departmentId: Number(filters.departmentId),
         subDeptId: filters.subdepartmentId,
+        quarter: filters.quarter as "All" | "Q1" | "Q2" | "Q3" | "Q4",
       },
       { enabled: !!catData },
     );
+  console.log(filters, "homepagefilters");
   console.log(budgetRes, "budgetRes");
   // join categories + budgets into rows
   const rows = useMemo<BudgetItem[]>(() => {
@@ -49,7 +51,10 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
     ) {
       return [];
     }
+    // const totalEmp = budgetRes.budgetData[0]?.employeeCount ?? 0;
+    // pick a plain number out of whatever you got back
     const totalEmp = budgetRes.budgetData[0]?.employeeCount ?? 0;
+
 
     // Map the quarter name to the field in your API response
     const quarterField: keyof (typeof budgetRes.budgetData)[0] =
@@ -124,9 +129,7 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
               <td className="border p-1 text-left font-medium">
                 {row.categoryName}
               </td>
-              <td className="border p-1 text-center">
-                {row.employeeCount}
-              </td>
+              <td className="border p-1 text-center">{row.employeeCount}</td>
               {/* Budget */}
               <td className="border p-1 text-center">
                 {row.budget.toLocaleString("hi-IN")}

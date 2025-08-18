@@ -8,6 +8,7 @@ import {  type ISelectItem } from "../../common/types/genericField";
 import useStaff from "../store/staffStore";
 import { toast } from "react-toastify"
 import { TRPCClientError } from "@trpc/client";
+import { date } from "drizzle-orm/mysql-core";
 interface ItemDetailProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   refetchStaffs: () => void;
@@ -32,6 +33,8 @@ interface StaffFormData {
   project: string;
   createdBy: number;
   createdAt: string; 
+  dateOfJoining: string;
+  dateOfResigning: string;
 }
 const typeMapping: typeMappingSchema []= [
   { label:"Full Time Consultant",value:"FTC"},
@@ -96,7 +99,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         locationId: data.locationData.label.toString(),
         departmentId: Number(data.departmenData.value),
         level:Number(data.levelData.value),
-        subDeptId: data.subDepartmentData?.value ? Number(data.subDepartmentData.value) : null
+        subDeptId: data.subDepartmentData?.value ? Number(data.subDepartmentData.value) : null,
+        dateOfJoining: new Date().toISOString().split("T")[0],
+        dateOfResigning: null
       };
       setActiveStaffDetails(submissionData);
       addStaff(submissionData);

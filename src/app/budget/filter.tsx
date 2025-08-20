@@ -110,7 +110,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
       },
     });
   };
-
+console.log(filters, 'filters')
   return (
     <div className='bg-white static md:fixed md:top-14 w-full z-50'>
       <div className='flex justify-between  bg-white   w-full py-5 px-2'>
@@ -221,9 +221,9 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
           
         </div>
         {
-          budgetId != 0 && filters.subdepartmentId!= 0 &&<div className='flex justify-end items-center space-x-2'>
+          budgetId != 0 && filters?.department != '0' &&<div className='flex justify-end items-center space-x-2'>
             {
-              !budgetId && userData.data?.user.role == 2 && <Button
+              !budgetId && (userData.data?.user.role == 2 || userData.data?.user.role == 1) && <Button
                 type="button"
                 className="!cursor-pointer !text-white !bg-primary px-2"
                 variant="soft"
@@ -290,7 +290,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
                 className="!cursor-pointer !bg-primary text-white"
                 onClick={() => handelStatusUpdate("submitted",userData.data?.user.id ?? 1)}
               >
-                Submit
+                Submitt
               </Button> : <Button
                 type="submit"
                 className="!cursor-pointer !bg-primary text-white"

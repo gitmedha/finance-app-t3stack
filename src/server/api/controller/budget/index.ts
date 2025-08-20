@@ -62,6 +62,7 @@ export const createBudget = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
+      console.log(input,'createBudget input')
       const result = await ctx.db
         .insert(budgetMasterInFinanceProject)
         .values({

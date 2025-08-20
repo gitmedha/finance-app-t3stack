@@ -65,6 +65,16 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const { mutate: addStaff } = api.post.addStaff.useMutation({
     async onSuccess(data) {
+      toast.success('Successfully Saved', {
+        position: "bottom-left",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       await apiContext.get.getStaffs.invalidate();
       if (data.staff) {
         setActiveStaffId(data.staff?.id);
@@ -72,9 +82,22 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       refetchStaffs();
     },
     onError(err) {
-      console.error("Error adding staff:", err);
+      toast.error(`Failed to Save ${err.message}`, {
+        position: "bottom-left",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      console.error("Error adding staff:", err.message);
+      console.log(err,'staff err')
     },
   });
+
+  
 // data
   const { data: departmentData } = api.get.getHeadDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
@@ -104,16 +127,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       };
       setActiveStaffDetails(submissionData);
       addStaff(submissionData);
-      toast.success('Successfully Saved', {
-        position: "bottom-left",
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      
       // // reset(submissionData);
     } catch (error) {
       console.error("Error adding staff:", error);

@@ -1,5 +1,14 @@
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, ilike,aliasedTable,or } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  ilike,
+  aliasedTable,
+  or,
+  sql,
+} from "drizzle-orm";
 import { z } from "zod";
 import {
   //   createTRPCRouter,
@@ -16,21 +25,29 @@ import {
   categoryMasterInFinanceProject,
 } from "~/server/db/schema";
 
-const subDepartmentTable = aliasedTable(departmentMaster,"subDepartmentTable")
+const subDepartmentTable = aliasedTable(departmentMaster, "subDepartmentTable");
 export const getStaffs = protectedProcedure
   .input(
     z.object({
       page: z.number().min(1).default(1),
       limit: z.number().min(1).max(100).default(10),
-      searchTerm: z.string().optional().default(""), 
-      department: z.number().optional().default(0), 
-      status: z.string().optional().default("Active"), 
+      searchTerm: z.string().optional().default(""),
+      department: z.number().optional().default(0),
+      status: z.string().optional().default("Active"),
       level: z.number().optional().default(0),
-      subdepartment:z.number().optional().default(0),
+      subdepartment: z.number().optional().default(0),
     }),
   )
   .query(async ({ ctx, input }) => {
-    const { page, limit, searchTerm, status, department, level, subdepartment} = input;
+    const {
+      page,
+      limit,
+      searchTerm,
+      status,
+      department,
+      level,
+      subdepartment,
+    } = input;
     const offset = (page - 1) * limit;
     // Apply the search condition only if searchTerm is not an empty string
     const searchCondition = searchTerm
@@ -38,21 +55,22 @@ export const getStaffs = protectedProcedure
       : undefined;
     const departmentCondition =
       department === 0 ? undefined : eq(staffMaster.department, department);
-    const subdepartmentCondition = 
-      subdepartment == 0 ? undefined:eq(staffMaster.subDeptid,subdepartment)
-    const statusCondition = status ?  eq(staffMaster.isactive, status === "Active"):undefined;
-    const levelCondition = level === 0
-      ? undefined
-      : eq(staffMaster.level, level);
+    const subdepartmentCondition =
+      subdepartment == 0 ? undefined : eq(staffMaster.subDeptid, subdepartment);
+    const statusCondition = status
+      ? eq(staffMaster.isactive, status === "Active")
+      : undefined;
+    const levelCondition =
+      level === 0 ? undefined : eq(staffMaster.level, level);
 
     const staffs = await ctx.db
       .select({
         id: staffMaster.id,
         name: staffMaster.name,
         empNo: staffMaster.empNo,
-        email:staffMaster.email,
-        level:staffMaster.level,
-        levelName:categoryMasterInFinanceProject.categoryname,
+        email: staffMaster.email,
+        level: staffMaster.level,
+        levelName: categoryMasterInFinanceProject.categoryname,
         isactive: staffMaster.isactive,
         notes: staffMaster.notes,
         nature_of_employment: staffMaster.natureOfEmployment,
@@ -76,8 +94,8 @@ export const getStaffs = protectedProcedure
         gratuity: salaryMaster.gratuity,
         epf: salaryMaster.epf,
         pgwPld: salaryMaster.pgwPld,
-        subDeptid:staffMaster.subDeptid,
-        subDeptName:subDepartmentTable.departmentname
+        subDeptid: staffMaster.subDeptid,
+        subDeptName: subDepartmentTable.departmentname,
       })
       .from(staffMaster)
       .leftJoin(
@@ -96,9 +114,7 @@ export const getStaffs = protectedProcedure
       )
       .leftJoin(
         categoryMasterInFinanceProject,
-        and(
-          eq(categoryMasterInFinanceProject.id,staffMaster.level)
-        )
+        and(eq(categoryMasterInFinanceProject.id, staffMaster.level)),
       )
       .leftJoin(salaryMaster, and(eq(salaryMaster.empId, staffMaster.id)))
       .where(
@@ -130,13 +146,15 @@ export const getStaffs = protectedProcedure
 
     const totalCount = totalCountResult[0]?.count ?? 0;
 
-    const updatedStaffs: Array<typeof staffs[0] & {
-      statesData: { value: string | null; label: string | null };
-      locationData: { value: string | null; label: string | null };
-      departmentData: { value: number | null; label: string | null };
-      levelData: { value: number | null; label: string | null };
-      subDeptData: { value: number | null; label: string | null };
-    }> = [];
+    const updatedStaffs: Array<
+      (typeof staffs)[0] & {
+        statesData: { value: string | null; label: string | null };
+        locationData: { value: string | null; label: string | null };
+        departmentData: { value: number | null; label: string | null };
+        levelData: { value: number | null; label: string | null };
+        subDeptData: { value: number | null; label: string | null };
+      }
+    > = [];
 
     for (const staff of staffs) {
       const statesData = {
@@ -154,13 +172,13 @@ export const getStaffs = protectedProcedure
         label: staff.departmentname,
       };
       const subDeptData = {
-        value:staff.subDeptid,
-        label:staff.subDeptName
-      }
+        value: staff.subDeptid,
+        label: staff.subDeptName,
+      };
       const levelData = {
-        value:staff.level,
-        label:staff.levelName
-      }
+        value: staff.level,
+        label: staff.levelName,
+      };
 
       updatedStaffs.push({
         ...staff,
@@ -168,7 +186,7 @@ export const getStaffs = protectedProcedure
         locationData,
         departmentData,
         levelData,
-        subDeptData
+        subDeptData,
       });
     }
     return {
@@ -202,27 +220,27 @@ export const addStaff = protectedProcedure
     }),
   )
   .mutation(async ({ ctx, input }) => {
-    try {
-      console.log(input, "addstaffinput");
-      const employeId = await ctx.db
+    const existing = await ctx.db
       .select()
       .from(staffMaster)
-      .where(or(eq(staffMaster.empNo,input.empNo),eq(staffMaster.email,input.email)))
-      // Format data for insertion
-      if(employeId?.length>0)
-      {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Employee ID or Employee Email already Present",
-        });
-      }
+      .where(
+        or(
+          eq(sql`LOWER(${staffMaster.empNo})`, input.empNo.toLowerCase()),
+          eq(sql`LOWER(${staffMaster.email})`, input.email.toLowerCase()),
+        ),
+      );
+    // Format data for insertion
+    if (existing?.length > 0) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Employee ID or Employee Email already Present",
+      });
+    }
+    try {
       const formattedInput = {
         ...input,
         department: input.departmentId,
-        subDeptid:input.subDeptId,
-        // id: undefined, // Ensure ID is not manually set
-        // state: undefined, // Ensure no conflicting state field
-        // location: undefined, // Ensure no conflicting location field
+        subDeptid: input.subDeptId,
       };
 
       // Insert new staff member into the database
@@ -241,7 +259,6 @@ export const addStaff = protectedProcedure
       console.error("Error adding staff:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         message: `Failed to add staff: ${error}`,
       });
     }
@@ -265,13 +282,19 @@ export const editStaff = protectedProcedure
       project: z.string().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
-      subDeptid: z.number().optional().nullable()
+      subDeptid: z.number().optional().nullable(),
     }),
   )
   .mutation(async ({ ctx, input }) => {
     try {
       console.log(input, "edit input");
-      const { id, updatedBy, updatedAt, natureOfEmployment,...fieldsToUpdate } = input;
+      const {
+        id,
+        updatedBy,
+        updatedAt,
+        natureOfEmployment,
+        ...fieldsToUpdate
+      } = input;
       // Check if the staff member exists
       const existingStaff =
         await ctx.db.query.staffMasterInFinanceProject.findFirst({
@@ -290,17 +313,17 @@ export const editStaff = protectedProcedure
         .update(staffMaster)
         .set({
           ...fieldsToUpdate,
-          natureOfEmployment:natureOfEmployment,
+          natureOfEmployment: natureOfEmployment,
           updatedBy,
           updatedAt,
         })
         .where(eq(staffMaster.id, id))
-        .returning()
+        .returning();
       console.log(updatedStaff, "updatedStaff");
       return {
         success: true,
         message: "Staff member updated successfully",
-        staff: updatedStaff[0], 
+        staff: updatedStaff[0],
       };
     } catch (error) {
       console.error("Error updating staff:", error);
@@ -370,7 +393,8 @@ export const deleteStaff = protectedProcedure
 
       return {
         success: true,
-        message: "Staff member and associated salary details deleted successfully",
+        message:
+          "Staff member and associated salary details deleted successfully",
         staff: updatedStaff[0], // Return the updated staff record
       };
     } catch (error) {
@@ -383,7 +407,7 @@ export const deleteStaff = protectedProcedure
     }
   });
 
-export const getLevels = protectedProcedure.query(async ({ ctx}) => {
+export const getLevels = protectedProcedure.query(async ({ ctx }) => {
   const subCategories = await ctx.db
     .select({
       subCategoryId: categoryHierarchyInFinanceProject.catId,
@@ -392,7 +416,10 @@ export const getLevels = protectedProcedure.query(async ({ ctx}) => {
     .from(categoryHierarchyInFinanceProject)
     .innerJoin(
       categoryMasterInFinanceProject,
-      eq(categoryHierarchyInFinanceProject.catId, categoryMasterInFinanceProject.id)
+      eq(
+        categoryHierarchyInFinanceProject.catId,
+        categoryMasterInFinanceProject.id,
+      ),
     )
     .where(eq(categoryHierarchyInFinanceProject.parentId, 1));
   const levelsData = subCategories.map((subcategory) => ({
@@ -407,8 +434,8 @@ export const activateStaff = protectedProcedure
   .input(
     z.object({
       id: z.number().min(1, "Staff ID is required"),
-      updatedAt:z.string() ,
-      updatedBy: z.number().min(1, "Invalid updater ID"),// Staff ID to locate the record
+      updatedAt: z.string(),
+      updatedBy: z.number().min(1, "Invalid updater ID"), // Staff ID to locate the record
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -433,8 +460,8 @@ export const activateStaff = protectedProcedure
         .update(staffMaster)
         .set({
           isactive: true,
-          updatedAt:input.updatedAt,
-          updatedBy:input.updatedBy
+          updatedAt: input.updatedAt,
+          updatedBy: input.updatedBy,
         })
         .where(eq(staffMaster.id, id))
         .returning();
@@ -444,12 +471,13 @@ export const activateStaff = protectedProcedure
         .update(salaryMaster)
         .set({
           isactive: true,
-        })  
+        })
         .where(eq(salaryMaster.empId, id));
 
       return {
         success: true,
-        message: "Staff member and associated salary details activated successfully",
+        message:
+          "Staff member and associated salary details activated successfully",
         staff: updatedStaff[0], // Return the updated staff record
       };
     } catch (error) {
@@ -471,29 +499,29 @@ export const getStaffLevels = protectedProcedure.query(async ({ ctx }) => {
     .from(staffMaster)
     .innerJoin(
       categoryMasterInFinanceProject,
-      eq(staffMaster.level, categoryMasterInFinanceProject.id)
+      eq(staffMaster.level, categoryMasterInFinanceProject.id),
     )
     .groupBy(staffMaster.level, categoryMasterInFinanceProject.categoryname); // Group by level to get unique values
-  
-  console.log(levels,'levels')
+
+  console.log(levels, "levels");
   // Format the results to match the expected structure
-  const formattedLevels = levels.map(level => ({
+  const formattedLevels = levels.map((level) => ({
     value: level.level,
     label: level.categoryname,
   }));
 
   // Create a mapping of Roman numerals to their numeric values for sorting
   const romanOrder: Record<string, number> = {
-    'I': 1,
-    'II': 2,
-    'III': 3,
-    'IV': 4,
-    'V': 5,
-    'VI': 6,
-    'VII': 7,
-    'VIII': 8,
-    'IX': 9,
-    'X': 10
+    I: 1,
+    II: 2,
+    III: 3,
+    IV: 4,
+    V: 5,
+    VI: 6,
+    VII: 7,
+    VIII: 8,
+    IX: 9,
+    X: 10,
   };
 
   // Sort the levels based on Roman numeral order
@@ -507,4 +535,3 @@ export const getStaffLevels = protectedProcedure.query(async ({ ctx }) => {
     levels: sortedLevels,
   };
 });
-

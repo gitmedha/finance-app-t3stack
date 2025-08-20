@@ -383,8 +383,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
     const key = raw.trim().toLowerCase();
     return displayColumnMap[key] ?? raw;
   }
-  console.log(tableData, "activityBudget tableData");
-  console.log(programData, " activityBudget programData");
+ console.log(userData, 'userData')
+ console.log(status, 'status')
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -596,8 +596,8 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
         {filter?.map != 0 &&
           subdepartmentId != 0 &&
           deptId != "0" &&
-          ((userData.data?.user.role == 1 && status != "Draft") ||
-            (userData.data?.user.role != 1 && status == "Draft")) && (
+          ((userData.data?.user.role == 1 && status != "draft") ||
+            (userData.data?.user.role != 1 && status == "draft")) && (
             <div className="flex flex-row-reverse gap-2 py-2 pr-4">
               {!inputStates && (
                 <div>

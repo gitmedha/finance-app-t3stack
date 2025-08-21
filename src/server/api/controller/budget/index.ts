@@ -4346,10 +4346,11 @@ export const getSubDepts = protectedProcedure
   )
   .query(async ({ ctx, input }) => {
     const { deptId } = input;
-    const baseConditions = [];
+    const baseConditions = [ eq(departmentMasterInFinanceProject.isactive, true) ];
     if (deptId != 0) {
       baseConditions.push(
         eq(departmentHierarchyInFinanceProject.parentId, deptId),
+        eq(departmentHierarchyInFinanceProject.isactive, true),
       );
     }
     const subdepartments = await ctx.db

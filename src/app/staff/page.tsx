@@ -179,7 +179,7 @@ export default function Staff() {
               selectedLimit={limit}
               onLimitChange={handleLimitChange}
             />
-            {userData.data?.user.role == 1 && <AddStaff refetch={refetch} />}
+            {(userData.data?.user.role == 1 || userData.data?.user.role == 2) && <AddStaff refetch={refetch} />}
           </div>
         </div>
 

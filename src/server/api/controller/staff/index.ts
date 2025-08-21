@@ -259,7 +259,7 @@ export const addStaff = protectedProcedure
       console.error("Error adding staff:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to add staff: ${error}`,
+        message: `Failed to add staff: ${String(error)}`,
       });
     }
   });

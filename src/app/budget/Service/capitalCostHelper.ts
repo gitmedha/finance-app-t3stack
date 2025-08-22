@@ -389,7 +389,7 @@ export const computeSimpleTotals = (tableData: TableData): Partial<LevelData> =>
   const amtSums: Record<string, number> = {};
 
   months.forEach((m) => {
-    if (m.endsWith(" notes")) {
+    if (m.endsWith("notes")) {
       totals[m] = "";
       return;
     }

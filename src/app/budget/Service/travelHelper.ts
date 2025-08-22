@@ -1,4 +1,4 @@
-import { getBaseStructure } from "../Constants/travelConstants";
+import { getBaseStructure, months } from "../Constants/travelConstants";
 import { LevelData, TableData, totalschema, TravelDataItem } from "../types/travel";
 import { toast, Bounce } from "react-toastify";
 
@@ -358,3 +358,40 @@ export const recalculateTotals = (tableData: TableData, setTotalQty: (totals: to
   newTotals.totalFY = newTotals.totalQ1 + newTotals.totalQ2 + newTotals.totalQ3 + newTotals.totalQ4;
   setTotalQty(newTotals);
 };
+
+export const computeSimpleTotals = (tableData: TableData): Partial<LevelData> => {
+  const totals: Partial<LevelData> = {};
+  const qtySums: Record<string, number> = {};
+  const amtSums: Record<string, number> = {};
+
+  months.forEach((m) => {
+    if (m.endsWith(" notes")) {
+      // totals[m] = "";
+      return;
+    }
+
+    let sum = 0;
+    Object.values(tableData).forEach((row) => {
+      const val = Number(row?.[m as keyof LevelData] ?? 0);
+      if (!isNaN(val)) sum += val;
+    });
+
+    // remember per-month qty & amount to compute rate later
+    if (m.endsWith(" qty")) qtySums[m.split(" ")[0] ?? ""] = sum;
+    if (m.endsWith(" amount")) amtSums[m.split(" ")[0] ?? ""] = sum;
+
+    totals[m] = sum;
+  });
+
+  // finalize rates: avg = amount / qty (0 if qty=0)
+  months.forEach((m) => {
+    if (m.endsWith(" rate")) {
+      const base = m.split(" ")[0];
+      const qty = qtySums[base ?? ""] ?? 0;
+      const amt = amtSums[base ?? ""] ?? 0;
+      totals[m] = qty > 0 ? Number((amt / qty).toFixed(2)) : 0;
+    }
+  });
+
+  return totals;
+}

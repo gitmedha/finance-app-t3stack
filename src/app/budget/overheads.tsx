@@ -2,7 +2,7 @@
 
 import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { api } from "~/trpc/react";
 import { toast } from "react-toastify";
 import {
@@ -30,6 +30,7 @@ import {
   transformTableRowToBudgetDetail,
   transformTableRowToUpdateBudgetDetail,
   recalculateTotals,
+  computeSimpleTotals,
 } from "./Service/overHeadHelper";
 
 const OverHeads: React.FC<OverHeadProps> = ({
@@ -327,7 +328,11 @@ const OverHeads: React.FC<OverHeadProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
-  console.log(status, 'status')
+  const columnTotals = useMemo(
+    () => computeSimpleTotals(tableData),
+    [tableData],
+  );
+  console.log(status, "status");
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* <ToastContainer /> */}
@@ -379,83 +384,113 @@ const OverHeads: React.FC<OverHeadProps> = ({
         <hr className="my-2 scale-x-150" />
 
         <div className="overflow-scroll bg-gray-50">
-        <div className="overflow-x-auto">
-  <table className="w-full table-auto border-collapse">
-    <thead>
-      <tr className="bg-gray-200 text-left text-sm text-gray-600">
-        <th
-          rowSpan={2}
-          className="sticky left-0 z-20 bg-gray-200 border p-2 capitalize"
-        >
-          {"Particular".toLowerCase()}
-        </th>
-        {headerMonth?.map((month) => (
-          <th
-            key={month}
-            colSpan={4}
-            className="border border-b-2 border-gray-400 p-2 text-center capitalize border-l-4 border-gray-500"
-          >
-            {month}
-          </th>
-        ))}
-      </tr>
-      {/* second row: the sub-columns for each month */}
-      <tr className="bg-gray-200 text-sm text-gray-600">
-        {months.map((sub, idx) => (
-          <th
-            key={idx}
-            className={`p-2 text-center ${
-              idx % 4 === 0 ? "border-l-4 border-gray-500" : "border-l-2 border-gray-300"
-            }`}
-          >
-            {getDisplayColumn(sub)}
-          </th>
-        ))}
-      </tr>
-    </thead>
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto border-collapse">
+              <thead>
+                <tr className="bg-gray-200 text-left text-sm text-gray-600">
+                  <th
+                    rowSpan={2}
+                    className="sticky left-0 z-20 border bg-gray-200 p-2 capitalize"
+                  >
+                    {"Particular".toLowerCase()}
+                  </th>
+                  {headerMonth?.map((month) => (
+                    <th
+                      key={month}
+                      colSpan={4}
+                      className="border border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
+                    >
+                      {month}
+                    </th>
+                  ))}
+                </tr>
+                {/* second row: the sub-columns for each month */}
+                <tr className="bg-gray-200 text-sm text-gray-600">
+                  {months.map((sub, idx) => (
+                    <th
+                      key={idx}
+                      className={`p-2 text-center ${
+                        idx % 4 === 0
+                          ? "border-l-4 border-gray-500"
+                          : "border-l-2 border-gray-300"
+                      }`}
+                    >
+                      {getDisplayColumn(sub)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
 
-    {!overHeadDataLodaing && (
-      <tbody>
-        {overHeadData?.subCategories.map((sub) => (
-          <tr
-            key={sub.subCategoryId}
-            className="text-sm transition hover:bg-gray-100"
-          >
-            <td className="sticky left-0 z-10 bg-white border p-2 font-medium capitalize">
-              {sub.subCategoryName.toLowerCase()}
-            </td>
+              {!overHeadDataLodaing && (
+                <tbody>
+                  {overHeadData?.subCategories.map((sub) => (
+                    <tr
+                      key={sub.subCategoryId}
+                      className="text-sm transition hover:bg-gray-100"
+                    >
+                      <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
+                        {sub.subCategoryName.toLowerCase()}
+                      </td>
 
-            {months.map((month, key) => (
-              <td
-                key={month}
-                className="border p-2"
-                style={{ minWidth: "100px" }}
-              >
-                <input
-                  type={key % 6 === 0 ? "number" : "text"}
-                  className={`w-full rounded border p-1 ${
-                    isReadOnlyField(month) ? "bg-gray-100" : ""
-                  } ${month.endsWith("notes") ? "min-w-40" : ""}`}
-                  value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                  id={sub.subCategoryId + month}
-                  disabled={inputStates || isReadOnlyField(month)}
-                  onChange={(e) =>
-                    handleInputChange(
-                      sub.subCategoryId,
-                      month,
-                      e.target.value
-                    )
-                  }
-                />
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    )}
-  </table>
-</div>
+                      {months.map((month, key) => (
+                        <td
+                          key={month}
+                          className="border p-2"
+                          style={{ minWidth: "100px" }}
+                        >
+                          <input
+                            type={key % 6 === 0 ? "number" : "text"}
+                            className={`w-full rounded border p-1 ${
+                              isReadOnlyField(month) ? "bg-gray-100" : ""
+                            } ${month.endsWith("notes") ? "min-w-40" : ""}`}
+                            value={tableData[sub.subCategoryId]?.[month] ?? ""}
+                            id={sub.subCategoryId + month}
+                            disabled={inputStates || isReadOnlyField(month)}
+                            onChange={(e) =>
+                              handleInputChange(
+                                sub.subCategoryId,
+                                month,
+                                e.target.value,
+                              )
+                            }
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+              {!overHeadDataLodaing && (
+                <tfoot>
+                  <tr className="bg-gray-100 text-sm font-semibold">
+                    <td className="sticky left-0 z-10 border bg-gray-100 p-2 uppercase">
+                      Total
+                    </td>
 
+                    {months.map((month, idx) => {
+                      const val = columnTotals[month as keyof LevelData];
+
+                      const display = month.endsWith(" notes")
+                        ? "" // keep notes empty
+                        : typeof val === "number"
+                          ? Number(val).toLocaleString("hi-IN")
+                          : (val ?? "");
+
+                      return (
+                        <td
+                          key={`total-${idx}`}
+                          className="border p-2 text-right"
+                          style={{ minWidth: "100px" }}
+                        >
+                          {display}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          </div>
         </div>
         {subdepartmentId != 0 &&
           deptId != "0" &&

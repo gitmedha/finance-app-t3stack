@@ -327,6 +327,7 @@ const OverHeads: React.FC<OverHeadProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
+  console.log(status, 'status')
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* <ToastContainer /> */}
@@ -458,8 +459,8 @@ const OverHeads: React.FC<OverHeadProps> = ({
         </div>
         {subdepartmentId != 0 &&
           deptId != "0" &&
-          ((userData.data?.user.role == 1 && status != "Draft") ||
-            (userData.data?.user.role != 1 && status == "Draft")) && (
+          ((userData.data?.user.role == 1 && status != "draft") ||
+            (userData.data?.user.role != 1 && status == "draft")) && (
             <div className="flex flex-row-reverse gap-2 py-2 pr-4">
               {!inputStates && (
                 <div>

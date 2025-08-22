@@ -470,8 +470,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
         </div>
         {subdepartmentId != 0 &&
           deptId != "0" &&
-          ((userData.data?.user.role == 1 && status != "Draft") ||
-            (userData.data?.user.role != 1 && status == "Draft")) && (
+          ((userData.data?.user.role == 1 && status != "draft") ||
+            (userData.data?.user.role != 1 && status == "draft")) && (
             <div className="flex flex-row-reverse gap-2 py-2 pr-4">
               {!inputStates && (
                 <div>

@@ -198,7 +198,7 @@ const Budget: React.FC = () => {
         <div className="m-2 md:mt-24">
           <div className="mt-0 p-2 text-right font-black text-green-900 md:mt-20">
             {status == "submitted" && <p>{status.toUpperCase()}</p>}
-            {status == "draft" && userData.data?.user.role == 1 && (
+            {status == "draft" && (userData.data?.user.role == 1 || userData.data?.user.role == 2 || userData.data?.user.role == 3)  && (
               <p className="text-red-900">{status.toUpperCase()}</p>
             )}
             {status == "approved" && <p>{status.toUpperCase()}</p>}

@@ -2,7 +2,7 @@
 
 import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { api } from "~/trpc/react";
 import {
   ProgramOfficeProps,
@@ -29,6 +29,7 @@ import {
   recalculateTotals,
   handleUpdateBudget,
   mapItemToBaseStructure,
+  computeSimpleTotals,
 } from "./Service/porgramOfficeHelper";
 
 const ProgramOffice: React.FC<ProgramOfficeProps> = ({
@@ -330,6 +331,11 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
+
+  const columnTotals = useMemo(
+    () => computeSimpleTotals(tableData as TableData),
+    [tableData],
+  );
   console.log(status, "status");
   console.log(userData, " userData");
   console.log(inputStates, "inputStates");
@@ -462,6 +468,35 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
                     </tr>
                   ))}
                 </tbody>
+              )}
+              {!programOfficeDataLodaing && (
+                <tfoot>
+                  <tr className="bg-gray-100 text-sm font-semibold">
+                    <td className="sticky left-0 z-10 border bg-gray-100 p-2 uppercase">
+                      Total
+                    </td>
+
+                    {months.map((month, idx) => {
+                      const val = columnTotals[month as keyof LevelData];
+
+                      const display = month.endsWith(" notes")
+                        ? "" // keep notes empty
+                        : typeof val === "number"
+                          ? Number(val).toLocaleString("hi-IN")
+                          : (val ?? "");
+
+                      return (
+                        <td
+                          key={`total-${idx}`}
+                          className="border p-2 text-right"
+                          style={{ minWidth: "100px" }}
+                        >
+                          {display}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tfoot>
               )}
             </table>
           </div>

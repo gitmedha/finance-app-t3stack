@@ -1,6 +1,6 @@
 import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { api } from "~/trpc/react";
 import {
   transformTableRowToBudgetDetail,
@@ -9,6 +9,7 @@ import {
   handleUpdateBudget,
   recalculateTotals,
   mapItemToBaseStructure,
+  computeSimpleTotals,
 } from "./Service/capitalCostHelper";
 import {
   TableData,
@@ -83,6 +84,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
     api.post.addCapitalCostBudgetDetails.useMutation();
   const updateBudgetDetails =
     api.post.updateCapitalCostBudgetDetails.useMutation();
+
+  // totals helper: sum qty/amount, leave notes blank, avg rate = amount/qty
 
   // useEffect hooks
   useEffect(() => {
@@ -312,7 +315,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
           subdepartmentId,
         ),
     );
-    console.log(updatedBudgetDetails, "updatedBudgetDetails");
+
     await handleUpdateBudget({
       payload: updatedBudgetDetails as BudgetDetailsUpdate[],
       updateBudgetDetails,
@@ -339,6 +342,12 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
     }
   }, [totalQty]);
 
+  const columnTotals = useMemo(
+    () => computeSimpleTotals(tableData),
+    [tableData],
+  );
+  console.log(months, "months");
+  console.log(tableData, "tableData");
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -464,6 +473,35 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
                     </tr>
                   ))}
                 </tbody>
+              )}
+              {!capitalCostDataLodaing && (
+                <tfoot>
+                  <tr className="bg-gray-100 text-sm font-semibold">
+                    <td className="sticky left-0 z-10 border bg-gray-100 p-2 uppercase">
+                      Total
+                    </td>
+
+                    {months.map((month, idx) => {
+                      const val = columnTotals[month as keyof LevelData];
+
+                      const display = month.endsWith(" notes")
+                        ? "" // keep notes empty
+                        : typeof val === "number"
+                          ? Number(val).toLocaleString("hi-IN")
+                          : (val ?? "");
+
+                      return (
+                        <td
+                          key={`total-${idx}`}
+                          className="border p-2 text-right"
+                          style={{ minWidth: "100px" }}
+                        >
+                          {display}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tfoot>
               )}
             </table>
           </div>

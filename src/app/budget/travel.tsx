@@ -2,7 +2,7 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Button } from "@radix-ui/themes";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { api } from "~/trpc/react";
 import Marquee from "react-fast-marquee";
@@ -35,6 +35,7 @@ import {
   transformTableRowToUpdateBudgetDetail,
   mapItemToBaseStructure,
   recalculateTotals,
+  computeSimpleTotals,
 } from "./Service/travelHelper";
 
 const TravelBudget: React.FC<TravelBudgetProps> = ({
@@ -497,6 +498,11 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
+  
+  const columnTotals = useMemo(
+    () => computeSimpleTotals(tableData),
+    [tableData],
+  );
 
   console.log(travelData, "travelData");
   console.log(selectedLevelStats, "selectedLevelStats");
@@ -702,6 +708,35 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                     }
                   })}
                 </tbody>
+              )}
+               {!travelDataLodaing && (
+                <tfoot>
+                  <tr className="bg-gray-100 text-sm font-semibold">
+                    <td className="sticky left-0 z-10 border bg-gray-100 p-2 uppercase">
+                      Total
+                    </td>
+
+                    {months.map((month, idx) => {
+                      const val = columnTotals[month as keyof LevelData];
+
+                      const display = month.endsWith(" notes")
+                        ? "" // keep notes empty
+                        : typeof val === "number"
+                          ? Number(val).toLocaleString("hi-IN")
+                          : (val ?? "");
+
+                      return (
+                        <td
+                          key={`total-${idx}`}
+                          className="border p-2 text-right"
+                          style={{ minWidth: "100px" }}
+                        >
+                          {display}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tfoot>
               )}
             </table>
           </div>

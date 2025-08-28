@@ -742,7 +742,8 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
           </div>
         </div>
         {filter?.map != 0 &&
-          subdepartmentId != 0 &&
+          ((deptId == "5" || deptId == "7" || deptId == "4" || deptId == "58" || deptId == "8") || 
+          (subdepartmentId != 0 && deptId != "0")) &&
           deptId != "0" &&
           (status != "draft" ||
             (userData.data?.user.role != 1 && status == "draft")) && (

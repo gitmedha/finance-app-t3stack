@@ -333,6 +333,9 @@ const OverHeads: React.FC<OverHeadProps> = ({
     [tableData],
   );
   console.log(status, "status");
+  console.log(subdepartmentId, "subdepartmentId");
+  console.log(deptId, "deptId");
+  console.log(userData.data?.user.role, "userData");
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* <ToastContainer /> */}
@@ -492,8 +495,8 @@ const OverHeads: React.FC<OverHeadProps> = ({
             </table>
           </div>
         </div>
-        {subdepartmentId != 0 &&
-          deptId != "0" &&
+        {((deptId == "5" || deptId == "7" || deptId == "4" || deptId == "58" || deptId == "8") || 
+          (subdepartmentId != 0 && deptId != "0")) &&
           ((userData.data?.user.role == 1 && status != "draft") ||
             (userData.data?.user.role != 1 && status == "draft")) && (
             <div className="flex flex-row-reverse gap-2 py-2 pr-4">

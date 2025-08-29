@@ -506,7 +506,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
             </table>
           </div>
         </div>
-        {((deptId == "5" || deptId == "7" || deptId == "4" || deptId == "58" || deptId == "8") || 
+        {((deptId == "5" || deptId == "7" || deptId == "4" || deptId == "8" || deptId == "6") || 
           (subdepartmentId != 0 && deptId != "0")) &&
           deptId != "0" &&
           ((userData.data?.user.role == 1 && status != "draft") ||

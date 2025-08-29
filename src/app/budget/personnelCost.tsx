@@ -955,7 +955,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
 
           <hr className="my-2 scale-x-150" />
 
-          <div className="overflow-scroll bg-gray-50">
+          <div className="max-h-[70vh] overflow-auto bg-gray-50">
             <table className="w-full table-auto border-collapse">
               <thead>
                 <tr className="bg-gray-200 text-left text-sm text-gray-600">
@@ -965,7 +965,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                       return (
                         <th
                           key={month}
-                          className="border p-2 capitalize"
+                          className="sticky top-0 z-40 bg-gray-200 border p-2 capitalize"
                           style={{ minWidth: "80px" }}
                         >
                           #Qty1
@@ -975,7 +975,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                       return (
                         <th
                           key={month}
-                          className="border p-2 capitalize"
+                          className="sticky top-0 z-40 bg-gray-200 border p-2 capitalize"
                           style={{ minWidth: "80px" }}
                         >
                           #Qty2
@@ -985,7 +985,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                       return (
                         <th
                           key={month}
-                          className="border p-2 capitalize"
+                          className="sticky top-0 z-40 bg-gray-200 border p-2 capitalize"
                           style={{ minWidth: "80px" }}
                         >
                           #Qty3
@@ -995,7 +995,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                       return (
                         <th
                           key={month}
-                          className="border p-2 capitalize"
+                          className="sticky top-0 z-40 bg-gray-200 border p-2 capitalize"
                           style={{ minWidth: "80px" }}
                         >
                           #Qty4
@@ -1017,7 +1017,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                       return (
                         <th
                           key={month}
-                          className="border bg-blue-50 p-2 font-medium capitalize"
+                          className="sticky top-0 z-40 bg-gray-200 border p-2 font-medium capitalize"
                           style={{ minWidth: "90px" }}
                         >
                           {quarterMap[month]}
@@ -1025,7 +1025,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                       );
                     } else
                       return (
-                        <th key={month} className="border p-2 capitalize">
+                        <th key={month} className="sticky top-0 z-40 bg-gray-200 border p-2 capitalize">
                           {month.toLowerCase()}
                         </th>
                       );
@@ -1041,7 +1041,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
                       className="text-sm transition hover:bg-gray-100"
                     >
                       {/* <td className="border p-2 font-medium capitalize">{sub.subCategoryName.toUpperCase()}</td> */}
-                      <td className="border p-2 font-medium capitalize">
+                      <td className="sticky left-0 z-10 bg-white border p-2 font-medium capitalize">
                         {["I", "II", "III", "IV", "V", "VI", "VII"].includes(
                           sub.subCategoryName,
                         )

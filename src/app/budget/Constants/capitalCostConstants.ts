@@ -17,6 +17,9 @@ export const months = [
   "jun amount",
   // "june",
   "jun notes",
+  "Q1 qty",
+  "Q1 rate",
+  "Q1 amount",
   "jul qty",
   "jul rate",
   "jul amount",
@@ -32,6 +35,9 @@ export const months = [
   "sep amount",
   // "september",
   "sep notes",
+  "Q2 qty",
+  "Q2 rate",
+  "Q2 amount",
   "oct qty",
   "oct rate",
   "oct amount",
@@ -47,6 +53,9 @@ export const months = [
   "dec amount",
   // "december",
   "dec notes",
+  "Q3 qty",
+  "Q3 rate",
+  "Q3 amount",
   "jan qty",
   "jan rate",
   "jan amount",
@@ -62,21 +71,28 @@ export const months = [
   "mar amount",
   // "march",
   "mar notes",
+  "Q4 qty",
+  "Q4 rate",
+  "Q4 amount",
 ];
 
 export const headerMonth = [
   "April",
   "May",
   "June",
+  "Q1",
   "July",
   "August",
   "September",
+  "Q2",
   "October",
   "November",
   "December",
+  "Q3",
   "January",
   "February",
   "March",
+  "Q4",
 ];
 
 // map each month to its quarter key
@@ -146,6 +162,10 @@ export const getBaseStructure = (): LevelData => ({
   "jun amount": 0,
   june: 0,
   "jun notes": "",
+  // Q1 totals
+  "Q1 qty": 0,
+  "Q1 rate": 0,
+  "Q1 amount": 0,
   "jul qty": 0,
   "jul rate": 0,
   "jul amount": 0,
@@ -161,6 +181,10 @@ export const getBaseStructure = (): LevelData => ({
   "sep amount": 0,
   september: 0,
   "sep notes": "",
+  // Q2 totals
+  "Q2 qty": 0,
+  "Q2 rate": 0,
+  "Q2 amount": 0,
   "oct qty": 0,
   "oct rate": 0,
   "oct amount": 0,
@@ -176,6 +200,10 @@ export const getBaseStructure = (): LevelData => ({
   "dec amount": 0,
   december: 0,
   "dec notes": "",
+  // Q3 totals
+  "Q3 qty": 0,
+  "Q3 rate": 0,
+  "Q3 amount": 0,
   "jan qty": 0,
   "jan rate": 0,
   "jan amount": 0,
@@ -191,6 +219,10 @@ export const getBaseStructure = (): LevelData => ({
   "mar amount": 0,
   march : 0,
   "mar notes": "",
+  // Q4 totals
+  "Q4 qty": 0,
+  "Q4 rate": 0,
+  "Q4 amount": 0,
   budgetDetailsId: 0,
 });
 
@@ -241,6 +273,10 @@ export const displayColumnMap: Record<string, string> = {
   "jun amount": "Amount", 
   "june": "June",
   "jun notes": "Notes",
+  // Q1
+  "q1 qty": "Qty",
+  "q1 rate": "Rate",
+  "q1 amount": "Amount",
   "jul qty": "Qty",
   "jul rate": "Rate",
   "jul amount": "Amount",
@@ -256,6 +292,10 @@ export const displayColumnMap: Record<string, string> = {
   "sep amount": "Amount",
   "september": "September",
   "sep notes": "Notes",
+  // Q2
+  "q2 qty": "Qty",
+  "q2 rate": "Rate",
+  "q2 amount": "Amount",
   "oct qty": "Qty",
   "oct rate": "Rate",
   "oct amount": "Amount",
@@ -271,6 +311,10 @@ export const displayColumnMap: Record<string, string> = {
   "dec amount": "Amount",
   "december": "December",  
   "dec notes": "Notes",
+  // Q3
+  "q3 qty": "Qty",
+  "q3 rate": "Rate",
+  "q3 amount": "Amount",
   "jan qty": "Qty",
   "jan rate": "Rate",
   "jan amount": "Amount",
@@ -286,4 +330,8 @@ export const displayColumnMap: Record<string, string> = {
   "mar amount": "Amount",
   "march": "March",
   "mar notes": "Notes",
+  // Q4
+  "q4 qty": "Qty",
+  "q4 rate": "Rate",
+  "q4 amount": "Amount",
 }

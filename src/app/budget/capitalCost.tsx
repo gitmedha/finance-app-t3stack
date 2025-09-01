@@ -10,6 +10,8 @@ import {
   recalculateTotals,
   mapItemToBaseStructure,
   computeSimpleTotals,
+  calculateQuarterlyValues,
+  calculateQuarterlyTotalsFromColumnTotals,
 } from "./Service/capitalCostHelper";
 import {
   TableData,
@@ -85,7 +87,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
   const updateBudgetDetails =
     api.post.updateCapitalCostBudgetDetails.useMutation();
 
-  // totals helper: sum qty/amount, leave notes blank, avg rate = amount/qty
+  // Helper function to calculate quarterly values for a row
+ 
 
   // useEffect hooks
   useEffect(() => {
@@ -412,7 +415,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
                   {headerMonth?.map((month) => (
                     <th
                       key={month}
-                      colSpan={4}
+                      colSpan={month.includes("Q") ? 3 : 4}
                       className="border border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
                     >
                       {month}
@@ -425,9 +428,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
                     <th
                       key={idx}
                       className={`p-2 text-center ${
-                        idx % 4 === 0
-                          ? "border-l-4 border-gray-500"
-                          : "border-l-2 border-gray-300"
+                        sub.includes("qty") ? "border-l-4 border-gray-500" : "border-l-2 border-gray-300"
                       }`}
                     >
                       {getDisplayColumn(sub)}
@@ -438,7 +439,8 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
 
               {!capitalCostDataLodaing && (
                 <tbody>
-                  {capitalCostData?.subCategories.map((sub) => (
+                  {capitalCostData?.subCategories.map((sub, rowIdx) => (
+                    console.log(capitalCostData, "capitalCostData"),
                     <tr
                       key={sub.subCategoryId}
                       className="text-sm transition hover:bg-gray-100"
@@ -446,30 +448,42 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
                       <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
                         {sub.subCategoryName.toLowerCase()}
                       </td>
-                      {months.map((month, key) => (
-                        <td
-                          key={month}
-                          className="border p-2"
-                          style={{ minWidth: "100px" }}
-                        >
-                          <input
-                            type={key % 6 === 0 ? "number" : "text"}
-                            className={`w-full rounded border p-1 ${
-                              isReadOnlyField(month) ? "bg-gray-100" : ""
-                            } ${month.endsWith("notes") ? "min-w-40" : ""}`}
-                            value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                            id={sub.subCategoryId + month}
-                            disabled={inputStates || isReadOnlyField(month)}
-                            onChange={(e) =>
-                              handleInputChange(
-                                sub.subCategoryId,
-                                month,
-                                e.target.value,
-                              )
-                            }
-                          />
-                        </td>
-                      ))}
+                      {months.map((month, key) => {
+                        const row = tableData[sub.subCategoryId] ?? {} as LevelData;
+                        console.log(row, "row");
+                        const quarterlyValues = calculateQuarterlyValues(row);
+                        console.log(quarterlyValues, "quarterlyValues");
+                        const isQuarterField = month.startsWith("Q");
+                        console.log(isQuarterField, "isQuarterField");
+                        // Get display value: use quarterly calculation for Q fields, otherwise use stored value
+                        const displayVal = isQuarterField 
+                          ? (quarterlyValues[month as keyof typeof quarterlyValues] ?? 0)
+                          : (row[month as keyof LevelData] ?? "");
+                        return (
+                          <td
+                            key={month}
+                            className="border p-2"
+                            style={{ minWidth: "100px" }}
+                          >
+                            <input
+                              type={key % 6 === 0 ? "number" : "text"}
+                              className={`w-full rounded border p-1 ${
+                                (isQuarterField || isReadOnlyField(month)) ? "bg-gray-100" : ""
+                              } ${month.endsWith("notes") ? "min-w-40" : ""}`}
+                              value={displayVal}
+                              id={sub.subCategoryId + month}
+                              disabled={isQuarterField || inputStates || isReadOnlyField(month)}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  sub.subCategoryId,
+                                  month,
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </td>
+                        );
+                      })}
                     </tr>
                   ))}
                 </tbody>
@@ -482,9 +496,16 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
                     </td>
 
                     {months.map((month, idx) => {
-                      const val = columnTotals[month as keyof LevelData];
+                      let val = columnTotals[month as keyof LevelData];
+                      let display = "";
 
-                      const display = month.endsWith(" notes")
+                      if (month.startsWith("Q")) {
+                        // For Q fields, calculate quarterly totals
+                        const quarterlyTotals = calculateQuarterlyTotalsFromColumnTotals(columnTotals);
+                        val = quarterlyTotals[month] ?? 0;
+                      }
+
+                      display = month.endsWith(" notes")
                         ? "" // keep notes empty
                         : typeof val === "number"
                           ? Number(val).toLocaleString("hi-IN")

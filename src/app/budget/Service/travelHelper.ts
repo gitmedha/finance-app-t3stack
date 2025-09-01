@@ -395,3 +395,68 @@ export const computeSimpleTotals = (tableData: TableData): Partial<LevelData> =>
 
   return totals;
 }
+
+export const calculateQuarterlyValues = (row: LevelData) => {
+  const quarterlyData: Record<string, number> = {};
+  
+  // Q1: Apr + May + Jun
+  const q1Qty = Number(row["apr qty"] ?? 0) + Number(row["may qty"] ?? 0) + Number(row["jun qty"] ?? 0);
+  const q1Amount = Number(row["apr amount"] ?? 0) + Number(row["may amount"] ?? 0) + Number(row["jun amount"] ?? 0);
+  const q1Rate = q1Qty > 0 ? Number((q1Amount / q1Qty).toFixed(2)) : 0;
+  
+  // Q2: Jul + Aug + Sep
+  const q2Qty = Number(row["jul qty"] ?? 0) + Number(row["aug qty"] ?? 0) + Number(row["sep qty"] ?? 0);
+  const q2Amount = Number(row["jul amount"] ?? 0) + Number(row["aug amount"] ?? 0) + Number(row["sep amount"] ?? 0);
+  const q2Rate = q2Qty > 0 ? Number((q2Amount / q2Qty).toFixed(2)) : 0;
+  
+  // Q3: Oct + Nov + Dec
+  const q3Qty = Number(row["oct qty"] ?? 0) + Number(row["nov qty"] ?? 0) + Number(row["dec qty"] ?? 0);
+  const q3Amount = Number(row["oct amount"] ?? 0) + Number(row["nov amount"] ?? 0) + Number(row["dec amount"] ?? 0);
+  const q3Rate = q3Qty > 0 ? Number((q3Amount / q3Qty).toFixed(2)) : 0;
+  
+  // Q4: Jan + Feb + Mar
+  const q4Qty = Number(row["jan qty"] ?? 0) + Number(row["feb qty"] ?? 0) + Number(row["mar qty"] ?? 0);
+  const q4Amount = Number(row["jan amount"] ?? 0) + Number(row["feb amount"] ?? 0) + Number(row["mar amount"] ?? 0);
+  const q4Rate = q4Qty > 0 ? Number((q4Amount / q4Qty).toFixed(2)) : 0;
+  
+  return {
+    "Q1 qty": q1Qty,
+    "Q1 rate": q1Rate,
+    "Q1 amount": q1Amount,
+    "Q2 qty": q2Qty,
+    "Q2 rate": q2Rate,
+    "Q2 amount": q2Amount,
+    "Q3 qty": q3Qty,
+    "Q3 rate": q3Rate,
+    "Q3 amount": q3Amount,
+    "Q4 qty": q4Qty,
+    "Q4 rate": q4Rate,
+    "Q4 amount": q4Amount,
+  };
+};
+
+export const calculateQuarterlyTotalsFromColumnTotals = (columnTotals: Partial<LevelData>) => {
+  const quarterlyTotals: Record<string, number> = {};
+  
+  // Q1: Apr + May + Jun
+  quarterlyTotals["Q1 qty"] = Number(columnTotals["apr qty"] ?? 0) + Number(columnTotals["may qty"] ?? 0) + Number(columnTotals["jun qty"] ?? 0);
+  quarterlyTotals["Q1 amount"] = Number(columnTotals["apr amount"] ?? 0) + Number(columnTotals["may amount"] ?? 0) + Number(columnTotals["jun amount"] ?? 0);
+  quarterlyTotals["Q1 rate"] = quarterlyTotals["Q1 qty"] > 0 ? Number((quarterlyTotals["Q1 amount"] / quarterlyTotals["Q1 qty"]).toFixed(2)) : 0;
+  
+  // Q2: Jul + Aug + Sep
+  quarterlyTotals["Q2 qty"] = Number(columnTotals["jul qty"] ?? 0) + Number(columnTotals["aug qty"] ?? 0) + Number(columnTotals["sep qty"] ?? 0);
+  quarterlyTotals["Q2 amount"] = Number(columnTotals["jul amount"] ?? 0) + Number(columnTotals["aug amount"] ?? 0) + Number(columnTotals["sep amount"] ?? 0);
+  quarterlyTotals["Q2 rate"] = quarterlyTotals["Q2 qty"] > 0 ? Number((quarterlyTotals["Q2 amount"] / quarterlyTotals["Q2 qty"]).toFixed(2)) : 0;
+  
+  // Q3: Oct + Nov + Dec
+  quarterlyTotals["Q3 qty"] = Number(columnTotals["oct qty"] ?? 0) + Number(columnTotals["nov qty"] ?? 0) + Number(columnTotals["dec qty"] ?? 0);
+  quarterlyTotals["Q3 amount"] = Number(columnTotals["oct amount"] ?? 0) + Number(columnTotals["nov amount"] ?? 0) + Number(columnTotals["dec amount"] ?? 0);
+  quarterlyTotals["Q3 rate"] = quarterlyTotals["Q3 qty"] > 0 ? Number((quarterlyTotals["Q3 amount"] / quarterlyTotals["Q3 qty"]).toFixed(2)) : 0;
+  
+  // Q4: Jan + Feb + Mar
+  quarterlyTotals["Q4 qty"] = Number(columnTotals["jan qty"] ?? 0) + Number(columnTotals["feb qty"] ?? 0) + Number(columnTotals["mar qty"] ?? 0);
+  quarterlyTotals["Q4 amount"] = Number(columnTotals["jan amount"] ?? 0) + Number(columnTotals["feb amount"] ?? 0) + Number(columnTotals["mar amount"] ?? 0);
+  quarterlyTotals["Q4 rate"] = quarterlyTotals["Q4 qty"] > 0 ? Number((quarterlyTotals["Q4 amount"] / quarterlyTotals["Q4 qty"]).toFixed(2)) : 0;
+  
+  return quarterlyTotals;
+};

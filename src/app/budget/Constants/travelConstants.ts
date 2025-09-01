@@ -27,6 +27,9 @@ export const months = [
   "jun trips",
   "jun rate",
   "jun amount",
+  "Q1 qty",
+  "Q1 rate",
+  "Q1 amount",
   // "june",
   "jul qty",
   "jul trips",
@@ -43,6 +46,9 @@ export const months = [
   "sep rate",
   "sep amount",
   // "september",
+  "Q2 qty",
+  "Q2 rate",
+  "Q2 amount",
   "oct qty",
   "oct trips",
   "oct rate",
@@ -58,6 +64,9 @@ export const months = [
   "dec rate",
   "dec amount",
   // "december",
+  "Q3 qty",
+  "Q3 rate",
+  "Q3 amount",
   "jan qty",
   "jan trips",
   "jan rate",
@@ -73,6 +82,9 @@ export const months = [
   "mar rate",
   "mar amount",
   // "march",
+  "Q4 qty",
+  "Q4 rate",
+  "Q4 amount",
 ];
 
 export const getBaseStructure = () => ({
@@ -92,6 +104,10 @@ export const getBaseStructure = () => ({
   "jun rate": 0,
   "jun amount": 0,
   june: 0,
+  // Q1 totals
+  "Q1 qty": 0,
+  "Q1 rate": 0,
+  "Q1 amount": 0,
   "jul qty": 0,
   "jul trips": 0,
   "jul rate": 0,
@@ -107,6 +123,10 @@ export const getBaseStructure = () => ({
       "sep rate": 0,
   "sep amount": 0,
   september: 0,
+  // Q2 totals
+  "Q2 qty": 0,
+  "Q2 rate": 0,
+  "Q2 amount": 0,
   "oct qty": 0,
   "oct trips": 0,
   "oct rate": 0,
@@ -122,6 +142,10 @@ export const getBaseStructure = () => ({
   "dec rate": 0,
   "dec amount": 0,
   december: 0,
+  // Q3 totals
+  "Q3 qty": 0,
+  "Q3 rate": 0,
+  "Q3 amount": 0,
   "jan qty": 0,
   "jan trips": 0,
       "jan rate": 0,
@@ -137,6 +161,10 @@ export const getBaseStructure = () => ({
   "mar rate": 0,
   "mar amount": 0,
   march : 0,
+  // Q4 totals
+  "Q4 qty": 0,
+  "Q4 rate": 0,
+  "Q4 amount": 0,
   budgetDetailsId: 0,
 });
 
@@ -144,15 +172,19 @@ export const headerMonth = [
   "April",
   "May",
   "June",
+  "Q1",
   "July",
   "August",
   "September",
+  "Q2",
   "October",
   "November",
   "December",
+  "Q3",
   "January",
   "February",
   "March",
+  "Q4",
 ];
 
 export const monthToQuarter: Record<string, keyof import("../types/travel").totalschema> = {
@@ -193,6 +225,10 @@ export const displayColumnMap: Record<string, string> = {
   "jun rate": " Rate",
   "jun amount": " Total",
   "june": "june",
+  // Q1
+  "Q1 qty": " No",
+  "Q1 rate": " Rate",
+  "Q1 amount": " Total",
   "jul qty": " No",
   "jul trips": " Trips",
   "jul rate": " Rate",
@@ -208,6 +244,10 @@ export const displayColumnMap: Record<string, string> = {
   "sep rate": " Rate",
   "sep amount": " Total",
   "september": "september",
+  // Q2
+  "Q2 qty": " No",
+  "Q2 rate": " Rate",
+  "Q2 amount": " Total",
   "oct qty": " No",
   "oct trips": " Trips",
   "oct rate": " Rate",
@@ -223,6 +263,10 @@ export const displayColumnMap: Record<string, string> = {
   "dec rate": " Rate",
   "dec amount": "Total",
   "december": "december",
+  // Q3
+  "Q3 qty": " No",
+  "Q3 rate": " Rate",
+  "Q3 amount": " Total",
     "jan qty": " No",
   "jan trips": " Trips",
   "jan rate": " Rate",
@@ -238,6 +282,10 @@ export const displayColumnMap: Record<string, string> = {
   "mar rate": " Rate",
   "mar amount": " Total",
   "march": "march",
+  // Q4
+  "Q4 qty": " No",
+  "Q4 rate": " Rate",
+  "Q4 amount": " Total",
 };
 
 export const monthMap: Record<string, string> = {

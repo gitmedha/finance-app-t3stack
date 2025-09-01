@@ -30,6 +30,8 @@ import {
   handleUpdateBudget,
   mapItemToBaseStructure,
   computeSimpleTotals,
+  calculateQuarterlyValues,
+  calculateQuarterlyTotalsFromColumnTotals,
 } from "./Service/porgramOfficeHelper";
 
 const ProgramOffice: React.FC<ProgramOfficeProps> = ({
@@ -134,10 +136,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
               Number(item.january) + Number(item.february) + Number(item.march);
           },
         );
-        console.log(
-          "🔍 DEBUG: Final Q1 total:",
-          totalQtyAfterBudgetDetails.totalQ1,
-        );
+
         setSaveBtnState("edit");
       } else {
         setSaveBtnState("save");
@@ -305,7 +304,6 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
           subdepartmentId,
         ),
     );
-    console.log(updatedBudgetDetails, "updatedBudgetDetails");
     await handleUpdateBudget({
       payload: updatedBudgetDetails as BudgetDetailsUpdate[],
       updateBudgetDetails,
@@ -336,11 +334,6 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
     () => computeSimpleTotals(tableData as TableData),
     [tableData],
   );
-  console.log(status, "status");
-  console.log(userData, " userData");
-  console.log(inputStates, "inputStates");
-  console.log(programOfficeData, "programOfficeData");
-  console.log(isSaveDisabled(), "isSaveDisabled");
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* <ToastContainer /> */}
@@ -398,17 +391,14 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-left text-sm text-gray-600">
-                <th
-                  rowSpan={2}
-                  className="border bg-gray-200 p-2 capitalize"
-                >
+                <th rowSpan={2} className="border bg-gray-200 p-2 capitalize">
                   {"Particular".toLowerCase()}
                 </th>
                 {headerMonth?.map((month) => (
                   <th
                     key={month}
-                    colSpan={4}
-                    className="sticky top-0 z-40 h-12 border bg-gray-200 border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
+                    colSpan={month.includes("Q") ? 3 : 4}
+                    className="sticky top-0 z-40 h-12 border border-b-2 border-l-4 border-gray-400 border-gray-500 bg-gray-200 p-2 text-center capitalize"
                   >
                     {month}
                   </th>
@@ -418,8 +408,8 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
                 {months.map((sub, idx) => (
                   <th
                     key={idx}
-                    className={`sticky top-[48px] z-30 bg-gray-200 p-2 text-center ${
-                      idx % 4 === 0
+                    className={`p-2 text-center ${
+                      sub.includes("qty")
                         ? "border-l-4 border-gray-500"
                         : "border-l-2 border-gray-300"
                     }`}
@@ -432,7 +422,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
 
             {!programOfficeDataLodaing && (
               <tbody>
-                {programOfficeData?.subCategories.map((sub) => (
+                {programOfficeData?.subCategories.map((sub, rowIdx) => (
                   <tr
                     key={sub.subCategoryId}
                     className="text-sm transition hover:bg-gray-100"
@@ -440,30 +430,51 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
                     <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
                       {sub.subCategoryName.toLowerCase()}
                     </td>
-                    {months.map((month, key) => (
-                      <td
-                        key={month}
-                        className="border p-2"
-                        style={{ minWidth: "100px" }}
-                      >
-                        <input
-                          type={key % 6 === 0 ? "number" : "text"}
-                          className={`w-full rounded border p-1 ${
-                            isReadOnlyField(month) ? "bg-gray-100" : ""
-                          } ${month.endsWith("notes") ? "min-w-40" : ""}`}
-                          value={tableData[sub.subCategoryId]?.[month] ?? ""}
-                          id={sub.subCategoryId + month}
-                          disabled={inputStates || isReadOnlyField(month)}
-                          onChange={(e) =>
-                            handleInputChange(
-                              sub.subCategoryId,
-                              month,
-                              e.target.value,
-                            )
-                          }
-                        />
-                      </td>
-                    ))}
+                    {months.map((month, key) => {
+                      const row =
+                        tableData[sub.subCategoryId] ?? ({} as LevelData);
+
+                      const quarterlyValues = calculateQuarterlyValues(row);
+
+                      const isQuarterField = month.startsWith("Q");
+
+                      // Get display value: use quarterly calculation for Q fields, otherwise use stored value
+                      const displayVal = isQuarterField
+                        ? (quarterlyValues[
+                            month as keyof typeof quarterlyValues
+                          ] ?? 0)
+                        : (row[month as keyof LevelData] ?? "");
+                      return (
+                        <td
+                          key={month}
+                          className="border p-2"
+                          style={{ minWidth: "100px" }}
+                        >
+                          <input
+                            type={key % 6 === 0 ? "number" : "text"}
+                            className={`w-full rounded border p-1 ${
+                              isQuarterField || isReadOnlyField(month)
+                                ? "bg-gray-100"
+                                : ""
+                            } ${month.endsWith("notes") ? "min-w-40" : ""}`}
+                            value={displayVal}
+                            id={sub.subCategoryId + month}
+                            disabled={
+                              isQuarterField ||
+                              inputStates ||
+                              isReadOnlyField(month)
+                            }
+                            onChange={(e) =>
+                              handleInputChange(
+                                sub.subCategoryId,
+                                month,
+                                e.target.value,
+                              )
+                            }
+                          />
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
@@ -476,9 +487,17 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
                   </td>
 
                   {months.map((month, idx) => {
-                    const val = columnTotals[month as keyof LevelData];
+                    let val = columnTotals[month as keyof LevelData];
+                    let display = "";
 
-                    const display = month.endsWith(" notes")
+                    if (month.startsWith("Q")) {
+                      // For Q fields, calculate quarterly totals
+                      const quarterlyTotals =
+                        calculateQuarterlyTotalsFromColumnTotals(columnTotals);
+                      val = quarterlyTotals[month] ?? 0;
+                    }
+
+                    display = month.endsWith(" notes")
                       ? "" // keep notes empty
                       : typeof val === "number"
                         ? Number(val).toLocaleString("hi-IN")

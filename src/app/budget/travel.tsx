@@ -36,6 +36,8 @@ import {
   mapItemToBaseStructure,
   recalculateTotals,
   computeSimpleTotals,
+  calculateQuarterlyValues,
+  calculateQuarterlyTotalsFromColumnTotals,
 } from "./Service/travelHelper";
 
 const TravelBudget: React.FC<TravelBudgetProps> = ({
@@ -637,7 +639,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                   {headerMonth?.map((month) => (
                     <th
                       key={month}
-                      colSpan={4}
+                      colSpan={month.includes("Q") ? 3 : 4}
                       className="border border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
                     >
                       {month}
@@ -649,9 +651,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                     <th
                       key={idx}
                       className={`p-2 text-center ${
-                        idx % 4 === 0
-                          ? "border-l-4 border-gray-500"
-                          : "border-l-2 border-gray-300"
+                        sub.includes("qty") ? "border-l-4 border-gray-500" : "border-l-2 border-gray-300"
                       }`}
                     >
                       {getDisplayColumn(sub)}
@@ -672,37 +672,39 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                           <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
                             {getDisplayName(sub.subCategoryName)}
                           </td>
-                          {months.map((month, key) => (
-                            <td
-                              key={month}
-                              className="border p-2"
-                              style={{ minWidth: "100px" }}
-                            >
-                              <input
-                                disabled={inputStates || isReadOnlyField(month)}
-                                id={sub.subCategoryId + month}
-                                type={key % 6 === 0 ? "number" : "text"}
-                                className={`w-full rounded border p-1 ${
-                                  isReadOnlyField(month) ? "bg-gray-100" : ""
-                                }`}
-                                value={
-                                  Number.isNaN(
-                                    tableData[sub.subCategoryId]?.[month],
-                                  )
-                                    ? ""
-                                    : (tableData[sub.subCategoryId]?.[month] ??
-                                      "")
-                                }
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    sub.subCategoryId,
-                                    month,
-                                    e.target.value,
-                                  )
-                                }
-                              />
-                            </td>
-                          ))}
+                          {months.map((month, key) => {
+                        const row = tableData[sub.subCategoryId] ?? {} as LevelData;
+                        const quarterlyValues = calculateQuarterlyValues(row);
+                        const isQuarterField = month.startsWith("Q");
+                        // Get display value: use quarterly calculation for Q fields, otherwise use stored value
+                        const displayVal = isQuarterField 
+                          ? (quarterlyValues[month as keyof typeof quarterlyValues] ?? 0)
+                          : (row[month as keyof LevelData] ?? "");
+                        return (
+                          <td
+                            key={month}
+                            className="border p-2"
+                            style={{ minWidth: "100px" }}
+                          >
+                            <input
+                              type={key % 6 === 0 ? "number" : "text"}
+                              className={`w-full rounded border p-1 ${
+                                (isQuarterField || isReadOnlyField(month)) ? "bg-gray-100" : ""
+                              } ${month.endsWith("notes") ? "min-w-40" : ""}`}
+                              value={displayVal}
+                              id={sub.subCategoryId + month}
+                              disabled={isQuarterField || inputStates || isReadOnlyField(month)}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  sub.subCategoryId,
+                                  month,
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </td>
+                        );
+                      })}
                         </tr>
                       );
                     }
@@ -717,9 +719,16 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
                     </td>
 
                     {months.map((month, idx) => {
-                      const val = columnTotals[month as keyof LevelData];
+                      let val = columnTotals[month as keyof LevelData];
+                      let display = "";
 
-                      const display = month.endsWith(" notes")
+                      if (month.startsWith("Q")) {
+                        // For Q fields, calculate quarterly totals
+                        const quarterlyTotals = calculateQuarterlyTotalsFromColumnTotals(columnTotals);
+                        val = quarterlyTotals[month] ?? 0;
+                      }
+
+                      display = month.endsWith(" notes")
                         ? "" // keep notes empty
                         : typeof val === "number"
                           ? Number(val).toLocaleString("hi-IN")

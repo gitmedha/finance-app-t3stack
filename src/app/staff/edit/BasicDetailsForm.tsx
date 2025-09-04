@@ -46,6 +46,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
     defaultValues: item,
   });
 
+
+
   const stateName = watch("statesData")?.label ?? "";
   const departmentId = watch("departmentData")?.value
 
@@ -84,22 +86,24 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
     try {
       console.log(data, "Edit data");
-      const submissionData = {
-        id: data.id,
-        name: data.name,
-        empNo: data.empNo,
-        designation: data?.designation,
-        natureOfEmployment: data?.typeData?.value?.toString() ?? undefined,
-        project: data.project ?? undefined,
-        department: Number(data?.departmentData?.value),
-        stateId: data?.statesData?.label ? data?.statesData?.label?.toString() : undefined,
-        locationId: data?.locationData?.label ? data?.locationData?.label?.toString() : undefined,
-        level: Number(data.levelData?.value),
-        subDeptid: data.subDeptData?.value ? Number(data.subDeptData.value) : null,
-        updatedBy: userData.data?.user.id ?? 1,
-        isactive: true,
-        updatedAt: new Date().toISOString().split("T")[0] ?? "",
-      };
+             const submissionData = {
+         id: data.id,
+         name: data.name,
+         empNo: data.empNo,
+         designation: data?.designation,
+         natureOfEmployment: data?.typeData?.value?.toString() ?? undefined,
+         project: data.project ?? undefined,
+         department: Number(data?.departmentData?.value),
+         stateId: data?.statesData?.label ? data?.statesData?.label?.toString() : undefined,
+         locationId: data?.locationData?.label ? data?.locationData?.label?.toString() : undefined,
+         level: Number(data.levelData?.value),
+         subDeptid: data.subDeptData?.value ? Number(data.subDeptData.value) : null,
+         email: data.email,
+         dateOfJoining: data.dateOfJoining,
+         updatedBy: userData.data?.user.id ?? 1,
+         isactive: true,
+         updatedAt: new Date().toISOString().split("T")[0] ?? "",
+       };
 console.log(submissionData, "submissionData");
       editStaff(submissionData);
       reset(submissionData);
@@ -151,6 +155,13 @@ console.log(submissionData, "submissionData");
     }
   }, [subDepartmentsRefectch, departmentId])
 
+  // Reset form when item changes to ensure proper pre-population
+  useEffect(() => {
+    if (item) {
+      reset(item);
+    }
+  }, [item, reset]);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex gap-2">
@@ -174,7 +185,6 @@ console.log(submissionData, "submissionData");
           <div>
             <label className="text-sm">Employee Number</label>
             <input
-            disabled
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="Enter employee number"
               {...register("empNo", {
@@ -237,6 +247,38 @@ console.log(submissionData, "submissionData");
               </span>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Email and Date of Joining */}
+      <div className="flex gap-2">
+        <div className="w-1/2">
+          <label className="text-sm">
+            Email <span className="text-red-400">*</span>
+          </label>
+          <input
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            placeholder="Enter staff email"
+            defaultValue={item.email || ''}
+            {...register("email", { required: "Email is required" })}
+          />
+          {errors.email && (
+            <span className="text-xs text-red-500">{errors.email.message}</span>
+          )}
+        </div>
+        <div className="w-1/2">
+          <label className="text-sm">
+            Date of Joining <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="date"
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+            defaultValue={item.dateOfJoining ? new Date(item.dateOfJoining).toISOString().split('T')[0] : ''}
+            {...register("dateOfJoining", { required: "Date of joining is required" })}
+          />
+          {errors.dateOfJoining && (
+            <span className="text-xs text-red-500">{errors.dateOfJoining.message}</span>
+          )}
         </div>
       </div>
 
@@ -355,24 +397,45 @@ console.log(submissionData, "submissionData");
         
         {/* Sub department */}
         <div className="w-1/2">
-          <label className="text-sm">Sub Department</label>
+          <label className="text-sm">
+            Sub Department <span className="text-red-400">*</span>
+          </label>
           <Controller
             name="subDeptData"
             control={control}
-            render={({ field }) => (
-              <Select
-                onChange={field.onChange}
-                defaultValue={item.subDeptData}
-                options={subDepartsmentDataFiltered}
-                placeholder="Select a Sub Department"
-                isClearable
-                aria-invalid={!!errors.subDepartment}
-              />
-            )}
+            rules={{
+              validate: (value) => {
+                const selectedDeptId = Number(departmentId);
+                const hideSubDeptForDepts = [4, 5, 6, 7, 8];
+                const shouldDisableSubDept = hideSubDeptForDepts.includes(selectedDeptId);
+                
+                if (!shouldDisableSubDept && (!value || !value.value)) {
+                  return "Sub Department is required";
+                }
+                return true;
+              }
+            }}
+            render={({ field }) => {
+              const selectedDeptId = Number(departmentId);
+              const hideSubDeptForDepts = [4, 5, 6, 7, 8];
+              const shouldDisableSubDept = hideSubDeptForDepts.includes(selectedDeptId);
+              
+              return (
+                <Select
+                  onChange={field.onChange}
+                  defaultValue={item.subDeptData}
+                  options={subDepartsmentDataFiltered}
+                  placeholder="Select a Sub Department"
+                  isClearable
+                  isDisabled={shouldDisableSubDept}
+                  aria-invalid={!!errors.subDeptData}
+                />
+              );
+            }}
           />
-          {errors.subDepartment && (
+          {errors.subDeptData && (
             <span className="text-xs text-red-500">
-              {errors.subDepartment.message}
+              {errors.subDeptData.message}
             </span>
           )}
         </div>

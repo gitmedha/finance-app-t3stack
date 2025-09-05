@@ -8,6 +8,8 @@ import {
   aliasedTable,
   or,
   sql,
+  ne,
+  notInArray,
 } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -424,7 +426,12 @@ export const getLevels = protectedProcedure.query(async ({ ctx }) => {
         categoryMasterInFinanceProject.id,
       ),
     )
-    .where(eq(categoryHierarchyInFinanceProject.parentId, 1));
+    .where(
+      and(
+        eq(categoryHierarchyInFinanceProject.parentId, 1),
+        ne(categoryMasterInFinanceProject.id, 76)
+      )
+    );
   const levelsData = subCategories.map((subcategory) => ({
     value: subcategory.subCategoryId,
     label: subcategory.subCategoryName,

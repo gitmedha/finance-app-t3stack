@@ -259,7 +259,7 @@ console.log(submissionData, "submissionData");
           <input
             className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
             placeholder="Enter staff email"
-            defaultValue={item.email || ''}
+            defaultValue={item.email ?? ''}
             {...register("email", { required: "Email is required" })}
           />
           {errors.email && (
@@ -409,7 +409,7 @@ console.log(submissionData, "submissionData");
                 const hideSubDeptForDepts = [4, 5, 6, 7, 8];
                 const shouldDisableSubDept = hideSubDeptForDepts.includes(selectedDeptId);
                 
-                if (!shouldDisableSubDept && (!value || !value.value)) {
+                if (!shouldDisableSubDept && (!value ? true : !value.value)) {
                   return "Sub Department is required";
                 }
                 return true;

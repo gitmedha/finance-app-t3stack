@@ -8,6 +8,8 @@ import {
   aliasedTable,
   or,
   sql,
+  ne,
+  notInArray,
 } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -69,6 +71,7 @@ export const getStaffs = protectedProcedure
         name: staffMaster.name,
         empNo: staffMaster.empNo,
         email: staffMaster.email,
+        dateOfJoining: staffMaster.dateOfJoining,
         level: staffMaster.level,
         levelName: categoryMasterInFinanceProject.categoryname,
         isactive: staffMaster.isactive,
@@ -280,6 +283,8 @@ export const editStaff = protectedProcedure
       description: z.string().optional().nullable(),
       level: z.number().optional(),
       project: z.string().optional(),
+      email: z.string().email().optional(),
+      dateOfJoining: z.string().optional().nullable(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
       subDeptid: z.number().optional().nullable(),
@@ -421,7 +426,12 @@ export const getLevels = protectedProcedure.query(async ({ ctx }) => {
         categoryMasterInFinanceProject.id,
       ),
     )
-    .where(eq(categoryHierarchyInFinanceProject.parentId, 1));
+    .where(
+      and(
+        eq(categoryHierarchyInFinanceProject.parentId, 1),
+        ne(categoryMasterInFinanceProject.id, 76)
+      )
+    );
   const levelsData = subCategories.map((subcategory) => ({
     value: subcategory.subCategoryId,
     label: subcategory.subCategoryName,

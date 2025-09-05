@@ -118,6 +118,25 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const onSubmit: SubmitHandler<StaffFormData> = async (data) => {
     try {
+      // Validate sub-department requirement
+      const selectedDeptId = Number(data.departmenData?.value);
+      const hideSubDeptForDepts = [4, 5, 6, 7, 8];
+      const shouldHideSubDept = hideSubDeptForDepts.includes(selectedDeptId);
+      
+      if (!shouldHideSubDept && !data.subDepartmentData?.value) {
+        toast.error("Sub Department is required for this department", {
+          position: "bottom-left",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        return;
+      }
+
       const submissionData = {
         ...data,
         // For TBH mode, set default values for required fields that are hidden
@@ -295,15 +314,11 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             </span>
           )}
         </div>
-        {/* Conditionally show sub-department based on selected department */}
+        {/* Always show sub-department field, but disable for specific departments */}
         {(() => {
           const selectedDeptId = Number(departmentId?.value);
           const hideSubDeptForDepts = [4, 5, 6, 7, 8];
-          const shouldHideSubDept = hideSubDeptForDepts.includes(selectedDeptId);
-          
-          if (shouldHideSubDept) {
-            return null; // Don't render sub-department field
-          }
+          const shouldDisableSubDept = hideSubDeptForDepts.includes(selectedDeptId);
           
           return (
             <div className="w-1/2">
@@ -313,12 +328,21 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
               <Controller
                 name="subDepartmentData"
                 control={control}
+                rules={{
+                  required: (() => {
+                    const selectedDeptId = Number(departmentId?.value);
+                    const hideSubDeptForDepts = [4, 5, 6, 7, 8];
+                    const shouldDisableSubDept = hideSubDeptForDepts.includes(selectedDeptId);
+                    return !shouldDisableSubDept ? "Sub Department is required" : false;
+                  })()
+                }}
                 render={({ field }) => (
                   <Select
                     onChange={field.onChange}
                     options={suDeptDataFiltered}
                     placeholder="Select a Sub Department"
                     isClearable
+                    isDisabled={shouldDisableSubDept}
                     aria-invalid={!!errors.subDepartmentData}
                   />
                 )}

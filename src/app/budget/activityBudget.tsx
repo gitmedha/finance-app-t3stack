@@ -514,14 +514,14 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-left text-sm text-gray-600">
-                <th rowSpan={2} className="border bg-gray-200 p-2 capitalize">
+                <th rowSpan={2} className="sticky left-0 z-20 border bg-gray-200 p-2 capitalize">
                   {"Particular".toLowerCase()}
                 </th>
                 {headerMonth?.map((month) => (
                   <th
                     key={month}
                     colSpan={month.includes("Q") ? 3 : 4}
-                    className="sticky top-0 z-40 h-12 border-b-2 border-l-4 border-gray-400 border-gray-500 bg-gray-200 p-2 text-center capitalize"
+                    className="sticky top-0 z-10 h-12 border-b-2 border-l-4 border-gray-400 border-gray-500 bg-gray-200 p-2 text-center capitalize"
                   >
                     {month}
                   </th>
@@ -550,7 +550,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                     key={sub.subCategoryId}
                     className="text-sm transition hover:bg-gray-100"
                   >
-                    <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
+                    <td className="sticky left-0 z-15 border bg-white p-2 font-medium capitalize">
                       {sub.subCategoryName.toLowerCase()}
                     </td>
                     {months.map((month, key) => {

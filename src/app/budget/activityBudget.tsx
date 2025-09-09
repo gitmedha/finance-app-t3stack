@@ -550,7 +550,7 @@ const ActivityBudget: React.FC<ActivityBudgetProps> = ({
                     key={sub.subCategoryId}
                     className="text-sm transition hover:bg-gray-100"
                   >
-                    <td className="sticky left-0 z-15 border bg-white p-2 font-medium capitalize">
+                    <td className="sticky left-0 z-20 border bg-white p-2 font-medium capitalize">
                       {sub.subCategoryName.toLowerCase()}
                     </td>
                     {months.map((month, key) => {

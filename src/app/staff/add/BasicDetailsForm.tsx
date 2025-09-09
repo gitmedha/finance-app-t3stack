@@ -165,7 +165,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           return data.subDepartmentData?.value ? Number(data.subDepartmentData.value) : null;
         })(),
         dateOfJoining: data.dateOfJoining,
-        dateOfResigning: null
+        dateOfResigning: null,
+        // Set hired status based on name: false for TBH staff, true for others
+        hired: data.name.toLowerCase().startsWith('tbh') ? false : true
       };
       console.log(submissionData, "submissionData");
       setActiveStaffDetails(submissionData);

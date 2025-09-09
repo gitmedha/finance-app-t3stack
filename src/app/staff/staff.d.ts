@@ -71,6 +71,7 @@ interface StaffItem {
   typeData?: ISelectItem;
   email?: string;
   dateOfJoining?: string;
+  hired?: boolean;
 }
 interface StaffFormData {
   name: string;

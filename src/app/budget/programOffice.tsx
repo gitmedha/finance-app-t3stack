@@ -391,14 +391,14 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-left text-sm text-gray-600">
-                <th rowSpan={2} className="border bg-gray-200 p-2 capitalize">
+                <th rowSpan={2} className="sticky left-0 z-20 border bg-gray-200 p-2 capitalize">
                   {"Particular".toLowerCase()}
                 </th>
                 {headerMonth?.map((month) => (
                   <th
                     key={month}
                     colSpan={month.includes("Q") ? 3 : 4}
-                    className="sticky top-0 z-40 h-12 border border-b-2 border-l-4 border-gray-400 border-gray-500 bg-gray-200 p-2 text-center capitalize"
+                    className="sticky top-0 z-10 border border-b-2 border-l-4 border-gray-400 border-gray-500 bg-gray-200 p-2 text-center capitalize"
                   >
                     {month}
                   </th>
@@ -408,7 +408,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
                 {months.map((sub, idx) => (
                   <th
                     key={idx}
-                    className={`p-2 text-center ${
+                    className={` p-2 text-center ${
                       sub.includes("qty")
                         ? "border-l-4 border-gray-500"
                         : "border-l-2 border-gray-300"

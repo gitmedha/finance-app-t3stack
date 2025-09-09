@@ -402,7 +402,7 @@ const OverHeads: React.FC<OverHeadProps> = ({
                   <th
                     key={month}
                     colSpan={month.includes("Q") ? 3 : 4}
-                    className="sticky top-0 z-40 h-12 border bg-gray-200 border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
+                    className="sticky top-0 z-10 h-12 border bg-gray-200 border-b-2 border-l-4 border-gray-400 border-gray-500 p-2 text-center capitalize"
                   >
                     {month}
                   </th>
@@ -430,17 +430,17 @@ const OverHeads: React.FC<OverHeadProps> = ({
                     key={sub.subCategoryId}
                     className="text-sm transition hover:bg-gray-100"
                   >
-                    <td className="sticky left-0 z-10 border bg-white p-2 font-medium capitalize">
+                    <td className="sticky left-0 z-30 border bg-white p-2 font-medium capitalize">
                       {sub.subCategoryName.toLowerCase()}
                     </td>
 
                     {months.map((month, key) => {
                         const row = tableData[sub.subCategoryId] ?? {} as LevelData;
-                        console.log(row, "row");
+                        
                           const quarterlyValues = calculateQuarterlyValues(row);
-                        console.log(quarterlyValues, "quarterlyValues");
+                       
                         const isQuarterField = month.startsWith("Q");
-                        console.log(isQuarterField, "isQuarterField");
+                        
                         // Get display value: use quarterly calculation for Q fields, otherwise use stored value
                         const displayVal = isQuarterField 
                           ? (quarterlyValues[month as keyof typeof quarterlyValues] ?? 0)

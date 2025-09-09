@@ -150,7 +150,7 @@ export default function Staff() {
           <div className="flex flex-col items-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
             <div  className="flex items-center space-x-2">
             {/* count */}
-            <span className="font-semibold">Count: {filteredStaffs.length}</span>
+            <span className="font-semibold">Count: {result?.totalCount}</span>
             {/* search */}
             <div className="w-[180px]">
               <SearchInput
@@ -165,9 +165,9 @@ export default function Staff() {
           </div>
           {/* pagination and add staff button */}
           <div className="flex items-center justify-center space-x-2 md:justify-end">
-            {filteredStaffs && (
+            {result?.staffs && (
               <ReactPaginationStyle
-                total={filteredStaffs.length}
+                total={result?.totalCount}
                 currentPage={currentPage}
                 handlePagination={handlePagination}
                 limit={limit}

@@ -276,6 +276,7 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
 	project: varchar("project", { length: 255 }),
 	dateOfJoining: date("date_of_joining"),
 	dateOfResigning: date("date_of_resigning"),
+	hired: boolean("hired"),
 },
 (table) => {
 	return {

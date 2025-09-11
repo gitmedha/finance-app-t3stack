@@ -220,7 +220,7 @@ export const addStaff = protectedProcedure
       subDeptId: z.number().optional().nullable(),
       dateOfJoining: z.string().optional().nullable(),
       dateOfResigning: z.string().optional().nullable(),
-      hired: z.boolean().optional().nullable(),
+      hired: z.string().optional().nullable(),
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -287,7 +287,7 @@ export const editStaff = protectedProcedure
       project: z.string().optional(),
       email: z.string().email().optional(),
       dateOfJoining: z.string().optional().nullable(),
-      hired: z.boolean().optional(),
+      hired: z.string().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
       subDeptid: z.number().optional().nullable(),

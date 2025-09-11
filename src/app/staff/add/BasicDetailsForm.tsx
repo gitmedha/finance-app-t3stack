@@ -36,6 +36,7 @@ interface StaffFormData {
   createdAt: string; 
   dateOfJoining: string;
   dateOfResigning: string;
+  hired: string;
 }
 
 const typeMapping: typeMappingSchema []= [
@@ -166,8 +167,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         })(),
         dateOfJoining: data.dateOfJoining,
         dateOfResigning: null,
-        // Set hired status based on name: false for TBH staff, true for others
-        hired: data.name.toLowerCase().startsWith('tbh') ? false : true
+        // Set hired status based on name: "false" for TBH staff, "hired" for others
+        hired: data.name.toLowerCase().startsWith('tbh') ? "false" : "hired"
       };
       console.log(submissionData, "submissionData");
       setActiveStaffDetails(submissionData);

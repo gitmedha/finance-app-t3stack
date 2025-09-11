@@ -24,7 +24,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
   
   // State for hired checkbox (only relevant for TBH staff)
   // Use the hired status from the database, default to false for TBH staff
-  const [isHired, setIsHired] = useState(item.hired ?? false);
+  const [isHired, setIsHired] = useState(item.hired === "hired" || item.hired === "true");
   
   // Form is editable if: not TBH staff OR (TBH staff AND hired checkbox is checked)
   const isFormEditable = !isTbhStaff || (isTbhStaff && isHired);
@@ -129,10 +129,10 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
   const onSubmit: SubmitHandler<StaffItem> = (data) => {
     try {
       // Update staff hired status if it has changed
-      if (isTbhStaff && item.hired !== isHired) {
+      if (isTbhStaff && item.hired !== (isHired ? "true" : "false")) {
         const staffUpdateData = {
           id: item.id,
-          hired: isHired,
+          hired: isHired ? "true" : "false",
           updatedBy: userData.data?.user.id ?? 1,
           updatedAt: new Date().toISOString().split("T")[0] ?? "",
         };

@@ -99,6 +99,7 @@ export const getStaffs = protectedProcedure
         pgwPld: salaryMaster.pgwPld,
         subDeptid: staffMaster.subDeptid,
         subDeptName: subDepartmentTable.departmentname,
+        hired: staffMaster.hired,
       })
       .from(staffMaster)
       .leftJoin(

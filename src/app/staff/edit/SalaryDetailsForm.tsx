@@ -181,11 +181,11 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
       console.error("Error adding staff:", error);
     }
   };
-
+console.log(item,'item')
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
       {/* TBH Staff Hired Checkbox */}
-      {isTbhStaff && (
+      {isTbhStaff  && (
         <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-center">
             <input

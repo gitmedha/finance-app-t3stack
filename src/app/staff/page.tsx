@@ -33,6 +33,7 @@ const cols = [
 
 export default function Staff() {
   const userData = useSession();
+  console.log("🚀 userData:", userData);
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearch] = useState("");
@@ -179,7 +180,7 @@ export default function Staff() {
               selectedLimit={limit}
               onLimitChange={handleLimitChange}
             />
-            {(userData.data?.user.role == 1 || userData.data?.user.role == 2) && <AddStaff refetch={refetch} />}
+            {(userData.data?.user.role == 1 || userData.data?.user.role == 2 || userData.data?.user.role == 3) && <AddStaff refetch={refetch} />}
           </div>
         </div>
 
@@ -212,7 +213,7 @@ export default function Staff() {
                     </div>
                     <div className="flex space-x-2">
                       <ViewStaff item={item} refetch={refetch} />
-                      {userData.data?.user.role === 1 && (
+                      {(userData.data?.user.role === 1 || userData.data?.user.role === 2 || userData.data?.user.role === 3) && (
                         <>
                           <EditStaff item={item} refetch={refetch} />
                           <DeleteStaff item={item} refetchStaffs={refetch} />
@@ -292,10 +293,10 @@ export default function Staff() {
                           {item.isactive ? (
                             <>
                               <ViewStaff item={item} refetch={refetch} />
-                              {userData.data?.user.role === 1 && (
+                              {(userData.data?.user.role === 1 || userData.data?.user.role === 2 || userData.data?.user.role === 3) && (
                                 <EditStaff item={item} refetch={refetch} />
                               )}
-                              {userData.data?.user.role === 1 && (
+                              {(userData.data?.user.role === 1 || userData.data?.user.role === 2 || userData.data?.user.role === 3) && (
                                 <DeleteStaff
                                   item={item}
                                   refetchStaffs={refetch}

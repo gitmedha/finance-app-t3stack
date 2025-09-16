@@ -209,7 +209,7 @@ console.log(submissionData, "submissionData");
               render={({ field }) => (
                 <Select
                   onChange={field.onChange}
-                  defaultValue={item.statesData}
+                  defaultValue={item.statesData?.value ? item.statesData : undefined}
                   options={statesData}
                   placeholder="Select a state"
                   isClearable
@@ -233,7 +233,7 @@ console.log(submissionData, "submissionData");
               render={({ field }) => (
                 <Select
                   onChange={field.onChange}
-                  defaultValue={item.locationData}
+                  defaultValue={item?.locationData?.value ? item.locationData : undefined}
                   options={locationsData}
                   placeholder="Select a location"
                   isClearable

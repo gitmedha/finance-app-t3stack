@@ -188,8 +188,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         })(),
         dateOfJoining: data.dateOfJoining,
         dateOfResigning: null,
-        // Set hired status based on name: "false" for TBH staff, "hired" for others
-        hired: data.name.toLowerCase().startsWith("tbh") ? "false" : "hired",
+        // Set hired status based on mode: "false" for TBH mode, "hired" for normal mode
+        hired: mode === "tbh" ? "false" : "true",
       };
       console.log(submissionData, "submissionData");
       setActiveStaffDetails(submissionData);

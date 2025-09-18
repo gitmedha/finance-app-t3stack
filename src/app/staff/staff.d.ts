@@ -103,14 +103,14 @@ interface GetStaffsResponse {
 }
 
 interface FilterOptions {
-  department: number | string;
+  department: number;
   departmentname: string;
   status: string;
   // designation: string;  // Commented out: no longer using designation filter
   level: number;           // Changed from string to number to match backend type
-  subdepartment: number|string;
+  subdepartment: number;
   subdepartmentname: string;
-  tbhPrefix: "" | "TBH";
+  hiredStatus: "" | "not-hired";
 }
 
 interface StaffFilterFormProps {

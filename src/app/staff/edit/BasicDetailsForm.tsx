@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
 import { Button, Flex } from "@radix-ui/themes";
@@ -35,6 +35,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const userData = useSession();
   const apiContext = api.useContext();
   const { setActiveStaffId } = useStaff();
+  
+  // Add state for hired checkbox
+  const [isHired, setIsHired] = useState(item.hired === "true" || item.hired === "hired");
   const {
     register,
     control,
@@ -100,6 +103,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
          subDeptid: data.subDeptData?.value ? Number(data.subDeptData.value) : null,
          email: data.email,
          dateOfJoining: data.dateOfJoining,
+         hired: isHired ? "true" : "false",
          updatedBy: userData.data?.user.id ?? 1,
          isactive: true,
          updatedAt: new Date().toISOString().split("T")[0] ?? "",
@@ -209,7 +213,7 @@ console.log(submissionData, "submissionData");
               render={({ field }) => (
                 <Select
                   onChange={field.onChange}
-                  defaultValue={item.statesData}
+                  defaultValue={item.statesData?.value ? item.statesData : undefined}
                   options={statesData}
                   placeholder="Select a state"
                   isClearable
@@ -233,7 +237,7 @@ console.log(submissionData, "submissionData");
               render={({ field }) => (
                 <Select
                   onChange={field.onChange}
-                  defaultValue={item.locationData}
+                  defaultValue={item?.locationData?.value ? item.locationData : undefined}
                   options={locationsData}
                   placeholder="Select a location"
                   isClearable
@@ -440,7 +444,30 @@ console.log(submissionData, "submissionData");
           )}
         </div>
       </div>
-      
+
+      {/* Hired Checkbox */}
+      <div className="flex gap-2">
+        <div className="w-1/2">
+          <label className="text-sm">
+            Hired Status
+          </label>
+          <div className="mt-1 flex items-center gap-2 p-3 border rounded-lg bg-white">
+            <input
+              type="checkbox"
+              id="hired-checkbox"
+              checked={isHired}
+              onChange={(e) => setIsHired(e.target.checked)}
+              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+            />
+            <label htmlFor="hired-checkbox" className="text-sm font-medium cursor-pointer">
+              {isHired ? "Hired" : "Not Hired"}
+            </label>
+          </div>
+        </div>
+        <div className="w-1/2">
+          {/* Empty div for spacing to match other fields */}
+        </div>
+      </div>
 
       <Flex gap="3" mt="4" justify="end">
         <Button

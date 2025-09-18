@@ -4,9 +4,9 @@ import { useForm, type SubmitHandler, Controller } from "react-hook-form";
 import { Button, Flex } from "@radix-ui/themes";
 import { api } from "~/trpc/react";
 import Select from "react-select";
-import {  type ISelectItem } from "../../common/types/genericField";
+import { type ISelectItem } from "../../common/types/genericField";
 import useStaff from "../store/staffStore";
-import { toast } from "react-toastify"
+import { toast } from "react-toastify";
 import { TRPCClientError } from "@trpc/client";
 
 interface ItemDetailProps {
@@ -14,38 +14,38 @@ interface ItemDetailProps {
   refetchStaffs: () => void;
 }
 
-interface typeMappingSchema{
-  value:string
-  label:string
+interface typeMappingSchema {
+  value: string;
+  label: string;
 }
 
 interface StaffFormData {
   name: string;
-  email:string
+  email: string;
   empNo: string;
-  levelData:ISelectItem
+  levelData: ISelectItem;
   stateData: ISelectItem;
   locationData: ISelectItem;
   departmenData: ISelectItem;
-  subDepartmentData:ISelectItem;
+  subDepartmentData: ISelectItem;
   designation: string;
   isactive: boolean;
   natureOfEmployment: ISelectItem;
   project: string;
   createdBy: number;
-  createdAt: string; 
+  createdAt: string;
   dateOfJoining: string;
   dateOfResigning: string;
   hired: string;
 }
 
-const typeMapping: typeMappingSchema []= [
-  { label:"Full Time Consultant",value:"FTC"},
-  { label:"Full Time Employee",value:"FTE"},
-  { label:"On Contract",value:"CON"},
-  { label:"Full Time Consultant (M.Corp)",value:"FTCM"},
-  { label:"Part time Consultant",value:"PTC"}
-]
+const typeMapping: typeMappingSchema[] = [
+  { label: "Full Time Consultant", value: "FTC" },
+  { label: "Full Time Employee", value: "FTE" },
+  { label: "On Contract", value: "CON" },
+  { label: "Full Time Consultant (M.Corp)", value: "FTCM" },
+  { label: "Part time Consultant", value: "PTC" },
+];
 
 const BasicDetails: React.FC<ItemDetailProps> = ({
   setIsModalOpen,
@@ -53,11 +53,12 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 }) => {
   const userData = useSession();
   const apiContext = api.useContext();
-  const { setActiveStaffId, activeStaffDetails, setActiveStaffDetails } = useStaff();
-  
+  const { setActiveStaffId, activeStaffDetails, setActiveStaffDetails } =
+    useStaff();
+
   // Add state for mode selection
-  const [mode, setMode] = useState<'normal' | 'tbh'>('normal');
-  
+  const [mode, setMode] = useState<"normal" | "tbh">("normal");
+
   const {
     register,
     control,
@@ -68,13 +69,13 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   } = useForm<StaffFormData>({
     defaultValues: activeStaffDetails,
   });
-  
+
   const stateName = watch("stateData");
-  const departmentId = watch("departmenData")
+  const departmentId = watch("departmenData");
 
   const { mutate: addStaff } = api.post.addStaff.useMutation({
     async onSuccess(data) {
-      toast.success('Successfully Saved', {
+      toast.success("Successfully Saved", {
         position: "bottom-left",
         autoClose: 1000,
         hideProgressBar: false,
@@ -102,20 +103,29 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         theme: "light",
       });
       console.error("Error adding staff:", err.message);
-      console.log(err,'staff err')
+      console.log(err, "staff err");
     },
   });
 
   // data
   const { data: departmentData } = api.get.getHeadDepartments.useQuery();
   const { data: statesData } = api.get.getAllStates.useQuery();
-  const { data: locationsData = [], refetch } =api.get.getAllLocations.useQuery({stateName: stateName?.label,});
-  const{data:levelsData=[]} = api.get.getLevels.useQuery()
-  const { data: suDeptData = [], refetch: subDeptRefetch } = api.get.getSubDepartments.useQuery(departmentId?{ deptId: Number(departmentId?.value) }:{deptId:undefined})
-  
+  const { data: locationsData = [], refetch } =
+    api.get.getAllLocations.useQuery({ stateName: stateName?.label });
+  const { data: levelsData = [] } = api.get.getLevels.useQuery();
+  const { data: suDeptData = [], refetch: subDeptRefetch } =
+    api.get.getSubDepartments.useQuery(
+      departmentId
+        ? { deptId: Number(departmentId?.value) }
+        : { deptId: undefined },
+    );
+
   // Filter out inactive departments and subdepartments
-  const departmentDataFiltered = departmentData?.filter(dept => dept.isactive !== false) ?? [];
-  const suDeptDataFiltered = suDeptData.filter(subDept => subDept.isactive !== false);
+  const departmentDataFiltered =
+    departmentData?.filter((dept) => dept.isactive !== false) ?? [];
+  const suDeptDataFiltered = suDeptData.filter(
+    (subDept) => subDept.isactive !== false,
+  );
 
   const onSubmit: SubmitHandler<StaffFormData> = async (data) => {
     try {
@@ -123,7 +133,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       const selectedDeptId = Number(data.departmenData?.value);
       const hideSubDeptForDepts = [4, 5, 6, 7, 8];
       const shouldHideSubDept = hideSubDeptForDepts.includes(selectedDeptId);
-      
+
       if (!shouldHideSubDept && !data.subDepartmentData?.value) {
         toast.error("Sub Department is required for this department", {
           position: "bottom-left",
@@ -141,39 +151,50 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       const submissionData = {
         ...data,
         // For TBH mode, set default values for required fields that are hidden
-        empNo: mode === 'tbh' ? 'TBH' + Date.now() : data.empNo,
-        email: mode === 'tbh' ? 'tbh'+Date.now()+'@company.com' : data.email,
-        stateData: mode === 'tbh' ? { value: 'Default', label: 'Default' } : data.stateData,
-        locationData: mode === 'tbh' ? { value: 'Default', label: 'Default' } : data.locationData,
-        project: mode === 'tbh' ? 'TBH Project' : data.project,
-        natureOfEmployment:data.natureOfEmployment.value.toString(),
+        empNo: mode === "tbh" ? "TBH" + Date.now() : data.empNo,
+        email:
+          mode === "tbh" ? "tbh" + Date.now() + "@company.com" : data.email,
+        stateData:
+          mode === "tbh"
+            ? { value: "Default", label: "Default" }
+            : data.stateData,
+        locationData:
+          mode === "tbh"
+            ? { value: "Default", label: "Default" }
+            : data.locationData,
+        project: mode === "tbh" ? "TBH Project" : data.project,
+        natureOfEmployment: data.natureOfEmployment.value.toString(),
         createdBy: userData.data?.user.id ?? 1,
         isactive: true,
         createdAt: new Date().toISOString().split("T")[0] ?? "",
-        stateId: mode === 'tbh' ? 'Default' : data.stateData.label.toString(),
-        locationId: mode === 'tbh' ? 'Default' : data.locationData.label.toString(),
+        stateId: mode === "tbh" ? "Default" : data.stateData.label.toString(),
+        locationId:
+          mode === "tbh" ? "Default" : data.locationData.label.toString(),
         departmentId: Number(data.departmenData.value),
-        level:Number(data.levelData.value),
+        level: Number(data.levelData.value),
         subDeptId: (() => {
           const selectedDeptId = Number(data.departmenData?.value);
           const hideSubDeptForDepts = [4, 5, 6, 7, 8];
-          const shouldHideSubDept = hideSubDeptForDepts.includes(selectedDeptId);
-          
+          const shouldHideSubDept =
+            hideSubDeptForDepts.includes(selectedDeptId);
+
           if (shouldHideSubDept) {
             return null;
           }
-          
-          return data.subDepartmentData?.value ? Number(data.subDepartmentData.value) : null;
+
+          return data.subDepartmentData?.value
+            ? Number(data.subDepartmentData.value)
+            : null;
         })(),
         dateOfJoining: data.dateOfJoining,
         dateOfResigning: null,
-        // Set hired status based on name: "false" for TBH staff, "hired" for others
-        hired: data.name.toLowerCase().startsWith('tbh') ? "false" : "hired"
+        // Set hired status based on mode: "false" for TBH mode, "hired" for normal mode
+        hired: mode === "tbh" ? "false" : "true",
       };
       console.log(submissionData, "submissionData");
       setActiveStaffDetails(submissionData);
       addStaff(submissionData);
-      
+
       // // reset(submissionData);
     } catch (error) {
       console.error("Error adding staff:", error);
@@ -201,49 +222,96 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   useEffect(() => {
     void refetch();
   }, [refetch, stateName]);
-  
+
   useEffect(() => {
     void subDeptRefetch();
   }, [subDeptRefetch, departmentId]);
-  
+
   // Clear sub-department when department changes to one without sub-departments
   useEffect(() => {
     if (departmentId?.value) {
       const selectedDeptId = Number(departmentId.value);
       const hideSubDeptForDepts = [4, 5, 6, 7, 8];
       const shouldHideSubDept = hideSubDeptForDepts.includes(selectedDeptId);
-      
+
       if (shouldHideSubDept) {
-        setValue('subDepartmentData', { value: '', label: '' });
+        setValue("subDepartmentData", { value: "", label: "" });
       }
     }
   }, [departmentId, setValue]);
+  // when dept options + session are ready, write into RHF state
+  useEffect(() => {
+    const sessionDeptId = userData.data?.user.departmentId;
+    if (!sessionDeptId || !departmentDataFiltered?.length) return;
+
+    const opt = departmentDataFiltered.find(
+      (d) => Number(d.value) === Number(sessionDeptId),
+    );
+    if (opt) {
+      setValue(
+        "departmenData",
+        {
+          value: String(opt.value),
+          label: opt.label,
+        },
+        {
+          shouldValidate: true,
+          shouldDirty: false,
+        },
+      );
+    }
+  }, [userData.data?.user.departmentId]);
+
+  // Pre-populate sub-department when it exists in user data
+  useEffect(() => {
+    const sessionSubDeptId = userData.data?.user.subDepartmentId;
+    if (!sessionSubDeptId || !suDeptDataFiltered?.length) return;
+
+    const opt = suDeptDataFiltered.find(
+      (d) => Number(d.value) === Number(sessionSubDeptId),
+    );
+    if (opt && watch("subDepartmentData")?.value !== String(opt.value)) {
+      setValue(
+        "subDepartmentData",
+        {
+          value: String(opt.value),
+          label: opt.label,
+        },
+        {
+          shouldValidate: true,
+          shouldDirty: false,
+        },
+      );
+    }
+  }, [userData.data?.user.subDepartmentId, suDeptDataFiltered, setValue, watch]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {/* Mode Selection Radio Buttons */}
       <div className="mb-6">
-        <label className="text-sm font-medium mb-3 block">Staff Type <span className="text-red-400">*</span></label>
+        <label className="mb-3 block text-sm font-medium">
+          Staff Type <span className="text-red-400">*</span>
+        </label>
         <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="radio"
               name="mode"
               value="normal"
-              checked={mode === 'normal'}
-              onChange={(e) => setMode(e.target.value as 'normal' | 'tbh')}
-              className="w-4 h-4 text-primary focus:ring-primary"
+              checked={mode === "normal"}
+              onChange={(e) => setMode(e.target.value as "normal" | "tbh")}
+              className="h-4 w-4 text-primary focus:ring-primary"
             />
             <span className="text-sm">Normal</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="radio"
               name="mode"
               value="tbh"
-              checked={mode === 'tbh'}
-              onChange={(e) => setMode(e.target.value as 'normal' | 'tbh')}
-              className="w-4 h-4 text-primary focus:ring-primary"
+              checked={mode === "tbh"}
+              onChange={(e) => setMode(e.target.value as "normal" | "tbh")}
+              className="h-4 w-4 text-primary focus:ring-primary"
             />
             <span className="text-sm">TBH</span>
           </label>
@@ -291,7 +359,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         </div>
       </div>
 
-              {/* Department and Sub Department - Conditionally shown */}
+      {/* Department and Sub Department - Conditionally shown */}
       <div className="flex gap-2">
         <div className="w-1/2">
           <label className="text-sm">
@@ -303,14 +371,16 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             rules={{ required: "Department is required" }}
             render={({ field }) => (
               <Select
-                onChange={field.onChange}
+                {...field}
                 options={departmentDataFiltered}
                 placeholder="Select a Department"
                 isClearable
+                isDisabled={Boolean(userData.data?.user.departmentId)} // optional lock
                 aria-invalid={!!errors.departmenData}
               />
             )}
           />
+
           {errors.departmenData && (
             <span className="text-xs text-red-500">
               {errors.departmenData.message}
@@ -321,8 +391,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         {(() => {
           const selectedDeptId = Number(departmentId?.value);
           const hideSubDeptForDepts = [4, 5, 6, 7, 8];
-          const shouldDisableSubDept = hideSubDeptForDepts.includes(selectedDeptId);
-          
+          const shouldDisableSubDept =
+            hideSubDeptForDepts.includes(selectedDeptId);
+
           return (
             <div className="w-1/2">
               <label className="text-sm">
@@ -335,17 +406,21 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
                   required: (() => {
                     const selectedDeptId = Number(departmentId?.value);
                     const hideSubDeptForDepts = [4, 5, 6, 7, 8];
-                    const shouldDisableSubDept = hideSubDeptForDepts.includes(selectedDeptId);
-                    return !shouldDisableSubDept ? "Sub Department is required" : false;
-                  })()
+                    const shouldDisableSubDept =
+                      hideSubDeptForDepts.includes(selectedDeptId);
+                    return !shouldDisableSubDept
+                      ? "Sub Department is required"
+                      : false;
+                  })(),
                 }}
                 render={({ field }) => (
                   <Select
+                    {...field}
                     onChange={field.onChange}
                     options={suDeptDataFiltered}
                     placeholder="Select a Sub Department"
                     isClearable
-                    isDisabled={shouldDisableSubDept}
+                    isDisabled={shouldDisableSubDept || Boolean(userData.data?.user.subDepartmentId)}
                     aria-invalid={!!errors.subDepartmentData}
                   />
                 )}
@@ -414,7 +489,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           <input
             type="date"
             className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-            {...register("dateOfJoining", { required: "Date of joining is required" })}
+            {...register("dateOfJoining", {
+              required: "Date of joining is required",
+            })}
           />
           {errors.dateOfJoining && (
             <span className="text-xs text-red-500">
@@ -423,11 +500,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
           )}
         </div>
         {/* Empty div for spacing when in TBH mode */}
-        {mode === 'normal' && (
+        {mode === "normal" && (
           <div className="w-1/2">
-            <label className="text-sm">
-              Project
-            </label>
+            <label className="text-sm">Project</label>
             <input
               className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="Enter project name"
@@ -443,7 +518,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       </div>
 
       {/* Only show these fields for Normal mode */}
-      {mode === 'normal' && (
+      {mode === "normal" && (
         <>
           {/* Employee Number Field */}
           <div className="flex gap-2">
@@ -459,7 +534,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
                 })}
               />
               {errors.empNo && (
-                <span className="text-xs text-red-500">{errors.empNo.message}</span>
+                <span className="text-xs text-red-500">
+                  {errors.empNo.message}
+                </span>
               )}
             </div>
             <div className="w-1/2">
@@ -469,10 +546,14 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
               <input
                 className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
                 placeholder="Enter staff email"
-                {...register("email", { required: "Email required is required" })}
+                {...register("email", {
+                  required: "Email required is required",
+                })}
               />
               {errors.email && (
-                <span className="text-xs text-red-500">{errors.email.message}</span>
+                <span className="text-xs text-red-500">
+                  {errors.email.message}
+                </span>
               )}
             </div>
           </div>
@@ -498,7 +579,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
                 )}
               />
               {errors.stateData && (
-                <span className="text-xs text-red-500">{errors.stateData.message}</span>
+                <span className="text-xs text-red-500">
+                  {errors.stateData.message}
+                </span>
               )}
             </div>
             <div className="w-1/2">

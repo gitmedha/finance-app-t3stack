@@ -22,12 +22,6 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
   // Check if staff name starts with "tbh" (case-insensitive)
   const isTbhStaff = activeStaffDetails.name?.toLowerCase().startsWith('tbh') ?? false;
   
-  // State for hired checkbox (only relevant for TBH staff)
-  const [isHired, setIsHired] = useState(activeStaffDetails.hired === "hired" || activeStaffDetails.hired === "true");
-  
-  // Form is editable if: not TBH staff OR (TBH staff AND hired checkbox is checked)
-  const isFormEditable = !isTbhStaff || (isTbhStaff && isHired);
-  
   const {
     register,
     handleSubmit,
@@ -47,15 +41,15 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
       
       // Calculate bonus: (salary * 12) * 0.06
       const bonus = (salary * 12) * 0.06;
-      setValue("bonus", bonus.toString());
+      setValue("bonus", bonus.toFixed(2));
       
       // Calculate gratuity: (salary * 15) / 26
       const gratuity = (salary * 15) / 26;
-      setValue("gratuity", gratuity.toString());
+      setValue("gratuity", gratuity.toFixed(2));
       
       // Calculate EPF: (salary * 0.4) * 0.125
       const epf = (salary * 0.4) * 0.125;
-      setValue("epf", epf.toString());
+      setValue("epf", epf.toFixed(2));
     }
   }, [salaryValue, setValue]);
 
@@ -95,22 +89,40 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
 
   const { mutate: editStaff } =
     api.post.editStaff.useMutation({
-      async onSuccess(data) {
-        // Staff hired status updated successfully
-        console.log("Staff hired status updated:", data);
+      async onSuccess(data) 
+      {
+        toast.success("Successfully Saved", {
+          position: "bottom-left",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       },
       onError(err) {
-        console.error("Error updating staff hired status:", err.message);
+        toast.error(`Failed to Save ${err.message}`, {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       },
     });
 
   const onSubmit: SubmitHandler<StaffItem> = (data) => {
     try {
-      // Update staff hired status if it has changed for TBH staff
-      if (isTbhStaff && activeStaffDetails.hired !== (isHired ? "hired" : "false")) {
+      
+       {
         const staffUpdateData = {
           id: activeStaffId ?? 0,
-          hired: isHired ? "hired" : "false",
+         
           updatedBy: userData.data?.user.id ?? 1,
           updatedAt: new Date().toISOString().split("T")[0] ?? "",
         };
@@ -143,26 +155,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
-      {/* TBH Staff Hired Checkbox */}
-      {isTbhStaff && (
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="hired-checkbox"
-              checked={isHired}
-              onChange={(e) => setIsHired(e.target.checked)}
-              className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-            />
-            <label htmlFor="hired-checkbox" className="text-sm font-medium text-yellow-800">
-              Hired
-            </label>
-          </div>
-          <p className="text-xs text-yellow-700 mt-1">
-            Check this box to enable editing salary details for TBH staff.
-          </p>
-        </div>
-      )}
+      
       
       {/* Salary Field */}
       <div>
@@ -171,10 +164,8 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
           type="number"
           placeholder="Enter salary"
           {...register("salary", { required: "Salary is required" })}
-          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none ${
-            !isFormEditable ? 'bg-gray-100 cursor-not-allowed' : ''
-          }`}
-          disabled={!isFormEditable}
+          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none`}
+          
         />
         {/* {errors.salary && <span className="text-xs text-red-500">{errors.salary.message}</span>} */}
       </div>
@@ -186,10 +177,8 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
           type="number"
           placeholder="Enter insurance amount"
           {...register("insurance")}
-          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none ${
-            !isFormEditable ? 'bg-gray-100 cursor-not-allowed' : ''
-          }`}
-          disabled={!isFormEditable}
+          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none`}
+          
         />
       </div>
 
@@ -200,9 +189,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
           type="number"
           placeholder="Auto-calculated from salary"
           {...register("bonus")}
-          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none ${
-            !isFormEditable ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
-          }`}
+          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none`}
           readOnly
         />
       </div>
@@ -214,9 +201,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
           type="number"
           placeholder="Auto-calculated from salary"
           {...register("gratuity")}
-          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none ${
-            !isFormEditable ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
-          }`}
+          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none`}
           readOnly
         />
       </div>
@@ -228,9 +213,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
           type="number"
           placeholder="Auto-calculated from salary"
           {...register("epf")}
-          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none ${
-            !isFormEditable ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-50'
-          }`}
+          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none`}
           readOnly
         />
       </div>
@@ -241,10 +224,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
           type="number"
           placeholder="Enter PGW PLD amount"
           {...register("pgwPld")}
-          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none ${
-            !isFormEditable ? 'bg-gray-100 cursor-not-allowed' : ''
-          }`}
-          disabled={!isFormEditable}
+          className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none`}
         />
       </div>
 
@@ -259,12 +239,8 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
         </button>
         <button
           type="submit"
-          className={`rounded-lg px-4 py-2 text-sm text-white ${
-            isFormEditable 
-              ? 'hover:bg-primary-dark bg-primary' 
-              : 'bg-gray-400 cursor-not-allowed'
-          }`}
-          disabled={!isFormEditable}
+          className={`rounded-lg border px-4 py-2 text-sm !cursor-pointer !bg-primary text-white`}
+          
         >
           Save
         </button>

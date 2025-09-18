@@ -38,6 +38,7 @@ export const getStaffs = protectedProcedure
       status: z.string().optional().default("Active"),
       level: z.number().optional().default(0),
       subdepartment: z.number().optional().default(0),
+      hiredStatus: z.string().optional().default(""),
     }),
   )
   .query(async ({ ctx, input }) => {
@@ -49,6 +50,7 @@ export const getStaffs = protectedProcedure
       department,
       level,
       subdepartment,
+      hiredStatus,
     } = input;
     const offset = (page - 1) * limit;
     // Apply the search condition only if searchTerm is not an empty string
@@ -64,6 +66,8 @@ export const getStaffs = protectedProcedure
       : undefined;
     const levelCondition =
       level === 0 ? undefined : eq(staffMaster.level, level);
+    const hiredStatusCondition =
+      hiredStatus === "not-hired" ? eq(staffMaster.hired, "false") : undefined;
 
     const staffs = await ctx.db
       .select({
@@ -128,6 +132,7 @@ export const getStaffs = protectedProcedure
           statusCondition,
           levelCondition,
           subdepartmentCondition,
+          hiredStatusCondition,
         ),
       )
       .orderBy(desc(staffMaster.createdAt))
@@ -145,6 +150,7 @@ export const getStaffs = protectedProcedure
           subdepartmentCondition,
           statusCondition,
           levelCondition,
+          hiredStatusCondition,
         ),
       );
 

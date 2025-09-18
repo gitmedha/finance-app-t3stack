@@ -10,7 +10,7 @@ import EditStaff from "./edit";
 import DeleteStaff from "./delete";
 import AddStaff from "./add";
 import { api } from "~/trpc/react";
-import type { GetStaffsResponse, StaffItem } from "./staff";
+import type { GetStaffsResponse, StaffItem, FilterOptions } from "./staff";
 import { useSession } from "next-auth/react";
 import ViewStaff from "./view";
 import ActivateStaff from "./activate";
@@ -33,11 +33,12 @@ const cols = [
 
 export default function Staff() {
   const userData = useSession();
+  console.log("🚀 userData:", userData);
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearch] = useState("");
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterOptions>({
     department: userData.data?.user.departmentId
       ? userData.data?.user.departmentId
       : 0,
@@ -48,7 +49,7 @@ export default function Staff() {
     level: 0,
     subdepartment: userData.data?.user.subDepartmentId ?? 0,
     subdepartmentname: userData.data?.user.subDepartmentName ?? "",
-    tbhPrefix: "" as "" | "TBH",
+    hiredStatus: "" as "" | "not-hired",
   });
   console.log("🚀 filters:", filters);
 
@@ -96,13 +97,13 @@ export default function Staff() {
     if (name === "department") {
       setFilters((prev) => ({
         ...prev,
-        [name]: (value as any)?.value ?? 0, // Using 'any' with optional chaining
+        [name]: Number((value as any)?.value ?? 0), // Using 'any' with optional chaining
         departmentname: (value as any)?.label, // Using 'any' with optional chaining
       }));
     } else if (name == "subdepartment") {
       setFilters((prev) => ({
         ...prev,
-        [name]: (value as any)?.value ?? 0, // Using 'any' with optional chaining
+        [name]: Number((value as any)?.value ?? 0), // Using 'any' with optional chaining
         subdepartmentname: (value as any)?.label, // Using 'any' with optional chaining
       }));
     } else if (name === "status") {
@@ -113,9 +114,9 @@ export default function Staff() {
     } else if (name === "level") {
       setFilters((prev) => ({
         ...prev,
-        [name]: (value as any)?.value, // Using 'any' with optional chaining
+        [name]: Number((value as any)?.value ?? 0), // Using 'any' with optional chaining
       }));
-    } else if (name === "tbhPrefix") {
+    } else if (name === "hiredStatus") {
       setFilters((prev) => ({
         ...prev,
         [name]: (value as any)?.value, // Using 'any' with optional chaining
@@ -135,9 +136,8 @@ export default function Staff() {
 
   const filteredStaffs =
   (result?.staffs ?? []).filter((s) => {
-    if (!filters.tbhPrefix) return true; // ALL
-    const dn = s.name || "";
-    return dn.slice(0, 3).toLowerCase() === "tbh"; // TBH only
+    if (!filters.hiredStatus) return true; // ALL
+    return s.hired === "false"; // Show only not hired staff
   });
 
   console.log("🚀 filteredStaffs:", filteredStaffs);
@@ -179,7 +179,7 @@ export default function Staff() {
               selectedLimit={limit}
               onLimitChange={handleLimitChange}
             />
-            {(userData.data?.user.role == 1 || userData.data?.user.role == 2) && <AddStaff refetch={refetch} />}
+            {(userData.data?.user.role == 1 || userData.data?.user.role == 2 || userData.data?.user.role == 3) && <AddStaff refetch={refetch} />}
           </div>
         </div>
 
@@ -212,7 +212,7 @@ export default function Staff() {
                     </div>
                     <div className="flex space-x-2">
                       <ViewStaff item={item} refetch={refetch} />
-                      {userData.data?.user.role === 1 && (
+                      {(userData.data?.user.role === 1 || userData.data?.user.role === 2 || userData.data?.user.role === 3) && (
                         <>
                           <EditStaff item={item} refetch={refetch} />
                           <DeleteStaff item={item} refetchStaffs={refetch} />
@@ -292,10 +292,10 @@ export default function Staff() {
                           {item.isactive ? (
                             <>
                               <ViewStaff item={item} refetch={refetch} />
-                              {userData.data?.user.role === 1 && (
+                              {(userData.data?.user.role === 1 || userData.data?.user.role === 2 || userData.data?.user.role === 3) && (
                                 <EditStaff item={item} refetch={refetch} />
                               )}
-                              {userData.data?.user.role === 1 && (
+                              {(userData.data?.user.role === 1 || userData.data?.user.role === 2 || userData.data?.user.role === 3) && (
                                 <DeleteStaff
                                   item={item}
                                   refetchStaffs={refetch}

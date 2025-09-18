@@ -89,9 +89,30 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
 
   const { mutate: editStaff } =
     api.post.editStaff.useMutation({
-      async onSuccess(data) {
+      async onSuccess(data) 
+      {
+        toast.success("Successfully Saved", {
+          position: "bottom-left",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       },
       onError(err) {
+        toast.error(`Failed to Save ${err.message}`, {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       },
     });
 

@@ -80,6 +80,16 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
 
   const { mutate: editStaff } = api.post.editStaff.useMutation({
     async onSuccess(data) {
+      toast.success("Successfully Updated", {
+        position: "bottom-left",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     },
     onError(err) {
       console.error("Error updating staff hired status:", err.message);

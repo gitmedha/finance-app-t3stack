@@ -28,12 +28,8 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   const departmentDataFiltered = data?.filter(dept => dept.isactive !== false) ?? [];
   const subDeptsDataFiltered = subDeptsData?.filter(subDept => subDept.isactive !== false) ?? [];
 
-  const departmentDataTBHFiltered =
-    filters.tbhPrefix === "TBH"
-      ? departmentDataFiltered.filter((d) =>
-          (d?.label ?? "").slice(0, 3).toLowerCase() === "tbh",
-        )
-      : departmentDataFiltered;
+  // No longer filtering departments by TBH prefix
+  const departmentDataTBHFiltered = departmentDataFiltered;
   
   
   useEffect(() => {
@@ -80,7 +76,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
                 <DropdownMenu.Item
                   key={dep?.value}
                   className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                  onSelect={() => handleSelect('department', dep)}
+                  onSelect={() => handleSelect('department', { value: Number(dep.value), label: dep.label })}
                 >
                   {dep.label}
                 </DropdownMenu.Item>
@@ -116,7 +112,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
                 <DropdownMenu.Item
                   key={dep?.value}
                   className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                  onSelect={() => handleSelect('subdepartment', dep)}
+                  onSelect={() => handleSelect('subdepartment', { value: Number(dep.value), label: dep.label })}
                 >
                   {dep.label}
                 </DropdownMenu.Item>
@@ -184,24 +180,24 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
         </DropdownMenu.Root>
       </div>
 
-      {/* 🔹 NEW: ALL / TBH dropdown */}
+      {/* 🔹 NEW: ALL / Not Hired dropdown */}
       <div className='w-full md:w-32 flex flex-col gap-1'>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button className='cursor-pointer w-full py-1 border rounded-lg text-left text-gray-500 text-sm pl-2 font-normal flex justify-between items-center'>
-              <span>{filters.tbhPrefix === "TBH" ? "TBH" :  "All"}</span>
+              <span>{filters.hiredStatus === "not-hired" ? "TBH" :  "All"}</span>
               <RiArrowDropDownLine size={30} />
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="bg-white max-h-56 overflow-y-scroll shadow-lg rounded-lg p-2 !w-[140px]">
             {[
               { label: "ALL", value: "" },
-              { label: "TBH", value: "TBH" },
+              { label: "TBH", value: "not-hired" },
             ].map(opt => (
               <DropdownMenu.Item
                 key={opt.label}
                 className="p-2 focus:ring-0 hover:bg-gray-100 rounded cursor-pointer"
-                onSelect={() => handleSelect('tbhPrefix', opt)} // 🔹 uses your existing handler
+                onSelect={() => handleSelect('hiredStatus', opt)} // 🔹 uses your existing handler
               >
                 {opt.label}
               </DropdownMenu.Item>

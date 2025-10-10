@@ -460,7 +460,7 @@ console.log(submissionData, "submissionData");
               className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
             />
             <label htmlFor="hired-checkbox" className="text-sm font-medium cursor-pointer">
-              {isHired ? "Hired" : "Not Hired"}
+              {isHired ? "Hired" : "Hired"}
             </label>
           </div>
         </div>

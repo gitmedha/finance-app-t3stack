@@ -212,6 +212,9 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       const isNumericInput = !isNaN(Number(value.trim()));
       const parsedValue = isNumericInput ? Number(value.trim()) : 0;
 
+      // 🆕 Auto-fill logic: If April is filled, fill all 12 months
+      const shouldAutoFill = baseMonth === "apr" && parsedValue > 0;
+      
       // 1️⃣ If plain month field (e.g. "jul"), update quarter total
       if (!field) {
         const oldVal = Number(row?.[key] ?? 0);
@@ -221,6 +224,20 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
         }
 
         row[key] = parsedValue;
+
+        // 🆕 Auto-fill all months if April is filled
+        if (shouldAutoFill) {
+          const allMonths = ["apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "jan", "feb", "mar"];
+          allMonths.forEach(monthKey => {
+            if (monthKey !== "apr") { // Don't overwrite April itself
+              const monthQuarter = monthToQuarter[monthKey] ?? "";
+              if (monthQuarter !== undefined) {
+                updateTotalQtyVals(monthQuarter, parsedValue);
+              }
+              row[monthKey] = parsedValue;
+            }
+          });
+        }
       }
 
       // 2️⃣ If qty or rate is updated
@@ -245,6 +262,31 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
         const mapped = monthMap[key as keyof typeof monthMap] ?? key;
 
         row[mapped] = amount; // Used for total calculation
+
+        // 🆕 Auto-fill all months if April qty/rate is filled
+        if (shouldAutoFill) {
+          const allMonths = ["apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "jan", "feb", "mar"];
+          allMonths.forEach(monthKey => {
+            if (monthKey !== "apr") { // Don't overwrite April itself
+              const monthQtyKey = `${monthKey} qty`;
+              const monthRateKey = `${monthKey} rate`;
+              const monthAmtKey = `${monthKey} amount`;
+              const monthMapped = monthMap[monthKey] ?? monthKey;
+
+              // Copy the same qty and rate values
+              row[monthQtyKey] = qty;
+              row[monthRateKey] = rate;
+              row[monthAmtKey] = amount;
+              row[monthMapped] = amount;
+
+              // Update quarter totals
+              const monthQuarter = monthToQuarter[monthKey] ?? "";
+              if (monthQuarter !== undefined) {
+                updateTotalQtyVals(monthQuarter, amount);
+              }
+            }
+          });
+        }
       }
 
       // 3️⃣ Always update the raw input value
@@ -334,6 +376,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
     () => computeSimpleTotals(tableData as TableData),
     [tableData],
   );
+  console.log(inputStates, "inputStates");
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* <ToastContainer /> */}
@@ -388,6 +431,16 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
 
         {/* Table */}
         <div className="max-h-[70vh] overflow-auto bg-gray-50">
+          {/* Auto-fill hint */}
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mb-2">
+            <div className="flex">
+              <div className="ml-3">
+                <p className="text-sm text-blue-700">
+                  💡 <strong>Tip:</strong> Fill the April column to automatically populate all 12 months with the same value.
+                </p>
+              </div>
+            </div>
+          </div>
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-left text-sm text-gray-600">

@@ -58,7 +58,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
     totalFY: 0,
   });
   const [inputStates, setInputStates] = useState<boolean>(true);
-  const [tableData, setTableData] = useState<Partial<TableData>>({});
+  const [tableData, setTableData] = useState<TableData>({});
   // api calls
   const { data: programOfficeData, isLoading: programOfficeDataLodaing } =
     api.get.getProgramOfficeData.useQuery(
@@ -143,7 +143,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       }
 
       // 3️⃣ Set once at the end
-      setTableData(initialData);
+      setTableData(initialData as TableData);
       setTotalQty(totalQtyAfterBudgetDetails);
     }
   }, [programOfficeData]);
@@ -298,7 +298,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       return updatedData;
     });
   };
-  const numericMonths = months.filter((m) => !m.endsWith("notes"));
+  const numericMonths = months.filter((m) => !m.endsWith("notes") && !m.startsWith("Q"));
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) =>
       numericMonths.some((monthKey) => {
@@ -313,7 +313,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       ([subCategoryId, data]) =>
         transformTableRowToBudgetDetail(
           subCategoryId,
-          data!,
+          data,
           budgetId,
           categoryId,
           deptId,
@@ -327,7 +327,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       handelnputDisable,
       setSaveBtnState,
       onSuccess: () => {
-        recalculateTotals(tableData as TableData, setTotalQty);
+        recalculateTotals(tableData , setTotalQty);
       },
     });
   };
@@ -338,7 +338,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       ([subCategoryId, data]) =>
         transformTableRowToUpdateBudgetDetail(
           subCategoryId,
-          data!,
+          data,
           budgetId,
           categoryId,
           deptId,
@@ -352,7 +352,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
       handelnputDisable,
       setSaveBtnState,
       onSuccess: () => {
-        recalculateTotals(tableData as TableData, setTotalQty);
+        recalculateTotals(tableData , setTotalQty);
       },
     });
   };
@@ -373,7 +373,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
   }, [totalQty]);
 
   const columnTotals = useMemo(
-    () => computeSimpleTotals(tableData as TableData),
+    () => computeSimpleTotals(tableData),
     [tableData],
   );
   console.log(inputStates, "inputStates");

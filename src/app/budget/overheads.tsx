@@ -313,7 +313,7 @@ const OverHeads: React.FC<OverHeadProps> = ({
       return updatedData;
     });
   };
-  const numericMonths = months.filter((m) => !m.endsWith("notes"));
+  const numericMonths = months.filter((m) => !m.endsWith("notes") && !m.startsWith("Q"));
   const isSaveDisabled = () => {
     return Object.values(tableData).some((subData) =>
       numericMonths.some((monthKey) => {

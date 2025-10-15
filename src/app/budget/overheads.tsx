@@ -231,9 +231,10 @@ const OverHeads: React.FC<OverHeadProps> = ({
           const allMonths = ["apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "jan", "feb", "mar"];
           allMonths.forEach(monthKey => {
             if (monthKey !== "apr") { // Don't overwrite April itself
+              const oldVal = Number(row[monthKey] ?? 0);
               const monthQuarter = monthToQuarter[monthKey] ?? "";
               if (monthQuarter !== undefined) {
-                updateTotalQtyVals(monthQuarter, parsedValue);
+                updateTotalQtyVals(monthQuarter, parsedValue - oldVal);
               }
               row[monthKey] = parsedValue;
             }
@@ -262,7 +263,15 @@ const OverHeads: React.FC<OverHeadProps> = ({
         row[amtKey as keyof LevelData] = amount;
         const mapped = monthMap[key as keyof typeof monthMap] ?? key;
 
+        // Get old amount to calculate difference
+        const oldAmount = Number(row[mapped] ?? 0);
         row[mapped] = amount; // Used for total calculation
+
+        // Update quarter total for current month
+        const quarter = monthToQuarter[key] ?? "";
+        if (quarter !== undefined) {
+          updateTotalQtyVals(quarter, amount - oldAmount);
+        }
 
         // 🆕 Auto-fill all months if April qty/rate is filled
         if (shouldAutoFill) {
@@ -274,16 +283,21 @@ const OverHeads: React.FC<OverHeadProps> = ({
               const monthAmtKey = `${monthKey} amount`;
               const monthMapped = monthMap[monthKey] ?? monthKey;
 
+              // Get old values to calculate difference
+              const oldQty = Number(row[monthQtyKey] ?? 0);
+              const oldRate = Number(row[monthRateKey] ?? 0);
+              const oldAmount = Number(row[monthAmtKey] ?? 0);
+
               // Copy the same qty and rate values
               row[monthQtyKey] = qty;
               row[monthRateKey] = rate;
               row[monthAmtKey] = amount;
               row[monthMapped] = amount;
 
-              // Update quarter totals
+              // Update quarter totals with difference (new amount - old amount)
               const monthQuarter = monthToQuarter[monthKey] ?? "";
               if (monthQuarter !== undefined) {
-                updateTotalQtyVals(monthQuarter, amount);
+                updateTotalQtyVals(monthQuarter, amount - oldAmount);
               }
             }
           });

@@ -117,7 +117,7 @@ export const addDonor = protectedProcedure
         totalBudget: parseFloat(input.totalBudget).toFixed(2),
         budgetReceived: parseFloat(input.budgetReceived).toFixed(2),
       };
-      console.log(formattedInput); // Useful for debugging
+    
 
       // Insert new donor into the database
       const result = await ctx.db.insert(donorMaster).values(formattedInput);

@@ -53,7 +53,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
         staleTime: 0,
       },
     );
-  console.log(personnelCostData, "personnelCostData");
+ 
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = [];
     setInputStates(disable);
@@ -486,7 +486,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               gratuitySum +
               salarySum +
               epfSum;
-            console.log(totalQtyAfterStaffCount, "totalQtyAfterStaffCount");
+          
             totalQtyAfterStaffCount.totalQ1 +=
               salarySum +
               epfSum +
@@ -603,7 +603,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               });
               return updatedData;
             });
-            // console.log("Budget created successfully:", data);
+           
           },
           onError: (error) => {
             setSaveBtnState("save");
@@ -645,8 +645,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       const subCategoryData = updatedData[subCategoryId];
       if (!subCategoryData || !avgQty[subCategoryId]) return updatedData;
       if (month == "Apr" || month == "May" || month == "Jun") {
-        console.log(Number(value));
-        console.log(Number(subCategoryData[month]));
+      
         const diff = Number(value) - Number(subCategoryData[month]);
         updateTotalQtyVals("totalQ1", diff);
 
@@ -666,7 +665,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       }
       if (month == "Jul" || month == "Aug" || month == "Sep") {
         const diff = Number(value) - Number(subCategoryData[month]);
-        console.log(diff);
+      
         updateTotalQtyVals("totalQ2", diff);
 
         // Update Q2 total for this subcategory
@@ -874,7 +873,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               theme: "light",
             });
             handelnputDisable(true);
-            console.log("Budget updated successfully:", data);
+          
           },
           onError: (error) => {
             throw new Error(JSON.stringify(error));
@@ -905,7 +904,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
-  console.log(personnelCostData, "personnelCostData");
+ 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details

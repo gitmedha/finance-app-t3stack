@@ -53,7 +53,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
               progress: undefined,
               theme: "light",
             });
-            console.log("Budget status updated successfully:", data);
+           
           },
           onError: (error) => {
             throw new Error(JSON.stringify(error))
@@ -102,7 +102,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
     };
     createBudgetMutation.mutate(input, {
       onSuccess: (data) => {
-        console.log("Budget created successfully:", data);
+       
         setBugetId(data[0] ? data[0].id : null)
       },
       onError: (error) => {
@@ -110,7 +110,7 @@ const BudgetFilterForm: React.FC<BudgetFilterFormProps> = ({ filters, handleSele
       },
     });
   };
-console.log(filters, 'filters')
+
   return (
     <div className='bg-white static md:fixed md:top-14 w-full z-50'>
       <div className='flex justify-between  bg-white   w-full py-5 px-2'>

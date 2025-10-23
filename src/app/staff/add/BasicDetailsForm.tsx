@@ -103,7 +103,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         theme: "light",
       });
       console.error("Error adding staff:", err.message);
-      console.log(err, "staff err");
+   
     },
   });
 
@@ -191,7 +191,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         // Set hired status based on mode: "false" for TBH mode, "hired" for normal mode
         hired: mode === "tbh" ? "false" : "true",
       };
-      console.log(submissionData, "submissionData");
+    
       setActiveStaffDetails(submissionData);
       addStaff(submissionData);
 

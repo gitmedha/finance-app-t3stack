@@ -108,7 +108,7 @@ const Budget: React.FC = () => {
         subdepartmentName: subDeptVal.departmentname,
       }));
     } else if (name === "year" && typeof value === "string") {
-      console.log(value, "value");
+     
       setFilters((prev) => ({
         ...prev,
         [name]: value, // Year is a string
@@ -141,7 +141,7 @@ const Budget: React.FC = () => {
   }, [budgetRes]);
   // get all main categories
   const { data } = api.get.getCats.useQuery();
-  console.log(data, "data");
+ 
   const allQ1 =
     personnelTotals.totalQ1 +
     activityTotals.totalQ1 +

@@ -245,7 +245,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
   }, [filter]);
 
   const isSaveDisabled = () => {
-    console.log(tableData, "travel tableData");
+   
     return Object.values(tableData).some((subData) => {
       return months.some((month) => {
         return !subData[month]?.toString().trim();
@@ -468,7 +468,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
         ),
     );
     try {
-      console.log(updatedBudgetDetails, "travel updatedBudgetDetails");
+     
       updateBudgetDetails.mutate(
         {
           data: updatedBudgetDetails as UpdateTravelBudgetDetails[],
@@ -506,8 +506,7 @@ const TravelBudget: React.FC<TravelBudgetProps> = ({
     [tableData],
   );
 
-  console.log(travelData, "travelData");
-  console.log(selectedLevelStats, "selectedLevelStats");
+ 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details

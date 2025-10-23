@@ -178,26 +178,9 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
     
     // Try to get token from cookie instead of auth header
     const cookies = ctx.headers?.get('cookie');
-    // console.log("Cookies:", cookies);
     
-    // if (cookies) {
-    //   // Extract the next-auth.session-token from cookies using RegExp.exec() instead of match()
-    //   const sessionTokenRegex = /next-auth\.session-token=([^;]+)/;
-    //   const sessionTokenMatch = sessionTokenRegex.exec(cookies);
-    //   const sessionToken = sessionTokenMatch ? sessionTokenMatch[1] : null;
-    //   console.log("Session token from cookie:", sessionToken);
-      
-      // Now you could use this token instead of looking for Authorization header
-    // }
-    // if (!ctx.session || !ctx.session.user) {
-    //   throw new TRPCError({ code: "UNAUTHORIZED" });
-    // }
-    // return next({
-    //   ctx: {
-    //     // infers the `session` as non-nullable
-    //     session: { ...ctx.session, user: ctx.session.user },
-    //   },
-    // });
+    
+   
     if (!ctx.session || !ctx.session) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }

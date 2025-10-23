@@ -62,7 +62,7 @@ export const createBudget = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      console.log(input,'createBudget input')
+    
       const result = await ctx.db
         .insert(budgetMasterInFinanceProject)
         .values({
@@ -168,11 +168,11 @@ export const addBudgetDetails = protectedProcedure
   .mutation(async ({ ctx, input }) => {
     
     try {
-        console.log(input, "addBudgetDetails input");
+    
       // Extract data from input
       const { data } = input;
       // Map data to include shared fields and default values
-      console.log(data, "addBudgetDetails data");
+   
       const recordsToInsert = [];
       for (const item of data) {
         const baseConditions = [
@@ -397,11 +397,11 @@ export const addBudgetDetails = protectedProcedure
   .mutation(async ({ ctx, input }) => {
     
     try {
-        console.log(input, "addBudgetDetails input");
+      
       // Extract data from input
       const { data } = input;
       // Map data to include shared fields and default values
-      console.log(data, "addBudgetDetails data");
+   
       const recordsToInsert = [];
       for (const item of data) {
         const baseConditions = [
@@ -623,11 +623,11 @@ export const addBudgetDetails = protectedProcedure
     .mutation(async ({ ctx, input }) => {
       
       try {
-          console.log(input, "addBudgetDetails input");
+      
         // Extract data from input
         const { data } = input;
         // Map data to include shared fields and default values
-        console.log(data, "addBudgetDetails data");
+     
         const recordsToInsert = [];
         for (const item of data) {
           const baseConditions = [
@@ -849,11 +849,11 @@ export const addBudgetDetails = protectedProcedure
   .mutation(async ({ ctx, input }) => {
     
     try {
-        console.log(input, "addBudgetDetails input");
+   
       // Extract data from input
       const { data } = input;
       // Map data to include shared fields and default values
-      console.log(data, "addBudgetDetails data");
+   
       const recordsToInsert = [];
       for (const item of data) {
         const baseConditions = [
@@ -1191,7 +1191,7 @@ export const getPersonalCatDetials = protectedProcedure
   )
   .query(async ({ ctx, input }) => {
     try {
-      console.log(input, "input");
+    
 
       // get sub categories
       const subCategories = await ctx.db
@@ -1402,7 +1402,7 @@ export const getPersonalCatDetials = protectedProcedure
         levelStatsBaseCondition.push(
           eq(staffMasterInFinanceProject.subDeptid, input.subdeptId),
         );
-      // console.log(levelStatsBaseCondition)
+     
       const levelStats = await ctx.db
         .select({
           level: staffMasterInFinanceProject.level,
@@ -1468,7 +1468,7 @@ export const getProgramActivities = protectedProcedure
     }),
   )
   .query(async ({ ctx, input }) => {
-    console.log(input, "get programinput");
+  
     try {
       // get sub categories
       const subCategories = await ctx.db
@@ -1830,14 +1830,13 @@ export const getProgramActivities = protectedProcedure
           .from(budgetDetailsInFinanceProject)
           .where(and(...baseConditions))
           .groupBy(budgetDetailsInFinanceProject.subcategoryId);
-          console.log("Result for activity == 0:", result);
-          console.log(baseConditions, "baseConditions");
+        
       } else {
         result = await ctx.db
           .select()
           .from(budgetDetailsInFinanceProject)
           .where(and(...baseConditions));
-          console.log("Result for activity != 0:", result);
+        
       }
       const activityTotalCondition = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
@@ -1874,7 +1873,7 @@ export const getProgramActivities = protectedProcedure
         .from(budgetDetailsInFinanceProject)
         .where(and(...activityTotalCondition))
         .groupBy(budgetDetailsInFinanceProject.activity);
-        console.log(result, "result");
+      
       return {
         subCategories,
         budgetId: input.budgetId,
@@ -2506,7 +2505,7 @@ export const getProgramOfficeData = protectedProcedure
         );
       }
       let result;
-      console.log(baseConditions, " get program office base conditions");
+   
       // Execute the query with all conditions
       if (input.activity == "0") {
         result = await ctx.db
@@ -2661,7 +2660,7 @@ export const getProgramOfficeData = protectedProcedure
           .from(budgetDetailsInFinanceProject)
           .where(and(...baseConditions));
       }
-      console.log(result, " get program result");
+    
       return {
         subCategories,
         budgetId: input.budgetId,
@@ -2686,7 +2685,7 @@ export const getCapitalCostData = protectedProcedure
   )
   .query(async ({ ctx, input }) => {
     try {
-      console.log(input, " get capital cost input");
+    
       // get sub categories
       const subCategories = await ctx.db
         .select({
@@ -3424,7 +3423,7 @@ export const updateBudgetDetails = protectedProcedure
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        console.log(input, "updateProgramOfficeBudgetDetails input");
+      
         const { data } = input;
   
         // Perform updates for each budget detail record
@@ -3626,7 +3625,7 @@ export const updateBudgetDetails = protectedProcedure
       )
       .mutation(async ({ ctx, input }) => {
         try {
-          console.log(input, "updateProgramOfficeBudgetDetails input");
+       
           const { data } = input;
     
           // Perform updates for each budget detail record
@@ -3828,7 +3827,7 @@ export const updateBudgetDetails = protectedProcedure
         )
         .mutation(async ({ ctx, input }) => {
           try {
-            console.log(input, "updateProgramOfficeBudgetDetails input");
+          
             const { data } = input;
       
             // Perform updates for each budget detail record
@@ -4220,7 +4219,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
   .mutation(async ({ ctx, input }) => {
     try {
       const { data, budgetId, travelCatId } = input;
-      console.log(budgetId, travelCatId, input.subDeptId);
+    
 
       // Perform updates for each budget detail record
       for (const item of data) {
@@ -4298,7 +4297,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
             eq(budgetDetailsInFinanceProject.subDeptid, input.subDeptId),
           ),
         );
-      console.log(travelData);
+    
       // here we need to update the values
       if (travelData && travelData.length > 0) {
         for (const item of data) {
@@ -4458,7 +4457,7 @@ export const saveTravelBudgetDetails = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      console.log(input, "save travel budget details");
+    
       // Extract data from input
       const { deptId, budgetId, catId, subDeptId, travel_typeid, data } = input;
       // Map data to include shared fields and default values

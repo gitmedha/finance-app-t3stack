@@ -27,7 +27,7 @@ const AnnualBudget: FC<{ financialYear: string }> = ({ financialYear }) => {
     financialYear,
     departmentId: userData.data?.user.departmentId,
   });
-  console.log(data, "data");
+ 
   // default to zero if data is still loading or absent
   const planned = data ?? 0;
   const actual = data ?? 0;

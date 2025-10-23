@@ -13,7 +13,7 @@ import ShowBudget from "./showBudget";
 
 export default function Home() {
   const userData = useSession();
-  console.log(userData, "userData");
+ 
   const year = new Date().getFullYear();
   const month = new Date().getMonth();
   const [filters, setFilters] = useState<FilterOptions>({

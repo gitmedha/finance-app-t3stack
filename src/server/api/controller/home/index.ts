@@ -292,7 +292,7 @@ const employeeCount = row?.total_count ?? 0;
               employeeCount,
             },
           ];
-    console.log(budgetData, "budgetData");
+ 
     // ─── 7. Return the aggregated result ────────────────────────────────────
     return {
       budgetData,

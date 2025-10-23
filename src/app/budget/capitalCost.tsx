@@ -58,14 +58,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
     totalFY: 0,
   });
   const [tableData, setTableData] = useState<TableData>({});
-  console.log(
-    budgetId,
-    categoryId,
-    deptId,
-    subdepartmentId,
-    financialYear,
-    "budgetId",
-  );
+ 
   // api calls
   const { data: capitalCostData, isLoading: capitalCostDataLodaing } =
     api.get.getCapitalCostData.useQuery(
@@ -146,10 +139,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
               Number(item.january) + Number(item.february) + Number(item.march);
           },
         );
-        console.log(
-          "🔍 DEBUG: Final Q1 total:",
-          totalQtyAfterBudgetDetails.totalQ1,
-        );
+       
         setSaveBtnState("edit");
       } else {
         setSaveBtnState("save");
@@ -349,8 +339,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
     () => computeSimpleTotals(tableData),
     [tableData],
   );
-  console.log(months, "months");
-  console.log(tableData, "tableData");
+ 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -440,7 +429,7 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
               {!capitalCostDataLodaing && (
                 <tbody>
                   {capitalCostData?.subCategories.map((sub, rowIdx) => (
-                    console.log(capitalCostData, "capitalCostData"),
+                    
                     <tr
                       key={sub.subCategoryId}
                       className="text-sm transition hover:bg-gray-100"
@@ -450,11 +439,11 @@ const CapitalCost: React.FC<CapitalCostProps> = ({
                       </td>
                       {months.map((month, key) => {
                         const row = tableData[sub.subCategoryId] ?? {} as LevelData;
-                        console.log(row, "row");
+                       
                         const quarterlyValues = calculateQuarterlyValues(row);
-                        console.log(quarterlyValues, "quarterlyValues");
+                      
                         const isQuarterField = month.startsWith("Q");
-                        console.log(isQuarterField, "isQuarterField");
+                       
                         // Get display value: use quarterly calculation for Q fields, otherwise use stored value
                         const displayVal = isQuarterField 
                           ? (quarterlyValues[month as keyof typeof quarterlyValues] ?? 0)

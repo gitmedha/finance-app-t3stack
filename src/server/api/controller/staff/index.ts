@@ -302,7 +302,7 @@ export const editStaff = protectedProcedure
   )
   .mutation(async ({ ctx, input }) => {
     try {
-      console.log(input, "edit input");
+    
       const {
         id,
         updatedBy,
@@ -334,7 +334,7 @@ export const editStaff = protectedProcedure
         })
         .where(eq(staffMaster.id, id))
         .returning();
-      console.log(updatedStaff, "updatedStaff");
+    
       return {
         success: true,
         message: "Staff member updated successfully",
@@ -523,7 +523,7 @@ export const getStaffLevels = protectedProcedure.query(async ({ ctx }) => {
     )
     .groupBy(staffMaster.level, categoryMasterInFinanceProject.categoryname); // Group by level to get unique values
 
-  console.log(levels, "levels");
+
   // Format the results to match the expected structure
   const formattedLevels = levels.map((level) => ({
     value: level.level,

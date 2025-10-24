@@ -1178,6 +1178,52 @@ export const getLevelStaffCount = protectedProcedure
     }
   });
 
+// Helper function to transform data to month-based structure
+function transformToMonthBasedStructure(rawData: Array<{level: number | null, month: string, employeeCount: number}>) {
+  const monthOrder = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+  const result: Record<string, Array<{level: number, count: number}>> = {};
+  
+  // Initialize all months with empty arrays
+  monthOrder.forEach(month => {
+    result[month] = [];
+  });
+  
+  // Get all unique levels from the data
+  const allLevels = new Set<number>();
+  rawData.filter(item => item.level !== null).forEach(item => {
+    allLevels.add(item.level!);
+  });
+  
+  // For each month, create entries for all levels
+  monthOrder.forEach((month, monthIndex) => {
+    allLevels.forEach(level => {
+      let count = 0;
+      
+      // Count employees who joined in this month or previous months
+      // (they continue to be counted in subsequent months as long as they're active)
+      for (let i = 0; i <= monthIndex; i++) {
+        const currentMonth = monthOrder[i];
+        const monthData = rawData.find(item => 
+          item.level === level && item.month === currentMonth
+        );
+        
+        if (monthData) {
+          count += monthData.employeeCount;
+        }
+      }
+      
+      if (result[month]) {
+        result[month].push({
+          level: level,
+          count: count
+        });
+      }
+    });
+  });
+  
+  return result;
+}
+
 export const getPersonalCatDetials = protectedProcedure
   .input(
     z.object({
@@ -1444,9 +1490,40 @@ export const getPersonalCatDetials = protectedProcedure
         .where(and(...levelStatsBaseCondition))
         .groupBy(staffMasterInFinanceProject.level);
 
+      // Get month-based employee counts for new hires only (not all active employees)
+      const monthlyEmployeeCountsRaw = await ctx.db
+        .select({
+          level: staffMasterInFinanceProject.level,
+          month: sql<string>`CASE 
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 4 THEN 'Apr'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 5 THEN 'May'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 6 THEN 'Jun'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 7 THEN 'Jul'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 8 THEN 'Aug'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 9 THEN 'Sep'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 10 THEN 'Oct'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 11 THEN 'Nov'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 12 THEN 'Dec'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 1 THEN 'Jan'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 2 THEN 'Feb'
+            WHEN EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining}) = 3 THEN 'Mar'
+            ELSE 'Unknown'
+          END`.as("month"),
+          employeeCount: sql<number>`COUNT(${staffMasterInFinanceProject.id})`.as("employee_count"),
+        })
+        .from(staffMasterInFinanceProject)
+        .where(and(...levelStatsBaseCondition))
+        .groupBy(staffMasterInFinanceProject.level, sql`EXTRACT(MONTH FROM ${staffMasterInFinanceProject.dateOfJoining})`);
+
+      // Transform data to month-based structure
+      const monthlyEmployeeCounts = transformToMonthBasedStructure(
+        monthlyEmployeeCountsRaw as Array<{level: number | null, month: string, employeeCount: number}>
+      );
+
       return {
         subCategories,
         levelStats,
+        monthlyEmployeeCounts,
         budgetId: input.budgetId,
         result,
         subDeptId: input.subdeptId,

@@ -53,7 +53,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
         staleTime: 0,
       },
     );
+<<<<<<< Updated upstream
   console.log(personnelCostData, "personnelCostData");
+=======
+ console.log(personnelCostData, "personnelCostData");
+>>>>>>> Stashed changes
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = [];
     setInputStates(disable);

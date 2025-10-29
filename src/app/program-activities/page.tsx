@@ -124,7 +124,7 @@ export default function ProgramActivities() {
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
   };
-  console.log(result?.activities, "result");
+ 
   return (
     <div className="mt-20 flex justify-center">
       <div className="container mt-6 min-h-[400px] min-w-full rounded bg-white px-3 py-4 shadow lg:mt-0">

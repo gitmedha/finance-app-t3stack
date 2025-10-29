@@ -73,7 +73,7 @@ const EditDonor: React.FC<ItemDetailProps> = ({ item }) => {
 
   const handleSave = async () => {
     try {
-      console.log("Saved donor data:", formData);
+    
       const donorData = {
         ...formData,
         finYear: Number(formData.finYear),

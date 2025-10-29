@@ -390,7 +390,7 @@ const ProgramOffice: React.FC<ProgramOfficeProps> = ({
     () => computeSimpleTotals(tableData),
     [tableData],
   );
-  console.log(inputStates, "inputStates");
+
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* <ToastContainer /> */}

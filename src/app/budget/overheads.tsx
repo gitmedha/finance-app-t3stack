@@ -134,10 +134,7 @@ const OverHeads: React.FC<OverHeadProps> = ({
           totalQtyAfterBudgetDetails.totalQ4 +=
             Number(item.january) + Number(item.february) + Number(item.march);
         });
-        console.log(
-          "🔍 DEBUG: Final Q1 total:",
-          totalQtyAfterBudgetDetails.totalQ1,
-        );
+      
         setSaveBtnState("edit");
       } else {
         setSaveBtnState("save");
@@ -361,7 +358,7 @@ const OverHeads: React.FC<OverHeadProps> = ({
           subdepartmentId,
         ),
     );
-    console.log(updatedBudgetDetails, "updatedBudgetDetails");
+  
     await handleUpdateBudget({
       payload: updatedBudgetDetails as BudgetDetailsUpdate[],
       updateBudgetDetails,
@@ -390,10 +387,7 @@ const OverHeads: React.FC<OverHeadProps> = ({
     () => computeSimpleTotals(tableData),
     [tableData],
   );
-  console.log(status, "status");
-  console.log(subdepartmentId, "subdepartmentId");
-  console.log(deptId, "deptId");
-  console.log(userData.data?.user.role, "userData");
+ 
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       {/* <ToastContainer /> */}

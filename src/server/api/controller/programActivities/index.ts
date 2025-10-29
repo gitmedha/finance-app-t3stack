@@ -120,7 +120,7 @@ export const getProgramActivity = protectedProcedure
     }),
   )
   .query(async ({ ctx, input }) => {
-    console.log("🚀 input:", input);
+ 
     const {
       page,
       limit,
@@ -610,7 +610,7 @@ export const getProgramActivitiesByDepartment = protectedProcedure
         .from(programActivitiesInFinanceProject)
         .where(filters.length > 0 ? and(...filters) : undefined)
         .orderBy(programActivitiesInFinanceProject.name);
-      console.log(activities, "activities");
+   
       // Return value/label pairs for dropdown selection
       return activities.map((activity) => ({
         value: activity.id,

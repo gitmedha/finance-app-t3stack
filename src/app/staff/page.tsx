@@ -33,7 +33,7 @@ const cols = [
 
 export default function Staff() {
   const userData = useSession();
-  console.log("🚀 userData:", userData);
+ 
   const [limit, setLimit] = useState<number>(10); // Default limit
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearch] = useState("");
@@ -51,7 +51,7 @@ export default function Staff() {
     subdepartmentname: userData.data?.user.subDepartmentName ?? "",
     hiredStatus: "" as "" | "not-hired",
   });
-  console.log("🚀 filters:", filters);
+ 
 
   const { data, isLoading, refetch } = api.get.getStaffs.useQuery(
     { page: currentPage, limit, searchTerm, ...filters },
@@ -65,14 +65,7 @@ export default function Staff() {
     void fetchData();
   }, [refetch, currentPage, filters, limit, searchTerm]);
 
-  useEffect(() => {
-    if (data) {
-      console.log("Frontend received data:", data);
-    }
-  }, [data]);
-  useEffect(() => {
-    console.log("🚀 session:", userData);
-  }, []);
+  
 
   const result = data as GetStaffsResponse | undefined;
 
@@ -92,8 +85,7 @@ export default function Staff() {
   /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 
   const handleSelect = (name: string, value: object) => {
-    console.log("🚀 name:", name);
-    console.log("🚀 value:", value);
+   
     if (name === "department") {
       setFilters((prev) => ({
         ...prev,
@@ -140,8 +132,7 @@ export default function Staff() {
     return s.hired === "false"; // Show only not hired staff
   });
 
-  console.log("🚀 filteredStaffs:", filteredStaffs);
-  console.log("🚀 result:", result);
+ 
 
   return (
     <div className="mt-20 flex justify-center">

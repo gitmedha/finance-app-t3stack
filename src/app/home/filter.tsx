@@ -9,8 +9,7 @@ const HomeFilterForm: React.FC<HomeFilterFormProps> = ({
   filters,
   handleSelect,
 }) => {
-  console.log(filters, "filters");
-  console.log(handleSelect, "handleSelect");
+ 
 
   const userData = useSession();
   // Fetch data for departments

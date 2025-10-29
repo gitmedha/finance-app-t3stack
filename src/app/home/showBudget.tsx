@@ -35,8 +35,7 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
       },
       { enabled: !!catData },
     );
-  console.log(filters, "homepagefilters");
-  console.log(budgetRes, "budgetRes");
+ 
   // join categories + budgets into rows
   const rows = useMemo<BudgetItem[]>(() => {
     if (catsLoading || budgetLoading || !catData?.categories || !budgetRes) {
@@ -104,7 +103,7 @@ const ShowBudget: React.FC<{ filters: FilterOptions }> = ({ filters }) => {
   if (catsLoading || budgetLoading) {
     return <div>Loading...</div>;
   }
-  console.log(rows, "rows");
+
   return (
     <div className="overflow-x-auto rounded-md bg-white shadow-lg">
       <table className="min-w-full table-auto border-collapse">

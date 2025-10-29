@@ -64,7 +64,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       refetchStaffs();
     },
     onError(err) {
-      console.log(err.message, "err.message");
+     
       console.error("Error adding staff:", err);
     },
   });
@@ -88,7 +88,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const onSubmit: SubmitHandler<StaffItem> = async (data) => {
     try {
-      console.log(data, "Edit data");
+     
              const submissionData = {
          id: data.id,
          name: data.name,
@@ -108,7 +108,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
          isactive: true,
          updatedAt: new Date().toISOString().split("T")[0] ?? "",
        };
-console.log(submissionData, "submissionData");
+
       editStaff(submissionData);
       reset(submissionData);
       toast.success('Successfully Edited', {

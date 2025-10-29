@@ -146,7 +146,7 @@ export default function Expenses() {
   };
 
   const handleFileupload = (e: object) => {
-    console.log(e)
+   console.log(e)
   }
   const handlePagination = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected); // Update current page
@@ -154,7 +154,7 @@ export default function Expenses() {
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
-    // console.log('Selected limit:', newLimit); // Handle limit change as needed
+   
   };
 
   return (

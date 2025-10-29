@@ -12,7 +12,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   // const { data: designations, refetch: designationsFetch } = api.get.getDesignation.useQuery();
   // Fetch levels data
   const { data: staffLevels, refetch: staffLevelsFetch } = api.get.getStaffLevels.useQuery();
-  console.log(staffLevels, "staffLevels");
+ 
   // get head departments 
   const {data,refetch} = api.get.getHeadDepartments.useQuery()
   // get subdepartments of that department if not every sub department
@@ -47,7 +47,7 @@ const StaffFilterForm: React.FC<StaffFilterFormProps> = ({ filters, handleSelect
   useEffect(()=>{
     void subDeptRefetch()
   },[subDeptRefetch,filters.department])
-  console.log("🚀 filters:", filters);
+ 
   return (
     <div className='w-full flex flex-col gap-1 md:flex-row'>
 

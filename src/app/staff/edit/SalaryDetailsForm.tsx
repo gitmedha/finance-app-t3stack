@@ -179,7 +179,7 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
       console.error("Error adding staff:", error);
     }
   };
-  console.log(item, "item");
+  
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
       {/* Salary Field */}

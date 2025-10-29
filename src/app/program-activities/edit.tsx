@@ -69,7 +69,7 @@ export default function EditProgramActivity({
   const activeDepts = depts
     .filter((d) => d.isactive)
     .map((d) => ({ value: d.value, label: d.label }));
-  console.log(activeDepts, "activeDepts");
+ 
   const activeSubs = subs
     .filter((s) => s.isactive)
     .map((s) => ({ value: s.value, label: s.label }));

@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql, isNotNull, inArray } from "drizzle-orm";
+import { and, eq, isNull, sql, isNotNull, inArray, or, gte, lte } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "~/server/api/trpc";
 import {
@@ -1178,6 +1178,52 @@ export const getLevelStaffCount = protectedProcedure
     }
   });
 
+type QuarterKey = "Q1" | "Q2" | "Q3" | "Q4";
+
+function parseFinancialYear(financialYear: string) {
+  const [startYearRaw, endYearRaw] = financialYear.split("-");
+  const startYear = Number(startYearRaw);
+  if (Number.isNaN(startYear)) {
+    throw new Error(`Invalid financial year format: ${financialYear}`);
+  }
+  const resolvedEndYear = (() => {
+    if (!endYearRaw) return startYear + 1;
+    if (endYearRaw.length === 2) {
+      const centuryPrefix = Math.floor(startYear / 100);
+      return Number(`${centuryPrefix}${endYearRaw}`);
+    }
+    const parsed = Number(endYearRaw);
+    return Number.isNaN(parsed) ? startYear + 1 : parsed;
+  })();
+  return { startYear, endYear: resolvedEndYear };
+}
+
+function toDateString(year: number, month: number, day: number) {
+  return new Date(Date.UTC(year, month, day)).toISOString().split("T")[0] ?? "";
+}
+
+function getQuarterDateRanges(financialYear: string): Record<QuarterKey, { start: string; end: string }> {
+  const { startYear, endYear } = parseFinancialYear(financialYear);
+  return {
+    Q1: {
+      start: toDateString(startYear, 3, 1),
+      end: toDateString(startYear, 5, 30),
+    },
+    Q2: {
+      start: toDateString(startYear, 6, 1),
+      end: toDateString(startYear, 8, 30),
+    },
+    Q3: {
+      start: toDateString(startYear, 9, 1),
+      end: toDateString(startYear, 11, 31),
+    },
+    Q4: {
+      start: toDateString(endYear, 0, 1),
+      end: toDateString(endYear, 2, 31),
+    },
+  };
+}
+
 export const getPersonalCatDetials = protectedProcedure
   .input(
     z.object({
@@ -1445,9 +1491,75 @@ export const getPersonalCatDetials = protectedProcedure
         .where(and(...levelStatsBaseCondition))
         .groupBy(staffMasterInFinanceProject.level);
 
+      const quarterRanges = getQuarterDateRanges(input.financialYear);
+      console.log(quarterRanges, "quarterRanges");
+      const quarterStatsEntries = await Promise.all(
+        (Object.entries(quarterRanges) as Array<
+          [QuarterKey, { start: string; end: string }]
+        >).map(async ([quarterKey, range]) => {
+          const quarterLevelStats = await ctx.db
+            .select({
+              level: staffMasterInFinanceProject.level,
+              employeeCount:
+                sql<number>`COUNT(${staffMasterInFinanceProject.id})`.as(
+                  "employee_count",
+                ),
+              salarySum:
+                sql<number>`SUM(${salaryDetailsInFinanceProject.salary})`.as(
+                  "salary_sum",
+                ),
+              insuranceSum:
+                sql<number>`SUM(${salaryDetailsInFinanceProject.insurance})`.as(
+                  "insurance_sum",
+                ),
+              bonusSum:
+                sql<number>`SUM(${salaryDetailsInFinanceProject.bonus})`.as(
+                  "bonus_sum",
+                ),
+              gratuitySum:
+                sql<number>`SUM(${salaryDetailsInFinanceProject.gratuity})`.as(
+                  "gratuity_sum",
+                ),
+              epfSum: sql<number>`SUM(${salaryDetailsInFinanceProject.epf})`.as(
+                "epf_sum",
+              ),
+              pgwPldSum:
+                sql<number>`SUM(${salaryDetailsInFinanceProject.pgwPld})`.as(
+                  "pgw_pld_sum",
+                ),
+            })
+            .from(staffMasterInFinanceProject)
+            .leftJoin(
+              salaryDetailsInFinanceProject,
+              eq(
+                salaryDetailsInFinanceProject.empId,
+                staffMasterInFinanceProject.id,
+              ),
+            )
+            .where(
+              and(
+                ...levelStatsBaseCondition,
+                lte(staffMasterInFinanceProject.dateOfJoining, range.end),
+                or(
+                  isNull(staffMasterInFinanceProject.dateOfResigning),
+                  gte(staffMasterInFinanceProject.dateOfResigning, range.start),
+                ),
+              ),
+            )
+            .groupBy(staffMasterInFinanceProject.level);
+
+          return [quarterKey, quarterLevelStats];
+        }),
+      );
+      const quarterStats = Object.fromEntries(quarterStatsEntries) as Record<
+        QuarterKey,
+        typeof levelStats
+      >;
+
       return {
         subCategories,
         levelStats,
+        quarterStats,
         budgetId: input.budgetId,
         result,
         subDeptId: input.subdeptId,

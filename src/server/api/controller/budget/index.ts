@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql, isNotNull, inArray, or, gte, lte } from "drizzle-orm";
+import { and, eq, isNull, sql, isNotNull, inArray, or, gte, lte, SQLWrapper } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure } from "~/server/api/trpc";
 import {
@@ -1436,9 +1436,9 @@ export const getPersonalCatDetials = protectedProcedure
           .where(and(...baseConditions));
       }
       // make a call for staff count
-      const levelStatsBaseCondition = [
+      const levelStatsBaseCondition: (SQLWrapper | undefined)[] = [
         // isNotNull(salaryDetailsInFinanceProject.salary),
-        eq(staffMasterInFinanceProject.isactive, true),
+        // eq(staffMasterInFinanceProject.isactive, true),
       ];
       if (input.deptId != 0)
         levelStatsBaseCondition.push(
@@ -1488,11 +1488,13 @@ export const getPersonalCatDetials = protectedProcedure
             staffMasterInFinanceProject.id,
           ),
         )
-        .where(and(...levelStatsBaseCondition))
+        .where(and(
+          // isNotNull(salaryDetailsInFinanceProject.salary),
+          eq(staffMasterInFinanceProject.isactive, true),
+        ))
         .groupBy(staffMasterInFinanceProject.level);
 
       const quarterRanges = getQuarterDateRanges(input.financialYear);
-      console.log(quarterRanges, "quarterRanges");
       const quarterStatsEntries = await Promise.all(
         (Object.entries(quarterRanges) as Array<
           [QuarterKey, { start: string; end: string }]

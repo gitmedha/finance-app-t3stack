@@ -1432,6 +1432,7 @@ export const getPersonalCatDetials = protectedProcedure
             sql<number>`SUM(${salaryDetailsInFinanceProject.pgwPld})`.as(
               "pgw_pld_sum",
             ),
+          
         })
         .from(staffMasterInFinanceProject)
         .leftJoin(
@@ -1456,6 +1457,9 @@ export const getPersonalCatDetials = protectedProcedure
       throw new Error("Failed to get staff level count. Please try again.");
     }
   });
+
+
+
 export const getProgramActivities = protectedProcedure
   .input(
     z.object({

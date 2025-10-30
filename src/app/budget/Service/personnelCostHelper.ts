@@ -2,6 +2,13 @@ import { TableData, totalschema, avgQtySchema } from "../types/personnelCost";
 
 type SubCategory = { subCategoryId: number };
 
+type QuarterKey = "Q1" | "Q2" | "Q3" | "Q4";
+
+function toNumber(value: unknown): number {
+  const num = Number(value ?? 0);
+  return Number.isFinite(num) ? num : 0;
+}
+
 export function buildInitialState(subCategories: SubCategory[]) {
   const initialData: TableData = {};
   const initialAvgQty: avgQtySchema = {};
@@ -293,6 +300,246 @@ export function applyLevelStats(
     totals.totalQ2 += salarySum + epfSum + salarySum + epfSum + pwgPldSum / 4 + salarySum + epfSum;
     totals.totalQ3 += salarySum + epfSum + salarySum + epfSum + pwgPldSum / 4 + salarySum + epfSum;
     totals.totalQ4 += salarySum + epfSum + bonusSum + pwgPldSum / 4 + salarySum + epfSum + gratuitySum + salarySum + epfSum;
+  });
+
+  return { tableData, avgQty, totals };
+}
+
+export function applyQuarterStats(
+  initialData: TableData,
+  initialAvgQty: avgQtySchema,
+  subCategories: SubCategory[],
+  quarterStats: Record<QuarterKey, Array<any> | undefined>,
+) {
+  const tableData: TableData = { ...initialData };
+  const avgQty: avgQtySchema = { ...initialAvgQty };
+  const totals: totalschema = {
+    totalQ1: 0,
+    totalQ2: 0,
+    totalQ3: 0,
+    totalQ4: 0,
+    totalFY: 0,
+  };
+
+  const aggregate = {
+    qty: {
+      Q1: 0,
+      Q2: 0,
+      Q3: 0,
+      Q4: 0,
+    },
+    months: {
+      Apr: 0,
+      May: 0,
+      Jun: 0,
+      Jul: 0,
+      Aug: 0,
+      Sep: 0,
+      Oct: 0,
+      Nov: 0,
+      Dec: 0,
+      Jan: 0,
+      Feb: 0,
+      Mar: 0,
+    },
+  };
+
+  const aggregatedSubCategoryIds: number[] = [];
+
+  const getStatsForLevel = (q: QuarterKey, levelId: number) => {
+    const stats = quarterStats[q] ?? [];
+    return stats.find((item) => Number(item.level) === levelId);
+  };
+
+  subCategories.forEach((sub) => {
+    const levelId = sub.subCategoryId;
+    const q1Stats = getStatsForLevel("Q1", levelId);
+    const q2Stats = getStatsForLevel("Q2", levelId);
+    const q3Stats = getStatsForLevel("Q3", levelId);
+    const q4Stats = getStatsForLevel("Q4", levelId);
+
+    const empQ1 = toNumber(q1Stats?.employeeCount);
+    const empQ2 = toNumber(q2Stats?.employeeCount);
+    const empQ3 = toNumber(q3Stats?.employeeCount);
+    const empQ4 = toNumber(q4Stats?.employeeCount);
+
+    const salaryQ1 = toNumber(q1Stats?.salarySum);
+    const salaryQ2 = toNumber(q2Stats?.salarySum);
+    const salaryQ3 = toNumber(q3Stats?.salarySum);
+    const salaryQ4 = toNumber(q4Stats?.salarySum);
+
+    const epfQ1 = toNumber(q1Stats?.epfSum);
+    const epfQ2 = toNumber(q2Stats?.epfSum);
+    const epfQ3 = toNumber(q3Stats?.epfSum);
+    const epfQ4 = toNumber(q4Stats?.epfSum);
+
+    const insuranceQ1 = toNumber(q1Stats?.insuranceSum);
+    const insuranceQ2 = toNumber(q2Stats?.insuranceSum);
+    const insuranceQ3 = toNumber(q3Stats?.insuranceSum);
+    const insuranceQ4 = toNumber(q4Stats?.insuranceSum);
+
+    const pwgQ1 = toNumber(q1Stats?.pgwPldSum);
+    const pwgQ2 = toNumber(q2Stats?.pgwPldSum);
+    const pwgQ3 = toNumber(q3Stats?.pgwPldSum);
+    const pwgQ4 = toNumber(q4Stats?.pgwPldSum);
+
+    const bonusQ4 = toNumber(q4Stats?.bonusSum);
+    const gratuityQ4 = toNumber(q4Stats?.gratuitySum);
+
+    const totalEmployees = empQ1 + empQ2 + empQ3 + empQ4;
+
+    if (levelId <= 14) {
+      tableData[levelId] = {
+        Count: totalEmployees,
+        Qty1: empQ1,
+        Qty2: empQ2,
+        Qty3: empQ3,
+        Qty4: empQ4,
+        Apr: salaryQ1,
+        May: salaryQ1,
+        Jun: salaryQ1,
+        Q1: salaryQ1 * 3,
+        Jul: salaryQ2,
+        Aug: salaryQ2,
+        Sep: salaryQ2,
+        Q2: salaryQ2 * 3,
+        Oct: salaryQ3,
+        Nov: salaryQ3,
+        Dec: salaryQ3,
+        Q3: salaryQ3 * 3,
+        Jan: salaryQ4,
+        Feb: salaryQ4,
+        Mar: salaryQ4,
+        Q4: salaryQ4 * 3,
+        Total: salaryQ1 * 3 + salaryQ2 * 3 + salaryQ3 * 3 + salaryQ4 * 3,
+        budgetDetailsId: 0,
+      } as any;
+
+      avgQty[levelId] = {
+        Apr: empQ1 ? salaryQ1 / empQ1 : 0,
+        May: empQ1 ? salaryQ1 / empQ1 : 0,
+        Jun: empQ1 ? salaryQ1 / empQ1 : 0,
+        Jul: empQ2 ? salaryQ2 / empQ2 : 0,
+        Aug: empQ2 ? salaryQ2 / empQ2 : 0,
+        Sep: empQ2 ? salaryQ2 / empQ2 : 0,
+        Oct: empQ3 ? salaryQ3 / empQ3 : 0,
+        Nov: empQ3 ? salaryQ3 / empQ3 : 0,
+        Dec: empQ3 ? salaryQ3 / empQ3 : 0,
+        Jan: empQ4 ? salaryQ4 / empQ4 : 0,
+        Feb: empQ4 ? salaryQ4 / empQ4 : 0,
+        Mar: empQ4 ? salaryQ4 / empQ4 : 0,
+      };
+
+      const q1Total = salaryQ1 * 3;
+      const q2Total = salaryQ2 * 3;
+      const q3Total = salaryQ3 * 3;
+      const q4Total = salaryQ4 * 3;
+
+      totals.totalQ1 += q1Total;
+      totals.totalQ2 += q2Total;
+      totals.totalQ3 += q3Total;
+      totals.totalQ4 += q4Total;
+      totals.totalFY += q1Total + q2Total + q3Total + q4Total;
+
+      aggregate.qty.Q1 += empQ1;
+      aggregate.qty.Q2 += empQ2;
+      aggregate.qty.Q3 += empQ3;
+      aggregate.qty.Q4 += empQ4;
+
+      aggregate.months.Apr += epfQ1 + insuranceQ1;
+      aggregate.months.May += epfQ1 + pwgQ1 / 4;
+      aggregate.months.Jun += epfQ1;
+      aggregate.months.Jul += epfQ2;
+      aggregate.months.Aug += epfQ2 + pwgQ2 / 4;
+      aggregate.months.Sep += epfQ2;
+      aggregate.months.Oct += epfQ3;
+      aggregate.months.Nov += epfQ3;
+      aggregate.months.Dec += epfQ3 + pwgQ3 / 4;
+      aggregate.months.Jan += epfQ4 + bonusQ4 + pwgQ4 / 4;
+      aggregate.months.Feb += epfQ4 + gratuityQ4;
+      aggregate.months.Mar += epfQ4;
+    } else {
+      aggregatedSubCategoryIds.push(levelId);
+    }
+  });
+
+  let aggregateTotalsCounted = false;
+
+  aggregatedSubCategoryIds.forEach((subId) => {
+    const qty1 = aggregate.qty.Q1;
+    const qty2 = aggregate.qty.Q2;
+    const qty3 = aggregate.qty.Q3;
+    const qty4 = aggregate.qty.Q4;
+    const totalCount = qty1 + qty2 + qty3 + qty4;
+
+    const apr = aggregate.months.Apr;
+    const may = aggregate.months.May;
+    const jun = aggregate.months.Jun;
+    const jul = aggregate.months.Jul;
+    const aug = aggregate.months.Aug;
+    const sep = aggregate.months.Sep;
+    const oct = aggregate.months.Oct;
+    const nov = aggregate.months.Nov;
+    const dec = aggregate.months.Dec;
+    const jan = aggregate.months.Jan;
+    const feb = aggregate.months.Feb;
+    const mar = aggregate.months.Mar;
+
+    const q1Total = apr + may + jun;
+    const q2Total = jul + aug + sep;
+    const q3Total = oct + nov + dec;
+    const q4Total = jan + feb + mar;
+    const totalFy = q1Total + q2Total + q3Total + q4Total;
+
+    tableData[subId] = {
+      Count: totalCount,
+      Qty1: qty1,
+      Qty2: qty2,
+      Qty3: qty3,
+      Qty4: qty4,
+      Apr: apr,
+      May: may,
+      Jun: jun,
+      Q1: q1Total,
+      Jul: jul,
+      Aug: aug,
+      Sep: sep,
+      Q2: q2Total,
+      Oct: oct,
+      Nov: nov,
+      Dec: dec,
+      Q3: q3Total,
+      Jan: jan,
+      Feb: feb,
+      Mar: mar,
+      Q4: q4Total,
+      Total: totalFy,
+      budgetDetailsId: 0,
+    } as any;
+
+    avgQty[subId] = {
+      Apr: qty1 ? apr / qty1 : 0,
+      May: qty1 ? may / qty1 : 0,
+      Jun: qty1 ? jun / qty1 : 0,
+      Jul: qty2 ? jul / qty2 : 0,
+      Aug: qty2 ? aug / qty2 : 0,
+      Sep: qty2 ? sep / qty2 : 0,
+      Oct: qty3 ? oct / qty3 : 0,
+      Nov: qty3 ? nov / qty3 : 0,
+      Dec: qty3 ? dec / qty3 : 0,
+      Jan: qty4 ? jan / qty4 : 0,
+      Feb: qty4 ? feb / qty4 : 0,
+      Mar: qty4 ? mar / qty4 : 0,
+    };
+
+    if (!aggregateTotalsCounted) {
+      totals.totalQ1 += q1Total;
+      totals.totalQ2 += q2Total;
+      totals.totalQ3 += q3Total;
+      totals.totalQ4 += q4Total;
+      totals.totalFY += totalFy;
+      aggregateTotalsCounted = true;
+    }
   });
 
   return { tableData, avgQty, totals };

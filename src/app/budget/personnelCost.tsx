@@ -11,7 +11,7 @@ import {
   avgQtySchema,
 } from "./types/personnelCost";
 import { months, bandLevelMapping } from "./Constants/personnelCostConstants";
-import { buildInitialState, applyBudgetResults, applyLevelStats } from "./Service/personnelCostHelper";
+import { buildInitialState, applyBudgetResults, applyQuarterStats } from "./Service/personnelCostHelper";
 
 const PersonnelCost: React.FC<PersonnelCostProps> = ({
   section,
@@ -180,13 +180,13 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
           setAvgQty(aq);
           setTableData(td);
           setTotalQty(totals);
-        } else if (personnelCostData.levelStats) {
+        } else if (personnelCostData.quarterStats) {
           setSaveBtnState("save");
-          const { tableData: td, avgQty: aq, totals } = applyLevelStats(
+          const { tableData: td, avgQty: aq, totals } = applyQuarterStats(
             initialData,
             initialAvgQty,
             personnelCostData.subCategories,
-            personnelCostData.levelStats,
+            personnelCostData.quarterStats,
           );
           setAvgQty(aq);
           setTableData(td);

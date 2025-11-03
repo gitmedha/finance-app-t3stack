@@ -154,12 +154,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       const aLabel = String(a?.label ?? "").toLowerCase();
       const bLabel = String(b?.label ?? "").toLowerCase();
 
-      const aIndex = labelOrder.has(aLabel)
-        ? (labelOrder.get(aLabel) as number)
-        : levelOrder.length;
-      const bIndex = labelOrder.has(bLabel)
-        ? (labelOrder.get(bLabel) as number)
-        : levelOrder.length;
+      const aIndex = labelOrder.get(aLabel) ?? levelOrder.length;
+      const bIndex = labelOrder.get(bLabel) ?? levelOrder.length;
 
       if (aIndex !== bIndex) {
         return aIndex - bIndex;

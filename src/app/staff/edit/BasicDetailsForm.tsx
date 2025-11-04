@@ -27,6 +27,26 @@ const typeMapping: typeMappingSchema[] = [
   { label: "Full Time Consultant (M.Corp)", value: "FTCM" },
   { label: "Part time Consultant", value: "PTC" }
 ]
+
+const levelDesignationMap = new Map<string, string>([
+  ["1", "Assistant"],
+  ["I", "Assistant"],
+  ["2", "Associate"],
+  ["II", "Associate"],
+  ["3", "Manager"],
+  ["III", "Manager"],
+  ["4", "Senior Manager"],
+  ["IV", "Senior Manager"],
+  ["5", "AVP"],
+  ["V", "AVP"],
+  ["6", "VP"],
+  ["VI", "VP"],
+  ["7", "CXO/Director"],
+  ["VII", "CXO/Director"],
+  ["OTHERS", "Intern"],
+])
+
+const DEFAULT_DESIGNATION = "Intern"
 const BasicDetails: React.FC<ItemDetailProps> = ({
   item,
   setIsModalOpen,
@@ -43,6 +63,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
     reset,
   } = useForm<StaffItem>({
@@ -53,6 +74,10 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const stateName = watch("statesData")?.label ?? "";
   const departmentId = watch("departmentData")?.value
+  const selectedLevel = watch("levelData")
+  const selectedLevelValue = selectedLevel?.value
+  const selectedLevelLabel = selectedLevel?.label
+  const currentDesignation = watch("designation")
 
   const { mutate: editStaff } = api.post.editStaff.useMutation({
       
@@ -152,6 +177,40 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
       void refetch();
     }
   }, [refetch, stateName]);
+
+  useEffect(() => {
+    const valueKey = selectedLevelValue?.toString();
+    const labelKey = selectedLevelLabel?.toString();
+
+    if (!valueKey && !labelKey) {
+      return;
+    }
+
+    const keysToTry = [labelKey, valueKey]
+      .filter((key): key is string => Boolean(key))
+      .map((key) => key.trim().toUpperCase());
+
+    let designation = currentDesignation ?? undefined;
+
+    for (const key of keysToTry) {
+      const mappedDesignation = levelDesignationMap.get(key);
+      if (mappedDesignation) {
+        designation = mappedDesignation;
+        break;
+      }
+    }
+
+    if (!designation) {
+      designation = DEFAULT_DESIGNATION;
+    }
+
+    if (designation !== currentDesignation) {
+      setValue("designation", designation, {
+        shouldValidate: true,
+        shouldDirty: false,
+      });
+    }
+  }, [selectedLevelValue, selectedLevelLabel, currentDesignation, setValue]);
   useEffect(()=>{
     if(departmentId)
     {

@@ -1,8 +1,41 @@
-import { TableData, totalschema, avgQtySchema } from "../types/personnelCost";
+import { TableData, totalschema, avgQtySchema, LevelData } from "../types/personnelCost";
 
 type SubCategory = { subCategoryId: number };
 
 type QuarterKey = "Q1" | "Q2" | "Q3" | "Q4";
+
+type BudgetResultSource = {
+  subcategoryId: number;
+  total?: unknown;
+  april?: unknown;
+  may?: unknown;
+  june?: unknown;
+  july?: unknown;
+  august?: unknown;
+  september?: unknown;
+  october?: unknown;
+  november?: unknown;
+  december?: unknown;
+  january?: unknown;
+  february?: unknown;
+  march?: unknown;
+  qty1?: unknown;
+  qty2?: unknown;
+  qty3?: unknown;
+  qty4?: unknown;
+  id?: unknown;
+};
+
+type LevelStat = {
+  level: unknown;
+  employeeCount?: unknown;
+  salarySum?: unknown;
+  insuranceSum?: unknown;
+  bonusSum?: unknown;
+  gratuitySum?: unknown;
+  epfSum?: unknown;
+  pgwPldSum?: unknown;
+};
 
 function toNumber(value: unknown): number {
   const num = Number(value ?? 0);
@@ -61,100 +94,87 @@ export function buildInitialState(subCategories: SubCategory[]) {
 export function applyBudgetResults(
   initialData: TableData,
   initialAvgQty: avgQtySchema,
-  result: any[]
+  result: BudgetResultSource[]
 ) {
   const tableData: TableData = { ...initialData };
   const avgQty: avgQtySchema = { ...initialAvgQty };
   const totals: totalschema = { totalQ1: 0, totalQ2: 0, totalQ3: 0, totalQ4: 0, totalFY: 0 };
 
   result.forEach((item) => {
-    tableData[item.subcategoryId] = {
-      Count: Number(item.total),
-      Apr: item.april ? Number(item.april) : "0",
-      May: item.may ? Number(item.may) : "0",
-      Jun: item.june ? Number(item.june) : "0",
-      Q1: (
-        Number(item.april || "0") +
-        Number(item.may || "0") +
-        Number(item.june || "0")
-      ).toString(),
-      Jul: item.july ? Number(item.july) : "0",
-      Aug: item.august ? Number(item.august) : "0",
-      Sep: item.september ? Number(item.september) : "0",
-      Q2: (
-        Number(item.july || "0") +
-        Number(item.august || "0") +
-        Number(item.september || "0")
-      ).toString(),
-      Oct: item.october ? Number(item.october) : "0",
-      Nov: item.november ? Number(item.november) : "0",
-      Dec: item.december ? Number(item.december) : "0",
-      Q3: (
-        Number(item.october || "0") +
-        Number(item.november || "0") +
-        Number(item.december || "0")
-      ).toString(),
-      Jan: item.january ? Number(item.january) : "0",
-      Feb: item.february ? Number(item.february) : "0",
-      Mar: item.march ? Number(item.march) : "0",
-      Q4: (
-        Number(item.january || "0") +
-        Number(item.february || "0") +
-        Number(item.march || "0")
-      ).toString(),
-      Qty1: item.qty1 ? Number(item.qty1) : 0,
-      Qty2: item.qty2 ? Number(item.qty2) : 0,
-      Qty3: item.qty3 ? Number(item.qty3) : 0,
-      Qty4: item.qty4 ? Number(item.qty4) : 0,
-      budgetDetailsId: Number(item.id),
-      Total: (
-        Number(item.january || 0) +
-        Number(item.february || 0) +
-        Number(item.march || 0) +
-        Number(item.april || 0) +
-        Number(item.may || 0) +
-        Number(item.june || 0) +
-        Number(item.july || 0) +
-        Number(item.august || 0) +
-        Number(item.september || 0) +
-        Number(item.october || 0) +
-        Number(item.november || 0) +
-        Number(item.december || 0)
-      ).toString(),
-    } as any;
+    const count = toNumber(item.total);
+    const apr = toNumber(item.april);
+    const may = toNumber(item.may);
+    const jun = toNumber(item.june);
+    const jul = toNumber(item.july);
+    const aug = toNumber(item.august);
+    const sep = toNumber(item.september);
+    const oct = toNumber(item.october);
+    const nov = toNumber(item.november);
+    const dec = toNumber(item.december);
+    const jan = toNumber(item.january);
+    const feb = toNumber(item.february);
+    const mar = toNumber(item.march);
 
-    avgQty[item.subcategoryId] = {
-      Apr: Number(item.april) / (item.qty1 ? Number(item.qty1) : 1),
-      May: Number(item.may) / (item.qty1 ? Number(item.qty1) : 1),
-      Jun: Number(item.june) / (item.qty1 ? Number(item.qty1) : 1),
-      Jul: Number(item.july) / (item.qty2 ? Number(item.qty2) : 1),
-      Aug: Number(item.august) / (item.qty2 ? Number(item.qty2) : 1),
-      Sep: Number(item.september) / (item.qty2 ? Number(item.qty2) : 1),
-      Oct: Number(item.october) / (item.qty3 ? Number(item.qty3) : 1),
-      Nov: Number(item.november) / (item.qty3 ? Number(item.qty3) : 1),
-      Dec: Number(item.december) / (item.qty3 ? Number(item.qty3) : 1),
-      Jan: Number(item.january) / (item.qty4 ? Number(item.qty4) : 1),
-      Feb: Number(item.february) / (item.qty4 ? Number(item.qty4) : 1),
-      Mar: Number(item.march) / (item.qty4 ? Number(item.qty4) : 1),
+    const qty1 = toNumber(item.qty1);
+    const qty2 = toNumber(item.qty2);
+    const qty3 = toNumber(item.qty3);
+    const qty4 = toNumber(item.qty4);
+    const budgetDetailsId = toNumber(item.id);
+
+    const q1Total = apr + may + jun;
+    const q2Total = jul + aug + sep;
+    const q3Total = oct + nov + dec;
+    const q4Total = jan + feb + mar;
+    const totalFy = q1Total + q2Total + q3Total + q4Total;
+
+    const updatedRow: LevelData = {
+      Count: count,
+      Apr: apr,
+      May: may,
+      Jun: jun,
+      Q1: q1Total.toString(),
+      Jul: jul,
+      Aug: aug,
+      Sep: sep,
+      Q2: q2Total.toString(),
+      Oct: oct,
+      Nov: nov,
+      Dec: dec,
+      Q3: q3Total.toString(),
+      Jan: jan,
+      Feb: feb,
+      Mar: mar,
+      Q4: q4Total.toString(),
+      Qty1: qty1,
+      Qty2: qty2,
+      Qty3: qty3,
+      Qty4: qty4,
+      budgetDetailsId,
+      Total: totalFy.toString(),
     };
 
-    totals.totalFY +=
-      Number(item.january) +
-      Number(item.february) +
-      Number(item.march) +
-      Number(item.april) +
-      Number(item.may) +
-      Number(item.june) +
-      Number(item.july) +
-      Number(item.august) +
-      Number(item.september) +
-      Number(item.october) +
-      Number(item.november) +
-      Number(item.december);
-    totals.totalQ1 += Number(item.april) + Number(item.may) + Number(item.june);
-    totals.totalQ2 += Number(item.july) + Number(item.august) + Number(item.september);
-    totals.totalQ3 += Number(item.october) + Number(item.november) + Number(item.december);
-    totals.totalQ4 += Number(item.january) + Number(item.february) + Number(item.march);
+    tableData[item.subcategoryId] = updatedRow;
+
+    avgQty[item.subcategoryId] = {
+      Apr: qty1 ? apr / qty1 : 0,
+      May: qty1 ? may / qty1 : 0,
+      Jun: qty1 ? jun / qty1 : 0,
+      Jul: qty2 ? jul / qty2 : 0,
+      Aug: qty2 ? aug / qty2 : 0,
+      Sep: qty2 ? sep / qty2 : 0,
+      Oct: qty3 ? oct / qty3 : 0,
+      Nov: qty3 ? nov / qty3 : 0,
+      Dec: qty3 ? dec / qty3 : 0,
+      Jan: qty4 ? jan / qty4 : 0,
+      Feb: qty4 ? feb / qty4 : 0,
+      Mar: qty4 ? mar / qty4 : 0,
+    };
+
+    totals.totalFY += totalFy;
+    totals.totalQ1 += q1Total;
+    totals.totalQ2 += q2Total;
+    totals.totalQ3 += q3Total;
+    totals.totalQ4 += q4Total;
   });
 
   return { tableData, avgQty, totals };
@@ -164,7 +184,7 @@ export function applyLevelStats(
   initialData: TableData,
   initialAvgQty: avgQtySchema,
   subCategories: SubCategory[],
-  levelStats: any[]
+  levelStats: LevelStat[] = []
 ) {
   const tableData: TableData = { ...initialData };
   const avgQty: avgQtySchema = { ...initialAvgQty };
@@ -175,21 +195,21 @@ export function applyLevelStats(
       q1OSum = 0, q2OSum = 0, q3OSum = 0, q4OSum = 0;
 
   subCategories.forEach((sub) => {
-    const levelData = levelStats?.find((l) => l.level === sub.subCategoryId);
+    const levelData = levelStats.find((l) => toNumber(l.level) === sub.subCategoryId);
     console.log(levelData, "levelData");
-    const employeeCount = levelData ? levelData.employeeCount : 0;
-    const salarySum = levelData?.salarySum ? Number(levelData?.salarySum) : 0;
-    const epfSum = levelData?.epfSum ? Number(levelData?.epfSum) : 0;
-    const insuranceSum = levelData?.insuranceSum ? Number(levelData?.insuranceSum) : 0;
-    const pwgPldSum = levelData?.pgwPldSum ? Number(levelData?.pgwPldSum) : 0;
-    const bonusSum = levelData?.bonusSum ? Number(levelData?.bonusSum) : 0;
-    const gratuitySum = levelData?.gratuitySum ? Number(levelData?.gratuitySum) : 0;
+    const employeeCount = toNumber(levelData?.employeeCount);
+    const salarySum = toNumber(levelData?.salarySum);
+    const epfSum = toNumber(levelData?.epfSum);
+    const insuranceSum = toNumber(levelData?.insuranceSum);
+    const pwgPldSum = toNumber(levelData?.pgwPldSum);
+    const bonusSum = toNumber(levelData?.bonusSum);
+    const gratuitySum = toNumber(levelData?.gratuitySum);
 
     if (sub.subCategoryId <= 14) {
-      q1OSum += Number(employeeCount);
-      q2OSum += Number(employeeCount);
-      q3OSum += Number(employeeCount);
-      q4OSum += Number(employeeCount);
+      q1OSum += employeeCount;
+      q2OSum += employeeCount;
+      q3OSum += employeeCount;
+      q4OSum += employeeCount;
 
       aprOSum += epfSum + insuranceSum;
       mayOSum += epfSum + pwgPldSum / 4;
@@ -228,7 +248,7 @@ export function applyLevelStats(
         Q4: salarySum * 3,
         Total: salarySum * 12,
         budgetDetailsId: 0,
-      } as any;
+      };
 
       avgQty[sub.subCategoryId] = {
         Apr: employeeCount != 0 ? salarySum / employeeCount : 0,
@@ -271,7 +291,7 @@ export function applyLevelStats(
           aprOSum + mayOSum + junOSum + julOSum + augOSum + sepOSum +
           octOSum + novOSum + decOSum + janOSum + febOSum + marOSum,
         budgetDetailsId: 0,
-      } as any;
+      };
 
       avgQty[sub.subCategoryId] = {
         Apr: employeeCount != 0 ? aprOSum / q1OSum : 0,
@@ -309,7 +329,7 @@ export function applyQuarterStats(
   initialData: TableData,
   initialAvgQty: avgQtySchema,
   subCategories: SubCategory[],
-  quarterStats: Record<QuarterKey, Array<any> | undefined>,
+  quarterStats: Record<QuarterKey, LevelStat[] | undefined>,
 ) {
   const tableData: TableData = { ...initialData };
   const avgQty: avgQtySchema = { ...initialAvgQty };
@@ -347,8 +367,8 @@ export function applyQuarterStats(
   const aggregatedSubCategoryIds: number[] = [];
 
   const getStatsForLevel = (q: QuarterKey, levelId: number) => {
-    const stats = quarterStats[q] ?? [];
-    return stats.find((item) => Number(item.level) === levelId);
+    const stats: LevelStat[] = quarterStats[q] ?? [];
+    return stats.find((item) => toNumber(item.level) === levelId);
   };
 
   subCategories.forEach((sub) => {
@@ -413,7 +433,7 @@ export function applyQuarterStats(
         Q4: salaryQ4 * 3,
         Total: salaryQ1 * 3 + salaryQ2 * 3 + salaryQ3 * 3 + salaryQ4 * 3,
         budgetDetailsId: 0,
-      } as any;
+      };
 
       avgQty[levelId] = {
         Apr: empQ1 ? salaryQ1 / empQ1 : 0,
@@ -515,7 +535,7 @@ export function applyQuarterStats(
       Q4: q4Total,
       Total: totalFy,
       budgetDetailsId: 0,
-    } as any;
+    };
 
     avgQty[subId] = {
       Apr: qty1 ? apr / qty1 : 0,
@@ -551,7 +571,7 @@ export function handlePersonnelSaveSuccess(
   handelnputDisable: (disable: boolean) => void,
   setSaveBtnState: (state: "loading" | "edit" | "save") => void
 ) {
-  import("react-toastify").then(({ toast }) => {
+  void import("react-toastify").then(({ toast }) => {
     toast.success("Successfully Saved", {
       position: "bottom-center",
       autoClose: 1000,
@@ -583,7 +603,7 @@ export function handlePersonnelSaveSuccess(
 export function handlePersonnelSaveError(
   setSaveBtnState: (state: "loading" | "edit" | "save") => void
 ) {
-  import("react-toastify").then(({ toast }) => {
+  void import("react-toastify").then(({ toast }) => {
     toast.warn("Error while saving", {
       position: "bottom-center",
       autoClose: 1000,

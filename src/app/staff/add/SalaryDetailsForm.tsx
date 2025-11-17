@@ -89,18 +89,8 @@ const SalaryDetailsForm: React.FC<SalaryDetailsFormProps> = ({
 
   const { mutate: editStaff } =
     api.post.editStaff.useMutation({
-      async onSuccess(data) 
-      {
-        toast.success("Successfully Saved", {
-          position: "bottom-left",
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+      async onSuccess() {
+        // No toast here; success notification handled after salary details save
       },
       onError(err) {
         toast.error(`Failed to Save ${err.message}`, {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
 import { Button, Flex } from "@radix-ui/themes";
@@ -47,6 +47,28 @@ const typeMapping: typeMappingSchema[] = [
   { label: "Part time Consultant", value: "PTC" },
 ];
 
+const levelDesignationMap = new Map<string, string>([
+  ["1", "Assistant"],
+  ["I", "Assistant"],
+  ["2", "Associate"],
+  ["II", "Associate"],
+  ["3", "Manager"],
+  ["III", "Manager"],
+  ["4", "Senior Manager"],
+  ["IV", "Senior Manager"],
+  ["5", "AVP"],
+  ["V", "AVP"],
+  ["6", "VP"],
+  ["VI", "VP"],
+  ["7", "CXO/Director"],
+  ["VII", "CXO/Director"],
+  ["OTHERS", "Intern"],
+]);
+
+const DEFAULT_DESIGNATION = "Intern";
+
+const levelOrder = ["Others", "I", "II", "III", "IV", "V", "VI", "VII"];
+
 const BasicDetails: React.FC<ItemDetailProps> = ({
   setIsModalOpen,
   refetchStaffs,
@@ -72,6 +94,9 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
 
   const stateName = watch("stateData");
   const departmentId = watch("departmenData");
+  const selectedLevel = watch("levelData");
+  const selectedLevelValue = selectedLevel?.value;
+  const selectedLevelLabel = selectedLevel?.label;
 
   const { mutate: addStaff } = api.post.addStaff.useMutation({
     async onSuccess(data) {
@@ -119,6 +144,26 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         ? { deptId: Number(departmentId?.value) }
         : { deptId: undefined },
     );
+
+  const orderedLevels = useMemo(() => {
+    const labelOrder = new Map(
+      levelOrder.map((label, index) => [label.toLowerCase(), index]),
+    );
+
+    return [...levelsData].sort((a, b) => {
+      const aLabel = String(a?.label ?? "").toLowerCase();
+      const bLabel = String(b?.label ?? "").toLowerCase();
+
+      const aIndex = labelOrder.get(aLabel) ?? levelOrder.length;
+      const bIndex = labelOrder.get(bLabel) ?? levelOrder.length;
+
+      if (aIndex !== bIndex) {
+        return aIndex - bIndex;
+      }
+
+      return aLabel.localeCompare(bLabel);
+    });
+  }, [levelsData]);
 
   // Filter out inactive departments and subdepartments
   const departmentDataFiltered =
@@ -226,6 +271,34 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   useEffect(() => {
     void subDeptRefetch();
   }, [subDeptRefetch, departmentId]);
+
+  useEffect(() => {
+    const valueKey = selectedLevelValue?.toString();
+    const labelKey = selectedLevelLabel?.toString();
+
+    if (!valueKey && !labelKey) {
+      return;
+    }
+
+    const keysToTry = [labelKey, valueKey]
+      .filter((key): key is string => Boolean(key))
+      .map((key) => key.trim().toUpperCase());
+
+    let designation = DEFAULT_DESIGNATION;
+
+    for (const key of keysToTry) {
+      const mappedDesignation = levelDesignationMap.get(key);
+      if (mappedDesignation) {
+        designation = mappedDesignation;
+        break;
+      }
+    }
+
+    setValue("designation", designation, {
+      shouldValidate: true,
+      shouldDirty: false,
+    });
+  }, [selectedLevelValue, selectedLevelLabel, setValue]);
 
   // Clear sub-department when department changes to one without sub-departments
   useEffect(() => {
@@ -343,10 +416,16 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
             control={control}
             render={({ field }) => (
               <Select
-                onChange={field.onChange}
-                options={levelsData}
+                {...field}
+                options={orderedLevels}
                 placeholder="Select Level"
                 isClearable
+                getOptionValue={(option) =>
+                  String(option?.value ?? option?.label ?? "")
+                }
+                getOptionLabel={(option) =>
+                  String(option?.label ?? option?.value ?? "")
+                }
                 aria-invalid={!!errors.levelData}
               />
             )}

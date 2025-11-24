@@ -84,7 +84,7 @@ export const roleMasterInFinanceProject = financeProject.table("role_master", {
 });
 
 export const salaryDetailsInFinanceProject = financeProject.table("salary_details", {
-	id: integer("id").default(sql`nextval('finance_project.salary_details_id_seq')`).primaryKey().notNull(),
+	id: integer("id").default(sql`nextval('finance_project.salary_details_id_seq'::regclass)`).primaryKey().notNull(),
 	empId: integer("emp_id").notNull(),
 	salary: numeric("salary", { precision: 8, scale:  2 }).notNull(),
 	insurance: numeric("insurance", { precision: 8, scale:  2 }),
@@ -276,7 +276,7 @@ export const staffMasterInFinanceProject = financeProject.table("staff_master", 
 	project: varchar("project", { length: 255 }),
 	dateOfJoining: date("date_of_joining"),
 	dateOfResigning: date("date_of_resigning"),
-	hired: text("hired"),
+	hired: boolean("hired").default(true),
 },
 (table) => {
 	return {

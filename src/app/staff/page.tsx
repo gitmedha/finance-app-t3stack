@@ -129,7 +129,7 @@ export default function Staff() {
   const filteredStaffs =
   (result?.staffs ?? []).filter((s) => {
     if (!filters.hiredStatus) return true; // ALL
-    return s.hired === "false"; // Show only not hired staff
+    return s.hired === false; // Show only not hired staff
   });
 
  

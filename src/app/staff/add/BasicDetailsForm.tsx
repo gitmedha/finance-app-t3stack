@@ -36,7 +36,7 @@ interface StaffFormData {
   createdAt: string;
   dateOfJoining: string;
   dateOfResigning: string;
-  hired: string;
+  hired: boolean;
 }
 
 const typeMapping: typeMappingSchema[] = [
@@ -233,8 +233,8 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
         })(),
         dateOfJoining: data.dateOfJoining,
         dateOfResigning: null,
-        // Set hired status based on mode: "false" for TBH mode, "hired" for normal mode
-        hired: mode === "tbh" ? "false" : "true",
+        // hired flag is boolean in API; TBH mode means not hired yet
+        hired: mode === "tbh" ? false : true,
       };
     
       setActiveStaffDetails(submissionData);

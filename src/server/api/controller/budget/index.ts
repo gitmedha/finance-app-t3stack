@@ -1233,6 +1233,7 @@ export const getPersonalCatDetials = protectedProcedure
       catId: z.number(),
       activity: z.string().optional(),
       financialYear: z.string(),
+      hired: z.boolean().optional(),
     }),
   )
   .query(async ({ ctx, input }) => {
@@ -1448,6 +1449,13 @@ export const getPersonalCatDetials = protectedProcedure
         levelStatsBaseCondition.push(
           eq(staffMasterInFinanceProject.subDeptid, input.subdeptId),
         );
+        const levelStatsWhere: SQLWrapper[] = [
+          eq(staffMasterInFinanceProject.isactive, true),
+        ];
+        
+        if (typeof input.hired === "boolean") {
+          levelStatsWhere.push(eq(staffMasterInFinanceProject.hired, input.hired));
+        }
      
       const levelStats = await ctx.db
         .select({
@@ -1488,11 +1496,9 @@ export const getPersonalCatDetials = protectedProcedure
             staffMasterInFinanceProject.id,
           ),
         )
-        .where(and(
-          // isNotNull(salaryDetailsInFinanceProject.salary),
-          eq(staffMasterInFinanceProject.isactive, true),
-        ))
+        .where(and(...levelStatsWhere))
         .groupBy(staffMasterInFinanceProject.level);
+      console.log(levelStats, "levelStats");
 
       const quarterRanges = getQuarterDateRanges(input.financialYear);
       const quarterStatsEntries = await Promise.all(
@@ -1540,8 +1546,8 @@ export const getPersonalCatDetials = protectedProcedure
             )
             .where(
               and(
-                ...levelStatsBaseCondition,
                 lte(staffMasterInFinanceProject.dateOfJoining, range.end),
+                eq(staffMasterInFinanceProject.hired, !!input.hired),
                 or(
                   isNull(staffMasterInFinanceProject.dateOfResigning),
                   gte(staffMasterInFinanceProject.dateOfResigning, range.start),

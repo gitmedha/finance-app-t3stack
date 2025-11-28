@@ -11,7 +11,11 @@ import {
   avgQtySchema,
 } from "./types/personnelCost";
 import { months, bandLevelMapping } from "./Constants/personnelCostConstants";
-import { buildInitialState, applyBudgetResults, applyQuarterStats } from "./Service/personnelCostHelper";
+import {
+  buildInitialState,
+  applyBudgetResults,
+  applyQuarterStats,
+} from "./Service/personnelCostHelper";
 
 const PersonnelCost: React.FC<PersonnelCostProps> = ({
   section,
@@ -37,6 +41,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
     totalFY: 0,
   });
   const [inputStates, setInputStates] = useState<boolean>(true);
+  const [hired, setHired] = useState<boolean>(false);
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession();
   const { data: personnelCostData, isLoading: personnelCostDataLodaing } =
@@ -47,6 +52,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
         catId: categoryId,
         deptId: Number(deptId),
         financialYear: financialYear,
+        hired: hired,
       },
       {
         refetchOnMount: false,
@@ -54,7 +60,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
         staleTime: 0,
       },
     );
- console.log(personnelCostData, "personnelCostData");
+  console.log(personnelCostData, "personnelCostData");
   const handelnputDisable = (disable: boolean) => {
     const subcategoryIds = [];
     setInputStates(disable);
@@ -172,7 +178,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
 
         if (personnelCostData.result && personnelCostData.result.length > 0) {
           setSaveBtnState("edit");
-          const { tableData: td, avgQty: aq, totals } = applyBudgetResults(
+          const {
+            tableData: td,
+            avgQty: aq,
+            totals,
+          } = applyBudgetResults(
             initialData,
             initialAvgQty,
             personnelCostData.result,
@@ -182,7 +192,11 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
           setTotalQty(totals);
         } else if (personnelCostData.quarterStats) {
           setSaveBtnState("save");
-          const { tableData: td, avgQty: aq, totals } = applyQuarterStats(
+          const {
+            tableData: td,
+            avgQty: aq,
+            totals,
+          } = applyQuarterStats(
             initialData,
             initialAvgQty,
             personnelCostData.subCategories,
@@ -269,7 +283,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               });
               return updatedData;
             });
-           
           },
           onError: (error) => {
             setSaveBtnState("save");
@@ -311,7 +324,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       const subCategoryData = updatedData[subCategoryId];
       if (!subCategoryData || !avgQty[subCategoryId]) return updatedData;
       if (month == "Apr" || month == "May" || month == "Jun") {
-      
         const diff = Number(value) - Number(subCategoryData[month]);
         updateTotalQtyVals("totalQ1", diff);
 
@@ -331,7 +343,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       }
       if (month == "Jul" || month == "Aug" || month == "Sep") {
         const diff = Number(value) - Number(subCategoryData[month]);
-      
+
         updateTotalQtyVals("totalQ2", diff);
 
         // Update Q2 total for this subcategory
@@ -539,7 +551,6 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               theme: "light",
             });
             handelnputDisable(true);
-          
           },
           onError: (error) => {
             throw new Error(JSON.stringify(error));
@@ -570,7 +581,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
       onTotalsChange(totalQty);
     }
   }, [totalQty]);
- 
+
   return (
     <div className="my-6 rounded-md bg-white shadow-lg">
       <details
@@ -580,26 +591,45 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
           e.preventDefault();
         }}
       >
+        
         <summary
-          className="flex grid-cols-[1.2fr_repeat(5,minmax(0,1fr))_min-content] items-center justify-center gap-4 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:cursor-pointer hover:border-primary/40 hover:shadow-sm md:grid"
-          // style={{ gridAutoRows: "minmax(60px, auto)" }}
-          onClick={(e) => {
+          className="flex flex-wrap items-center gap-3 rounded-md border border-primary/20 bg-primary/10 p-2 font-medium text-primary transition-all hover:cursor-pointer hover:border-primary/40 hover:shadow-sm md:grid md:grid-cols-[0.68fr_100px_repeat(5,1fr)_min-content]"
+          onClick={(e) => { 
+            const target = e.target as HTMLElement;
+            if (target.closest('[data-hired-filter="true"]')) {
+              e.stopPropagation();
+              return;
+            }
             e.preventDefault();
             setSectionOpen(sectionOpen === "PERSONNEL" ? null : "PERSONNEL");
           }}
         >
           {[
-            // 1) Section title in col 1
-            <h1 key="section" className="text-md capitalize">
+            <h1 key="section" className="text-md whitespace-nowrap capitalize">
               {section.toLowerCase()}
             </h1>,
 
-            // 2–6) Q1–Q4 + Total in cols 2–6
+            // Dropdown next to section title
+            <select
+              key="hired-filter"
+              value={hired ? "ALL" : "TBH"}
+              onChange={(event) => setHired(event.target.value === "ALL")}
+              data-hired-filter="true"
+              onClick={(e) => e.stopPropagation()}
+              className="rounded-md border border-primary bg-white px-3 py-1 text-sm font-medium text-primary shadow-sm outline-none transition focus:border-primary md:ml-0"
+            >
+              <option value="ALL" className="border-b border-primary py-1">
+                ALL
+              </option>
+              <option value="TBH" className="border-b border-primary py-1">
+                TBH
+              </option>
+            </select>,
+
             ...(["Q1", "Q2", "Q3", "Q4", "Total"] as const).map((label) => (
               <div
                 key={label}
-                className="flex hidden w-full flex-col items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1 text-center md:flex xl:flex-row xl:justify-center xl:gap-1"
-                // style={{ minHeight: "50px" }}
+                className="hidden w-full flex-col items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1 text-center md:flex xl:flex-row xl:justify-center xl:gap-1"
               >
                 <span className="text-sm font-medium">{label}:</span>{" "}
                 <span className="overflow-hidden text-ellipsis">
@@ -611,11 +641,9 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
               </div>
             )),
 
-            // 7) Arrow in col 7
             <span
               key="arrow"
-              // className="text-lg font-bold transition-transform group-open:rotate-90"
-              className="self-center justify-self-end text-lg font-bold transition-transform group-open:rotate-90"
+              className="self-center justify-self-end text-lg font-bold transition-transform"
             >
               →
             </span>,

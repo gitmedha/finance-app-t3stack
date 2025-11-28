@@ -67,7 +67,7 @@ export const getStaffs = protectedProcedure
     const levelCondition =
       level === 0 ? undefined : eq(staffMaster.level, level);
     const hiredStatusCondition =
-      hiredStatus === "not-hired" ? eq(staffMaster.hired, "false") : undefined;
+      hiredStatus === "not-hired" ? eq(staffMaster.hired, false) : undefined;
 
     const staffs = await ctx.db
       .select({
@@ -227,7 +227,7 @@ export const addStaff = protectedProcedure
       subDeptId: z.number().optional().nullable(),
       dateOfJoining: z.string().optional().nullable(),
       dateOfResigning: z.string().optional().nullable(),
-      hired: z.string().optional().nullable(),
+      hired: z.boolean().optional().nullable(),
     }),
   )
   .mutation(async ({ ctx, input }) => {
@@ -294,7 +294,7 @@ export const editStaff = protectedProcedure
       project: z.string().optional(),
       email: z.string().email().optional(),
       dateOfJoining: z.string().optional().nullable(),
-      hired: z.string().optional(),
+      hired: z.boolean().optional(),
       updatedBy: z.number().min(1, "Invalid updater ID"),
       updatedAt: z.string(),
       subDeptid: z.number().optional().nullable(),

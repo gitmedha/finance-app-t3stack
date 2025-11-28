@@ -57,7 +57,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
   const { setActiveStaffId } = useStaff();
   
   // Add state for hired checkbox
-  const [isHired, setIsHired] = useState(item.hired === "true" || item.hired === "hired");
+  const [isHired, setIsHired] = useState(Boolean(item.hired));
   const {
     register,
     control,
@@ -128,7 +128,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
          subDeptid: data.subDeptData?.value ? Number(data.subDeptData.value) : null,
          email: data.email,
          dateOfJoining: data.dateOfJoining,
-         hired: isHired ? "true" : "false",
+         hired: isHired,
          updatedBy: userData.data?.user.id ?? 1,
          isactive: true,
          updatedAt: new Date().toISOString().split("T")[0] ?? "",
@@ -519,7 +519,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
               className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
             />
             <label htmlFor="hired-checkbox" className="text-sm font-medium cursor-pointer">
-              {isHired ? "Hired" : "Hired"}
+              {isHired ? "Hired" : "TBH"}
             </label>
           </div>
         </div>

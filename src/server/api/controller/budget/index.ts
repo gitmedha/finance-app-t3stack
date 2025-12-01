@@ -1256,9 +1256,7 @@ export const getPersonalCatDetials = protectedProcedure
         )
         .where(eq(categoryHierarchyInFinanceProject.parentId, input.catId));
       if (!subCategories) throw new Error("Failed to get the subcategories");
-      // we going to get the sub departments
 
-      // category budgetDetails call
       const baseConditions = [
         eq(budgetDetailsInFinanceProject.catid, input.catId),
       ];
@@ -1298,7 +1296,6 @@ export const getPersonalCatDetials = protectedProcedure
       if (input.activity == "0") {
         result = await ctx.db
           .select({
-            // budgetDetailsIds: sql`ARRAY_AGG(${budgetDetailsInFinanceProject.id})`.as("budgetDetailsIds"),
             subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
             budgetId: budgetDetailsInFinanceProject.budgetid,
             april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
@@ -1372,7 +1369,6 @@ export const getPersonalCatDetials = protectedProcedure
         ];
         result = await ctx.db
           .select({
-            // budgetDetailsIds: sql`ARRAY_AGG(${budgetDetailsInFinanceProject.id})`.as("budgetDetailsIds"),
             subcategoryId: budgetDetailsInFinanceProject.subcategoryId,
             april: sql`SUM(${budgetDetailsInFinanceProject.april})`.as("april"),
             may: sql`SUM(${budgetDetailsInFinanceProject.may})`.as("may"),
@@ -1437,10 +1433,7 @@ export const getPersonalCatDetials = protectedProcedure
           .where(and(...baseConditions));
       }
       // make a call for staff count
-      const levelStatsBaseCondition: (SQLWrapper | undefined)[] = [
-        // isNotNull(salaryDetailsInFinanceProject.salary),
-        // eq(staffMasterInFinanceProject.isactive, true),
-      ];
+      const levelStatsBaseCondition: (SQLWrapper | undefined)[] = [];
       if (input.deptId != 0)
         levelStatsBaseCondition.push(
           eq(staffMasterInFinanceProject.department, input.deptId),
@@ -1449,8 +1442,10 @@ export const getPersonalCatDetials = protectedProcedure
         levelStatsBaseCondition.push(
           eq(staffMasterInFinanceProject.subDeptid, input.subdeptId),
         );
+        
         const levelStatsWhere: SQLWrapper[] = [
           eq(staffMasterInFinanceProject.isactive, true),
+          eq(salaryDetailsInFinanceProject.isactive, true),
         ];
         
         if (typeof input.hired === "boolean") {
@@ -1496,9 +1491,8 @@ export const getPersonalCatDetials = protectedProcedure
             staffMasterInFinanceProject.id,
           ),
         )
-        .where(and(...levelStatsWhere))
+        .where(and(...levelStatsWhere, ...levelStatsBaseCondition))
         .groupBy(staffMasterInFinanceProject.level);
-      console.log(levelStats, "levelStats");
 
       const quarterRanges = getQuarterDateRanges(input.financialYear);
       const quarterStatsEntries = await Promise.all(
@@ -1552,6 +1546,8 @@ export const getPersonalCatDetials = protectedProcedure
                   isNull(staffMasterInFinanceProject.dateOfResigning),
                   gte(staffMasterInFinanceProject.dateOfResigning, range.start),
                 ),
+                eq(salaryDetailsInFinanceProject.isactive, true),
+                ...levelStatsBaseCondition,
               ),
             )
             .groupBy(staffMasterInFinanceProject.level);

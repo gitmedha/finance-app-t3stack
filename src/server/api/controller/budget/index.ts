@@ -1433,7 +1433,7 @@ export const getPersonalCatDetials = protectedProcedure
           .where(and(...baseConditions));
       }
       // make a call for staff count
-      const levelStatsBaseCondition: (SQLWrapper | undefined)[] = [];
+      const levelStatsBaseCondition: SQLWrapper[] = [];
       if (input.deptId != 0)
         levelStatsBaseCondition.push(
           eq(staffMasterInFinanceProject.department, input.deptId),
@@ -1499,6 +1499,24 @@ export const getPersonalCatDetials = protectedProcedure
         (Object.entries(quarterRanges) as Array<
           [QuarterKey, { start: string; end: string }]
         >).map(async ([quarterKey, range]) => {
+          const resignationWindow = or(
+            isNull(staffMasterInFinanceProject.dateOfResigning),
+            gte(staffMasterInFinanceProject.dateOfResigning, range.start),
+          ) as SQLWrapper;
+
+          const quarterLevelStatsWhere: SQLWrapper[] = [
+            lte(staffMasterInFinanceProject.dateOfJoining, range.end),
+            resignationWindow,
+            eq(salaryDetailsInFinanceProject.isactive, true),
+            ...levelStatsBaseCondition,
+          ];
+
+          if (typeof input.hired === "boolean") {
+            quarterLevelStatsWhere.push(
+              eq(staffMasterInFinanceProject.hired, input.hired),
+            );
+          }
+
           const quarterLevelStats = await ctx.db
             .select({
               level: staffMasterInFinanceProject.level,
@@ -1538,18 +1556,7 @@ export const getPersonalCatDetials = protectedProcedure
                 staffMasterInFinanceProject.id,
               ),
             )
-            .where(
-              and(
-                lte(staffMasterInFinanceProject.dateOfJoining, range.end),
-                eq(staffMasterInFinanceProject.hired, !!input.hired),
-                or(
-                  isNull(staffMasterInFinanceProject.dateOfResigning),
-                  gte(staffMasterInFinanceProject.dateOfResigning, range.start),
-                ),
-                eq(salaryDetailsInFinanceProject.isactive, true),
-                ...levelStatsBaseCondition,
-              ),
-            )
+            .where(and(...quarterLevelStatsWhere))
             .groupBy(staffMasterInFinanceProject.level);
 
           return [quarterKey, quarterLevelStats];

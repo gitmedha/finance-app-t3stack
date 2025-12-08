@@ -52,7 +52,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
         catId: categoryId,
         deptId: Number(deptId),
         financialYear: financialYear,
-        hired: hired ?? undefined,
+        hired: hired ?? null,
       },
       {
         refetchOnMount: false,

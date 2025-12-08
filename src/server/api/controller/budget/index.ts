@@ -1233,7 +1233,7 @@ export const getPersonalCatDetials = protectedProcedure
       catId: z.number(),
       activity: z.string().optional(),
       financialYear: z.string(),
-      hired: z.boolean().optional(),
+      hired: z.boolean().optional().nullable(),
     }),
   )
   .query(async ({ ctx, input }) => {

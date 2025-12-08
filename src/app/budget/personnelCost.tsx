@@ -41,7 +41,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
     totalFY: 0,
   });
   const [inputStates, setInputStates] = useState<boolean>(true);
-  const [hired, setHired] = useState<boolean>(true);
+  const [hired, setHired] = useState<boolean | null>(true);
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession();
   const { data: personnelCostData, isLoading: personnelCostDataLodaing } =
@@ -52,7 +52,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
         catId: categoryId,
         deptId: Number(deptId),
         financialYear: financialYear,
-        hired: hired,
+        hired: hired ?? null,
       },
       {
         refetchOnMount: false,
@@ -612,14 +612,22 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
             // Dropdown next to section title
             <select
               key="hired-filter"
-              value={hired ? "ALL" : "TBH"}
-              onChange={(event) => setHired(event.target.value === "ALL")}
+              value={hired === null ? "ALL" : hired ? "Hired" : "TBH"}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (value === "Hired") setHired(true);
+                else if (value === "TBH") setHired(false);
+                else setHired(null);
+              }}
               data-hired-filter="true"
               onClick={(e) => e.stopPropagation()}
               className="rounded-md border border-primary bg-white px-3 py-1 text-sm font-medium text-primary shadow-sm outline-none transition focus:border-primary md:ml-0"
             >
               <option value="ALL" className="border-b border-primary py-1">
-                ALL
+                All
+              </option>
+              <option value="Hired" className="border-b border-primary py-1">
+                Hired
               </option>
               <option value="TBH" className="border-b border-primary py-1">
                 TBH

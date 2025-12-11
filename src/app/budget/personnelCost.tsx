@@ -41,7 +41,7 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
     totalFY: 0,
   });
   const [inputStates, setInputStates] = useState<boolean>(true);
-  const [hired, setHired] = useState<boolean | null>(true);
+  const [hired, setHired] = useState<boolean | null>(null);
   const [tableData, setTableData] = useState<TableData>({});
   const userData = useSession();
   const { data: personnelCostData, isLoading: personnelCostDataLodaing } =

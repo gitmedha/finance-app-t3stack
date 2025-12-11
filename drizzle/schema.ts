@@ -412,4 +412,5 @@ export const budgetDetailsInFinanceProject = financeProject.table("budget_detail
 	janTrips: integer("jan_trips"),
 	febTrips: integer("feb_trips"),
 	marTrips: integer("mar_trips"),
+	hired: boolean("hired"),
 });

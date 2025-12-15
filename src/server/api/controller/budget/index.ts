@@ -1291,6 +1291,12 @@ export const getPersonalCatDetials = protectedProcedure
           eq(budgetDetailsInFinanceProject.activity, input.activity),
         );
       }
+      // Add hired condition if it is not null or undefined
+      if (typeof input.hired === "boolean") {
+        baseConditions.push(
+          eq(budgetDetailsInFinanceProject.hired, input.hired),
+        );
+      }
       let result;
       // Execute the query with all conditions
       if (input.activity == "0") {
@@ -4137,6 +4143,7 @@ export const savePersonalBudgetDetails = protectedProcedure
           qty4: z.number().optional(),
           rate4: z.string().optional(),
           amount4: z.string().optional(),
+          hired: z.boolean(),
         }),
       ),
     }),
@@ -4159,6 +4166,7 @@ export const savePersonalBudgetDetails = protectedProcedure
                 budgetDetailsInFinanceProject.subcategoryId,
                 item.subcategoryId,
               ),
+              eq(budgetDetailsInFinanceProject.hired, item.hired),
               eq(budgetDetailsInFinanceProject.activity, item.activity ?? ""),
               eq(budgetDetailsInFinanceProject.subDeptid, item.subDeptId),
             ),
@@ -4227,6 +4235,7 @@ export const savePersonalBudgetDetails = protectedProcedure
               parseInt(item.february.trim() === "" ? "0" : item.february) +
               parseInt(item.march.trim() === "" ? "0" : item.march)
             ).toString(),
+            hired: item.hired,
           });
         }
       }
@@ -4266,6 +4275,7 @@ export const savePersonalBudgetDetails = protectedProcedure
             qty2: item.qty2 ?? 0,
             qty3: item.qty3 ?? 0,
             qty4: item.qty4 ?? 0,
+          hired: item.hired,
           };
           await ctx.db
             .update(budgetDetailsInFinanceProject)
@@ -4339,6 +4349,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
           qty4: z.number().optional(),
           rate4: z.string().optional(),
           amount4: z.string().optional(),
+          hired: z.boolean(),
         }),
       ),
     }),
@@ -4406,6 +4417,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
             parseInt(item.february.trim() === "" ? "0" : item.february) +
             parseInt(item.march.trim() === "" ? "0" : item.march)
           ).toString(),
+          hired: item.hired,
         };
 
         // Update record in the database
@@ -4439,6 +4451,7 @@ export const updatePersonalBudgetDetails = protectedProcedure
             qty2: item.qty2 ?? 0,
             qty3: item.qty3 ?? 0,
             qty4: item.qty4 ?? 0,
+          hired: item.hired,
           };
           await ctx.db
             .update(budgetDetailsInFinanceProject)

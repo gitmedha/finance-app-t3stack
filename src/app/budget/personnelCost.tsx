@@ -15,6 +15,7 @@ import {
   buildInitialState,
   applyBudgetResults,
   applyQuarterStats,
+  buildPersonnelUpdatePayload,
 } from "./Service/personnelCostHelper";
 
 const PersonnelCost: React.FC<PersonnelCostProps> = ({
@@ -489,48 +490,16 @@ const PersonnelCost: React.FC<PersonnelCostProps> = ({
     api.post.updatePersonalBudgetDetails.useMutation();
   const handleUpdate = async () => {
     setSaveBtnState("loading");
-    const budgetDetails = Object.entries(tableData).map(
-      ([subCategoryId, data]) => ({
-        budgetDetailsId: data.budgetDetailsId,
-        catid: categoryId,
-        subcategoryId: parseInt(subCategoryId, 10),
-        // need to be removed
-        unit: 1,
-        rate: "1",
-        total: "1",
-        currency: "INR",
-        notes: "",
-        description: "",
-        april: (data.Apr ?? "0").toString(),
-        may: (data.May ?? "0").toString(),
-        june: (data.Jun ?? "0").toString(),
-        july: (data.Jul ?? "0").toString(),
-        august: (data.Aug ?? "0").toString(),
-        september: (data.Sep ?? "0").toString(),
-        october: (data.Oct ?? "0").toString(),
-        november: (data.Nov ?? "0").toString(),
-        december: (data.Dec ?? "0").toString(),
-        january: (data.Jan ?? "0").toString(),
-        february: (data.Feb ?? "0").toString(),
-        march: (data.Mar ?? "0").toString(),
-        updatedBy: userData.data?.user.id ?? 1,
-        updatedAt: new Date().toISOString(),
-        rate1: (data.rate1 ?? "0").toString(),
-        rate2: (data.rate2 ?? "0").toString(),
-        rate3: (data.rate3 ?? "0").toString(),
-        rate4: (data.rate4 ?? "0").toString(),
-        amount1: (data.amount1 ?? "0").toString(),
-        amount2: (data.amount2 ?? "0").toString(),
-        amount3: (data.amount3 ?? "0").toString(),
-        amount4: (data.amount4 ?? "0").toString(),
-        qty1: Number(data.Qty1),
-        qty2: Number(data.Qty2),
-        qty3: Number(data.Qty3),
-        qty4: Number(data.Qty4),
-        hired: hired ?? false,
-      }),
+    const budgetDetails = buildPersonnelUpdatePayload(
+      tableData,
+      categoryId,
+      userData.data?.user.id,
+      hired,
     );
     try {
+      console.log(tableData, "tableData");
+      console.log(budgetDetails, "budgetDetails");
+      console.log(budgetId, "budgetId");
       updateBudgetDetails.mutate(
         {
           deptId: parseInt(deptId, 10),

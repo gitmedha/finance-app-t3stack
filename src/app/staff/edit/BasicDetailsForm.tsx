@@ -519,7 +519,7 @@ const BasicDetails: React.FC<ItemDetailProps> = ({
               className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
             />
             <label htmlFor="hired-checkbox" className="text-sm font-medium cursor-pointer">
-              {isHired ? "Hired" : "TBH"}
+             Hired
             </label>
           </div>
         </div>

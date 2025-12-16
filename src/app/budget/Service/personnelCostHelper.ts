@@ -6,24 +6,24 @@ type QuarterKey = "Q1" | "Q2" | "Q3" | "Q4";
 
 type BudgetResultSource = {
   subcategoryId: number;
-  total?: unknown;
-  april?: unknown;
-  may?: unknown;
-  june?: unknown;
-  july?: unknown;
-  august?: unknown;
-  september?: unknown;
-  october?: unknown;
-  november?: unknown;
-  december?: unknown;
-  january?: unknown;
-  february?: unknown;
-  march?: unknown;
-  qty1?: unknown;
-  qty2?: unknown;
-  qty3?: unknown;
-  qty4?: unknown;
-  id?: unknown;
+  total?: number | string | null;
+  april?: number | string | null;
+  may?: number | string | null;
+  june?: number | string | null;
+  july?: number | string | null;
+  august?: number | string | null;
+  september?: number | string | null;
+  october?: number | string | null;
+  november?: number | string | null;
+  december?: number | string | null;
+  january?: number | string | null;
+  february?: number | string | null;
+  march?: number | string | null;
+  qty1?: number | string | null;
+  qty2?: number | string | null;
+  qty3?: number | string | null;
+  qty4?: number | string | null;
+  id?: number | string | null;
 };
 
 type LevelStat = {
@@ -89,6 +89,54 @@ export function buildInitialState(subCategories: SubCategory[]) {
   });
  
   return { initialData, initialAvgQty };
+}
+
+// Helper to build the payload for updatePersonalBudgetDetails from tableData
+export function buildPersonnelUpdatePayload(
+  tableData: TableData,
+  categoryId: number,
+  userId: number | null | undefined,
+  hired: boolean | null,
+) {
+  return Object.entries(tableData).map(([subCategoryId, data]) => ({
+    budgetDetailsId: data.budgetDetailsId,
+    catid: categoryId,
+    subcategoryId: parseInt(subCategoryId, 10),
+    // TODO: unit/rate/total are legacy fields and can be cleaned up later
+    unit: 1,
+    rate: "1",
+    total: "1",
+    currency: "INR",
+    notes: "",
+    description: "",
+    april: (data.Apr ?? "0").toString(),
+    may: (data.May ?? "0").toString(),
+    june: (data.Jun ?? "0").toString(),
+    july: (data.Jul ?? "0").toString(),
+    august: (data.Aug ?? "0").toString(),
+    september: (data.Sep ?? "0").toString(),
+    october: (data.Oct ?? "0").toString(),
+    november: (data.Nov ?? "0").toString(),
+    december: (data.Dec ?? "0").toString(),
+    january: (data.Jan ?? "0").toString(),
+    february: (data.Feb ?? "0").toString(),
+    march: (data.Mar ?? "0").toString(),
+    updatedBy: userId ?? 1,
+    updatedAt: new Date().toISOString(),
+    rate1: (data.rate1 ?? "0").toString(),
+    rate2: (data.rate2 ?? "0").toString(),
+    rate3: (data.rate3 ?? "0").toString(),
+    rate4: (data.rate4 ?? "0").toString(),
+    amount1: (data.amount1 ?? "0").toString(),
+    amount2: (data.amount2 ?? "0").toString(),
+    amount3: (data.amount3 ?? "0").toString(),
+    amount4: (data.amount4 ?? "0").toString(),
+    qty1: Number(data.Qty1),
+    qty2: Number(data.Qty2),
+    qty3: Number(data.Qty3),
+    qty4: Number(data.Qty4),
+    hired: hired ?? false,
+  }));
 }
 
 export function applyBudgetResults(

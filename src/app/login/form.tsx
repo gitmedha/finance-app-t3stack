@@ -55,21 +55,28 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center text-center px-6 md:px-10 pb-6">
+    <div className="w-full flex flex-col items-center justify-center text-center px-6 md:px-10 pb-4">
       <div className="w-full max-w-md">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-black mb-2">Sign in</h2>
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-black mb-1">Sign In</h2>
           <p className="text-sm text-gray-600">
             Enter your credentials to access your account
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full">
-          {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md w-full">
-              {error}
-            </div>
-          )}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-1 w-full">
+          {/* Fixed-height error area to prevent layout shift */}
+          <div
+            className={[
+              "w-full rounded-md border p-2 text-sm transition-opacity",
+              error
+                ? "border-red-200 bg-red-50 text-red-600 opacity-100"
+                : "border-transparent bg-transparent text-transparent opacity-0",
+            ].join(" ")}
+            aria-hidden={!error}
+          >
+            {error ?? "placeholder"}
+          </div>
 
           <div className="w-full flex flex-col gap-2">
             <label className="text-sm font-medium text-black text-left">
@@ -85,11 +92,11 @@ const LoginForm = () => {
               })}
               type="email"
               placeholder="Enter your email address"
-              className="h-10 w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-normal shadow-sm focus:outline-none focus:ring-1 focus:ring-primary/60 focus:border-transparent placeholder:text-gray-400"
+              className="h-9 w-full rounded-md border border-gray-300 px-3 py-2 text-sm font-normal shadow-sm focus:outline-none focus:ring-1 focus:ring-primary/60 focus:border-transparent placeholder:text-gray-400"
             />
-            {errors.email && (
-              <span className="text-red-500 text-xs text-left">{errors.email.message}</span>
-            )}
+            <p className="text-red-500 text-xs text-left h-4 leading-4">
+              {errors.email?.message ?? "\u00A0"}
+            </p>
           </div>
 
           <div className="w-full flex flex-col gap-2">
@@ -101,7 +108,7 @@ const LoginForm = () => {
                 {...register("password", { required: "Password is required" })}
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                className="h-10 w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm font-normal shadow-sm focus:outline-none focus:ring-1 focus:ring-primary/60 focus:border-transparent placeholder:text-gray-400"
+                className="h-9 w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm font-normal shadow-sm focus:outline-none focus:ring-1 focus:ring-primary/60 focus:border-transparent placeholder:text-gray-400"
               />
               <button
                 type="button"
@@ -116,15 +123,15 @@ const LoginForm = () => {
                 )}
               </button>
             </div>
-            {errors.password && (
-              <span className="text-red-500 text-xs text-left">{errors.password.message}</span>
-            )}
+            <p className="text-red-500 text-xs text-left h-4 leading-4">
+              {errors.password?.message ?? "\u00A0"}
+            </p>
           </div>
 
           <Button
             size='3'
             type='submit'
-            className="w-full h-10 text-sm font-medium cursor-pointer !bg-[#32b89d] hover:!bg-[#2aa58d] text-white transition-colors rounded-md"
+            className="w-full h-9 text-sm font-medium cursor-pointer !bg-[#32b89d] hover:!bg-[#2aa58d] text-white transition-colors rounded-md"
             disabled={loading}
           >
             {loading ? "Signing in..." : "Sign in"}

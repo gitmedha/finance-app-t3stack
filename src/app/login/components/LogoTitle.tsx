@@ -12,7 +12,7 @@ export default function LogoTitle() {
       />
 
       <p className="font-bold text-black text-base sm:text-lg md:text-3xl leading-snug text-center mt-4 md:mt-10 sm:mt-10">
-        Finance Management System
+        FinTool
       </p>
     </div>
   );
